@@ -32,5 +32,18 @@ git clone https://github.com/your-username/pensasha-houses.git
 cd pensasha-houses
 ```
 2. Set up the backend:
-   a. Configure application.properties for database connection
-   b. Run the Spring Boot application
+- Configure application.properties for database connection
+- Run the Spring Boot application
+
+3. Set up the frontend:
+```bash
+cd frontend
+npm install
+npm start
+```
+
+## Contributing
+Contributions are welcome! Feel free to fork the repo and submit pull requests.
+
+## License
+This project is licensed under the MIT License.
