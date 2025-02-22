@@ -27,6 +27,10 @@ Pensasha Houses is a web application designed to streamline the management of re
 
 ## Installation
 1. Clone the repository:
-''' bash
+```bash
 git clone https://github.com/your-username/pensasha-houses.git
 cd pensasha-houses
+```
+2. Set up the backend:
+1. Configure application.properties for database connection
+2. Run the Spring Boot application
