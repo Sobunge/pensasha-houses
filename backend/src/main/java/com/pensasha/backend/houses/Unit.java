@@ -1,4 +1,6 @@
-package com.pensasha.backend.user;
+package com.pensasha.backend.houses;
+
+import com.pensasha.backend.user.Tenant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
