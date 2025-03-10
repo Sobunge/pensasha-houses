@@ -2,6 +2,7 @@ package com.pensasha.backend.user;
 
 import java.util.Set;
 
+import com.pensasha.backend.bankDetails.BankDetails;
 import com.pensasha.backend.houses.Property;
 
 import jakarta.persistence.*;

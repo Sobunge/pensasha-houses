@@ -1,4 +1,4 @@
-package com.pensasha.backend.user;
+package com.pensasha.backend.bankDetails;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
