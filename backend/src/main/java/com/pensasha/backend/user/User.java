@@ -1,5 +1,7 @@
 package com.pensasha.backend.user;
 
+import com.pensasha.backend.role.Role;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
