@@ -11,4 +11,14 @@ public class LandLordService {
     @Autowired
     private LandLordRepository landLordRepository;
     
+     //Adding a new user (LandLord)
+
+    //Editing user details (LandLord)
+
+    //Deleting a user (LandLord)
+
+    //Getting a single user (LandLord)
+
+    //Getting all users (LandLord)
+
 }

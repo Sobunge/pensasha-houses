@@ -11,14 +11,14 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    //Adding a new user
+    //Adding a new user (Admin)
 
-    //Editing user details
+    //Editing user details (Admin)
 
-    //Deleting a user
+    //Deleting a user (Admin)
 
-    //Getting a single user
+    //Getting a single user (Admin)
 
-    //Getting all users
+    //Getting all users (Admin)
 
 }

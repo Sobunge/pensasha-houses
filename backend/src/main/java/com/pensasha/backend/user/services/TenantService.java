@@ -11,4 +11,14 @@ public class TenantService {
     @Autowired
     private TenantRepository tenantRepository;
     
+     //Adding a new user (Tenant)
+
+    //Editing user details (Tenant)
+
+    //Deleting a user (Tenant)
+
+    //Getting a single user (Tenant)
+
+    //Getting all users (Tenant)
+
 }
