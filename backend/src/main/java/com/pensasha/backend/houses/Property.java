@@ -2,7 +2,7 @@ package com.pensasha.backend.houses;
 
 import java.util.Set;
 
-import com.pensasha.backend.user.LandLord;
+import com.pensasha.backend.user.models.LandLord;
 
 import jakarta.persistence.*;
 import lombok.*;

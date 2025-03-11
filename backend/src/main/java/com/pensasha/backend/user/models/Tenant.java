@@ -1,4 +1,4 @@
-package com.pensasha.backend.user;
+package com.pensasha.backend.user.models;
 
 import com.pensasha.backend.houses.Unit;
 
