@@ -1,6 +1,10 @@
 package com.pensasha.backend.user.models;
 
+import com.pensasha.backend.role.Role;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -26,8 +30,8 @@ public class UpdateUserDTO {
     @Column(unique = true, nullable = false)
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
     @NotNull(message = "Role is required")
-    @Pattern(regexp = "Admin|LandLord|Tenant|Caretaker", message = "Invalid role. Allowed values: Admin, LandLord, Tenant, Caretaker")
-    private String role;
+    private Role role;
 
 }

@@ -15,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.UpdateUserDTO;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.services.UserService;
@@ -76,13 +74,7 @@ public class UserController {
         user.setThirdName(updatedUserDetails.getThirdName());
         user.setIdNumber(updatedUserDetails.getIdNumber());
         user.setPhoneNumber(updatedUserDetails.getPhoneNumber());
-
-        try {
-            Role newRole = Role.valueOf(updatedUserDetails.getRole());
-            user.setRole(newRole);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        user.setRole(updatedUserDetails.getRole());
 
         User savedUser = userService.addingAnAdmin(user);
 
