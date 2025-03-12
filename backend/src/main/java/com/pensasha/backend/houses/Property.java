@@ -3,6 +3,7 @@ package com.pensasha.backend.houses;
 import java.util.Set;
 
 import com.pensasha.backend.user.models.LandLord;
+import com.pensasha.backend.user.models.User;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,4 +25,9 @@ public class Property {
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Unit> units;
+
+    @ManyToOne
+    @JoinColumn(name = "LandLord_Id")
+    private User user;
+
 }
