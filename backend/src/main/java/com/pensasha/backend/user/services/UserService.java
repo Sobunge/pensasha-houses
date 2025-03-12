@@ -36,8 +36,8 @@ public class UserService {
     }
 
     // Getting all users (Admin)
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     // Getting a user by role
