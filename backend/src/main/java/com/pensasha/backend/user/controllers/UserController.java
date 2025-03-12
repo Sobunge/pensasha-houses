@@ -37,11 +37,12 @@ public class UserController {
 
     // Editing user details (Admin)
     @PutMapping("/{idNumber}")
-    public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber, @RequestBody UpdateUserDTO updatedUserDetails){
+    public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
+            @RequestBody UpdateUserDTO updatedUserDetails) {
 
         Optional<User> optionalUser = userService.gettingUser(idNumber);
 
-        if(optionalUser.isEmpty()){
+        if (optionalUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with the provided ID number");
         }
 
@@ -66,7 +67,7 @@ public class UserController {
                 linkTo(methodOn(UserController.class).getAllUsers()).withRel("all-users"));
 
         return ResponseEntity.status(HttpStatus.OK).body(userModel);
-        
+
     }
 
     // Deleting a user (Admin)
