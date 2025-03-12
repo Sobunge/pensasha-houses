@@ -1,6 +1,7 @@
 package com.pensasha.backend.user.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByRole(Role role);
     void deleteByIdNumber(String idNumber);
-    User findByIdNumber(String idNumber);
+    Optional<User> findByIdNumber(String idNumber);
     Boolean existsByIdNumber(String idNumber);
 
 }
