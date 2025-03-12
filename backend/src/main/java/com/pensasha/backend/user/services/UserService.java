@@ -31,8 +31,8 @@ public class UserService {
     }
 
     // Getting a single user (Admin)
-    public User gettingUser(String idNumber) {
-        return userRepository.findByIdNumber(idNumber).get();
+    public Optional<User> gettingUser(String idNumber) {
+        return userRepository.findByIdNumber(idNumber);
     }
 
     // Getting all users (Admin)
