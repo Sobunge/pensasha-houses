@@ -71,6 +71,22 @@ public class UserController {
     }
 
     // Deleting a user (Admin)
+    @DeleteMapping("/{idNumber}")
+    public ResponseEntity<EntityModel<String>> deleteUser(@PathVariable String idNumber) {
+        Optional<User> user = userService.gettingUser(idNumber);
+
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(EntityModel.of("User not found with the provided ID number"));
+        }
+
+        userService.deleteUser(idNumber);
+
+        EntityModel<String> response = EntityModel.of("User deleted successfully",
+                linkTo(methodOn(UserController.class).getAllUsers()).withRel("all-users"));
+
+        return ResponseEntity.ok(response);
+    }
 
     // Getting a single user (Admin)
 
