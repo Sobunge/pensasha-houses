@@ -6,12 +6,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+@Entity
 @Table(name="users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Inheritance(strategy = InheritanceType.JOINED) // Allows subclasses to extend this entity
 public class User {
 
