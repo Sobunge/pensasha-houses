@@ -1,6 +1,8 @@
 package com.pensasha.backend.user.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -12,6 +14,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +24,8 @@ import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.UpdateUserDTO;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.services.UserService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +46,16 @@ public class UserController {
 
     // Adding a new user (Admin)
     @PostMapping("/register")
-    public ResponseEntity<EntityModel<User>> addUser(@RequestBody User user) {
+    public ResponseEntity<?> addUser(@Valid @RequestBody User user, BindingResult result) {
+
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : result.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+
+            return ResponseEntity.badRequest().body(errors);
+        }
 
         Optional<User> optionalUser = userService.gettingUser(user.getIdNumber());
 
@@ -49,7 +64,7 @@ public class UserController {
                     .body(EntityModel.of(user,
                             linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel()));
         }
-        
+
         User savedUser = userService.addingAnAdmin(user);
 
         EntityModel<User> userModel = EntityModel.of(savedUser,
