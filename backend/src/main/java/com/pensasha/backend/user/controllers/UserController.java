@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +32,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
-@RequestMapping(name = "/user")
+@RequestMapping(path = "/user")
 public class UserController {
 
     @Autowired
@@ -130,27 +130,30 @@ public class UserController {
 
     // Getting all users (Admin)
     @GetMapping("/all")
-    public ResponseEntity<CollectionModel<EntityModel<User>>> getAllUsers(@RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+public ResponseEntity<PagedModel<EntityModel<User>>> getAllUsers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<User> usersPage = userService.getAllUsers(pageable);
+    Pageable pageable = PageRequest.of(page, size);
+    Page<User> usersPage = userService.getAllUsers(pageable);
 
-        if (usersPage.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-
-        List<EntityModel<User>> userResources = usersPage.getContent().stream()
-                .map(user -> EntityModel.of(user,
-                        linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel(),
-                        linkTo(methodOn(UserController.class).getAllUsers(page, size)).withRel("all-users")))
-                .collect(Collectors.toList());
-
-        CollectionModel<EntityModel<User>> response = CollectionModel.of(userResources,
-                linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel());
-
-        return ResponseEntity.ok(response);
-
+    if (usersPage.isEmpty()) {
+        return ResponseEntity.ok(PagedModel.empty());
     }
+
+    List<EntityModel<User>> userResources = usersPage.getContent().stream()
+            .map(user -> EntityModel.of(user,
+                    linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel()))
+            .collect(Collectors.toList());
+
+    PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, usersPage.getTotalElements());
+
+    PagedModel<EntityModel<User>> response = PagedModel.of(userResources, metadata,
+            linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
+            linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
+            linkTo(methodOn(UserController.class).getAllUsers(usersPage.getTotalPages() - 1, size)).withRel("last-page"));
+
+    return ResponseEntity.ok(response);
+        }
 
 }
