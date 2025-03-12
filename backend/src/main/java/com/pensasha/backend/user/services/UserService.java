@@ -27,12 +27,12 @@ public class UserService {
 
     // Deleting a user (Admin)
     public void deleteUser(String idNumber) {
-        userRepository.deleteById(idNumber);
+        userRepository.deleteByIdNumber(idNumber);
     }
 
     // Getting a single user (Admin)
     public User gettingUser(String idNumber) {
-        return userRepository.findById(idNumber).get();
+        return userRepository.findByIdNumber(idNumber).get();
     }
 
     // Getting all users (Admin)
