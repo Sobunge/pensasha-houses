@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 public class LandLord extends User{
     
-    @OneToMany(mappedBy = "User", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "landLord", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Property> Properties;
 
     private BankDetails BankDetails;

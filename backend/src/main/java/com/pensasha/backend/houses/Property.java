@@ -26,8 +26,4 @@ public class Property {
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Unit> units;
 
-    @ManyToOne
-    @JoinColumn(name = "LandLord_Id")
-    private User user;
-
 }
