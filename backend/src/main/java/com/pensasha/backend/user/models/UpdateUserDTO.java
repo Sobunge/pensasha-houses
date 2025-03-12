@@ -1,5 +1,13 @@
 package com.pensasha.backend.user.models;
 
+import com.pensasha.backend.role.Role;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+
 @Data
 public class UpdateUserDTO {
 
