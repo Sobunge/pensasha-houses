@@ -15,6 +15,10 @@ import lombok.*;
 @Inheritance(strategy = InheritanceType.JOINED) // Allows subclasses to extend this entity
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @NotBlank(message = "First name is required")
     @Size(min = 3, max = 20, message = "First name must be between 3 and 20 characters")
     private String firstName;
@@ -25,7 +29,6 @@ public class User {
     @Size(min = 3, max = 20, message = "Third name must be between 3 and 20 characters")
     private String thirdName;
 
-    @Id
     @NotBlank(message = "National ID is required")
     @Pattern(regexp = "^[0-9]{7,8}$", message = "National ID must be 7-8 digits")
     private String idNumber;
