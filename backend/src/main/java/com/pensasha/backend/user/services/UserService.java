@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.role.Role;
@@ -46,8 +48,8 @@ public class UserService {
         return userRepository.findAllByRole(role);
     }
 
-    //Checking if a user exists
-    public Boolean doesUserExist(String idNumber){
+    // Checking if a user exists
+    public Boolean doesUserExist(String idNumber) {
         return userRepository.existsByIdNumber(idNumber);
     }
 
