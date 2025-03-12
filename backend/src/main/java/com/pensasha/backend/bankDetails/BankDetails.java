@@ -6,6 +6,7 @@ import lombok.*;
 
 @Entity
 @Data
+@Table(name = "bank_details")
 @NoArgsConstructor
 @AllArgsConstructor
 public class BankDetails {
