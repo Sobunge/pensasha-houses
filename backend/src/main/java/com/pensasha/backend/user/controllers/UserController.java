@@ -1,5 +1,7 @@
 package com.pensasha.backend.user.controllers;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -89,6 +91,20 @@ public class UserController {
     }
 
     // Getting a single user (Admin)
+    @GetMapping("/{idNumber}")
+    public ResponseEntity<User> gettingUser(@PathVariable String idNumber) {
+        Optional<User> user = userService.gettingUser(idNumber);
+
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        EntityModel<User> response = EntityModel.of(user.get(),
+                linkTo(methodOn(UserController.class).gettingUser(idumber)).withSelfRel(),
+                linkTo(methodOn(UserController.class).getAllUsers()).withRel("all-users"));
+
+        return ResponseEntity.ok(response);
+    }
 
     // Getting all users (Admin)
 
