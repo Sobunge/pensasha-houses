@@ -1,5 +1,6 @@
 package com.pensasha.backend.user.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pensasha.backend.role.Role;
 
 import jakarta.persistence.*;

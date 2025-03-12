@@ -15,11 +15,12 @@ public class WebSecurityConfig {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-        .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                .requestMatchers("/user/register").permitAll().anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers("/user/update/**").authenticated()
+                        .requestMatchers("/user/register").permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
-                  
+
         return http.build();
 
     }

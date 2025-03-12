@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.UpdateUserDTO;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.services.UserService;
@@ -47,7 +49,7 @@ public class UserController {
                     .body(EntityModel.of(user,
                             linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel()));
         }
-
+        
         User savedUser = userService.addingAnAdmin(user);
 
         EntityModel<User> userModel = EntityModel.of(savedUser,
@@ -58,7 +60,7 @@ public class UserController {
     }
 
     // Editing user details (Admin)
-    @PutMapping("/{idNumber}")
+    @PutMapping("/update/{idNumber}")
     public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
             @RequestBody UpdateUserDTO updatedUserDetails) {
 
@@ -74,7 +76,7 @@ public class UserController {
         user.setThirdName(updatedUserDetails.getThirdName());
         user.setIdNumber(updatedUserDetails.getIdNumber());
         user.setPhoneNumber(updatedUserDetails.getPhoneNumber());
-        user.setRole(updatedUserDetails.getRole());
+        user.setRole(Role.ADMIN);
 
         User savedUser = userService.addingAnAdmin(user);
 
@@ -122,30 +124,32 @@ public class UserController {
 
     // Getting all users (Admin)
     @GetMapping("/all")
-public ResponseEntity<PagedModel<EntityModel<User>>> getAllUsers(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<PagedModel<EntityModel<User>>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-    Pageable pageable = PageRequest.of(page, size);
-    Page<User> usersPage = userService.getAllUsers(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> usersPage = userService.getAllUsers(pageable);
 
-    if (usersPage.isEmpty()) {
-        return ResponseEntity.ok(PagedModel.empty());
-    }
-
-    List<EntityModel<User>> userResources = usersPage.getContent().stream()
-            .map(user -> EntityModel.of(user,
-                    linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel()))
-            .collect(Collectors.toList());
-
-    PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, usersPage.getTotalElements());
-
-    PagedModel<EntityModel<User>> response = PagedModel.of(userResources, metadata,
-            linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
-            linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
-            linkTo(methodOn(UserController.class).getAllUsers(usersPage.getTotalPages() - 1, size)).withRel("last-page"));
-
-    return ResponseEntity.ok(response);
+        if (usersPage.isEmpty()) {
+            return ResponseEntity.ok(PagedModel.empty());
         }
+
+        List<EntityModel<User>> userResources = usersPage.getContent().stream()
+                .map(user -> EntityModel.of(user,
+                        linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel()))
+                .collect(Collectors.toList());
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, usersPage.getTotalElements());
+
+        PagedModel<EntityModel<User>> response = PagedModel.of(userResources, metadata,
+                linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
+                linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
+                linkTo(methodOn(UserController.class).getAllUsers(usersPage.getTotalPages() - 1, size))
+                        .withRel("last-page"));
+
+        return ResponseEntity.ok(response);
+
+    }
 
 }
