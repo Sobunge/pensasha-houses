@@ -41,7 +41,7 @@ public class User {
     @NotBlank(message = "Phone number is required")
     @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid phone number")
     @Column(unique = true, nullable = false)
-    private int phoneNumber;
+    private String phoneNumber;
 
     private String profilePicture;
 
