@@ -45,4 +45,9 @@ public class UserService {
         return userRepository.findAllByRole(role);
     }
 
+    //Checking if a user exists
+    public Boolean doesUserExist(String idNumber){
+        return userRepository.existsByIdNumber(idNumber);
+    }
+
 }
