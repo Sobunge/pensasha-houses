@@ -10,7 +10,7 @@ import com.pensasha.backend.user.models.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByRole(Role role);
-    voids deleteByIdNumber(String idNumber);
+    void deleteByIdNumber(String idNumber);
     User findByIdNumber(String idNumber);
     Boolean existsByIdNumber(String idNumber);
 
