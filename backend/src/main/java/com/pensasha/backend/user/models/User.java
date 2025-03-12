@@ -29,6 +29,7 @@ public class User {
     @Size(min = 3, max = 20, message = "Third name must be between 3 and 20 characters")
     private String thirdName;
 
+    @Column(unique = true, nullable = false)
     @NotBlank(message = "National ID is required")
     @Pattern(regexp = "^[0-9]{7,8}$", message = "National ID must be 7-8 digits")
     private String idNumber;
