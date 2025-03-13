@@ -12,7 +12,7 @@ import org.springframework.security.config.Customizer;
 public class WebSecurityConfig {
 
     @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
