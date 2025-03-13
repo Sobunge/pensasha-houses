@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pensasha.backend.user.models.CareTaker;
 import com.pensasha.backend.user.services.CareTakerService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
@@ -61,7 +62,7 @@ public class CareTakerController {
     }
 
     // Getting caretaker details
-    @GetMapping("/{idNumber}")
+    @PutMapping("/{idNumber}")
     public ResponseEntity<EntityModel<CareTaker>> getCareTaker(@RequestParam String idNumber) {
         Optional<CareTaker> careTaker = careTakerService.gettingCareTaker(idNumber);
 
@@ -76,6 +77,7 @@ public class CareTakerController {
     }
 
     // Deleting caretaker details
+
 
     // Adding caretaker details
 
