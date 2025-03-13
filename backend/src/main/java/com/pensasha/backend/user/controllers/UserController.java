@@ -37,7 +37,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
-@RequestMapping(path = "/user")
+@RequestMapping(path = "/user/admin")
 public class UserController {
 
     @Autowired
@@ -64,6 +64,7 @@ public class UserController {
                             linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel()));
         }
 
+        user.setRole(Role.ADMIN);
         User savedUser = userService.addingAnAdmin(user);
 
         EntityModel<User> userModel = EntityModel.of(savedUser,

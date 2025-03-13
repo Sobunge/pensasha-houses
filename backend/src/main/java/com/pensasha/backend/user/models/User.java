@@ -47,7 +47,7 @@ public class User {
     private String profilePicture;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Role is required")
+    @Column(nullable = false)
     private Role role;
     
 }
