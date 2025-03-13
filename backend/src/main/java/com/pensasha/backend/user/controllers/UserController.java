@@ -76,8 +76,17 @@ public class UserController {
 
     // Editing user details (Admin)
     @PutMapping("/update/{idNumber}")
-    public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
-            @RequestBody UpdateUserDTO updatedUserDetails) {
+    public ResponseEntity<?> updateProfile(@PathVariable String idNumber,
+            @Valid @RequestBody UpdateUserDTO updatedUserDetails, BindingResult result) {
+
+        if (result.hasErrors()) {
+            // Extract simple error messages
+            List<String> errors = result.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage()) // Shorter message
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
+        }
 
         Optional<User> optionalUser = userService.gettingUser(idNumber);
 
