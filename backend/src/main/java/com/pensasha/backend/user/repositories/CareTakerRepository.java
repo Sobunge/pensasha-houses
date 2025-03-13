@@ -6,4 +6,6 @@ import com.pensasha.backend.user.models.CareTaker;
 
 public interface CareTakerRepository extends JpaRepository<CareTaker, Long>{
 
+    void deleteByIdNumber(String idNumber);
+
 }
