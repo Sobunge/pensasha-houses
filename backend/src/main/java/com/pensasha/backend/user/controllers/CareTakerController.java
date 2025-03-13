@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,21 +16,30 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.CareTaker;
+import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.ApiResponse;
 import com.pensasha.backend.user.services.CareTakerService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping(path = "/user/caretaker")
+@Validated
 public class CareTakerController {
 
     @Autowired
@@ -66,7 +76,7 @@ public class CareTakerController {
     }
 
     // Getting caretaker details
-    @PutMapping("/{idNumber}")
+    @GetMapping("/{idNumber}")
     public ResponseEntity<EntityModel<CareTaker>> getCareTaker(@PathVariable String idNumber) {
         Optional<CareTaker> careTaker = careTakerService.gettingCareTaker(idNumber);
 
@@ -100,6 +110,35 @@ public class CareTakerController {
     }
 
     // Adding caretaker details
+    @PostMapping("/register")
+    public ResponseEntity<?> addingCareTakerDetails(@Valid @RequestBody CareTaker careTaker,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Extract simple error messages
+            List<String> errors = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage()) // Shorter message
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
+        }
+
+        Optional<CareTaker> optionalCareTaker = careTakerService.gettingCareTaker(careTaker.getIdNumber());
+
+        if (!optionalCareTaker.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(EntityModel.of(careTaker,
+                            linkTo(methodOn(UserController.class).gettingUser(careTaker.getIdNumber())).withSelfRel()));
+        }
+
+        careTaker.setRole(Role.CARETAKER);
+        CareTaker savedCareTaker = careTakerService.addCareTaker(careTaker);
+
+        EntityModel<User> careTakerModel = EntityModel.of(savedCareTaker,
+                linkTo(methodOn(UserController.class).gettingUser(savedCareTaker.getIdNumber())).withSelfRel(),
+                linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(careTakerModel);
+    }
 
     // Updating caretaker details
 
