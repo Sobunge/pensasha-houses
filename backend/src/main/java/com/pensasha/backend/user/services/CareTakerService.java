@@ -1,6 +1,7 @@
 package com.pensasha.backend.user.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class CareTakerService {
     }
 
     // Getting a single user (CareTaker)
-    public CareTaker gettingCareTaker(String idNumber) {
+    public Optional<CareTaker> gettingCareTaker(String idNumber) {
         return careTakerRepository.findByIdNumber(idNumber);
     }
 
