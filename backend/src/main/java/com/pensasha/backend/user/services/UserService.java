@@ -30,7 +30,10 @@ public class UserService {
 
     // Deleting a user (Admin)
     public void deleteUser(String idNumber) {
-        userRepository.deleteByIdNumber(idNumber);
+
+        Optional<User> user = userRepository.findByIdNumber(idNumber);
+        userRepository.deleteById(user.get().getId());
+
     }
 
     // Getting a single user (Admin)

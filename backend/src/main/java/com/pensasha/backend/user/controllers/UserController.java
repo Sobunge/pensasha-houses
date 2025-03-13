@@ -19,8 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.role.Role;
-import com.pensasha.backend.user.models.UpdateUserDTO;
 import com.pensasha.backend.user.models.User;
+import com.pensasha.backend.user.models.dto.ApiResponse;
+import com.pensasha.backend.user.models.dto.UpdateUserDTO;
 import com.pensasha.backend.user.services.UserService;
 
 import jakarta.validation.Valid;
@@ -103,17 +104,17 @@ public class UserController {
 
     // Deleting a user (Admin)
     @DeleteMapping("/{idNumber}")
-    public ResponseEntity<EntityModel<String>> deleteUser(@PathVariable String idNumber) {
+    public ResponseEntity<EntityModel<ApiResponse>> deleteUser(@PathVariable String idNumber) {
         Optional<User> user = userService.gettingUser(idNumber);
 
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(EntityModel.of("User not found with the provided ID number"));
+                    .body(EntityModel.of(new ApiResponse("User not found with the provided ID number")));
         }
 
         userService.deleteUser(idNumber);
 
-        EntityModel<String> response = EntityModel.of("User deleted successfully",
+        EntityModel<ApiResponse> response = EntityModel.of(new ApiResponse("User deleted successfully"),
                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
         return ResponseEntity.ok(response);
