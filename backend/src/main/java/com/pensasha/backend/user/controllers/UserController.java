@@ -49,12 +49,12 @@ public class UserController {
     public ResponseEntity<?> addUser(@Valid @RequestBody User user, BindingResult result) {
 
         if (result.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : result.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
+            // Extract simple error messages
+            List<String> errors = result.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage()) // Shorter message
+                    .collect(Collectors.toList());
 
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
         }
 
         Optional<User> optionalUser = userService.gettingUser(user.getIdNumber());
