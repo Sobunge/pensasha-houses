@@ -13,14 +13,14 @@ public class CareTakerController {
     @Autowired
     private CareTakerService careTakerService;
 
-    //Getting all caretaker details
+    // Getting all caretaker details
 
-    //Getting caretaker details
+    // Getting caretaker details
 
-    //Deleting caretaker details
+    // Deleting caretaker details
 
-    //Adding caretaker details
+    // Adding caretaker details
 
-    //Updating caretaker details
+    // Updating caretaker details
 
 }
