@@ -3,6 +3,8 @@ package com.pensasha.backend.user.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.user.models.CareTaker;
@@ -35,8 +37,8 @@ public class CareTakerService {
     }
 
     // Getting all users (CareTaker)
-    public List<CareTaker> gettingAllCareTakers() {
-        return careTakerRepository.findAll();
+    public Page<CareTaker> gettingAllCareTakers(Pageable pageable) {
+        return careTakerRepository.findAll(pageable);
     }
 
 }
