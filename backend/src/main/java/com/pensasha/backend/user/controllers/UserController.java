@@ -91,7 +91,6 @@ public class UserController {
         user.setThirdName(updatedUserDetails.getThirdName());
         user.setIdNumber(updatedUserDetails.getIdNumber());
         user.setPhoneNumber(updatedUserDetails.getPhoneNumber());
-        user.setRole(Role.ADMIN);
 
         User savedUser = userService.addingAnAdmin(user);
 
