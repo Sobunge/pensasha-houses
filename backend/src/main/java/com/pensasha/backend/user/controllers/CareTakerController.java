@@ -25,6 +25,7 @@ import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.CareTaker;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.ApiResponse;
+import com.pensasha.backend.user.models.dto.UpdateUserDTO;
 import com.pensasha.backend.user.services.CareTakerService;
 
 import jakarta.validation.Valid;
@@ -141,5 +142,30 @@ public class CareTakerController {
     }
 
     // Updating caretaker details
+    @PutMapping("update/{idNumber}")
+    public ResponseEntity<EntityModel<CareTaker>> updateCareTakerDetails(@PathVariable String idNumber,
+            @RequestBody UpdateUserDTO updateUserDTO) {
+
+        Optional<CareTaker> optionalCareTaker = careTakerService.gettingCareTaker(idNumber);
+
+        if (optionalCareTaker.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        CareTaker careTaker = optionalCareTaker.get();
+        careTaker.setFirstName(updateUserDTO.getFirstName());
+        careTaker.setSecondName(updateUserDTO.getSecondName());
+        careTaker.setThirdName(updateUserDTO.getThirdName());
+        careTaker.setIdNumber(updateUserDTO.getIdNumber());
+        careTaker.setPhoneNumber(updateUserDTO.getPhoneNumber());
+
+        CareTaker savedCareTaker = careTakerService.addCareTaker(careTaker);
+
+        EntityModel<CareTaker> careTakerModel = EntityModel.of(savedCareTaker,
+                linkTo(methodOn(CareTakerController.class).getCareTaker(savedCareTaker.getIdNumber())).withSelfRel(),
+                linkTo(methodOn(CareTakerController.class).getAllCareTakers(1, 10)).withRel("all-users"));
+
+        return ResponseEntity.status(HttpStatus.OK).body(careTakerModel);
+    }
 
 }
