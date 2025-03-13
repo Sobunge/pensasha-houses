@@ -8,4 +8,6 @@ public interface CareTakerRepository extends JpaRepository<CareTaker, Long>{
 
     void deleteByIdNumber(String idNumber);
 
+    CareTaker findByIdNumber(String idNumber);
+
 }
