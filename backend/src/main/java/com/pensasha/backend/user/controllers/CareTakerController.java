@@ -19,8 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.user.models.CareTaker;
+import com.pensasha.backend.user.models.dto.ApiResponse;
 import com.pensasha.backend.user.services.CareTakerService;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -63,7 +67,7 @@ public class CareTakerController {
 
     // Getting caretaker details
     @PutMapping("/{idNumber}")
-    public ResponseEntity<EntityModel<CareTaker>> getCareTaker(@RequestParam String idNumber) {
+    public ResponseEntity<EntityModel<CareTaker>> getCareTaker(@PathVariable String idNumber) {
         Optional<CareTaker> careTaker = careTakerService.gettingCareTaker(idNumber);
 
         if (careTaker.isEmpty()) {
@@ -77,7 +81,23 @@ public class CareTakerController {
     }
 
     // Deleting caretaker details
+    @DeleteMapping("/{idNumber}")
+    public ResponseEntity<EntityModel<ApiResponse>> deleteCareTakerDetails(@PathVariable String idNumber) {
 
+        Optional<CareTaker> optionalCareTaker = careTakerService.gettingCareTaker(idNumber);
+
+        if (optionalCareTaker.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(EntityModel.of(new ApiResponse("Caretaker not found with the provided ID number")));
+        }
+
+        careTakerService.deleteCareTaker(idNumber);
+
+        EntityModel<ApiResponse> response = EntityModel.of(new ApiResponse("Caretaker details deleted successfully"),
+                linkTo(methodOn(CareTakerController.class).getAllCareTakers(1, 10)).withRel("all-users"));
+
+        return ResponseEntity.ok(response);
+    }
 
     // Adding caretaker details
 
