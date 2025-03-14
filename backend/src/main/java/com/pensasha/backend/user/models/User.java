@@ -48,6 +48,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull(message = "Role is required")
     private Role role;
     
 }
