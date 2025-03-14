@@ -165,4 +165,32 @@ public class UserController {
 
     }
 
+    @GetMapping("/role/{userRole}")
+    public ResponseEntity<PageModel<EntityModel<User>>> getAllUserByRole(@PathVariable Role role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> usersPage = userService.gettingUsersByRole(role, pageable);
+
+        if (usersPage.isEmpty()) {
+            return ResponseEntity.ok(PagedModel.empty());
+        }
+
+        List<EntityModel<User>> userResources = usersPage.getContent().stream()
+                .map(user -> EntityModel.of(user,
+                        linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber())).withSelfRel()))
+                .collect(Collectors.toList());
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page, usersPage.getTotalElements());
+
+        PagedModel<EntityModel<User>> response = PagedModel.of(userResources, metadata,
+                linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
+                linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
+                linkTo(methodOn(UserController.class).getAllUsers(usersPage.getTotalPages() - 1, size))
+                        .withRel("last-page"));
+
+        return ResponseEntity.ok(response);
+
+    }
 }
