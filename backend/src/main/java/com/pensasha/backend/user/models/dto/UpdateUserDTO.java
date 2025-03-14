@@ -30,8 +30,4 @@ public class UpdateUserDTO {
     @Column(unique = true, nullable = false)
     private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "Role is required")
-    private Role role;
-
 }
