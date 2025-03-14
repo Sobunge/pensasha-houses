@@ -43,7 +43,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // Adding a new user (Admin)
+    // Adding a new user
     @PostMapping("/register")
     public ResponseEntity<?> addUser(@Valid @RequestBody User user, BindingResult result) {
 
@@ -73,7 +73,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
     }
 
-    // Editing user details (Admin)
+    // Editing user details
     @PutMapping("/update/{idNumber}")
     public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
             @Valid @RequestBody UpdateUserDTO updatedUserDetails, BindingResult result) {
@@ -101,7 +101,7 @@ public class UserController {
 
     }
 
-    // Deleting a user (Admin)
+    // Deleting a user
     @DeleteMapping("/{idNumber}")
     public ResponseEntity<EntityModel<ApiResponse>> deleteUser(@PathVariable String idNumber) {
         Optional<User> user = userService.gettingUser(idNumber);
@@ -119,7 +119,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // Getting a single user (Admin)
+    // Getting a single user
     @GetMapping("/{idNumber}")
     public ResponseEntity<EntityModel<User>> gettingUser(@PathVariable String idNumber) {
         Optional<User> user = userService.gettingUser(idNumber);
