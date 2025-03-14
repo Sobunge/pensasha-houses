@@ -47,8 +47,8 @@ public class UserService {
     }
 
     // Getting a user by role
-    public List<User> gettingUsersByRole(Role role) {
-        return userRepository.findAllByRole(role);
+    public Page<User> gettingUsersByRole(Role role, Pageable pageable) {
+        return userRepository.findAllByRole(role, pageable);
     }
 
 }

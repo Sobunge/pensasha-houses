@@ -10,7 +10,7 @@ import com.pensasha.backend.user.models.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    List<User> findAllByRole(Role role);
+    Page<User> findAllByRole(Role role, Pageable pageable);
 
     Optional<User> findByIdNumber(String idNumber);
 
