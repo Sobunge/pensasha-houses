@@ -2,16 +2,16 @@ package com.pensasha.backend.user.models.dto;
 
 import com.pensasha.backend.role.Role;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
+import lombok.*;
+import org.springframework.validation.annotation.Validated;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateUserDTO {
+@Validated
+public class UserDTO {
 
     @NotBlank(message = "First name is required")
     @Size(min = 3, max = 20, message = "First name must be between 3 and 20 characters")
@@ -27,9 +27,17 @@ public class UpdateUserDTO {
     @Pattern(regexp = "^[0-9]{7,8}$", message = "National ID must be 7-8 digits")
     private String idNumber;
 
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    private String password;
+
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid phone number")
-    @Column(unique = true, nullable = false)
+    @Pattern(regexp = "^(?:\\+254|0)[17][0-9]{8}$", message = "Phone number must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)")
     private String phoneNumber;
+
+    private String profilePicture;
+
+    @NotNull(message = "Role is required")
+    private Role role;
 
 }

@@ -5,6 +5,7 @@ import com.pensasha.backend.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.validation.annotation.Validated;
 
 @Entity
 @Table(name = "users")
@@ -18,12 +19,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String firstName;
     private String secondName;
+
+    @Column(nullable = false)
     private String thirdName;
+
+    @Column(unique = true, nullable = false)
     private String idNumber;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(unique = true, nullable = false)
     private String phoneNumber;
+
     private String profilePicture;
 
     @Enumerated(EnumType.STRING)
