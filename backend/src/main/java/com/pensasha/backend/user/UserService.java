@@ -13,6 +13,7 @@ import com.pensasha.backend.user.models.LandLord;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.CareTakerDTO;
 import com.pensasha.backend.user.models.dto.LandLordDTO;
+import com.pensasha.backend.user.models.dto.UpdateUserDTO;
 import com.pensasha.backend.user.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -69,8 +70,12 @@ public class UserService {
 
     }
 
-    // Editing user details (Admin)
-    public User updateUserDetails(User updatedUser) {
+    // Editing common user details
+    public User updateUserDetails(UpdateUserDTO updatedUserDTO) {
+
+        User user = new User();
+        copyCommonAttributes(user, updatedUserDTO);
+
         return userRepository.save(updatedUser);
     }
 

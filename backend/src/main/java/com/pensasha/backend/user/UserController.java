@@ -85,7 +85,7 @@ public class UserController {
         // Editing common user details
         @PutMapping("/update/{idNumber}")
         public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
-                        @Valid @RequestBody UpdateUserDTO updatedUserDetails, BindingResult result) {
+                        @Valid @RequestBody UpdateUserDTO updatedUserDTO, BindingResult result) {
 
                 Optional<User> optionalUser = userService.gettingUser(idNumber);
 
@@ -93,7 +93,7 @@ public class UserController {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 }
 
-                User savedUser = userService.addingAnAdmin(updatedUserDetails);
+                User savedUser = userService.updateUserDetails(updatedUserDTO);
 
                 EntityModel<User> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
