@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Validated
 public class UpdateUserDTO {
 
     @NotBlank(message = "First name is required")
@@ -28,7 +29,7 @@ public class UpdateUserDTO {
     private String idNumber;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid phone number")
+    @Pattern(regexp = "^(?:\\+254|0)[17][0-9]{8}$", message = "Phone number must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)")
     @Column(unique = true, nullable = false)
     private String phoneNumber;
 
