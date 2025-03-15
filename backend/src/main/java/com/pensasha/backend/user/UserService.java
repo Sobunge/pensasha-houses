@@ -76,7 +76,7 @@ public class UserService {
         User user = new User();
         copyCommonAttributes(user, updatedUserDTO);
 
-        return userRepository.save(updatedUser);
+        return userRepository.save(user);
     }
 
     // Deleting a user (Admin)
