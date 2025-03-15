@@ -84,10 +84,10 @@ public class UserService {
 
         Optional<User> user = userService.gettingUser(idNumber);
 
-        if(user.isPresent()){
-            if(passwordEncoder.matches(user.get().getPassword(), updatePasswordDTO.getCurrentPassword())){
+        if (user.isPresent()) {
+            if (passwordEncoder.matches(user.get().getPassword(), updatePasswordDTO.getCurrentPassword())) {
 
-                if(updatePasswordDTO.getNewPassword().equals(updatePasswordDTO.getConfirmNewPassword())){
+                if (updatePasswordDTO.getNewPassword().equals(updatePasswordDTO.getConfirmNewPassword())) {
                     user.get().setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
                     return "Password changed successfully";
                 }
@@ -96,7 +96,7 @@ public class UserService {
                 return "Current password entered does not match existing password";
             }
         } else {
-           return "User with this id: " + idNumber + " not found.";
+            return "User with this id: " + idNumber + " not found.";
         }
 
     }
