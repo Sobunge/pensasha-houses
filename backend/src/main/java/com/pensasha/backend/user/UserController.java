@@ -44,9 +44,6 @@ public class UserController {
         @Autowired
         private UserService userService;
 
-        @Autowired
-        private PasswordEncoder passwordEncoder; // Inject password encoder
-
         // Adding a new user
         @PostMapping("/register")
         public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
@@ -66,6 +63,7 @@ public class UserController {
 
                 Optional<User> optionalUser = userService.gettingUser(userDTO.getIdNumber());
 
+                // Checks if the user already exists
                 if (optionalUser.isPresent()) {
                         return ResponseEntity.status(HttpStatus.CONFLICT)
                                         .body(EntityModel.of(userDTO,
@@ -74,21 +72,7 @@ public class UserController {
                                                                         .withSelfRel()));
                 }
 
-                User newUser = new User();
-
-                newUser.setFirstName(userDTO.getFirstName());
-                newUser.setSecondName(userDTO.getSecondName());
-                newUser.setThirdName(userDTO.getThirdName());
-                newUser.setIdNumber(userDTO.getIdNumber());
-                newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-                newUser.setPhoneNumber(userDTO.getPhoneNumber());
-                newUser.setRole(userDTO.getRole());
-
-                if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
-                        newUser.setProfilePicture(userDTO.getProfilePicture());
-                }
-
-                User savedUser = userService.addingAnAdmin(newUser);
+                User savedUser = userService.addingAnAdmin(userDTO);
 
                 EntityModel<User> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
@@ -109,14 +93,7 @@ public class UserController {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 }
 
-                User user = optionalUser.get();
-                user.setFirstName(updatedUserDetails.getFirstName());
-                user.setSecondName(updatedUserDetails.getSecondName());
-                user.setThirdName(updatedUserDetails.getThirdName());
-                user.setIdNumber(updatedUserDetails.getIdNumber());
-                user.setPhoneNumber(updatedUserDetails.getPhoneNumber());
-
-                User savedUser = userService.addingAnAdmin(user);
+                User savedUser = userService.addingAnAdmin(updatedUserDetails);
 
                 EntityModel<User> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
@@ -127,31 +104,8 @@ public class UserController {
 
         }
 
-        // Editing user details (Landlord)
-        public ResponseEntity<EntityModel<LandLord>> updateProfile(@PathVariable String idNumber,
-                        @Valid @RequestBody UpdateUserDTO updatedUserDetails, BindingResult result) {
-
-                Optional<User> optionalUser = userService.gettingUser(idNumber);
-
-                if (optionalUser.isEmpty()) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                }
-
-                User user = optionalUser.get();
-                user.setFirstName(updatedUserDetails.getFirstName());
-                user.setSecondName(updatedUserDetails.getSecondName());
-                user.setThirdName(updatedUserDetails.getThirdName());
-                user.setIdNumber(updatedUserDetails.getIdNumber());
-                user.setPhoneNumber(updatedUserDetails.getPhoneNumber());
-
-                User savedUser = userService.addingAnAdmin(user);
-
-                EntityModel<User> userModel = EntityModel.of(savedUser,
-                                linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
-                                                .withSelfRel(),
-                                linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
-
-                return ResponseEntity.status(HttpStatus.OK).body(userModel);
+        @PutMapping("/update/{idumber}/role")
+        public ResponseEntity<EntityModel<User>> updateUserRole(@PathVariable String idNumber) {
 
         }
 
