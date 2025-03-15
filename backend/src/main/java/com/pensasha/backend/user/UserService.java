@@ -20,7 +20,7 @@ public class UserService {
     private UserRepository userRepository;
 
     // Adding a new user (Admin)
-    public User addingAnAdmin(User user) {
+    public User addUser(User user) {
         return userRepository.save(user);
     }
 

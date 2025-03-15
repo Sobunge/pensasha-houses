@@ -45,7 +45,7 @@ public class UserController {
         private UserService userService;
 
         @Autowired
-        private PasswordEncoder passwordEncoder;  // Inject password encoder
+        private PasswordEncoder passwordEncoder; // Inject password encoder
 
         // Adding a new user
         @PostMapping("/register")
@@ -98,7 +98,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
         }
 
-        // Editing user details (Admin)
+        // Editing common user details
         @PutMapping("/update/{idNumber}")
         public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
                         @Valid @RequestBody UpdateUserDTO updatedUserDetails, BindingResult result) {
