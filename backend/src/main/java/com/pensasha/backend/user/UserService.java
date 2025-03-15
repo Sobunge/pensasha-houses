@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.repositories.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {

@@ -22,6 +22,7 @@ import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.ApiResponse;
 import com.pensasha.backend.user.models.dto.UpdateUserDTO;
+import com.pensasha.backend.user.models.dto.UserDTO;
 import com.pensasha.backend.user.services.UserService;
 
 import jakarta.validation.Valid;
@@ -43,11 +44,16 @@ public class UserController {
         @Autowired
         private UserService userService;
 
+        @Autowired
+        private PasswordEncoder passwordEncoder;  // Inject password encoder
+
         // Adding a new user
         @PostMapping("/register")
-        public ResponseEntity<?> addUser(@Valid @RequestBody User user, BindingResult result) {
+        public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
 
+                // Checks for input validations errors
                 if (result.hasErrors()) {
+
                         // Extract simple error messages
                         List<String> errors = result.getFieldErrors().stream()
                                         .map(error -> error.getField() + ": " + error.getDefaultMessage()) // Shorter
@@ -55,19 +61,34 @@ public class UserController {
                                         .collect(Collectors.toList());
 
                         return ResponseEntity.badRequest().body(Map.of("errors", errors));
+
                 }
 
-                Optional<User> optionalUser = userService.gettingUser(user.getIdNumber());
+                Optional<User> optionalUser = userService.gettingUser(userDTO.getIdNumber());
 
-                if (!optionalUser.isEmpty()) {
+                if (optionalUser.isPresent()) {
                         return ResponseEntity.status(HttpStatus.CONFLICT)
-                                        .body(EntityModel.of(user,
+                                        .body(EntityModel.of(userDTO,
                                                         linkTo(methodOn(UserController.class)
-                                                                        .gettingUser(user.getIdNumber()))
+                                                                        .gettingUser(userDTO.getIdNumber()))
                                                                         .withSelfRel()));
                 }
 
-                User savedUser = userService.addingAnAdmin(user);
+                User newUser = new User();
+
+                newUser.setFirstName(userDTO.getFirstName());
+                newUser.setSecondName(userDTO.getSecondName());
+                newUser.setThirdName(userDTO.getThirdName());
+                newUser.setIdNumber(userDTO.getIdNumber());
+                newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+                newUser.setPhoneNumber(userDTO.getPhoneNumber());
+                newUser.setRole(userDTO.getRole());
+
+                if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
+                        newUser.setProfilePicture(userDTO.getProfilePicture());
+                }
+
+                User savedUser = userService.addingAnAdmin(newUser);
 
                 EntityModel<User> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
