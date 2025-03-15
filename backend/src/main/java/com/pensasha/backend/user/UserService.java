@@ -79,6 +79,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User updateUserPassword(String idNumber, UpdateUserDTO updateUserDTO){
+
+    }
+
     // Deleting a user (Admin)
     public void deleteUser(String idNumber) {
 

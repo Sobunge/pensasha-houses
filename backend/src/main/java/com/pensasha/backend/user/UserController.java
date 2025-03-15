@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pensasha.backend.role.Role;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.ApiResponse;
+import com.pensasha.backend.user.models.dto.UpdatePasswordDTO;
 import com.pensasha.backend.user.models.dto.UpdateUserDTO;
 import com.pensasha.backend.user.models.dto.UserDTO;
 import com.pensasha.backend.user.services.UserService;
@@ -97,6 +98,21 @@ public class UserController {
 
                 EntityModel<User> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
+                                                .withSelfRel(),
+                                linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
+
+                return ResponseEntity.status(HttpStatus.OK).body(userModel);
+
+        }
+
+        @PutMapping("/{idNumber}/changePassword")
+        public ResponseEntity<EntityModel<User>> changeUserPassword(@PathVariable String idNumber,
+                        UpdatePasswordDTO updatePasswordDTO) {
+
+                User user = userService.updateUserPassword(idNumber, updatePasswordDTO);
+
+                EntityModel<User> userModel = EntityModel.of(user,
+                                linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
