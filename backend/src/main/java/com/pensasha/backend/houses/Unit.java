@@ -28,14 +28,8 @@ public class Unit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Unit number is required")
     private String unitNumber;
-
-    @NotNull(message = "Rent amount is required")
-    @Positive(message = "Rent amount must be a positive number")
     private Double rentAmount;
-
-    @NotNull(message = "Occupancy status is required")
     private Boolean isOccupied;
 
     @ManyToOne
