@@ -19,7 +19,11 @@ import lombok.Setter;
 @Setter
 public class LandLord extends User {
 
+    @OneToMany(mappedBy = "landLord", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Property> Properties;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "bank_details_id", referencedColumnName = "id")
     private BankDetails BankDetails;
-    
+
 }
