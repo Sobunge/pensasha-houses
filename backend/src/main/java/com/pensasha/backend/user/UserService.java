@@ -13,6 +13,7 @@ import com.pensasha.backend.user.models.LandLord;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.CareTakerDTO;
 import com.pensasha.backend.user.models.dto.LandLordDTO;
+import com.pensasha.backend.user.models.dto.UpdatePasswordDTO;
 import com.pensasha.backend.user.models.dto.UpdateUserDTO;
 import com.pensasha.backend.user.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -79,7 +80,24 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateUserPassword(String idNumber, UpdateUserDTO updateUserDTO){
+    public String updateUserPassword(String idNumber, UpdatePasswordDTO updatePasswordDTO) {
+
+        Optional<User> user = userService.gettingUser(idNumber);
+
+        if(user.isPresent()){
+            if(passwordEncoder.matches(user.get().getPassword(), updatePasswordDTO.getCurrentPassword())){
+
+                if(updatePasswordDTO.getNewPassword().equals(updatePasswordDTO.getConfirmNewPassword())){
+                    user.get().setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
+                    return "Password changed successfully";
+                }
+
+            } else {
+                return "Current password entered does not match existing password";
+            }
+        } else {
+           return "User with this id: " + idNumber + " not found.";
+        }
 
     }
 
