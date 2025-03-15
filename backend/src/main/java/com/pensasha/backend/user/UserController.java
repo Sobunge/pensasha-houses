@@ -77,9 +77,37 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
         }
 
-        // Editing user details
+        // Editing user details (Admin)
         @PutMapping("/update/{idNumber}")
         public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
+                        @Valid @RequestBody UpdateUserDTO updatedUserDetails, BindingResult result) {
+
+                Optional<User> optionalUser = userService.gettingUser(idNumber);
+
+                if (optionalUser.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
+
+                User user = optionalUser.get();
+                user.setFirstName(updatedUserDetails.getFirstName());
+                user.setSecondName(updatedUserDetails.getSecondName());
+                user.setThirdName(updatedUserDetails.getThirdName());
+                user.setIdNumber(updatedUserDetails.getIdNumber());
+                user.setPhoneNumber(updatedUserDetails.getPhoneNumber());
+
+                User savedUser = userService.addingAnAdmin(user);
+
+                EntityModel<User> userModel = EntityModel.of(savedUser,
+                                linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
+                                                .withSelfRel(),
+                                linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
+
+                return ResponseEntity.status(HttpStatus.OK).body(userModel);
+
+        }
+
+        // Editing user details (Landlord)
+        public ResponseEntity<EntityModel<LandLord>> updateProfile(@PathVariable String idNumber,
                         @Valid @RequestBody UpdateUserDTO updatedUserDetails, BindingResult result) {
 
                 Optional<User> optionalUser = userService.gettingUser(idNumber);
