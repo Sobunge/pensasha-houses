@@ -8,7 +8,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "tenants")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tenant extends User {
