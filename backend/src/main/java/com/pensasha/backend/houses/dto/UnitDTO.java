@@ -1,5 +1,11 @@
 package com.pensasha.backend.houses.dto;
 
+import com.pensasha.backend.houses.Property;
+import com.pensasha.backend.user.models.Tenant;
+
+import jakarta.validation.constraints.*;
+import lombok.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
