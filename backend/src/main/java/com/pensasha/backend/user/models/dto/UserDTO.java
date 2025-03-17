@@ -1,11 +1,10 @@
 package com.pensasha.backend.user.models.dto;
 
-import com.pensasha.backend.role.Role;
-
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
+
+import com.pensasha.backend.user.models.Role;
 
 @Data
 @NoArgsConstructor
