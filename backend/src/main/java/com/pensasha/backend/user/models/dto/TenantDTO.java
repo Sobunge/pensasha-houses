@@ -1,6 +1,12 @@
 package com.pensasha.backend.user.models.dto;
 
-@Data
+import com.pensasha.backend.houses.Unit;
+
+import jakarta.validation.constraints.*;
+import lombok.*;
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantDTO extends UserDTO{
