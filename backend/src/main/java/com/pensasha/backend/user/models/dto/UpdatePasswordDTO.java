@@ -1,5 +1,8 @@
 package com.pensasha.backend.user.models.dto;
 
+import jakarta.validation.constraints.*;
+import lombok.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
