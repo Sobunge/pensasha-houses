@@ -3,7 +3,6 @@ package com.pensasha.backend.user.models;
 import com.pensasha.backend.houses.Unit;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
