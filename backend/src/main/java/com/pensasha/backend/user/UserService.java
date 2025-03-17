@@ -1,4 +1,4 @@
-package com.pensasha.backend.user.services;
+package com.pensasha.backend.user;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,14 +8,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pensasha.backend.role.Role;
+import com.pensasha.backend.user.models.CareTaker;
 import com.pensasha.backend.user.models.LandLord;
+import com.pensasha.backend.user.models.Role;
+import com.pensasha.backend.user.models.Tenant;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.CareTakerDTO;
 import com.pensasha.backend.user.models.dto.LandLordDTO;
+import com.pensasha.backend.user.models.dto.TenantDTO;
 import com.pensasha.backend.user.models.dto.UpdatePasswordDTO;
 import com.pensasha.backend.user.models.dto.UpdateUserDTO;
-import com.pensasha.backend.user.repositories.UserRepository;
+import com.pensasha.backend.user.models.dto.UserDTO;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
@@ -74,15 +80,20 @@ public class UserService {
     // Editing common user details
     public User updateUserDetails(UpdateUserDTO updatedUserDTO) {
 
-        User user = new User();
-        copyCommonAttributes(user, updatedUserDTO);
+        User user = userRepository.findByIdNumber(updatedUserDTO.getIdNumber()).get();
+
+        user.setFirstName(updatedUserDTO.getFirstName());
+        user.setSecondName(updatedUserDTO.getSecondName());
+        user.setThirdName(updatedUserDTO.getThirdName());
+        user.setIdNumber(updatedUserDTO.getIdNumber());
+        user.setPhoneNumber(updatedUserDTO.getPhoneNumber());
 
         return userRepository.save(user);
     }
 
     public String updateUserPassword(String idNumber, UpdatePasswordDTO updatePasswordDTO) {
 
-        Optional<User> user = userService.gettingUser(idNumber);
+        Optional<User> user = userRepository.findByIdNumber(idNumber);
 
         if (user.isPresent()) {
             if (passwordEncoder.matches(user.get().getPassword(), updatePasswordDTO.getCurrentPassword())) {
@@ -90,6 +101,8 @@ public class UserService {
                 if (updatePasswordDTO.getNewPassword().equals(updatePasswordDTO.getConfirmNewPassword())) {
                     user.get().setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
                     return "Password changed successfully";
+                } else {
+                    return "New password does not match the confirmed password";
                 }
 
             } else {
@@ -125,7 +138,7 @@ public class UserService {
     }
 
     // Helper method to copy common attributes
-    private void copyCommonAttributes(User user, UserDTO dto) {
+    private void copyCommonAttributes(User user, UserDTO userDTO) {
 
         user.setFirstName(userDTO.getFirstName());
         user.setSecondName(userDTO.getSecondName());

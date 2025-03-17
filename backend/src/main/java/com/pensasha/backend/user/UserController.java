@@ -1,4 +1,4 @@
-package com.pensasha.backend.user.controllers;
+package com.pensasha.backend.user;
 
 import java.util.List;
 import java.util.Map;
@@ -18,14 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pensasha.backend.role.Role;
+import com.pensasha.backend.user.models.Role;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.ApiResponse;
 import com.pensasha.backend.user.models.dto.UpdatePasswordDTO;
 import com.pensasha.backend.user.models.dto.UpdateUserDTO;
 import com.pensasha.backend.user.models.dto.UserDTO;
-import com.pensasha.backend.user.services.UserService;
-
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -73,7 +71,7 @@ public class UserController {
                                                                         .withSelfRel()));
                 }
 
-                User savedUser = userService.addingAnAdmin(userDTO);
+                User savedUser = userService.addUser(userDTO);
 
                 EntityModel<User> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
@@ -193,7 +191,7 @@ public class UserController {
         }
 
         @GetMapping("/role/{userRole}")
-        public ResponseEntity<PageModel<EntityModel<User>>> getAllUserByRole(@PathVariable Role role,
+        public ResponseEntity<PagedModel<EntityModel<User>>> getAllUserByRole(@PathVariable Role role,
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "10") int size) {
 
