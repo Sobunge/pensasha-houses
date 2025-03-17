@@ -1,4 +1,4 @@
-package com.pensasha.backend.role;
+package com.pensasha.backend.user.models;
 
 public enum Role {
 
