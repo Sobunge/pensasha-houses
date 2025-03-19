@@ -1,6 +1,5 @@
 package com.pensasha.backend.user;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +42,12 @@ public class UserService {
 
             CareTaker careTaker = new CareTaker();
             copyCommonAttributes(careTaker, careTakerDTO);
-            careTaker.setAssignedProperty(convertToPropertyEntities(careTakerDTO.getAssignedProperty()));
-
             user = careTaker;
 
         } else if (userDTO instanceof LandLordDTO landLordDTO) {
 
             LandLord landLord = new LandLord();
             copyCommonAttributes(landLord, landLordDTO);
-            landLord.setProperties(convertToPropertyEntities(landLordDTO.getProperties()));
-            landLord.setBankDetails(convertToBankDetailsEntity(landLordDTO.getBankDetails()));
 
             user = landLord;
 
@@ -60,21 +55,22 @@ public class UserService {
 
             Tenant tenant = new Tenant();
             copyCommonAttributes(tenant, tenantDTO);
-            tenant.setRentalUnit(convertToRentalUnitEntity(tenantDTO.getRentalUnit()));
-            tenant.setLeaseStartDate(convertToLeaseStartEntity(tenantDTO.getLeaseStartDate()));
-            tenant.setLeaseEndDate(convertToLeaseEndEntity(tenantDTO.getLeaseEndDate()));
-            tenant.setMonthlyRent(convertToMonthlyRentEntity(tenantDTO.getMonthlyRent()));
-            tenant.setEmergencyContact(convertToEmergencyContactEntity(tenantDTO.getEmergencyContact()));
 
             user = tenant;
-        } else {
 
-            user = new User();
-            copyCommonAttributes(user, userDTO);
+        } else if (userDTO.getRole() == Role.ADMIN) {
+
+            // Ensure only admins can be assigned explicitly
+            User admin = new User();
+            copyCommonAttributes(admin, userDTO);
+            admin.setRole(Role.ADMIN);
+            user = admin;
+
+        } else {
+            throw new IllegalArgumentException("Invalid user type provided");
         }
 
         return userRepository.save(user);
-
     }
 
     // Editing common user details
@@ -115,57 +111,59 @@ public class UserService {
 
     }
 
-    //Changing role
+    // Changing role
+    // Changing role
     @Transactional
     public User changeRole(String idNumber, Role newRole) {
         Optional<User> optionalUser = userRepository.findByIdNumber(idNumber);
 
-        if (optionalUser.isPresent()) {
-
-            User oldUser = optionalUser.get();
-
-            // Ensure we are not trying to convert to the same role
-            if (oldUser.getRole() == newRole) {
-                return oldUser; // No changes needed
-            }
-
-            // Create a new instance based on the role
-            User newUser;
-
-            // Handle role change to Admin separately
-            if (newRole == Role.ADMIN) {
-                userRepository.delete(oldUser); // Remove old user
-                Admin admin = new Admin();
-                copyCommonAttributes(admin, oldUser); // Copy common attributes
-                admin.setRole(Role.ADMIN);
-                return userRepository.save(admin); // Save the new Admin entity
-            }
-
-            switch (newRole) {
-                case CARETAKER -> {
-                    CareTaker careTaker = new CareTaker();
-                    copyCommonAttributes(careTaker, oldUser); // Copy common user attributes
-                    careTaker.setRole(Role.CARETAKER);
-                    newUser = careTaker;
-                }
-                case LANDLORD -> {
-                    LandLord landLord = new LandLord();
-                    copyCommonAttributes(landLord, oldUser);
-                    landLord.setRole(Role.LANDLORD);
-                    newUser = landLord;
-                }
-                case TENANT -> {
-                    Tenant tenant = new Tenant();
-                    copyCommonAttributes(tenant, oldUser);
-                    tenant.setRole(Role.TENANT);
-                    newUser = tenant;
-                }
-                default -> throw new IllegalArgumentException("Unsupported role change");
-            }
-
-        } else {
+        if (optionalUser.isEmpty()) {
             throw new RuntimeException("User with ID: " + idNumber + " not found.");
         }
+
+        User oldUser = optionalUser.get();
+
+        // Ensure we are not trying to convert to the same role
+        if (oldUser.getRole() == newRole) {
+            return oldUser; // No changes needed
+        }
+
+        // Handle role change to Admin separately
+        if (newRole == Role.ADMIN) {
+            userRepository.delete(oldUser); // Remove old user
+            User admin = new User();
+            copyCommonAttributes(admin, oldUser); // Copy common attributes
+            admin.setRole(Role.ADMIN);
+            return userRepository.save(admin); // Save and return new Admin user
+        }
+
+        // Create a new instance based on the role
+        User newUser;
+
+        switch (newRole) {
+            case CARETAKER -> {
+                CareTaker careTaker = new CareTaker();
+                copyCommonAttributes(careTaker, oldUser);
+                careTaker.setRole(Role.CARETAKER);
+                newUser = careTaker;
+            }
+            case LANDLORD -> {
+                LandLord landLord = new LandLord();
+                copyCommonAttributes(landLord, oldUser);
+                landLord.setRole(Role.LANDLORD);
+                newUser = landLord;
+            }
+            case TENANT -> {
+                Tenant tenant = new Tenant();
+                copyCommonAttributes(tenant, oldUser);
+                tenant.setRole(Role.TENANT);
+                newUser = tenant;
+            }
+            default -> throw new IllegalArgumentException("Unsupported role change");
+        }
+
+        userRepository.delete(oldUser); // Delete the old user
+        return userRepository.save(newUser); // Save and return the new user
     }
 
     // Deleting a user (Admin)
@@ -205,6 +203,22 @@ public class UserService {
         if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
             user.setProfilePicture(userDTO.getProfilePicture());
         }
+    }
+
+    // Helper method to copy common attributes override
+    private void copyCommonAttributes(User target, User source) {
+
+        target.setFirstName(source.getFirstName());
+        target.setSecondName(source.getSecondName());
+        target.setThirdName(source.getThirdName());
+        target.setIdNumber(source.getIdNumber());
+        target.setPassword(source.getPassword());
+        target.setPhoneNumber(source.getPhoneNumber());
+
+        if (source.getProfilePicture() != null && !source.getProfilePicture().isEmpty()) {
+            target.setProfilePicture(source.getProfilePicture());
+        }
+
     }
 
 }
