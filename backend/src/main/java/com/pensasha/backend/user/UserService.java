@@ -91,6 +91,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // Changing password
     public String updateUserPassword(String idNumber, UpdatePasswordDTO updatePasswordDTO) {
 
         Optional<User> user = userRepository.findByIdNumber(idNumber);
@@ -114,6 +115,7 @@ public class UserService {
 
     }
 
+    //Changing role
     @Transactional
     public User changeRole(String idNumber, Role newRole) {
         Optional<User> optionalUser = userRepository.findByIdNumber(idNumber);
