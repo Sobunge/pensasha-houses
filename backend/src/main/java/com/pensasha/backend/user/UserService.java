@@ -114,6 +114,58 @@ public class UserService {
 
     }
 
+    @Transactional
+    public User changeRole(String idNumber, Role newRole) {
+        Optional<User> optionalUser = userRepository.findByIdNumber(idNumber);
+
+        if (optionalUser.isPresent()) {
+
+            User oldUser = optionalUser.get();
+
+            // Ensure we are not trying to convert to the same role
+            if (oldUser.getRole() == newRole) {
+                return oldUser; // No changes needed
+            }
+
+            // Create a new instance based on the role
+            User newUser;
+
+            // Handle role change to Admin separately
+            if (newRole == Role.ADMIN) {
+                userRepository.delete(oldUser); // Remove old user
+                Admin admin = new Admin();
+                copyCommonAttributes(admin, oldUser); // Copy common attributes
+                admin.setRole(Role.ADMIN);
+                return userRepository.save(admin); // Save the new Admin entity
+            }
+
+            switch (newRole) {
+                case CARETAKER -> {
+                    CareTaker careTaker = new CareTaker();
+                    copyCommonAttributes(careTaker, oldUser); // Copy common user attributes
+                    careTaker.setRole(Role.CARETAKER);
+                    newUser = careTaker;
+                }
+                case LANDLORD -> {
+                    LandLord landLord = new LandLord();
+                    copyCommonAttributes(landLord, oldUser);
+                    landLord.setRole(Role.LANDLORD);
+                    newUser = landLord;
+                }
+                case TENANT -> {
+                    Tenant tenant = new Tenant();
+                    copyCommonAttributes(tenant, oldUser);
+                    tenant.setRole(Role.TENANT);
+                    newUser = tenant;
+                }
+                default -> throw new IllegalArgumentException("Unsupported role change");
+            }
+
+        } else {
+            throw new RuntimeException("User with ID: " + idNumber + " not found.");
+        }
+    }
+
     // Deleting a user (Admin)
     public void deleteUser(String idNumber) {
 
