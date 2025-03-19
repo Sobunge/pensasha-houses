@@ -104,22 +104,17 @@ public class UserController {
         }
 
         @PutMapping("/{idNumber}/changePassword")
-        public ResponseEntity<EntityModel<User>> changeUserPassword(@PathVariable String idNumber,
+        public ResponseEntity<EntityModel<String>> changeUserPassword(@PathVariable String idNumber,
                         UpdatePasswordDTO updatePasswordDTO) {
 
-                User user = userService.updateUserPassword(idNumber, updatePasswordDTO);
+                String response = userService.updateUserPassword(idNumber, updatePasswordDTO);
 
-                EntityModel<User> userModel = EntityModel.of(user,
-                                linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber()))
-                                                .withSelfRel(),
+                // Create response model
+                EntityModel<String> responseModel = EntityModel.of(response,
+                                linkTo(methodOn(UserController.class).gettingUser(idNumber)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
-                return ResponseEntity.status(HttpStatus.OK).body(userModel);
-
-        }
-
-        @PutMapping("/update/{idumber}/role")
-        public ResponseEntity<EntityModel<User>> updateUserRole(@PathVariable String idNumber) {
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
 
         }
 
