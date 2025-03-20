@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pensasha.backend.user.models.Role;
 import com.pensasha.backend.user.models.User;
 import com.pensasha.backend.user.models.dto.ApiResponse;
+import com.pensasha.backend.user.models.dto.LoginRequest;
 import com.pensasha.backend.user.models.dto.UpdatePasswordDTO;
 import com.pensasha.backend.user.models.dto.UpdateUserDTO;
 import com.pensasha.backend.user.models.dto.UserDTO;
@@ -79,6 +80,12 @@ public class UserController {
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
+        }
+
+        // Login 
+        @PostMapping("/login")
+        public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+            return ResponseEntity.ok("Login successful");
         }
 
         // Editing common user details
