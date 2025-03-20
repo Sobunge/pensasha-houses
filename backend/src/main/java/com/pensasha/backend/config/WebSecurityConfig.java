@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.pensasha.backend.user.CustomUserDetailsService;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -32,19 +33,24 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/user/all").authenticated()
-                        .requestMatchers("/user/register", "/authenticate").permitAll().anyRequest().authenticated())
+                        .requestMatchers("/user/register", "/user/login").permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
 
     }
 
-    @Bean
+     @Bean
     public AuthenticationManager authenticationManager() {
+        return new ProviderManager(List.of(authenticationProvider()));
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(List.of(provider));
+        return provider;
     }
 
     @Bean
