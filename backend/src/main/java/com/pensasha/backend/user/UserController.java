@@ -13,6 +13,9 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.Authentication;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -43,6 +47,9 @@ public class UserController {
 
         @Autowired
         private UserService userService;
+
+        @Autowired
+        private AuthenticationManager authenticationManager;
 
         // Adding a new user
         @PostMapping("/register")
@@ -82,10 +89,13 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
         }
 
-        // Login 
+        // Login
         @PostMapping("/login")
         public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-            return ResponseEntity.ok("Login successful");
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(request.getIdNumber(), request.getPassword()));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                return ResponseEntity.ok("Login successful");
         }
 
         // Editing common user details

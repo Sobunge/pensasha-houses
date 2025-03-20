@@ -34,13 +34,20 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/user/all").authenticated()
                         .requestMatchers("/user/register", "/user/login").permitAll().anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                .logout(logout -> logout
+                        .logoutUrl("/user/logout") // Set custom logout endpoint
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.getWriter().write("{\"message\": \"Logout successful\"}");
+                            response.getWriter().flush();
+                        }));
 
         return http.build();
 
     }
 
-     @Bean
+    @Bean
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(List.of(authenticationProvider()));
     }
