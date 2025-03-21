@@ -45,6 +45,5 @@ public class User {
     private LocalDateTime accountExpirationDate; // Optional, null means never expires
 
     private LocalDateTime passwordExpirationDate; // Optional, null means never expires
-}
 
 }
