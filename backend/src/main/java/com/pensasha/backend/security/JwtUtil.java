@@ -27,6 +27,7 @@ public class JWTUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Generate Access Token
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
@@ -36,11 +37,23 @@ public class JWTUtils {
                 .compact();
     }
 
+      // Generate Refresh Token
+      public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
+    // Validate Token
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
+    // Extract Username from Token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
