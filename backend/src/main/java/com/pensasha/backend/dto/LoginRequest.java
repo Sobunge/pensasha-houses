@@ -1,14 +1,15 @@
-package com.pensasha.backend.user.models.dto;
+package com.pensasha.backend.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class LoginRequest {
-
+    @NotBlank(message = "ID Number is required")
     private String idNumber;
+
+    @NotBlank(message = "Password is required")
     private String password;
 }
