@@ -1,4 +1,4 @@
-package com.pensasha.backend.utils;
+package com.pensasha.backend.security;
 
 import java.util.Date;
 import java.util.function.Function;
@@ -34,16 +34,6 @@ public class JWTUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-      // Generate Refresh Token
-      public String generateRefreshToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 

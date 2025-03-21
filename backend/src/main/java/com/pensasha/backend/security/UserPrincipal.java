@@ -1,6 +1,6 @@
 package com.pensasha.backend.security;
 
-import com.pensasha.backend.entity.UserEntity;
+import com.pensasha.backend.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,7 +11,7 @@ public class UserPrincipal implements UserDetails {
 
     private final User user;
 
-    public UserPrincipal(UserEntity user) {
+    public UserPrincipal(User user) {
         this.user = user;
     }
 
