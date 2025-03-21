@@ -38,6 +38,13 @@ public class User {
     private Role role;
 
     @Column(nullable = false)
-    private boolean enabled = true;
+    private boolean enabled = true; // Default enabled
+
+    private boolean locked = false; // Default not locked
+
+    private LocalDateTime accountExpirationDate; // Optional, null means never expires
+
+    private LocalDateTime passwordExpirationDate; // Optional, null means never expires
+}
 
 }
