@@ -2,7 +2,7 @@ package com.pensasha.backend.controller;
 
 @RestController
 @RequestMapping("/api")
-@RequiredArgsContructors
+@RequiredArgsContructor
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
