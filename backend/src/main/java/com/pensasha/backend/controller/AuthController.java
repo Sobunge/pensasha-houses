@@ -2,18 +2,12 @@ package com.pensasha.backend.controller;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsContructors
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-
-    public AuthController(AuthenticationManager authenticationManager, JWTUtils jwtUtils,
-            PasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     // Register
     @PostMapping("/auth/register")
