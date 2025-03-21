@@ -31,6 +31,8 @@ public class WebSecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .formLogin().disable()
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/user/all").authenticated()
                         .requestMatchers("/user/register", "/user/login").permitAll().anyRequest().authenticated())
