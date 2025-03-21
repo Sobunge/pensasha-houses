@@ -1,9 +1,6 @@
-package com.pensasha.backend.user.models;
+package com.pensasha.backend.entity;
 
 import java.util.Set;
-
-import com.pensasha.backend.bankDetails.BankDetails;
-import com.pensasha.backend.houses.Property;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

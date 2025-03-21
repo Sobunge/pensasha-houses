@@ -1,4 +1,4 @@
-package com.pensasha.backend.user.models.dto;
+package com.pensasha.backend.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;

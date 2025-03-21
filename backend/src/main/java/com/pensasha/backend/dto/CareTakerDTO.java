@@ -1,6 +1,6 @@
-package com.pensasha.backend.user.models.dto;
+package com.pensasha.backend.dto;
 
-import com.pensasha.backend.houses.Property;
+import com.pensasha.backend.entity.Property;
 
 import lombok.*;
 

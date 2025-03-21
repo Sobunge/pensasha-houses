@@ -1,6 +1,5 @@
 package com.pensasha.backend.security;
 
-import com.pensasha.backend.entity.UserEntity;
 import com.pensasha.backend.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

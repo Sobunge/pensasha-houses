@@ -1,4 +1,4 @@
-package com.pensasha.backend.user;
+package com.pensasha.backend.service;
 
 import java.util.Optional;
 
@@ -7,17 +7,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pensasha.backend.user.models.CareTaker;
-import com.pensasha.backend.user.models.LandLord;
-import com.pensasha.backend.user.models.Role;
-import com.pensasha.backend.user.models.Tenant;
-import com.pensasha.backend.user.models.User;
-import com.pensasha.backend.user.models.dto.CareTakerDTO;
-import com.pensasha.backend.user.models.dto.LandLordDTO;
-import com.pensasha.backend.user.models.dto.TenantDTO;
-import com.pensasha.backend.user.models.dto.UpdatePasswordDTO;
-import com.pensasha.backend.user.models.dto.UpdateUserDTO;
-import com.pensasha.backend.user.models.dto.UserDTO;
+import com.pensasha.backend.dto.CareTakerDTO;
+import com.pensasha.backend.dto.LandLordDTO;
+import com.pensasha.backend.dto.TenantDTO;
+import com.pensasha.backend.dto.UpdatePasswordDTO;
+import com.pensasha.backend.dto.UpdateUserDTO;
+import com.pensasha.backend.dto.UserDTO;
+import com.pensasha.backend.entity.CareTaker;
+import com.pensasha.backend.entity.LandLord;
+import com.pensasha.backend.entity.Role;
+import com.pensasha.backend.entity.Tenant;
+import com.pensasha.backend.entity.User;
+import com.pensasha.backend.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 

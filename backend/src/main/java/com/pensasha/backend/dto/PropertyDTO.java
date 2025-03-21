@@ -1,9 +1,9 @@
-package com.pensasha.backend.houses.dto;
+package com.pensasha.backend.dto;
 
 import java.util.Set;
 
-import com.pensasha.backend.houses.Unit;
-import com.pensasha.backend.user.models.LandLord;
+import com.pensasha.backend.entity.LandLord;
+import com.pensasha.backend.entity.Unit;
 
 import lombok.*;
 

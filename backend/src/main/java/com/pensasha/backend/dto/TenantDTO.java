@@ -1,6 +1,6 @@
-package com.pensasha.backend.user.models.dto;
+package com.pensasha.backend.dto;
 
-import com.pensasha.backend.houses.Unit;
+import com.pensasha.backend.entity.Unit;
 
 import jakarta.validation.constraints.*;
 import lombok.*;

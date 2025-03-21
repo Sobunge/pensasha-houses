@@ -1,4 +1,8 @@
-package com.pensasha.backend.user.models;
+package com.pensasha.backend.entity;
+
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.*;

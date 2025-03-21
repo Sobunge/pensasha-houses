@@ -1,4 +1,4 @@
-package com.pensasha.backend.user;
+package com.pensasha.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

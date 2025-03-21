@@ -1,6 +1,4 @@
-package com.pensasha.backend.user.models;
-
-import com.pensasha.backend.houses.Unit;
+package com.pensasha.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
