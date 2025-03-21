@@ -1,4 +1,4 @@
-package com.pensasha.backend.user;
+package com.pensasha.backend.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -21,13 +21,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pensasha.backend.user.models.Role;
-import com.pensasha.backend.user.models.User;
-import com.pensasha.backend.user.models.dto.ApiResponse;
-import com.pensasha.backend.user.models.dto.LoginRequest;
-import com.pensasha.backend.user.models.dto.UpdatePasswordDTO;
-import com.pensasha.backend.user.models.dto.UpdateUserDTO;
-import com.pensasha.backend.user.models.dto.UserDTO;
+import com.pensasha.backend.dto.ApiResponse;
+import com.pensasha.backend.dto.LoginRequest;
+import com.pensasha.backend.dto.UpdatePasswordDTO;
+import com.pensasha.backend.dto.UpdateUserDTO;
+import com.pensasha.backend.dto.UserDTO;
+import com.pensasha.backend.entity.Role;
+import com.pensasha.backend.entity.User;
+import com.pensasha.backend.service.UserService;
+
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
