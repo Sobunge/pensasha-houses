@@ -18,28 +18,31 @@ public class PropertyService {
 
     // Adding a property
     @Transactional
-    public String addProperty(@Valid PropertyDTO propertyDTO) {
+    public Property addProperty(@Valid PropertyDTO propertyDTO) {
         Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
         Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
 
         // Validate Landlord
         if (landlordOpt.isEmpty()) {
-            return "A Landlord with National ID: " + propertyDTO.getLandLordId() + " not found";
+            throw new RuntimeException("A Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
         }
         User landlord = landlordOpt.get();
         if (!Role.LANDLORD.equals(landlord.getRole())) {
-            return "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord";
+            throw new RuntimeException(
+                    "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
         }
 
         // Validate Caretaker (if provided)
         User caretaker = null;
         if (propertyDTO.getCareTakerId() != null) {
             if (caretakerOpt.isEmpty()) {
-                return "A Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found";
+                throw new RuntimeException(
+                        "A Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
             }
             caretaker = caretakerOpt.get();
             if (!Role.CARETAKER.equals(caretaker.getRole())) {
-                return "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker";
+                throw new RuntimeException(
+                        "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
         }
 
@@ -54,8 +57,7 @@ public class PropertyService {
         property.setCareTaker(caretaker); // Can be null
         property.setUnits(new HashSet<>()); // Empty Set (will be added later)
 
-        propertyRepository.save(property);
-        return "Property saved successfully";
+        return propertyRepository.save(property);
     }
 
     // Updating property details
