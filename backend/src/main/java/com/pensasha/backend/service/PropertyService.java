@@ -8,6 +8,8 @@ import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.entity.User;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.repository.UserRepository;
+import com.pensasha.backend.utils.PropertyMapperUtil;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Service
@@ -130,9 +132,9 @@ public class PropertyService {
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property with ID " + propertyId + " not found"));
 
-        return new PropertyDTO(property.getName(), property.getDescription(), property.getLocation(),
-                property.getNumOfUnits(), property.getAmenities(), property.getLandLord(), property.getCareTaker(),
-                property.getUnits());
+        PropertyDTO propertyDTO = PropertyMapperUtil.mapToDTO(property);
+
+        return new PropertyDTO(propertyDTO);
     }
 
     // Geting all properties
