@@ -19,7 +19,7 @@ public class PropertyService {
 
     // Adding a property
     @Transactional
-    public ResponseEntity<EntityModel<Property>> addProperty(@Valid PropertyDTO propertyDTO) {
+    public ResponseEntity<EntityModel<Property>> addProperty(PropertyDTO propertyDTO) {
         Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
         Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
 
@@ -63,7 +63,7 @@ public class PropertyService {
 
     // Updating property details
     @Transactional
-    public Property updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
+    public Property updateProperty(Long propertyId, PropertyDTO propertyDTO) {
         Optional<Property> existingPropertyOpt = propertyRepository.findById(propertyId);
 
         if (existingPropertyOpt.isEmpty()) {
