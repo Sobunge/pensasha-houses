@@ -19,15 +19,17 @@ public class Unit {
     private String unitNumber;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal rentAmount; // Changed from Double to BigDecimal
+    private BigDecimal rentAmount; 
 
     @Column(nullable = false)
-    private boolean isOccupied; // Changed from Boolean to primitive boolean
+    private boolean isOccupied; 
 
     @ManyToOne
-    @JoinColumn(name = "property_id", nullable = false) // Fixed typo from "propery_id"
+    @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    @OneToOne(mappedBy = "rentalUnit", cascade = CascadeType.ALL)
-    private Tenant tenant;
+    @ManyToOne
+    @JoinColumn(name = "tenant_id") 
+    private Tenant tenant; // Many units belong to one tenant
+    
 }
