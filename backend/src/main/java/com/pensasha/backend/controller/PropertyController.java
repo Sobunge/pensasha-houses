@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.entity.Property;
 import com.pensasha.backend.service.PropertyService;
+import com.pensasha.backend.utils.PropertyMapperUtil;
 
 @RestController
 @RequestMapping("/api/properties/")
@@ -32,7 +33,7 @@ public class PropertyController {
         Property property = propertyService.addProperty(propertyDTO);
 
         // Convert Property to PropertyDTO (if necessary)
-        PropertyDTO responseDTO = new PropertyDTO(property);
+        PropertyDTO responseDTO = PropertyMapperUtil.mapToDTO(property);
 
         // Create HATEOAS links
         EntityModel<PropertyDTO> propertyModel = EntityModel.of(responseDTO,
@@ -43,6 +44,32 @@ public class PropertyController {
     }
 
     // Update a property
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProperty(
+            @PathVariable Long id,
+            @Valid @RequestBody PropertyDTO propertyDTO,
+            BindingResult bindingResult) {
+    
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+    
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
+        }
+    
+        Property updatedProperty = propertyService.updateProperty(id, propertyDTO);
+        
+        // Use the utility method
+        PropertyDTO updatedPropertyDTO = PropertyMapperUtil.mapToDTO(updatedProperty);
+    
+        EntityModel<PropertyDTO> propertyModel = EntityModel.of(updatedPropertyDTO,
+                linkTo(methodOn(PropertyController.class).updateProperty(id, propertyDTO, bindingResult)).withSelfRel(),
+                linkTo(methodOn(PropertyController.class).getAllProperties()).withRel("all-properties"));
+    
+        return ResponseEntity.ok(propertyModel);
+    }
+    
 
     // Getting a property
 
