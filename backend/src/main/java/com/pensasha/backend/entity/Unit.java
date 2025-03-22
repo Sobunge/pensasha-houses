@@ -1,16 +1,8 @@
 package com.pensasha.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "units")
@@ -23,14 +15,19 @@ public class Unit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String unitNumber;
-    private Double rentAmount;
-    private Boolean isOccupied;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal rentAmount; // Changed from Double to BigDecimal
+
+    @Column(nullable = false)
+    private boolean isOccupied; // Changed from Boolean to primitive boolean
 
     @ManyToOne
-    @JoinColumn(name = "propery_id")
+    @JoinColumn(name = "property_id", nullable = false) // Fixed typo from "propery_id"
     private Property property;
 
-    @OneToOne(mappedBy = "rentalUnit")
+    @OneToOne(mappedBy = "rentalUnit", cascade = CascadeType.ALL)
     private Tenant tenant;
 }
