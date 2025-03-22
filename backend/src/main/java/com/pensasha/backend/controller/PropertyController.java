@@ -8,4 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PropertyController {
 
+    // Add a property
+
+    // Update a property
+
+    // Getting a property
+
+    // Getting all properties
+
+    // Getting all properties belonging to a landlord
+
+    // Deleting a property
+
 }
