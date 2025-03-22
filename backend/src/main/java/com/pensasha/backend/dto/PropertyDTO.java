@@ -30,7 +30,7 @@ public class PropertyDTO {
     @NotNull(message = "Landlord ID is required")
     private String landLordId;
 
-    private Long careTakerId; // Optional caretaker
+    private String careTakerId; // Optional caretaker
 
     private Set<UnitDTO> units;
 }
