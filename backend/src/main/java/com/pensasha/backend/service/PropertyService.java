@@ -62,11 +62,11 @@ public class PropertyService {
 
     // Updating property details
     @Transactional
-    public String updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
+    public Property updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
         Optional<Property> existingPropertyOpt = propertyRepository.findById(propertyId);
 
         if (existingPropertyOpt.isEmpty()) {
-            return "Property with ID " + propertyId + " not found";
+            throw new RuntimeException("Property with ID " + propertyId + " not found");
         }
 
         Property existingProperty = existingPropertyOpt.get();
@@ -93,11 +93,12 @@ public class PropertyService {
                 && !propertyDTO.getLandLordId().equals(existingProperty.getLandLord().getIdNumber())) {
             Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
             if (landlordOpt.isEmpty()) {
-                return "Landlord with National ID: " + propertyDTO.getLandLordId() + " not found";
+                throw new RuntimeException("Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
             }
             User landlord = landlordOpt.get();
             if (!Role.LANDLORD.equals(landlord.getRole())) {
-                return "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord";
+                throw new RuntimeException(
+                        "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
             }
             existingProperty.setLandLord(landlord);
         }
@@ -107,18 +108,20 @@ public class PropertyService {
                 || !propertyDTO.getCareTakerId().equals(existingProperty.getCareTaker().getIdNumber()))) {
             Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
             if (caretakerOpt.isEmpty()) {
-                return "Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found";
+                throw new RuntimeException(
+                        "Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
             }
             User caretaker = caretakerOpt.get();
             if (!Role.CARETAKER.equals(caretaker.getRole())) {
-                return "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker";
+                throw new RuntimeException(
+                        "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
             existingProperty.setCareTaker(caretaker);
         }
 
         // Save updated property
-        propertyRepository.save(existingProperty);
-        return "Property updated successfully";
+        return propertyRepository.save(existingProperty);
+
     }
 
     // Getting one property
