@@ -146,6 +146,13 @@ public class PropertyService {
     }
 
     // Deleting a property
+    public void deleteProperty(Long propertyId) {
+        if (propertyRepository.existsById(propertyId)) {
+            propertyRepository.deleteById(propertyId);
+        } else {
+            throw new ResourceNotFoundException("Property with ID " + propertyId + " not found.");
+        }
+    }
 
     // Getting a property belonging to a landlord (Owner)
 
