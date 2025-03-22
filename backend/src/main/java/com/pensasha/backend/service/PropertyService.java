@@ -9,6 +9,10 @@ import com.pensasha.backend.entity.User;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.repository.UserRepository;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgConstructor
@@ -68,7 +72,7 @@ public class PropertyService {
 
     // Updating property details
     @Transactional
-    public Property updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
+    public ResponseEntity<EntityModel<Property>> updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
         Optional<Property> existingPropertyOpt = propertyRepository.findById(propertyId);
 
         if (existingPropertyOpt.isEmpty()) {
