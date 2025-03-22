@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -30,10 +30,14 @@ public class AuthController {
     private final CustomUserDetailsService userDetailsService;
 
     // Register
-   
+    @PostMapping("/register")
+    public String register() {
+
+        return "We are in the registration page";
+    }
 
     // login
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request, BindingResult result) {
 
         // Validate input
