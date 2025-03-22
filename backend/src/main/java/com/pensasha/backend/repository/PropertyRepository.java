@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 public interface PropertyRepository extends JpaRepository<Property, Long>{
 
+    List<Property> findAllByLandLord_IdNumber(String idNumber);
 }
