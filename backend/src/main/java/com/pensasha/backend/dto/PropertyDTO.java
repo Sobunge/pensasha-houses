@@ -1,10 +1,8 @@
 package com.pensasha.backend.dto;
 
+import java.util.List;
 import java.util.Set;
-
-import com.pensasha.backend.entity.LandLord;
-import com.pensasha.backend.entity.Unit;
-
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Data
@@ -12,7 +10,27 @@ import lombok.*;
 @AllArgsConstructor
 public class PropertyDTO {
 
-    private LandLord landLord;
-    private Set<Unit> units;
+    @NotBlank(message = "Property name is required")
+    @Size(min = 3, max = 50, message = "Property name must be between 3 and 50 characters")
+    private String name;
 
+    @NotBlank(message = "Description is required")
+    @Size(min = 10, max = 255, message = "Description must be between 10 and 255 characters")
+    private String description;
+
+    @NotBlank(message = "Location is required")
+    private String location;
+
+    @Min(value = 1, message = "Number of units must be at least 1")
+    private int noOfUnits;
+
+    @NotEmpty(message = "Amenities list cannot be empty")
+    private List<@NotBlank(message = "Amenity cannot be blank") String> amenities;
+
+    @NotNull(message = "Landlord ID is required")
+    private String landLordId;
+
+    private Long careTakerId; // Optional caretaker
+
+    private Set<UnitDTO> units;
 }
