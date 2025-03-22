@@ -155,5 +155,8 @@ public class PropertyService {
     }
 
     // Getting a property belonging to a landlord (Owner)
+    public List<Property> gettingPropertiesForLandlord(String idNumber) {
+        return propertyRepository.findAllByLandLord_IdNumber(idNumber);
+    }
 
 }
