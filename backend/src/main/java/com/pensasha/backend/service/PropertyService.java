@@ -120,8 +120,30 @@ public class PropertyService {
     }
 
     // Getting one property
+    public PropertyDTO getProperty(Long propertyId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new EntityNotFoundException("Property with ID " + propertyId + " not found"));
+
+        return new PropertyDTO(property.getName(), property.getDescription(), property.getLocation(),
+                property.getNumOfUnits(), property.getAmenities(), property.getLandLord(), property.getCareTaker(),
+                property.getUnits());
+    }
 
     // Geting all properties
+    public List<PropertyDTO> getAllProperties() {
+        List<Property> properties = propertyRepository.findAll();
+        return properties.stream()
+                .map(property -> new PropertyDTO(
+                        property.getName(),
+                        property.getDescription(),
+                        property.getLocation(),
+                        property.getNumOfUnits(),
+                        property.getAmenities(),
+                        property.getLandLord().getId(), // Return only ID to avoid exposing the whole entity
+                        property.getCareTaker().getId(),
+                        property.getUnits()))
+                .collect(Collectors.toList());
+    }
 
     // Deleting a property
 
