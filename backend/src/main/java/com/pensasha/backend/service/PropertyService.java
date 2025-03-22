@@ -9,10 +9,6 @@ import com.pensasha.backend.entity.User;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.repository.UserRepository;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgConstructor
@@ -25,31 +21,33 @@ public class PropertyService {
     @Transactional
     public ResponseEntity<EntityModel<Property>> addProperty(@Valid PropertyDTO propertyDTO) {
         Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
+        Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
 
+        // Validate Landlord
         if (landlordOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
+            throw new RuntimeException("A Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
         }
         User landlord = landlordOpt.get();
         if (!Role.LANDLORD.equals(landlord.getRole())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "User with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
+            throw new RuntimeException(
+                    "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
         }
 
+        // Validate Caretaker (if provided)
         User caretaker = null;
         if (propertyDTO.getCareTakerId() != null) {
-            Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
             if (caretakerOpt.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
+                throw new RuntimeException(
+                        "A Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
             }
             caretaker = caretakerOpt.get();
             if (!Role.CARETAKER.equals(caretaker.getRole())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "User with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
+                throw new RuntimeException(
+                        "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
         }
 
+        // Create Property
         Property property = new Property();
         property.setName(propertyDTO.getName());
         property.setDescription(propertyDTO.getDescription());
@@ -57,22 +55,15 @@ public class PropertyService {
         property.setNumOfUnits(propertyDTO.getNoOfUnits());
         property.setAmenities(propertyDTO.getAmenities());
         property.setLandLord(landlord);
-        property.setCareTaker(caretaker);
-        property.setUnits(new HashSet<>());
+        property.setCareTaker(caretaker); // Can be null
+        property.setUnits(new HashSet<>()); // Empty Set (will be added later)
 
-        Property savedProperty = propertyRepository.save(property);
-
-        // Build HATEOAS links
-        EntityModel<Property> entityModel = EntityModel.of(savedProperty,
-                linkTo(methodOn(PropertyController.class).getPropertyById(savedProperty.getId())).withSelfRel(),
-                linkTo(methodOn(PropertyController.class).getAllProperties())).withRel("all-properties");
-
-        return ResponseEntity.ok(entityModel);
+        return propertyRepository.save(property);
     }
 
     // Updating property details
     @Transactional
-    public ResponseEntity<EntityModel<Property>> updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
+    public Property updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
         Optional<Property> existingPropertyOpt = propertyRepository.findById(propertyId);
 
         if (existingPropertyOpt.isEmpty()) {
