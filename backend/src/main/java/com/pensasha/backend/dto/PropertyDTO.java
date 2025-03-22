@@ -21,8 +21,9 @@ public class PropertyDTO {
     @NotBlank(message = "Location is required")
     private String location;
 
+    @NotNull(message = "Number of units is required")
     @Min(value = 1, message = "Number of units must be at least 1")
-    private int noOfUnits;
+    private Integer noOfUnits;
 
     @NotEmpty(message = "Amenities list cannot be empty")
     private List<@NotBlank(message = "Amenity cannot be blank") String> amenities;
@@ -30,7 +31,7 @@ public class PropertyDTO {
     @NotNull(message = "Landlord ID is required")
     private String landLordId;
 
-    private String careTakerId; // Optional caretaker
+    private String careTakerId; // Optional caretaker (changed to String for consistency)
 
     private Set<UnitDTO> units;
 }
