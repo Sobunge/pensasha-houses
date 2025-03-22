@@ -59,6 +59,65 @@ public class PropertyService {
     }
 
     // Updating property details
+    @Transactional
+    public String updateProperty(Long propertyId, @Valid PropertyDTO propertyDTO) {
+        Optional<Property> existingPropertyOpt = propertyRepository.findById(propertyId);
+
+        if (existingPropertyOpt.isEmpty()) {
+            return "Property with ID " + propertyId + " not found";
+        }
+
+        Property existingProperty = existingPropertyOpt.get();
+
+        // Update fields if new values are provided
+        if (propertyDTO.getName() != null) {
+            existingProperty.setName(propertyDTO.getName());
+        }
+        if (propertyDTO.getDescription() != null) {
+            existingProperty.setDescription(propertyDTO.getDescription());
+        }
+        if (propertyDTO.getLocation() != null) {
+            existingProperty.setLocation(propertyDTO.getLocation());
+        }
+        if (propertyDTO.getNoOfUnits() > 0) {
+            existingProperty.setNumOfUnits(propertyDTO.getNoOfUnits());
+        }
+        if (propertyDTO.getAmenities() != null) {
+            existingProperty.setAmenities(propertyDTO.getAmenities());
+        }
+
+        // Validate and update Landlord (if changed)
+        if (propertyDTO.getLandLordId() != null
+                && !propertyDTO.getLandLordId().equals(existingProperty.getLandLord().getIdNumber())) {
+            Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
+            if (landlordOpt.isEmpty()) {
+                return "Landlord with National ID: " + propertyDTO.getLandLordId() + " not found";
+            }
+            User landlord = landlordOpt.get();
+            if (!Role.LANDLORD.equals(landlord.getRole())) {
+                return "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord";
+            }
+            existingProperty.setLandLord(landlord);
+        }
+
+        // Validate and update Caretaker (if changed)
+        if (propertyDTO.getCareTakerId() != null && (existingProperty.getCareTaker() == null
+                || !propertyDTO.getCareTakerId().equals(existingProperty.getCareTaker().getIdNumber()))) {
+            Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
+            if (caretakerOpt.isEmpty()) {
+                return "Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found";
+            }
+            User caretaker = caretakerOpt.get();
+            if (!Role.CARETAKER.equals(caretaker.getRole())) {
+                return "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker";
+            }
+            existingProperty.setCareTaker(caretaker);
+        }
+
+        // Save updated property
+        propertyRepository.save(existingProperty);
+        return "Property updated successfully";
+    }
 
     // Getting one property
 
