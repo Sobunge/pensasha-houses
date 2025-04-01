@@ -1,8 +1,5 @@
 package com.pensasha.backend.dto;
 
-import com.pensasha.backend.entity.Property;
-import com.pensasha.backend.entity.Tenant;
-
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -21,7 +18,9 @@ public class UnitDTO {
     @NotNull(message = "Occupancy status is required")
     private Boolean isOccupied;
 
-    private Property property;
+    @NotNull(message = "Property ID is required")
+    private Long propertyId;
 
-    private Tenant tenant;
+    private Long tenantId;
+
 }

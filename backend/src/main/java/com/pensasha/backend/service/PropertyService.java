@@ -1,19 +1,32 @@
 package com.pensasha.backend.service;
 
-import java.util.Optional;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.pensasha.backend.controller.PropertyController;
 import com.pensasha.backend.dto.PropertyDTO;
+import com.pensasha.backend.entity.CareTaker;
+import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.entity.Property;
 import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.entity.User;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.repository.UserRepository;
 import com.pensasha.backend.utils.PropertyMapperUtil;
+import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.stereotype.Service;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Service
-@RequiredArgConstructor
+@RequiredArgsConstructor
 public class PropertyService {
 
     private final PropertyRepository propertyRepository;
@@ -29,25 +42,23 @@ public class PropertyService {
         if (landlordOpt.isEmpty()) {
             throw new RuntimeException("A Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
         }
-        User landlord = landlordOpt.get();
-        if (!Role.LANDLORD.equals(landlord.getRole())) {
+
+        User landlordUser = landlordOpt.get();
+
+        if (!(landlordUser instanceof LandLord)) {
             throw new RuntimeException(
                     "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
         }
+        LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
 
-        // Validate Caretaker (if provided)
-        User caretaker = null;
-        if (propertyDTO.getCareTakerId() != null) {
-            if (caretakerOpt.isEmpty()) {
-                throw new RuntimeException(
-                        "A Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
-            }
-            caretaker = caretakerOpt.get();
-            if (!Role.CARETAKER.equals(caretaker.getRole())) {
-                throw new RuntimeException(
-                        "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
-            }
+        // Cast the User to Caretaker
+        User caretakerUser = caretakerOpt.get();
+
+        if (!(caretakerUser instanceof CareTaker)) {
+            throw new RuntimeException(
+                    "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
         }
+        CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
 
         // Create Property
         Property property = new Property();
@@ -60,7 +71,13 @@ public class PropertyService {
         property.setCareTaker(caretaker); // Can be null
         property.setUnits(new HashSet<>()); // Empty Set (will be added later)
 
-        return propertyRepository.save(property);
+        // Save the Property
+        Property savedProperty = propertyRepository.save(property);
+
+        // Create the EntityModel for Property with HATEOAS links
+        EntityModel<Property> propertyModel = EntityModel.of(savedProperty,
+                linkTo(methodOn(PropertyController.class).getProperty(savedProperty.getId())).withSelfRel(),
+                linkTo(methodOn(PropertyController.class).getAllProperties()).withRel("all-properties"));
     }
 
     // Updating property details
