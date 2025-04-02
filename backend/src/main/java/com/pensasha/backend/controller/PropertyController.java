@@ -89,15 +89,20 @@ public class PropertyController {
     // Getting a property
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<PropertyDTO>> getProperty(@PathVariable Long id) {
+        Optional<PropertyDTO> propertyDTOOpt = propertyService.getProperty(id);
 
-        PropertyDTO propertyDTO = propertyService.getProperty(id);
+        if (propertyDTOOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null); // Returns 404 if property is not found
+        }
+
+        PropertyDTO propertyDTO = propertyDTOOpt.get();
 
         EntityModel<PropertyDTO> responseDTO = EntityModel.of(propertyDTO,
                 linkTo(methodOn(PropertyController.class).getProperty(id)).withSelfRel(),
                 linkTo(methodOn(PropertyController.class).getAllProperties()).withRel("all-properties"));
 
         return ResponseEntity.ok(responseDTO);
-
     }
 
     // Getting all properties
@@ -105,11 +110,11 @@ public class PropertyController {
     public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getAllProperties() {
 
         List<Property> properties = propertyService.getAllProperties(); // Fetch properties
-    
+
         if (properties.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content if no properties exist
         }
-    
+
         // Convert to DTO and wrap in EntityModel
         List<EntityModel<PropertyDTO>> propertyDTOs = properties.stream()
                 .map(property -> {
@@ -119,14 +124,13 @@ public class PropertyController {
                             linkTo(methodOn(PropertyController.class).getAllProperties()).withRel("all-properties"));
                 })
                 .collect(Collectors.toList());
-    
+
         // Wrap in CollectionModel
         CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
                 linkTo(methodOn(PropertyController.class).getAllProperties()).withSelfRel());
-    
+
         return ResponseEntity.ok(responseDTO);
     }
-    
 
     // Getting all properties belonging to a landlord
     @GetMapping("/all/{idNumber}")
