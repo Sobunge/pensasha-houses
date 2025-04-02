@@ -14,6 +14,7 @@ import com.pensasha.backend.entity.User;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.repository.UserRepository;
 import com.pensasha.backend.utils.PropertyMapperUtil;
+import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
