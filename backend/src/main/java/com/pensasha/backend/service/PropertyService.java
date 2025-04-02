@@ -1,15 +1,12 @@
 package com.pensasha.backend.service;
 
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.pensasha.backend.controller.PropertyController;
 import com.pensasha.backend.dto.PropertyDTO;
 import com.pensasha.backend.entity.CareTaker;
 import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.entity.Property;
-import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.entity.User;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.repository.UserRepository;
@@ -17,14 +14,10 @@ import com.pensasha.backend.utils.PropertyMapperUtil;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +28,7 @@ public class PropertyService {
 
     // Adding a property
     @Transactional
-    public ResponseEntity<EntityModel<Property>> addProperty(PropertyDTO propertyDTO) {
+    public Property addProperty(PropertyDTO propertyDTO) {
         Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
         Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
 
@@ -75,10 +68,8 @@ public class PropertyService {
         // Save the Property
         Property savedProperty = propertyRepository.save(property);
 
-        // Create the EntityModel for Property with HATEOAS links
-        EntityModel<Property> propertyModel = EntityModel.of(savedProperty,
-                linkTo(methodOn(PropertyController.class).getProperty(savedProperty.getId())).withSelfRel(),
-                linkTo(methodOn(PropertyController.class).getAllProperties()).withRel("all-properties"));
+        return savedProperty;
+
     }
 
     // Updating property details
