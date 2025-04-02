@@ -11,7 +11,6 @@ import com.pensasha.backend.entity.Property;
 import com.pensasha.backend.service.PropertyService;
 import com.pensasha.backend.utils.PropertyMapperUtil;
 import com.pensasha.backend.dto.PropertyDTO;
-import com.pensasha.backend.dto.UnitDTO;
 
 import jakarta.validation.Valid;
 import java.util.List;

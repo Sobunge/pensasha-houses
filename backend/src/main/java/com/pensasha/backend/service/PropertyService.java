@@ -1,10 +1,8 @@
 package com.pensasha.backend.service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.pensasha.backend.dto.PropertyDTO;
-import com.pensasha.backend.dto.UnitDTO;
 import com.pensasha.backend.entity.CareTaker;
 import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.entity.Property;
@@ -17,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
