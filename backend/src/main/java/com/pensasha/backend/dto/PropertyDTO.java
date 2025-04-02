@@ -36,5 +36,5 @@ public class PropertyDTO {
 
     private String careTakerId; // Optional caretaker (changed to String for consistency)
 
-    private Set<Unit> units;
+    private Set<UnitDTO> units;
 }

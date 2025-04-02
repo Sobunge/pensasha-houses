@@ -14,21 +14,21 @@ public class PropertyMapperUtil {
             return null;
         }
 
-        PropertyDTO dto = new PropertyDTO();
-        dto.setName(property.getName());
-        dto.setDescription(property.getDescription());
-        dto.setLocation(property.getLocation());
-        dto.setNoOfUnits(property.getNumOfUnits());
-        dto.setAmenities(property.getAmenities());
+        PropertyDTO propertyDTO = new PropertyDTO();
+        propertyDTO.setName(property.getName());
+        propertyDTO.setDescription(property.getDescription());
+        propertyDTO.setLocation(property.getLocation());
+        propertyDTO.setNumOfUnits(property.getNumOfUnits());
+        propertyDTO.setAmenities(property.getAmenities());
 
         // Set the Landlord ID instead of the full Landlord object
         if (property.getLandLord() != null) {
-            dto.setLandLordId(property.getLandLord().getIdNumber()); // Set only the ID of the landlord
+            propertyDTO.setLandLordId(property.getLandLord().getIdNumber()); // Set only the ID of the landlord
         }
 
         // Set the Caretaker ID instead of the full Caretaker object
         if (property.getCareTaker() != null) {
-            dto.setCareTakerId(property.getCareTaker().getIdNumber()); // Set only the ID of the caretaker
+            propertyDTO.setCareTakerId(property.getCareTaker().getIdNumber()); // Set only the ID of the caretaker
         }
 
         // Map the units using UnitDTOs
@@ -42,8 +42,8 @@ public class PropertyMapperUtil {
                                                                                    // assigned)
                 ))
                 .collect(Collectors.toSet());
-        dto.setUnits(unitDTOs);
+        propertyDTO.setUnits(unitDTOs);
 
-        return dto;
+        return propertyDTO;
     }
 }
