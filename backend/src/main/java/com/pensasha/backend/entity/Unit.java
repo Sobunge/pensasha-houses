@@ -19,7 +19,7 @@ public class Unit {
     private String unitNumber;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal rentAmount; 
+    private Double rentAmount; 
 
     @Column(nullable = false)
     private boolean isOccupied; 
