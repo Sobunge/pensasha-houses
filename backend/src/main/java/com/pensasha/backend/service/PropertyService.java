@@ -165,8 +165,8 @@ public class PropertyService {
                         property.getLocation(),
                         property.getNumOfUnits(),
                         property.getAmenities(),
-                        property.getLandLord().getId(), // Return only ID to avoid exposing the whole entity
-                        property.getCareTaker().getId(),
+                        property.getLandLord().getIdNumber(), // Return only ID to avoid exposing the whole entity
+                        property.getCareTaker().getIdNumber(),
                         property.getUnits()))
                 .collect(Collectors.toList());
     }

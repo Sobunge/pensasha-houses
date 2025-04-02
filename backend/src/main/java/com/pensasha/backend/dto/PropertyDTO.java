@@ -2,6 +2,9 @@ package com.pensasha.backend.dto;
 
 import java.util.List;
 import java.util.Set;
+
+import com.pensasha.backend.entity.Unit;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -23,7 +26,7 @@ public class PropertyDTO {
 
     @NotNull(message = "Number of units is required")
     @Min(value = 1, message = "Number of units must be at least 1")
-    private Integer noOfUnits;
+    private Integer numOfUnits;
 
     @NotEmpty(message = "Amenities list cannot be empty")
     private List<@NotBlank(message = "Amenity cannot be blank") String> amenities;
@@ -33,5 +36,5 @@ public class PropertyDTO {
 
     private String careTakerId; // Optional caretaker (changed to String for consistency)
 
-    private Set<UnitDTO> units;
+    private Set<Unit> units;
 }
