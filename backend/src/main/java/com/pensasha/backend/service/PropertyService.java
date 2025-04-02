@@ -66,7 +66,7 @@ public class PropertyService {
         property.setName(propertyDTO.getName());
         property.setDescription(propertyDTO.getDescription());
         property.setLocation(propertyDTO.getLocation());
-        property.setNumOfUnits(propertyDTO.getNoOfUnits());
+        property.setNumOfUnits(propertyDTO.getNumOfUnits());
         property.setAmenities(propertyDTO.getAmenities());
         property.setLandLord(landlord);
         property.setCareTaker(caretaker); // Can be null
@@ -102,8 +102,8 @@ public class PropertyService {
         if (propertyDTO.getLocation() != null) {
             existingProperty.setLocation(propertyDTO.getLocation());
         }
-        if (propertyDTO.getNoOfUnits() > 0) {
-            existingProperty.setNumOfUnits(propertyDTO.getNoOfUnits());
+        if (propertyDTO.getNumOfUnits() > 0) {
+            existingProperty.setNumOfUnits(propertyDTO.getNumOfUnits());
         }
         if (propertyDTO.getAmenities() != null) {
             existingProperty.setAmenities(propertyDTO.getAmenities());
@@ -116,11 +116,14 @@ public class PropertyService {
             if (landlordOpt.isEmpty()) {
                 throw new RuntimeException("Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
             }
-            User landlord = landlordOpt.get();
-            if (!Role.LANDLORD.equals(landlord.getRole())) {
+            User landlordUser = landlordOpt.get();
+            if (!(landlordUser instanceof LandLord)) {
                 throw new RuntimeException(
                         "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
             }
+
+            LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
+
             existingProperty.setLandLord(landlord);
         }
 
@@ -132,11 +135,14 @@ public class PropertyService {
                 throw new RuntimeException(
                         "Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
             }
-            User caretaker = caretakerOpt.get();
-            if (!Role.CARETAKER.equals(caretaker.getRole())) {
+            User caretakerUser = caretakerOpt.get();
+            if (!(caretakerUser instanceof CareTaker)) {
                 throw new RuntimeException(
                         "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
+
+            CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
+
             existingProperty.setCareTaker(caretaker);
         }
 
