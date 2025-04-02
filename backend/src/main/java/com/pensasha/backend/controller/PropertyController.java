@@ -133,7 +133,7 @@ public class PropertyController {
     public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getPropertiesByLandlord(
             @PathVariable String idNumber) {
 
-        List<Property> properties = propertyService.getPropertiesByLandlord(idNumber);
+        List<Property> properties = propertyService.gettingPropertiesForLandlord(idNumber);
 
         if (properties.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content if no properties exist for the landlord
@@ -158,7 +158,7 @@ public class PropertyController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProperty(@PathVariable Long id) {
 
-        Optional<PropertyDTO> propertyOpt = propertyService.getProperty(id);
+        PropertyDTO propertyOpt = propertyService.getProperty(id);
 
         if (propertyOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Property not found"));

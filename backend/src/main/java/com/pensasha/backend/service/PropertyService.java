@@ -143,19 +143,14 @@ public class PropertyService {
 
     }
 
-    // Getting one property
-    public PropertyDTO getProperty(Long propertyId) {
-        Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new EntityNotFoundException("Property with ID " + propertyId + " not found"));
-
-        PropertyDTO propertyDTO = PropertyMapperUtil.mapToDTO(property);
-
-        return propertyDTO;
+    public Optional<PropertyDTO> getProperty(Long propertyId) {
+        return propertyRepository.findById(propertyId)
+                .map(PropertyMapperUtil::mapToDTO); // Wrap result in Optional
     }
-
+    
     // Geting all properties
     public List<Property> getAllProperties() {
-        
+
         return propertyRepository.findAll();
 
        /*  return properties.stream()
