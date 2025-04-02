@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.pensasha.backend.dto.PropertyDTO;
+import com.pensasha.backend.dto.UnitDTO;
 import com.pensasha.backend.entity.CareTaker;
 import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.entity.Property;
@@ -155,6 +156,7 @@ public class PropertyService {
     // Geting all properties
     public List<PropertyDTO> getAllProperties() {
         List<Property> properties = propertyRepository.findAll();
+
         return properties.stream()
                 .map(property -> new PropertyDTO(
                         property.getName(),
@@ -164,7 +166,17 @@ public class PropertyService {
                         property.getAmenities(),
                         property.getLandLord().getIdNumber(), // Return only ID to avoid exposing the whole entity
                         property.getCareTaker().getIdNumber(),
-                        property.getUnits()))
+                        property.getUnits().stream()
+                                .map(unit -> new UnitDTO(
+                                        unit.getUnitNumber(),
+                                        unit.getRentAmount(),
+                                        unit.isOccupied(),
+                                        unit.getProperty() != null ? unit.getProperty().getId() : null, // Property ID
+                                        unit.getTenant() != null ? unit.getTenant().getId() : null // Tenant ID (can be
+                                                                                                   // null if not
+                                                                                                   // assigned)
+                                ))
+                                .collect(Collectors.toSet())))
                 .collect(Collectors.toList());
     }
 
