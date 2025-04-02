@@ -1,9 +1,12 @@
 package com.pensasha.backend.controller;
 
+import java.util.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.dto.LoginRequest;
-import com.pensasha.backend.security.CustomUserDetailsService;
 import com.pensasha.backend.security.JWTUtils;
 
 import jakarta.validation.Valid;
@@ -25,7 +27,6 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtils jwtUtils;
-    private final CustomUserDetailsService userDetailsService;
 
     // Register
     @PostMapping("/register")
@@ -36,25 +37,27 @@ public class AuthController {
 
     // login
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request, BindingResult result) {
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request, BindingResult result) {
 
-        // Validate input
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body("Invalid input data");
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid input data"));
         }
 
-        // Authenticate user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getIdNumber(), request.getPassword()));
 
-        // Load user details
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getIdNumber());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Generate JWT token
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtils.generateToken(userDetails);
+        String roles = userDetails.getAuthorities().toString();
 
-        return ResponseEntity.ok("{\"token\": \"" + token + "\"}");
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("role", roles);
+        response.put("username", userDetails.getUsername());
 
+        return ResponseEntity.ok(response);
     }
 
     // Logout
