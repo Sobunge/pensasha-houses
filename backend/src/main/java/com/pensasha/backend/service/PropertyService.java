@@ -152,7 +152,7 @@ public class PropertyService {
 
         PropertyDTO propertyDTO = PropertyMapperUtil.mapToDTO(property);
 
-        return new PropertyDTO(propertyDTO);
+        return propertyDTO;
     }
 
     // Geting all properties
