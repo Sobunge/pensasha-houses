@@ -158,7 +158,7 @@ public class PropertyController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProperty(@PathVariable Long id) {
 
-        PropertyDTO propertyOpt = propertyService.getProperty(id);
+        Optional<PropertyDTO> propertyOpt = propertyService.getProperty(id);
 
         if (propertyOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Property not found"));
