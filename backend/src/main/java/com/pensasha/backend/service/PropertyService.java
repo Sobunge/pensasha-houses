@@ -154,10 +154,11 @@ public class PropertyService {
     }
 
     // Geting all properties
-    public List<PropertyDTO> getAllProperties() {
-        List<Property> properties = propertyRepository.findAll();
+    public List<Property> getAllProperties() {
+        
+        return propertyRepository.findAll();
 
-        return properties.stream()
+       /*  return properties.stream()
                 .map(property -> new PropertyDTO(
                         property.getName(),
                         property.getDescription(),
@@ -178,6 +179,8 @@ public class PropertyService {
                                 ))
                                 .collect(Collectors.toSet())))
                 .collect(Collectors.toList());
+
+                */
     }
 
     // Deleting a property

@@ -104,25 +104,29 @@ public class PropertyController {
     @GetMapping("/all")
     public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getAllProperties() {
 
-        List<Property> properties = propertyService.getAllProperties();
-
+        List<Property> properties = propertyService.getAllProperties(); // Fetch properties
+    
         if (properties.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Returns 204 No Content if no properties exist
+            return ResponseEntity.noContent().build(); // 204 No Content if no properties exist
         }
-
+    
+        // Convert to DTO and wrap in EntityModel
         List<EntityModel<PropertyDTO>> propertyDTOs = properties.stream()
                 .map(property -> {
-                    PropertyDTO propertyDTO = PropertyMapperUtil.mapToDTO(property);
-                    return EntityModel.of(propertyDTO,
-                            linkTo(methodOn(PropertyController.class).getProperty(property.getId())).withSelfRel());
+                    PropertyDTO dto = PropertyMapperUtil.mapToDTO(property);
+                    return EntityModel.of(dto,
+                            linkTo(methodOn(PropertyController.class).getProperty(property.getId())).withSelfRel(),
+                            linkTo(methodOn(PropertyController.class).getAllProperties()).withRel("all-properties"));
                 })
                 .collect(Collectors.toList());
-
+    
+        // Wrap in CollectionModel
         CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
                 linkTo(methodOn(PropertyController.class).getAllProperties()).withSelfRel());
-
+    
         return ResponseEntity.ok(responseDTO);
     }
+    
 
     // Getting all properties belonging to a landlord
     @GetMapping("/all/{idNumber}")
