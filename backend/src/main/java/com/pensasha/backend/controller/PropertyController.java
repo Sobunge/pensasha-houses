@@ -1,13 +1,27 @@
 package com.pensasha.backend.controller;
 
-import javax.swing.text.html.parser.Entity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
 
 import com.pensasha.backend.entity.Property;
 import com.pensasha.backend.service.PropertyService;
 import com.pensasha.backend.utils.PropertyMapperUtil;
+import com.pensasha.backend.dto.PropertyDTO;
+import com.pensasha.backend.dto.UnitDTO;
+
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/properties/")
@@ -76,13 +90,7 @@ public class PropertyController {
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<PropertyDTO>> getProperty(@PathVariable Long id) {
 
-        Property property = propertyService.getProperty(id);
-
-        if (property.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        PropertyDTO propertyDTO = PropertyMapperUtil.mapToDTO(property.get());
+        PropertyDTO propertyDTO = propertyService.getProperty(id);
 
         EntityModel<PropertyDTO> responseDTO = EntityModel.of(propertyDTO,
                 linkTo(methodOn(PropertyController.class).getProperty(id)).withSelfRel(),
