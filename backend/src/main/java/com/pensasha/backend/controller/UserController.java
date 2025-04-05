@@ -50,15 +50,6 @@ public class UserController {
         @Autowired
         private UserService userService;
 
-        // Login
-        @PostMapping("/login")
-        public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-                Authentication authentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(request.getIdNumber(), request.getPassword()));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                return ResponseEntity.ok("Login successful");
-        }
-
         // Editing common user details
         @PutMapping("/update/{idNumber}")
         public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
