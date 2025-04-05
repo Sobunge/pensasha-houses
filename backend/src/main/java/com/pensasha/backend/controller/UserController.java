@@ -50,47 +50,6 @@ public class UserController {
         @Autowired
         private UserService userService;
 
-        @Autowired
-        private AuthenticationManager authenticationManager;
-
-        // Adding a new user
-        @PostMapping("/register")
-        public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
-
-                // Checks for input validations errors
-                if (result.hasErrors()) {
-
-                        // Extract simple error messages
-                        List<String> errors = result.getFieldErrors().stream()
-                                        .map(error -> error.getField() + ": " + error.getDefaultMessage()) // Shorter
-                                                                                                           // message
-                                        .collect(Collectors.toList());
-
-                        return ResponseEntity.badRequest().body(Map.of("errors", errors));
-
-                }
-
-                Optional<User> optionalUser = userService.gettingUser(userDTO.getIdNumber());
-
-                // Checks if the user already exists
-                if (optionalUser.isPresent()) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT)
-                                        .body(EntityModel.of(userDTO,
-                                                        linkTo(methodOn(UserController.class)
-                                                                        .gettingUser(userDTO.getIdNumber()))
-                                                                        .withSelfRel()));
-                }
-
-                User savedUser = userService.addUser(userDTO);
-
-                EntityModel<User> userModel = EntityModel.of(savedUser,
-                                linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
-                                                .withSelfRel(),
-                                linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
-
-                return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
-        }
-
         // Login
         @PostMapping("/login")
         public ResponseEntity<String> login(@RequestBody LoginRequest request) {
