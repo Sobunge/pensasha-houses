@@ -35,7 +35,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtils jwtUtils;
-    private final UserService userService; 
+    private final UserService userService;
 
     // Register
     @PostMapping("/register")
