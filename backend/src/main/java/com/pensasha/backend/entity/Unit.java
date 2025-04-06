@@ -17,7 +17,7 @@ public class Unit {
     @Column(nullable = false, unique = true)
     private String unitNumber;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false)
     private Double rentAmount; 
 
     @Column(nullable = false)

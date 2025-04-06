@@ -2,7 +2,6 @@ package com.pensasha.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,8 +21,9 @@ public class Tenant extends User {
 
     @Column(nullable = false)
     private LocalDate leaseEndDate; 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal monthlyRent; 
+
+    @Column(nullable = false)
+    private Double monthlyRent; 
 
     @Column(length = 15)
     private String emergencyContact; 
