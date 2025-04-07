@@ -1,6 +1,7 @@
 package com.pensasha.backend.security;
 
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ public class JWTUtils {
 
     // Generate Access Token
     public String generateToken(UserDetails userDetails) {
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())

@@ -90,7 +90,11 @@ public class AuthController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtils.generateToken(userDetails);
-        String roles = userDetails.getAuthorities().toString();
+        
+        // Extract roles as a list of strings
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .collect(Collectors.toList());
 
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
