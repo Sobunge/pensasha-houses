@@ -1,7 +1,6 @@
 package com.pensasha.backend.security;
 
 import java.util.Date;
-import java.util.List;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
