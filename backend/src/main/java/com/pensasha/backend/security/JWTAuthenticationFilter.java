@@ -37,7 +37,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header == null || !header.startsWith("Bearer ")) {
-            logger.debug("Authorization header is missing or not starting with 'Bearer '");
             chain.doFilter(request, response);
             return;
         }
@@ -49,13 +48,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtUtils.validateToken(token, userDetails)) {
-                logger.debug("Token is valid, setting authentication in SecurityContext");
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-            } else {
-                logger.debug("Token validation failed for user: " + username);
-                ;
             }
         }
 
