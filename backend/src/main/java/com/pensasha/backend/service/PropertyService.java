@@ -12,6 +12,7 @@ import com.pensasha.backend.repository.UserRepository;
 import com.pensasha.backend.utils.PropertyMapperUtil;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j // Lombok annotation to generate logger
 public class PropertyService {
 
     private final PropertyRepository propertyRepository;
@@ -32,14 +34,15 @@ public class PropertyService {
 
         // Validate Landlord
         if (landlordOpt.isEmpty()) {
+            log.error("A Landlord with National ID: {} not found", propertyDTO.getLandLordId());
             throw new RuntimeException("A Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
         }
 
         User landlordUser = landlordOpt.get();
 
         if (!(landlordUser instanceof LandLord)) {
-            throw new RuntimeException(
-                    "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
+            log.error("The user with National ID: {} is not a Landlord", propertyDTO.getLandLordId());
+            throw new RuntimeException("The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
         }
         LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
 
@@ -47,8 +50,8 @@ public class PropertyService {
         User caretakerUser = caretakerOpt.get();
 
         if (!(caretakerUser instanceof CareTaker)) {
-            throw new RuntimeException(
-                    "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
+            log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
+            throw new RuntimeException("The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
         }
         CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
 
@@ -66,8 +69,9 @@ public class PropertyService {
         // Save the Property
         Property savedProperty = propertyRepository.save(property);
 
-        return savedProperty;
+        log.info("Property with ID {} has been successfully added", savedProperty.getId());
 
+        return savedProperty;
     }
 
     // Updating property details
@@ -76,6 +80,7 @@ public class PropertyService {
         Optional<Property> existingPropertyOpt = propertyRepository.findById(propertyId);
 
         if (existingPropertyOpt.isEmpty()) {
+            log.error("Property with ID {} not found", propertyId);
             throw new RuntimeException("Property with ID " + propertyId + " not found");
         }
 
@@ -103,12 +108,13 @@ public class PropertyService {
                 && !propertyDTO.getLandLordId().equals(existingProperty.getLandLord().getIdNumber())) {
             Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
             if (landlordOpt.isEmpty()) {
+                log.error("Landlord with National ID: {} not found", propertyDTO.getLandLordId());
                 throw new RuntimeException("Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
             }
             User landlordUser = landlordOpt.get();
             if (!(landlordUser instanceof LandLord)) {
-                throw new RuntimeException(
-                        "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
+                log.error("The user with National ID: {} is not a Landlord", propertyDTO.getLandLordId());
+                throw new RuntimeException("The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
             }
 
             LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
@@ -121,11 +127,13 @@ public class PropertyService {
                 || !propertyDTO.getCareTakerId().equals(existingProperty.getCareTaker().getIdNumber()))) {
             Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
             if (caretakerOpt.isEmpty()) {
+                log.error("Caretaker with National ID: {} not found", propertyDTO.getCareTakerId());
                 throw new RuntimeException(
                         "Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
             }
             User caretakerUser = caretakerOpt.get();
             if (!(caretakerUser instanceof CareTaker)) {
+                log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
                 throw new RuntimeException(
                         "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
@@ -136,57 +144,44 @@ public class PropertyService {
         }
 
         // Save updated property
-        return propertyRepository.save(existingProperty);
+        log.info("Property with ID {} has been successfully updated", propertyId);
 
+        return propertyRepository.save(existingProperty);
     }
 
     public Optional<PropertyDTO> getProperty(Long propertyId) {
-        return propertyRepository.findById(propertyId)
+        Optional<PropertyDTO> propertyDTO = propertyRepository.findById(propertyId)
                 .map(PropertyMapperUtil::mapToDTO); // Wrap result in Optional
+        
+        if (propertyDTO.isPresent()) {
+            log.info("Fetched property with ID {}", propertyId);
+        } else {
+            log.warn("Property with ID {} not found", propertyId);
+        }
+        
+        return propertyDTO;
     }
     
-    // Geting all properties
+    // Get all properties
     public List<Property> getAllProperties() {
-
+        log.info("Fetching all properties");
         return propertyRepository.findAll();
-
-       /*  return properties.stream()
-                .map(property -> new PropertyDTO(
-                        property.getName(),
-                        property.getDescription(),
-                        property.getLocation(),
-                        property.getNumOfUnits(),
-                        property.getAmenities(),
-                        property.getLandLord().getIdNumber(), // Return only ID to avoid exposing the whole entity
-                        property.getCareTaker().getIdNumber(),
-                        property.getUnits().stream()
-                                .map(unit -> new UnitDTO(
-                                        unit.getUnitNumber(),
-                                        unit.getRentAmount(),
-                                        unit.isOccupied(),
-                                        unit.getProperty() != null ? unit.getProperty().getId() : null, // Property ID
-                                        unit.getTenant() != null ? unit.getTenant().getId() : null // Tenant ID (can be
-                                                                                                   // null if not
-                                                                                                   // assigned)
-                                ))
-                                .collect(Collectors.toSet())))
-                .collect(Collectors.toList());
-
-                */
     }
 
     // Deleting a property
     public void deleteProperty(Long propertyId) {
         if (propertyRepository.existsById(propertyId)) {
             propertyRepository.deleteById(propertyId);
+            log.info("Property with ID {} has been successfully deleted", propertyId);
         } else {
+            log.error("Property with ID {} not found, cannot delete", propertyId);
             throw new ResourceNotFoundException("Property with ID " + propertyId + " not found.");
         }
     }
 
     // Getting a property belonging to a landlord (Owner)
     public List<Property> gettingPropertiesForLandlord(String idNumber) {
+        log.info("Fetching properties for landlord with ID number {}", idNumber);
         return propertyRepository.findAllByLandLord_IdNumber(idNumber);
     }
-
 }
