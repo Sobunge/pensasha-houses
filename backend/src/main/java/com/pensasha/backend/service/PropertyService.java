@@ -18,17 +18,29 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
+/**
+ * Service class for managing properties.
+ * Handles adding, updating, fetching, and deleting properties, as well as managing landlord and caretaker associations.
+ */
 @Service
 @RequiredArgsConstructor
-@Slf4j // Lombok annotation to generate logger
+@Slf4j // Lombok annotation to generate a logger for logging operations
 public class PropertyService {
 
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
 
-    // Adding a property
+    /**
+     * Adds a new property.
+     * Validates and associates a landlord and a caretaker with the property.
+     * 
+     * @param propertyDTO DTO containing the property details to be added.
+     * @return The added property entity.
+     * @throws RuntimeException if the landlord or caretaker are not valid.
+     */
     @Transactional
     public Property addProperty(PropertyDTO propertyDTO) {
+        // Fetch landlord and caretaker users by their ID numbers
         Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
         Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
 
@@ -39,7 +51,6 @@ public class PropertyService {
         }
 
         User landlordUser = landlordOpt.get();
-
         if (!(landlordUser instanceof LandLord)) {
             log.error("The user with National ID: {} is not a Landlord", propertyDTO.getLandLordId());
             throw new RuntimeException(
@@ -49,7 +60,6 @@ public class PropertyService {
 
         // Cast the User to Caretaker
         User caretakerUser = caretakerOpt.get();
-
         if (!(caretakerUser instanceof CareTaker)) {
             log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
             throw new RuntimeException(
@@ -57,7 +67,7 @@ public class PropertyService {
         }
         CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
 
-        // Create Property
+        // Create Property entity and populate fields from DTO
         Property property = new Property();
         property.setName(propertyDTO.getName());
         property.setDescription(propertyDTO.getDescription());
@@ -68,15 +78,22 @@ public class PropertyService {
         property.setCareTaker(caretaker); // Can be null
         property.setUnits(new HashSet<>()); // Empty Set (will be added later)
 
-        // Save the Property
+        // Save the Property in the database
         Property savedProperty = propertyRepository.save(property);
 
         log.info("Property with ID {} has been successfully added", savedProperty.getId());
-
         return savedProperty;
     }
 
-    // Updating property details
+    /**
+     * Updates an existing property.
+     * Validates and updates fields like name, description, landlord, and caretaker.
+     * 
+     * @param propertyId The ID of the property to update.
+     * @param propertyDTO DTO containing updated property details.
+     * @return The updated property entity.
+     * @throws RuntimeException if the property or related entities (landlord/caretaker) are not found.
+     */
     @Transactional
     public Property updateProperty(Long propertyId, PropertyDTO propertyDTO) {
         Optional<Property> existingPropertyOpt = propertyRepository.findById(propertyId);
@@ -88,7 +105,7 @@ public class PropertyService {
 
         Property existingProperty = existingPropertyOpt.get();
 
-        // Update fields if new values are provided
+        // Update property fields if new values are provided in the DTO
         if (propertyDTO.getName() != null) {
             existingProperty.setName(propertyDTO.getName());
         }
@@ -105,7 +122,7 @@ public class PropertyService {
             existingProperty.setAmenities(propertyDTO.getAmenities());
         }
 
-        // Validate and update Landlord (if changed)
+        // Validate and update Landlord if changed
         if (propertyDTO.getLandLordId() != null
                 && !propertyDTO.getLandLordId().equals(existingProperty.getLandLord().getIdNumber())) {
             Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
@@ -119,13 +136,11 @@ public class PropertyService {
                 throw new RuntimeException(
                         "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
             }
-
-            LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
-
+            LandLord landlord = (LandLord) landlordUser;
             existingProperty.setLandLord(landlord);
         }
 
-        // Validate and update Caretaker (if changed)
+        // Validate and update Caretaker if changed
         if (propertyDTO.getCareTakerId() != null && (existingProperty.getCareTaker() == null
                 || !propertyDTO.getCareTakerId().equals(existingProperty.getCareTaker().getIdNumber()))) {
             Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
@@ -140,21 +155,24 @@ public class PropertyService {
                 throw new RuntimeException(
                         "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
-
-            CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
-
+            CareTaker caretaker = (CareTaker) caretakerUser;
             existingProperty.setCareTaker(caretaker);
         }
 
-        // Save updated property
+        // Save the updated property
         log.info("Property with ID {} has been successfully updated", propertyId);
-
         return propertyRepository.save(existingProperty);
     }
 
+    /**
+     * Fetches a property by its ID and maps it to a DTO.
+     * 
+     * @param propertyId The ID of the property to fetch.
+     * @return Optional containing PropertyDTO if found, empty if not found.
+     */
     public Optional<PropertyDTO> getProperty(Long propertyId) {
         Optional<PropertyDTO> propertyDTO = propertyRepository.findById(propertyId)
-                .map(PropertyMapperUtil::mapToDTO); // Wrap result in Optional
+                .map(PropertyMapperUtil::mapToDTO); // Map Property entity to DTO
 
         if (propertyDTO.isPresent()) {
             log.info("Fetched property with ID {}", propertyId);
@@ -165,13 +183,22 @@ public class PropertyService {
         return propertyDTO;
     }
 
-    // Get all properties
+    /**
+     * Fetches all properties.
+     * 
+     * @return A list of all property entities.
+     */
     public List<Property> getAllProperties() {
         log.info("Fetching all properties");
         return propertyRepository.findAll();
     }
 
-    // Deleting a property
+    /**
+     * Deletes a property by its ID.
+     * 
+     * @param propertyId The ID of the property to delete.
+     * @throws ResourceNotFoundException if the property with the given ID is not found.
+     */
     public void deleteProperty(Long propertyId) {
         if (propertyRepository.existsById(propertyId)) {
             propertyRepository.deleteById(propertyId);
@@ -182,7 +209,12 @@ public class PropertyService {
         }
     }
 
-    // Getting a property belonging to a landlord (Owner)
+    /**
+     * Fetches all properties belonging to a landlord identified by their ID number.
+     * 
+     * @param idNumber The ID number of the landlord.
+     * @return A list of properties associated with the specified landlord.
+     */
     public List<Property> gettingPropertiesForLandlord(String idNumber) {
         log.info("Fetching properties for landlord with ID number {}", idNumber);
         return propertyRepository.findAllByLandLord_IdNumber(idNumber);
