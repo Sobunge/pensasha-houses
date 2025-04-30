@@ -42,7 +42,8 @@ public class PropertyService {
 
         if (!(landlordUser instanceof LandLord)) {
             log.error("The user with National ID: {} is not a Landlord", propertyDTO.getLandLordId());
-            throw new RuntimeException("The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
+            throw new RuntimeException(
+                    "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
         }
         LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
 
@@ -51,7 +52,8 @@ public class PropertyService {
 
         if (!(caretakerUser instanceof CareTaker)) {
             log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
-            throw new RuntimeException("The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
+            throw new RuntimeException(
+                    "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
         }
         CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
 
@@ -114,7 +116,8 @@ public class PropertyService {
             User landlordUser = landlordOpt.get();
             if (!(landlordUser instanceof LandLord)) {
                 log.error("The user with National ID: {} is not a Landlord", propertyDTO.getLandLordId());
-                throw new RuntimeException("The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
+                throw new RuntimeException(
+                        "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
             }
 
             LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
@@ -152,16 +155,16 @@ public class PropertyService {
     public Optional<PropertyDTO> getProperty(Long propertyId) {
         Optional<PropertyDTO> propertyDTO = propertyRepository.findById(propertyId)
                 .map(PropertyMapperUtil::mapToDTO); // Wrap result in Optional
-        
+
         if (propertyDTO.isPresent()) {
             log.info("Fetched property with ID {}", propertyId);
         } else {
             log.warn("Property with ID {} not found", propertyId);
         }
-        
+
         return propertyDTO;
     }
-    
+
     // Get all properties
     public List<Property> getAllProperties() {
         log.info("Fetching all properties");
