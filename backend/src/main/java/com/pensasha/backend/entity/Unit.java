@@ -8,6 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Unit {
 
     @Id
@@ -18,17 +19,22 @@ public class Unit {
     private String unitNumber;
 
     @Column(nullable = false)
-    private Double rentAmount; 
+    private Double rentAmount;
 
     @Column(nullable = false)
-    private boolean isOccupied; 
+    private boolean isOccupied;
 
     @ManyToOne
     @JoinColumn(name = "property_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    // @JsonIgnore 
     private Property property;
 
     @ManyToOne
-    @JoinColumn(name = "tenant_id") 
-    private Tenant tenant; // Many units belong to one tenant
-    
+    @JoinColumn(name = "tenant_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    // @JsonIgnore 
+    private Tenant tenant;
 }
