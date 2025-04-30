@@ -7,12 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service class responsible for managing Unit entities.
  * Provides business logic for CRUD operations, pagination, filtering, and other custom logic related to Units.
  */
 @Service
+@Slf4j
 public class UnitService {
 
     // Injecting the UnitRepository to interact with the database.
@@ -34,6 +37,7 @@ public class UnitService {
      * @return The saved unit entity.
      */
     public Unit addUnit(Unit unit) {
+        log.info("Adding new unit: {}", unit);
         return unitRepository.save(unit);  // Save the unit in the repository and return the saved entity.
     }
 
@@ -42,11 +46,14 @@ public class UnitService {
      *
      * @param id The ID of the unit to retrieve.
      * @return The found unit entity.
-     * @throws UnitNotFoundException if no unit is found with the given ID.
+     * @throws ResourceNotFoundException if no unit is found with the given ID.
      */
     public Unit getUnitById(Long id) {
         return unitRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Unit not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.error("Unit not found with ID: {}", id);
+                    return new ResourceNotFoundException("Unit not found with id: " + id);
+                });
     }
 
     /**
@@ -80,8 +87,9 @@ public class UnitService {
      * @param id The ID of the unit to update.
      * @param unitDetails The updated unit details.
      * @return The updated unit entity.
-     * @throws UnitNotFoundException if no unit is found with the given ID.
+     * @throws ResourceNotFoundException if no unit is found with the given ID.
      */
+    @Transactional
     public Unit updateUnit(Long id, Unit unitDetails) {
         Unit unit = getUnitById(id);  // Retrieve the unit to update (throws exception if not found).
         
@@ -92,6 +100,7 @@ public class UnitService {
         unit.setProperty(unitDetails.getProperty());
         unit.setTenant(unitDetails.getTenant());
 
+        log.info("Updating unit with ID: {}", id);
         return unitRepository.save(unit);  // Save and return the updated unit entity.
     }
 
@@ -99,10 +108,12 @@ public class UnitService {
      * Deletes a unit from the database.
      * 
      * @param id The ID of the unit to delete.
-     * @throws UnitNotFoundException if no unit is found with the given ID.
+     * @throws ResourceNotFoundException if no unit is found with the given ID.
      */
+    @Transactional
     public void deleteUnit(Long id) {
         Unit unit = getUnitById(id);  // Retrieve the unit to delete (throws exception if not found).
+        log.info("Deleting unit with ID: {}", id);
         unitRepository.delete(unit);  // Delete the unit from the repository.
     }
 
@@ -111,7 +122,7 @@ public class UnitService {
      * 
      * @param id The ID of the unit to check.
      * @return true if the unit is available (not occupied), false otherwise.
-     * @throws UnitNotFoundException if no unit is found with the given ID.
+     * @throws ResourceNotFoundException if no unit is found with the given ID.
      */
     public boolean isUnitAvailable(Long id) {
         Unit unit = getUnitById(id);  // Retrieve the unit to check (throws exception if not found).
@@ -123,7 +134,7 @@ public class UnitService {
      * 
      * @param id The ID of the unit to calculate the rent for.
      * @return The rent amount due for the unit.
-     * @throws UnitNotFoundException if no unit is found with the given ID.
+     * @throws ResourceNotFoundException if no unit is found with the given ID.
      */
     public double calculateRentDue(Long id) {
         Unit unit = getUnitById(id);  // Retrieve the unit to calculate rent for (throws exception if not found).
