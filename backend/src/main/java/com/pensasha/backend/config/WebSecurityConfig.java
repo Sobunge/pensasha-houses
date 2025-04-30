@@ -21,47 +21,64 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-@Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
+@Configuration // Marks the class as a configuration class for Spring
+@EnableWebSecurity // Enables Spring Security for the application
+@RequiredArgsConstructor // Automatically generates a constructor with required arguments (dependencies)
 public class WebSecurityConfig {
 
-    private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final JWTAuthenticationFilter jwtAuthenticationFilter; // JWT filter to intercept and authenticate requests
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(csrf -> csrf.disable()) // Disables CSRF protection, since the application is stateless
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless
+                                                                                                              // session
+                                                                                                              // management
+                                                                                                              // for a
+                                                                                                              // RESTful
+                                                                                                              // API
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // Adds the JWT
+                                                                                                      // authentication
+                                                                                                      // filter before
+                                                                                                      // the standard
+                                                                                                      // username/password
+                                                                                                      // filter
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() // Allows unauthenticated
+                                                                                              // access to registration
+                                                                                              // and login
+                        .anyRequest().authenticated() // Requires authentication for all other requests
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/user/logout")
-                        .logoutSuccessHandler(this::logoutSuccessHandler));
+                        .logoutUrl("/user/logout") // URL for logging out the user
+                        .logoutSuccessHandler(this::logoutSuccessHandler)); // Handles the success of the logout process
 
-        return http.build();
+        return http.build(); // Builds the SecurityFilterChain with the defined configuration
     }
 
+    // Custom logout success handler, returns a success message in JSON format
     private void logoutSuccessHandler(HttpServletRequest request, HttpServletResponse response,
-                                      org.springframework.security.core.Authentication authentication)
+            org.springframework.security.core.Authentication authentication)
             throws IOException, ServletException {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("{\"message\": \"Logout successful\"}");
-        response.getWriter().flush();
+        response.getWriter().write("{\"message\": \"Logout successful\"}"); // Sends a logout success message in
+                                                                            // response
+        response.getWriter().flush(); // Flushes the output to the client
     }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        // Let Spring Security automatically configure the AuthenticationManager
+        // Configures and returns the AuthenticationManager for the security
+        // configuration
         return http.getSharedObject(AuthenticationManagerBuilder.class).build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Spring Security will use this for password encoding
+        // Returns a password encoder (BCryptPasswordEncoder) for encoding user
+        // passwords
+        return new BCryptPasswordEncoder();
     }
 }
