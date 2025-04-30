@@ -42,41 +42,44 @@ public class UserController {
         @Autowired
         private UserService userService;
 
-        // Editing common user details
+        // Editing common user details (Profile update)
         @PutMapping("/update/{idNumber}")
         public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
                         @Valid @RequestBody UpdateUserDTO updatedUserDTO, BindingResult result) {
 
                 Optional<User> optionalUser = userService.gettingUser(idNumber);
 
+                // Return 404 if the user with the given ID does not exist
                 if (optionalUser.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 }
 
+                // Update the user's details
                 User savedUser = userService.updateUserDetails(updatedUserDTO);
 
+                // Creating response model with HATEOAS links
                 EntityModel<User> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
                 return ResponseEntity.status(HttpStatus.OK).body(userModel);
-
         }
 
+        // Changing a user's password
         @PutMapping("/{idNumber}/changePassword")
         public ResponseEntity<EntityModel<String>> changeUserPassword(@PathVariable String idNumber,
                         UpdatePasswordDTO updatePasswordDTO) {
 
+                // Update the password for the given user
                 String response = userService.updateUserPassword(idNumber, updatePasswordDTO);
 
-                // Create response model
+                // Create response model with HATEOAS links
                 EntityModel<String> responseModel = EntityModel.of(response,
                                 linkTo(methodOn(UserController.class).gettingUser(idNumber)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-
         }
 
         // Deleting a user
@@ -84,29 +87,34 @@ public class UserController {
         public ResponseEntity<EntityModel<ApiResponse>> deleteUser(@PathVariable String idNumber) {
                 Optional<User> user = userService.gettingUser(idNumber);
 
+                // Return 404 if the user with the given ID does not exist
                 if (user.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                         .body(EntityModel.of(
                                                         new ApiResponse("User not found with the provided ID number")));
                 }
 
+                // Delete the user
                 userService.deleteUser(idNumber);
 
+                // Response after successful deletion with HATEOAS links
                 EntityModel<ApiResponse> response = EntityModel.of(new ApiResponse("User deleted successfully"),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
                 return ResponseEntity.ok(response);
         }
 
-        // Getting a single user
+        // Getting a single user by their ID number
         @GetMapping("/{idNumber}")
         public ResponseEntity<EntityModel<User>> gettingUser(@PathVariable String idNumber) {
                 Optional<User> user = userService.gettingUser(idNumber);
 
+                // Return 404 if the user with the given ID does not exist
                 if (user.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 }
 
+                // Creating response model with HATEOAS links
                 EntityModel<User> response = EntityModel.of(user.get(),
                                 linkTo(methodOn(UserController.class).gettingUser(idNumber)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
@@ -114,7 +122,7 @@ public class UserController {
                 return ResponseEntity.ok(response);
         }
 
-        // Getting all users (Admin)
+        // Getting all users (for admin use, paginated)
         @GetMapping("/all")
         public ResponseEntity<PagedModel<EntityModel<User>>> getAllUsers(
                         @RequestParam(defaultValue = "0") int page,
@@ -123,19 +131,23 @@ public class UserController {
                 Pageable pageable = PageRequest.of(page, size);
                 Page<User> usersPage = userService.getAllUsers(pageable);
 
+                // Return empty response if no users are found
                 if (usersPage.isEmpty()) {
                         return ResponseEntity.ok(PagedModel.empty());
                 }
 
+                // Map users to HATEOAS entity models
                 List<EntityModel<User>> userResources = usersPage.getContent().stream()
                                 .map(user -> EntityModel.of(user,
                                                 linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber()))
                                                                 .withSelfRel()))
                                 .collect(Collectors.toList());
 
+                // Metadata for paginated response
                 PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page,
                                 usersPage.getTotalElements());
 
+                // Building paginated model with HATEOAS links
                 PagedModel<EntityModel<User>> response = PagedModel.of(userResources, metadata,
                                 linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
                                 linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
@@ -143,9 +155,9 @@ public class UserController {
                                                 .withRel("last-page"));
 
                 return ResponseEntity.ok(response);
-
         }
 
+        // Getting all users by role (for admin use, paginated)
         @GetMapping("/role/{userRole}")
         public ResponseEntity<PagedModel<EntityModel<User>>> getAllUserByRole(@PathVariable Role role,
                         @RequestParam(defaultValue = "0") int page,
@@ -154,19 +166,23 @@ public class UserController {
                 Pageable pageable = PageRequest.of(page, size);
                 Page<User> usersPage = userService.gettingUsersByRole(role, pageable);
 
+                // Return empty response if no users are found
                 if (usersPage.isEmpty()) {
                         return ResponseEntity.ok(PagedModel.empty());
                 }
 
+                // Map users to HATEOAS entity models
                 List<EntityModel<User>> userResources = usersPage.getContent().stream()
                                 .map(user -> EntityModel.of(user,
                                                 linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber()))
                                                                 .withSelfRel()))
                                 .collect(Collectors.toList());
 
+                // Metadata for paginated response
                 PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page,
                                 usersPage.getTotalElements());
 
+                // Building paginated model with HATEOAS links
                 PagedModel<EntityModel<User>> response = PagedModel.of(userResources, metadata,
                                 linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
                                 linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
@@ -174,6 +190,5 @@ public class UserController {
                                                 .withRel("last-page"));
 
                 return ResponseEntity.ok(response);
-
         }
 }
