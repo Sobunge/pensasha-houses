@@ -14,6 +14,8 @@ import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -215,8 +217,8 @@ public class PropertyService {
      * @param idNumber The ID number of the landlord.
      * @return A list of properties associated with the specified landlord.
      */
-    public List<Property> gettingPropertiesForLandlord(String idNumber) {
+    public Page<Property> gettingPropertiesForLandlord(String idNumber, Pageable pageable) {
         log.info("Fetching properties for landlord with ID number {}", idNumber);
-        return propertyRepository.findAllByLandLord_IdNumber(idNumber);
+        return propertyRepository.findByLandLordId(idNumber, pageable);
     }
 }
