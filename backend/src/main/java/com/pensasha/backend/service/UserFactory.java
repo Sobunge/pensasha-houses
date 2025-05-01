@@ -14,35 +14,46 @@ import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.entity.Tenant;
 import com.pensasha.backend.entity.User;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class UserFactory {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     public User createUser(UserDTO userDTO) {
+
+        log.info("Creating user for role: {}", userDTO.getRole());
+
         if (userDTO instanceof CareTakerDTO careTakerDTO) {
             CareTaker careTaker = new CareTaker();
             copyCommonAttributes(careTaker, careTakerDTO);
+            log.debug("Created CareTaker: {}", careTaker.getIdNumber());
             return careTaker;
 
         } else if (userDTO instanceof LandLordDTO landLordDTO) {
             LandLord landLord = new LandLord();
             copyCommonAttributes(landLord, landLordDTO);
+            log.debug("Created LandLord: {}", landLord.getIdNumber());
             return landLord;
 
         } else if (userDTO instanceof TenantDTO tenantDTO) {
             Tenant tenant = new Tenant();
             copyCommonAttributes(tenant, tenantDTO);
+            log.debug("Created Tenant: {}", tenant.getIdNumber());
             return tenant;
 
         } else if (userDTO.getRole() == Role.ADMIN) {
             User admin = new User();
             copyCommonAttributes(admin, userDTO);
             admin.setRole(Role.ADMIN);
+            log.debug("Created Admin: {}", admin.getIdNumber());
             return admin;
 
         } else {
+            log.error("Invalid user role: {}", userDTO.getRole());
             throw new IllegalArgumentException("Invalid user type provided for ID: " + userDTO.getIdNumber());
         }
     }

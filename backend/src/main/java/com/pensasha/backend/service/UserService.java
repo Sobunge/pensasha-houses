@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.dto.*;
 import com.pensasha.backend.entity.*;
+import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -110,50 +111,24 @@ public class UserService {
 
         if (optionalUser.isEmpty()) {
             log.error("Role change failed. User not found with ID: {}", idNumber);
-            throw new RuntimeException("User with ID: " + idNumber + " not found.");
+            throw new ResourceNotFoundException("User with ID: " + idNumber + " not found.");
         }
 
         User oldUser = optionalUser.get();
 
+        // If the role is already the same, no need to change it
         if (oldUser.getRole() == newRole) {
             log.info("No role change needed for user ID: {}", idNumber);
             return oldUser;
         }
 
-        User newUser;
+        // Logging the role change
         log.info("Changing role for user ID: {} from {} to {}", idNumber, oldUser.getRole(), newRole);
 
-        if (newRole == Role.ADMIN) {
-            userRepository.delete(oldUser);
-            User admin = new User();
-            copyCommonAttributes(admin, oldUser);
-            admin.setRole(Role.ADMIN);
-            log.info("Role changed to ADMIN for user ID: {}", idNumber);
-            return userRepository.save(admin);
-        }
+        // Creating the new user object based on the new role
+        User newUser = createUserWithNewRole(oldUser, newRole);
 
-        switch (newRole) {
-            case CARETAKER -> {
-                CareTaker careTaker = new CareTaker();
-                copyCommonAttributes(careTaker, oldUser);
-                careTaker.setRole(Role.CARETAKER);
-                newUser = careTaker;
-            }
-            case LANDLORD -> {
-                LandLord landLord = new LandLord();
-                copyCommonAttributes(landLord, oldUser);
-                landLord.setRole(Role.LANDLORD);
-                newUser = landLord;
-            }
-            case TENANT -> {
-                Tenant tenant = new Tenant();
-                copyCommonAttributes(tenant, oldUser);
-                tenant.setRole(Role.TENANT);
-                newUser = tenant;
-            }
-            default -> throw new IllegalArgumentException("Unsupported role change");
-        }
-
+        // Deleting the old user and saving the new user
         userRepository.delete(oldUser);
         log.info("Role changed to {} for user ID: {}", newRole, idNumber);
         return userRepository.save(newUser);
@@ -203,7 +178,6 @@ public class UserService {
         return userRepository.findAllByRole(role, pageable);
     }
 
-   
     /**
      * Copies common attributes from one User entity to another.
      *
@@ -225,7 +199,7 @@ public class UserService {
 
     private User createUserWithNewRole(User oldUser, Role newRole) {
         User newUser;
-    
+
         switch (newRole) {
             case ADMIN -> {
                 newUser = new User();
@@ -253,7 +227,7 @@ public class UserService {
             }
             default -> throw new IllegalArgumentException("Unsupported role change: " + newRole);
         }
-    
+
         return newUser;
     }
 

@@ -3,13 +3,29 @@ package com.pensasha.backend.dto;
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
 import lombok.*;  // Importing Lombok annotations for generating boilerplate code
 import org.springframework.validation.annotation.Validated;  // Importing validation support from Spring
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.pensasha.backend.entity.Role;  // Importing the Role entity
+
 
 // DTO class for transferring user-related data, with validation constraints
 @Data  // Lombok annotation to generate getters, setters, toString, equals, and hashCode methods
 @NoArgsConstructor  // Lombok annotation to generate a no-argument constructor
 @AllArgsConstructor  // Lombok annotation to generate an all-arguments constructor
 @Validated  // Spring annotation to trigger validation during method execution
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,         // Use name of the class/type
+    include = JsonTypeInfo.As.PROPERTY, // Include it as a field in the JSON
+    property = "role",                  // Use the "role" field to determine type
+    visible = true                      // Make "role" available for deserialization
+)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = LandLordDTO.class, name = "LANDLORD"),
+    @JsonSubTypes.Type(value = TenantDTO.class, name = "TENANT"),
+    @JsonSubTypes.Type(value = CareTakerDTO.class, name = "CARETAKER"),
+    @JsonSubTypes.Type(value = UserDTO.class, name = "ADMIN") // fallback/default
+})
 public class UserDTO {
 
     // First name field: must not be blank and must be between 3 and 20 characters
