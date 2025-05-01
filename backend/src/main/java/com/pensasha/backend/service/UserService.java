@@ -29,6 +29,9 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private UserFactory userFactory;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     /**
@@ -40,38 +43,8 @@ public class UserService {
      */
     @Transactional
     public User addUser(UserDTO userDTO) {
-        User user;
-
-        if (userDTO instanceof CareTakerDTO careTakerDTO) {
-            CareTaker careTaker = new CareTaker();
-            copyCommonAttributes(careTaker, careTakerDTO);
-            user = careTaker;
-            log.info("Created new CareTaker with ID: {}", userDTO.getIdNumber());
-
-        } else if (userDTO instanceof LandLordDTO landLordDTO) {
-            LandLord landLord = new LandLord();
-            copyCommonAttributes(landLord, landLordDTO);
-            user = landLord;
-            log.info("Created new LandLord with ID: {}", userDTO.getIdNumber());
-
-        } else if (userDTO instanceof TenantDTO tenantDTO) {
-            Tenant tenant = new Tenant();
-            copyCommonAttributes(tenant, tenantDTO);
-            user = tenant;
-            log.info("Created new Tenant with ID: {}", userDTO.getIdNumber());
-
-        } else if (userDTO.getRole() == Role.ADMIN) {
-            User admin = new User();
-            copyCommonAttributes(admin, userDTO);
-            admin.setRole(Role.ADMIN);
-            user = admin;
-            log.info("Created new Admin with ID: {}", userDTO.getIdNumber());
-
-        } else {
-            log.error("Invalid user type provided for ID: {}", userDTO.getIdNumber());
-            throw new IllegalArgumentException("Invalid user type provided");
-        }
-
+        User user = userFactory.createUser(userDTO);
+        log.info("Created new {} with ID: {}", user.getRole(), userDTO.getIdNumber());
         return userRepository.save(user);
     }
 
@@ -230,26 +203,7 @@ public class UserService {
         return userRepository.findAllByRole(role, pageable);
     }
 
-    /**
-     * Copies common attributes from a DTO to a User entity.
-     *
-     * @param user    Target user entity.
-     * @param userDTO Source DTO.
-     */
-    private void copyCommonAttributes(User user, UserDTO userDTO) {
-        user.setFirstName(userDTO.getFirstName());
-        user.setSecondName(userDTO.getSecondName());
-        user.setThirdName(userDTO.getThirdName());
-        user.setIdNumber(userDTO.getIdNumber());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setRole(userDTO.getRole());
-
-        if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
-            user.setProfilePicture(userDTO.getProfilePicture());
-        }
-    }
-
+   
     /**
      * Copies common attributes from one User entity to another.
      *
@@ -267,6 +221,40 @@ public class UserService {
         if (source.getProfilePicture() != null && !source.getProfilePicture().isEmpty()) {
             target.setProfilePicture(source.getProfilePicture());
         }
+    }
+
+    private User createUserWithNewRole(User oldUser, Role newRole) {
+        User newUser;
+    
+        switch (newRole) {
+            case ADMIN -> {
+                newUser = new User();
+                copyCommonAttributes(newUser, oldUser);
+                newUser.setRole(Role.ADMIN);
+                log.debug("Created new ADMIN user: {}", oldUser.getIdNumber());
+            }
+            case CARETAKER -> {
+                newUser = new CareTaker();
+                copyCommonAttributes(newUser, oldUser);
+                newUser.setRole(Role.CARETAKER);
+                log.debug("Created new CARETAKER user: {}", oldUser.getIdNumber());
+            }
+            case LANDLORD -> {
+                newUser = new LandLord();
+                copyCommonAttributes(newUser, oldUser);
+                newUser.setRole(Role.LANDLORD);
+                log.debug("Created new LANDLORD user: {}", oldUser.getIdNumber());
+            }
+            case TENANT -> {
+                newUser = new Tenant();
+                copyCommonAttributes(newUser, oldUser);
+                newUser.setRole(Role.TENANT);
+                log.debug("Created new TENANT user: {}", oldUser.getIdNumber());
+            }
+            default -> throw new IllegalArgumentException("Unsupported role change: " + newRole);
+        }
+    
+        return newUser;
     }
 
 }
