@@ -11,20 +11,20 @@ import com.pensasha.backend.entity.Invoice;
 import com.pensasha.backend.entity.InvoiceStatus;
 import com.pensasha.backend.entity.Tenant;
 import com.pensasha.backend.repository.InvoiceRepository;
+import com.pensasha.backend.repository.InvoiceSequenceRepository;
 import com.pensasha.backend.repository.TenantRepository;
 import com.pensasha.backend.repository.UnitRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class InvoiceService {
 
-    @Autowired
-    private InvoiceRepository invoiceRepository;
-
-    @Autowired
-    private TenantRepository tenantRepository;
-
-    @Autowired
-    private UnitRepository unitRepository;
+    private final InvoiceRepository invoiceRepository;
+    private final TenantRepository tenantRepository;
+    private final UnitRepository unitRepository;
+    private final InvoiceSequenceRepository invoiceSequenceRepository;
 
     // Creating an invoice
     public Invoice createInvoice(Invoice invoice) {
