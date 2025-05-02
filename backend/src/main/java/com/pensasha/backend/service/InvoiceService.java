@@ -53,24 +53,24 @@ public class InvoiceService {
     }
 
     // Schedule invoice creation 5th of every month
-    @Scheduled(cron = "0 0 0 5 * *") // At 00:00 on the 5th day of every month
+    @Scheduled(cron = "0 0 0 5 * ?")
+    @Transactional
     public void generateMonthlyInvoices() {
         List<Tenant> tenants = tenantRepository.findAll();
-        for (Tenant tenant : tenants) {
-            if (LocalDate.now().isAfter(tenant.getLeaseStartDate())
-                    && LocalDate.now().isBefore(tenant.getLeaseEndDate())) {
 
+        for (Tenant tenant : tenants) {
+            if (tenant.getLeaseEndDate().isAfter(LocalDate.now())) {
                 Invoice invoice = new Invoice();
+                invoice.setInvoiceNumber(generateInvoiceNumber());
                 invoice.setTenant(tenant);
                 invoice.setAmountDue(tenant.getMonthlyRent());
-                invoice.setAmountPaid(0.0);
-                invoice.setDueDate(LocalDate.now());
-                invoice.setStatus(InvoiceStatus.DRAFT);
+                invoice.setInvoiceDate(LocalDate.now());
+                invoice.setDueDate(LocalDate.now().plusDays(5));
+                invoice.setStatus(InvoiceStatus.PENDING);
 
                 invoiceRepository.save(invoice);
             }
         }
-        System.out.println("Invoices generated for " + LocalDate.now());
     }
 
     // Updating an invoice

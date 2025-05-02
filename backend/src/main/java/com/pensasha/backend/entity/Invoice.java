@@ -21,7 +21,7 @@ public class Invoice {
 
     /** Unique identifier for the invoice (auto-generated). */
     @Id
-    private String id;
+    private String invoiceNumber;
 
     /** The tenant to whom this invoice belongs. */
     @ManyToOne
@@ -30,6 +30,9 @@ public class Invoice {
 
     /** Total amount that the tenant is required to pay for this invoice. */
     private Double amountDue;
+
+    /** The date by which the invoice is created. */
+    private LocalDate invoiceDate;
 
     /** Amount that has already been paid towards this invoice. */
     private Double amountPaid;
