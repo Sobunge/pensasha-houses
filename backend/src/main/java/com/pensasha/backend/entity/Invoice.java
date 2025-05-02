@@ -21,8 +21,7 @@ public class Invoice {
 
     /** Unique identifier for the invoice (auto-generated). */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     /** The tenant to whom this invoice belongs. */
     @ManyToOne
