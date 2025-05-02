@@ -3,13 +3,14 @@ package com.pensasha.backend.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.entity.Invoice;
 import com.pensasha.backend.entity.InvoiceSequence;
 import com.pensasha.backend.entity.InvoiceStatus;
-import com.pensasha.backend.entity.Tenant;
 import com.pensasha.backend.repository.InvoiceRepository;
 import com.pensasha.backend.repository.InvoiceSequenceRepository;
 import com.pensasha.backend.repository.TenantRepository;
@@ -104,21 +105,18 @@ public class InvoiceService {
     }
 
     // Viewing all invoices
-    public List<Invoice> getAllInvoices() {
-        return invoiceRepository.findAll();
-    }
-
-    // Viewing all invoices by Month
-    public List<Invoice> getInvoicesByMonth(int month) {
-        return invoiceRepository.findByInvoiceDateMonth(month);
+    public Page<Invoice> getAllInvoices(Pageable pageable) {
+        return invoiceRepository.findAll(pageable);
     }
 
     // Viewing all invoices by tenant
-    public List<Invoice> getInvoicesByTenant(Long tenantId) {
-        return invoiceRepository.findByTenantId(tenantId);
+    public Page<Invoice> getInvoicesByTenant(String idNumber, Pageable pageable) {
+        return invoiceRepository.findByTenantIdNumber(idNumber, pageable);
     }
 
-    // Viewing all invoices by units
+    public Page<Invoice> getInvoicesByProperty(Long propertyId, Pageable pageable) {
+        return invoiceRepository.findByTenantUnitPropertyId(propertyId, pageable);
+    }
 
     // Viewing an invoice
     public Invoice getInvoice(String invoiceNumber) {

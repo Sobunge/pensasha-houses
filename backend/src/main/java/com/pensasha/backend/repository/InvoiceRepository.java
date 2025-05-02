@@ -12,6 +12,8 @@ import com.pensasha.backend.entity.InvoiceStatus;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, String> {
 
+    Page<Invoice> findByTenantIdNumber(String idNumber, Pageable pageable);
+
     Page<Invoice> findByTenantUnitPropertyId(Long propertyId, Pageable pageable);
 
     Page<Invoice> findByTenantUnitPropertyIdAndInvoiceDateBetween(
