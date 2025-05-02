@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.entity.Invoice;
+import com.pensasha.backend.entity.InvoiceStatus;
 import com.pensasha.backend.entity.Tenant;
 import com.pensasha.backend.repository.InvoiceRepository;
 import com.pensasha.backend.repository.TenantRepository;
@@ -43,7 +44,7 @@ public class InvoiceService {
                 invoice.setAmountDue(tenant.getMonthlyRent());
                 invoice.setAmountPaid(0.0);
                 invoice.setDueDate(LocalDate.now());
-                invoice.setStatus("OPEN");
+                invoice.setStatus(InvoiceStatus.DRAFT);
 
                 invoiceRepository.save(invoice);
             }
