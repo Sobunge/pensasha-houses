@@ -73,7 +73,16 @@ public class InvoiceService {
         }
     }
 
-    // Updating an invoice
+     // Controlled update: update only status and payment date
+     @Transactional
+     public Invoice updateInvoiceStatus(String invoiceNumber, InvoiceStatus status) {
+         Invoice invoice = invoiceRepository.findById(invoiceNumber)
+             .orElseThrow(() -> new RuntimeException("Invoice not found"));
+ 
+         invoice.setStatus(status);
+         
+         return invoiceRepository.save(invoice);
+     }
 
     // Deleting an invoice
 
@@ -83,8 +92,14 @@ public class InvoiceService {
     }
 
     // Viewing all invoices by Month
+    public List<Invoice> getInvoicesByMonth(int month) {
+        return invoiceRepository.findByInvoiceDateMonth(month);
+    }
 
     // Viewing all invoices by tenant
+    public List<Invoice> getInvoicesByTenant(Long tenantId) {
+        return invoiceRepository.findByTenantId(tenantId);
+    }
 
     // Viewing all invoices by units
 
