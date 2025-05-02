@@ -78,6 +78,9 @@ public class InvoiceService {
     // Deleting an invoice
 
     // Viewing all invoices
+    public List<Invoice> getAllInvoices() {
+        return invoiceRepository.findAll();
+    }
 
     // Viewing all invoices by Month
 
