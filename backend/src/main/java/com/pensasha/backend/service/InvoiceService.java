@@ -73,18 +73,35 @@ public class InvoiceService {
         }
     }
 
-     // Controlled update: update only status and payment date
-     @Transactional
-     public Invoice updateInvoiceStatus(String invoiceNumber, InvoiceStatus status) {
-         Invoice invoice = invoiceRepository.findById(invoiceNumber)
-             .orElseThrow(() -> new RuntimeException("Invoice not found"));
- 
-         invoice.setStatus(status);
-         
-         return invoiceRepository.save(invoice);
-     }
+    // Controlled update: update only status and payment date
+    @Transactional
+    public Invoice updateInvoiceStatus(String invoiceNumber, InvoiceStatus status) {
+        Invoice invoice = invoiceRepository.findById(invoiceNumber)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        invoice.setStatus(status);
+
+        return invoiceRepository.save(invoice);
+    }
 
     // Deleting an invoice
+    @Transactional
+    public void deleteInvoice(String invoiceNumber) {
+        Invoice invoice = invoiceRepository.findById(invoiceNumber)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        // Check if the invoice is paid
+        if ("Paid".equals(invoice.getStatus())) {
+            throw new RuntimeException("Cannot delete a paid invoice.");
+        }
+
+        // Optional: Check for other conditions like 'Closed' or 'Archived'
+        if ("Closed".equals(invoice.getStatus())) {
+            throw new RuntimeException("Cannot delete a closed invoice.");
+        }
+
+        invoiceRepository.deleteById(invoiceNumber);
+    }
 
     // Viewing all invoices
     public List<Invoice> getAllInvoices() {
