@@ -51,25 +51,26 @@ public class InvoiceService {
         return invoiceRepository.save(invoice);
     }
 
-    // Schedule invoice creation 5th of every month
-    @Scheduled(cron = "0 0 0 5 * ?")
+    /**
+     * Generates invoices for all active tenants.
+     */
     @Transactional
     public void generateMonthlyInvoices() {
-        List<Tenant> tenants = tenantRepository.findAll();
+        List<Invoice> newInvoices = tenantRepository.findAll().stream()
+                .filter(tenant -> tenant.getLeaseEndDate().isAfter(LocalDate.now()))
+                .map(tenant -> {
+                    Invoice invoice = new Invoice();
+                    invoice.setInvoiceNumber(generateInvoiceNumber());
+                    invoice.setTenant(tenant);
+                    invoice.setAmountDue(tenant.getMonthlyRent());
+                    invoice.setInvoiceDate(LocalDate.now());
+                    invoice.setDueDate(LocalDate.now().plusDays(5));
+                    invoice.setStatus(InvoiceStatus.PENDING);
+                    return invoice;
+                })
+                .toList();
 
-        for (Tenant tenant : tenants) {
-            if (tenant.getLeaseEndDate().isAfter(LocalDate.now())) {
-                Invoice invoice = new Invoice();
-                invoice.setInvoiceNumber(generateInvoiceNumber());
-                invoice.setTenant(tenant);
-                invoice.setAmountDue(tenant.getMonthlyRent());
-                invoice.setInvoiceDate(LocalDate.now());
-                invoice.setDueDate(LocalDate.now().plusDays(5));
-                invoice.setStatus(InvoiceStatus.PENDING);
-
-                invoiceRepository.save(invoice);
-            }
-        }
+        invoiceRepository.saveAll(newInvoices);
     }
 
     // Controlled update: update only status and payment date
