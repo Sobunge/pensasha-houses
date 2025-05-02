@@ -3,7 +3,6 @@ package com.pensasha.backend.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -91,12 +90,12 @@ public class InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
 
         // Check if the invoice is paid
-        if ("Paid".equals(invoice.getStatus())) {
+        if (InvoiceStatus.PAID.equals(invoice.getStatus())) {
             throw new RuntimeException("Cannot delete a paid invoice.");
         }
 
         // Optional: Check for other conditions like 'Closed' or 'Archived'
-        if ("Closed".equals(invoice.getStatus())) {
+        if (InvoiceStatus.CLOSED.equals(invoice.getStatus())) {
             throw new RuntimeException("Cannot delete a closed invoice.");
         }
 
