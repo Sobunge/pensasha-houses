@@ -8,7 +8,8 @@ import lombok.*;
 
 /**
  * Represents an invoice issued to a tenant.
- * Each invoice contains payment details, due date, status, and associated payments.
+ * Each invoice contains payment details, due date, status, and associated
+ * payments.
  */
 @Entity
 @Table(name = "invoices")
