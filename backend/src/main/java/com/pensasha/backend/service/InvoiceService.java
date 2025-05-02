@@ -47,7 +47,7 @@ public class InvoiceService {
         return String.format("INV-%s-%04d", year, newNumber);
     }
 
-    // Creating an invoice
+    // Manual generation of an invoice
     public Invoice createInvoice(Invoice invoice) {
         return invoiceRepository.save(invoice);
     }
@@ -86,5 +86,8 @@ public class InvoiceService {
     // Viewing all invoices by units
 
     // Viewing an invoice
+    public Invoice getInvoice(String invoiceNumber) {
+        return invoiceRepository.findById(invoiceNumber).orElse(null);
+    }
 
 }
