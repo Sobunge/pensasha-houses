@@ -25,6 +25,13 @@ public class Tenant extends User {
     private List<Unit> rentalUnits;
 
     /**
+     * List of invoices assigned to this tenant.
+     * One tenant can have multiple invoices.
+     */
+    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Invoice> invoices;
+
+    /**
      * The start date of the lease agreement.
      * Cannot be null.
      */
