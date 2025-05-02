@@ -39,7 +39,7 @@ public class Invoice {
     private LocalDate dueDate;
 
     /** Status of the invoice, e.g. "OPEN", "CLOSED". */
-    private String status;
+    private InvoiceStatus status;
 
     /**
      * List of payments made towards this invoice.
