@@ -1,5 +1,7 @@
 package com.pensasha.backend.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,16 @@ public class PaymentService {
     }
 
     //Updating payment details
+    public Payment updatingPaymentDetails(Payment payment){
+        return paymentRepository.save(payment);
+    }
 
     //Getting payment by id
+    public Optional<Payment> getPaymentById(Long id){
+        return paymentRepository.findById(id);
+    }
 
-    //Getting pall payments
+    //Getting all payments
 
     //Deleting payment
 
