@@ -14,7 +14,6 @@ import com.pensasha.backend.entity.InvoiceStatus;
 import com.pensasha.backend.repository.InvoiceRepository;
 import com.pensasha.backend.repository.InvoiceSequenceRepository;
 import com.pensasha.backend.repository.TenantRepository;
-import com.pensasha.backend.repository.UnitRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final TenantRepository tenantRepository;
-    private final UnitRepository unitRepository;
     private final InvoiceSequenceRepository invoiceSequenceRepository;
 
     // Generate invoice number using database sequence
