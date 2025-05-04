@@ -29,7 +29,7 @@ public class Payment {
     private LocalDate paymentDate;
 
     /** The payment method used, e.g. "MPESA", "Cash", "Bank". */
-    private String method;
+    private MethodsOfPayment method;
 
     /** 
      * The tenant who made this payment.
