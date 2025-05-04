@@ -21,7 +21,7 @@ import com.pensasha.backend.dto.ApiResponse;
 import com.pensasha.backend.dto.UpdatePasswordDTO;
 import com.pensasha.backend.dto.UpdateUserDTO;
 import com.pensasha.backend.entity.Role;
-import com.pensasha.backend.entity.User;
+import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.service.UserService;
 
 import jakarta.validation.Valid;

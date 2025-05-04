@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pensasha.backend.entity.Tenant;
-import com.pensasha.backend.entity.User;
+import com.pensasha.backend.modules.user.User;
 
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
 

@@ -12,7 +12,7 @@ import com.pensasha.backend.entity.CareTaker;
 import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.entity.Tenant;
-import com.pensasha.backend.entity.User;
+import com.pensasha.backend.modules.user.User;
 
 import lombok.extern.slf4j.Slf4j;
 

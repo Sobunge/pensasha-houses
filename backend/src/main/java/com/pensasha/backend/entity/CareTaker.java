@@ -1,5 +1,7 @@
 package com.pensasha.backend.entity;
 
+import com.pensasha.backend.modules.user.User;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;

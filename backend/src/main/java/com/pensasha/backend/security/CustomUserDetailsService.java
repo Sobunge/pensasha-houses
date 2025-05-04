@@ -1,6 +1,6 @@
 package com.pensasha.backend.security;
 
-import com.pensasha.backend.entity.User;
+import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.repository.UserRepository;
 
 import java.util.List;

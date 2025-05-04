@@ -5,6 +5,8 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.pensasha.backend.modules.user.User;
+
 /**
  * Entity representing a Tenant in the system.
  * A Tenant is a user who rents one or more units within a property.

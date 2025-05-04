@@ -6,11 +6,12 @@ import com.pensasha.backend.dto.PropertyDTO;
 import com.pensasha.backend.entity.CareTaker;
 import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.entity.Property;
-import com.pensasha.backend.entity.User;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.repository.UserRepository;
 import com.pensasha.backend.utils.PropertyMapperUtil;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
+import com.pensasha.backend.modules.user.User;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

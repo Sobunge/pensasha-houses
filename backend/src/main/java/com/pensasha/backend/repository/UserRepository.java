@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pensasha.backend.entity.Role;
-import com.pensasha.backend.entity.User;
+import com.pensasha.backend.modules.user.User;
 
 /**
  * Repository interface for the User entity.

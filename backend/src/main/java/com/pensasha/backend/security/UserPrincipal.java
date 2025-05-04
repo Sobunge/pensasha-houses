@@ -1,8 +1,9 @@
 package com.pensasha.backend.security;
 
-import com.pensasha.backend.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.pensasha.backend.modules.user.User;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -2,6 +2,8 @@ package com.pensasha.backend.entity;
 
 import java.util.Set;
 
+import com.pensasha.backend.modules.user.User;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
