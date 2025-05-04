@@ -2,14 +2,12 @@ package com.pensasha.backend.service;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.entity.Invoice;
 import com.pensasha.backend.entity.Payment;
-import com.pensasha.backend.entity.Tenant;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.repository.InvoiceRepository;
 import com.pensasha.backend.repository.PaymentRepository;
