@@ -31,7 +31,7 @@ public class Payment {
     /** The payment method used, e.g. "MPESA", "Cash", "Bank". */
     private MethodsOfPayment method;
 
-    /** 
+    /**
      * The tenant who made this payment.
      * This is a mandatory relationship.
      */
@@ -39,7 +39,7 @@ public class Payment {
     @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
 
-    /** 
+    /**
      * The invoice this payment is linked to (if any).
      * This is optional — a payment may or may not be tied to an invoice.
      */
