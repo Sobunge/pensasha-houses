@@ -11,7 +11,7 @@ import com.pensasha.backend.dto.*;
 import com.pensasha.backend.entity.*;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.User;
-import com.pensasha.backend.repository.UserRepository;
+import com.pensasha.backend.modules.user.UserRepository;
 
 import jakarta.transaction.Transactional;
 
