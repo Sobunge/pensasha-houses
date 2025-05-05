@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.pensasha.backend.modules.unit.Unit;
+import com.pensasha.backend.modules.user.caretaker.CareTaker;
 
 /**
  * Entity class representing a Property.

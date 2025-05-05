@@ -1,5 +1,6 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.user.caretaker;
 
+import com.pensasha.backend.entity.Property;
 import com.pensasha.backend.modules.user.User;
 
 import jakarta.persistence.Entity;
