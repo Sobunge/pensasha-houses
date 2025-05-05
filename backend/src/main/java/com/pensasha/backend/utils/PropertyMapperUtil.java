@@ -1,8 +1,8 @@
 package com.pensasha.backend.utils;
 
-import com.pensasha.backend.dto.PropertyDTO;
 import com.pensasha.backend.dto.UnitDTO;
 import com.pensasha.backend.modules.property.Property;
+import com.pensasha.backend.modules.property.dto.PropertyDTO;
 
 import java.util.Set;
 import java.util.stream.Collectors;

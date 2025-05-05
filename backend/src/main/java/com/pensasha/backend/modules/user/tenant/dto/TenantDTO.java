@@ -1,4 +1,4 @@
-package com.pensasha.backend.dto;
+package com.pensasha.backend.modules.user.tenant.dto;
 
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.dto.UserDTO;
