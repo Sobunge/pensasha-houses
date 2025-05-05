@@ -1,4 +1,7 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.unit;
+
+import com.pensasha.backend.entity.Property;
+import com.pensasha.backend.entity.Tenant;
 
 import jakarta.persistence.*;
 import lombok.*;

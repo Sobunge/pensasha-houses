@@ -1,6 +1,6 @@
 package com.pensasha.backend.dto;
 
-import com.pensasha.backend.entity.Unit;  // Importing the Unit entity to represent the rental unit
+import com.pensasha.backend.modules.unit.Unit;
 
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
 import lombok.*;  // Importing Lombok annotations for generating boilerplate code

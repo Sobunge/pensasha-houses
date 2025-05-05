@@ -6,6 +6,8 @@ import lombok.*;
 import java.util.List;
 import java.util.Set;
 
+import com.pensasha.backend.modules.unit.Unit;
+
 /**
  * Entity class representing a Property.
  * Maps to the 'properties' table in the database.

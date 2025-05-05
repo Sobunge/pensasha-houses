@@ -1,7 +1,7 @@
 package com.pensasha.backend.service;
 
-import com.pensasha.backend.entity.Unit;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
+import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.repository.UnitRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
