@@ -1,5 +1,6 @@
-package com.pensasha.backend.dto;
+package com.pensasha.backend.modules.user.caretaker.dto;
 
+import com.pensasha.backend.dto.UserDTO;
 import com.pensasha.backend.modules.property.Property;
 
 import lombok.*;
