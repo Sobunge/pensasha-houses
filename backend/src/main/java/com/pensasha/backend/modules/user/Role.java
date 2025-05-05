@@ -1,4 +1,4 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.user;
 
 /**
  * Enumeration representing the different user roles within the system.

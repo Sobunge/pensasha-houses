@@ -3,7 +3,6 @@ package com.pensasha.backend.modules.user;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pensasha.backend.entity.Role;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pensasha.backend.dto.ApiResponse;
 import com.pensasha.backend.dto.UpdatePasswordDTO;
 import com.pensasha.backend.dto.UpdateUserDTO;
-import com.pensasha.backend.entity.Role;
+import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.UserService;
 

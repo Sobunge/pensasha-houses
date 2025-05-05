@@ -10,7 +10,6 @@ import com.pensasha.backend.dto.TenantDTO;
 import com.pensasha.backend.dto.UserDTO;
 import com.pensasha.backend.entity.CareTaker;
 import com.pensasha.backend.entity.LandLord;
-import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.entity.Tenant;
 
 import lombok.extern.slf4j.Slf4j;
