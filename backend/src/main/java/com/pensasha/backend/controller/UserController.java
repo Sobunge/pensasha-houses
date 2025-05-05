@@ -22,7 +22,7 @@ import com.pensasha.backend.dto.UpdatePasswordDTO;
 import com.pensasha.backend.dto.UpdateUserDTO;
 import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.modules.user.User;
-import com.pensasha.backend.service.UserService;
+import com.pensasha.backend.modules.user.UserService;
 
 import jakarta.validation.Valid;
 

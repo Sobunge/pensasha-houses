@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pensasha.backend.dto.LoginRequest;
 import com.pensasha.backend.dto.UserDTO;
 import com.pensasha.backend.modules.user.User;
+import com.pensasha.backend.modules.user.UserService;
 import com.pensasha.backend.security.JWTUtils;
-import com.pensasha.backend.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

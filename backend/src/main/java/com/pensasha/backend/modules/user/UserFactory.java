@@ -1,4 +1,4 @@
-package com.pensasha.backend.service;
+package com.pensasha.backend.modules.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,7 +12,6 @@ import com.pensasha.backend.entity.CareTaker;
 import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.entity.Role;
 import com.pensasha.backend.entity.Tenant;
-import com.pensasha.backend.modules.user.User;
 
 import lombok.extern.slf4j.Slf4j;
 
