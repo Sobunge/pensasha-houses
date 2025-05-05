@@ -1,11 +1,10 @@
-package com.pensasha.backend.repository;
+package com.pensasha.backend.modules.user.tenant;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pensasha.backend.modules.user.User;
-import com.pensasha.backend.modules.user.tenant.Tenant;
 
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
 

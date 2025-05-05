@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pensasha.backend.repository.TenantRepository;
+import com.pensasha.backend.modules.user.tenant.TenantRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
