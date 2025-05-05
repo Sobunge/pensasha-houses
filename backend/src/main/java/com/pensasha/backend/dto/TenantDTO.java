@@ -1,6 +1,7 @@
 package com.pensasha.backend.dto;
 
 import com.pensasha.backend.modules.unit.Unit;
+import com.pensasha.backend.modules.user.dto.UserDTO;
 
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
 import lombok.*;  // Importing Lombok annotations for generating boilerplate code

@@ -3,6 +3,7 @@ package com.pensasha.backend.dto;
 import java.util.Set;
 
 import com.pensasha.backend.modules.property.Property;
+import com.pensasha.backend.modules.user.dto.UserDTO;
 import com.pensasha.backend.modules.user.landlord.BankDetails;
 
 import lombok.*;

@@ -1,4 +1,4 @@
-package com.pensasha.backend.dto;
+package com.pensasha.backend.modules.user.dto;
 
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
 import lombok.*;  // Importing Lombok annotations for generating boilerplate code
@@ -6,6 +6,8 @@ import org.springframework.validation.annotation.Validated;  // Importing valida
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.pensasha.backend.dto.LandLordDTO;
+import com.pensasha.backend.dto.TenantDTO;
 import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
 
