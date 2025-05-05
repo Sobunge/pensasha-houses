@@ -1,4 +1,4 @@
-package com.pensasha.backend.controller;
+package com.pensasha.backend.modules.user;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pensasha.backend.controller.UserController;
 import com.pensasha.backend.dto.LoginRequest;
 import com.pensasha.backend.dto.UserDTO;
-import com.pensasha.backend.modules.user.User;
-import com.pensasha.backend.modules.user.UserService;
 import com.pensasha.backend.security.JWTUtils;
 
 import jakarta.validation.Valid;
