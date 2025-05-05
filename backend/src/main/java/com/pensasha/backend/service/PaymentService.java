@@ -6,9 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pensasha.backend.entity.Invoice;
 import com.pensasha.backend.entity.Payment;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
+import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.repository.InvoiceRepository;
 import com.pensasha.backend.repository.PaymentRepository;
 

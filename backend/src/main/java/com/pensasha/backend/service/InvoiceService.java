@@ -8,9 +8,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pensasha.backend.entity.Invoice;
-import com.pensasha.backend.entity.InvoiceSequence;
-import com.pensasha.backend.entity.InvoiceStatus;
+import com.pensasha.backend.modules.invoice.Invoice;
+import com.pensasha.backend.modules.invoice.InvoiceSequence;
+import com.pensasha.backend.modules.invoice.InvoiceStatus;
 import com.pensasha.backend.repository.InvoiceRepository;
 import com.pensasha.backend.repository.InvoiceSequenceRepository;
 import com.pensasha.backend.repository.TenantRepository;

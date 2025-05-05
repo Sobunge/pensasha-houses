@@ -1,4 +1,4 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.invoice;
 
 /**
  * Enum representing the different possible statuses of an invoice

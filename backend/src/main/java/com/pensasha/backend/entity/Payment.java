@@ -2,6 +2,8 @@ package com.pensasha.backend.entity;
 
 import java.time.LocalDate;
 
+import com.pensasha.backend.modules.invoice.Invoice;
+
 import jakarta.persistence.*;
 import lombok.*;
 
