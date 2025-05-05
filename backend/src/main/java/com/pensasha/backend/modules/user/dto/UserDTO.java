@@ -6,10 +6,10 @@ import org.springframework.validation.annotation.Validated;  // Importing valida
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.pensasha.backend.dto.TenantDTO;
 import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
+import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 
 
 // DTO class for transferring user-related data, with validation constraints
