@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.modules.invoice.Invoice;
+import com.pensasha.backend.modules.invoice.InvoiceRepository;
 import com.pensasha.backend.modules.invoice.InvoiceSequence;
+import com.pensasha.backend.modules.invoice.InvoiceSequenceRepository;
 import com.pensasha.backend.modules.invoice.InvoiceStatus;
-import com.pensasha.backend.repository.InvoiceRepository;
-import com.pensasha.backend.repository.InvoiceSequenceRepository;
 import com.pensasha.backend.repository.TenantRepository;
 
 import jakarta.transaction.Transactional;

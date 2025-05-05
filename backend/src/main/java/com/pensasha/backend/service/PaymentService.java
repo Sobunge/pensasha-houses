@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.pensasha.backend.entity.Payment;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.invoice.Invoice;
-import com.pensasha.backend.repository.InvoiceRepository;
+import com.pensasha.backend.modules.invoice.InvoiceRepository;
 import com.pensasha.backend.repository.PaymentRepository;
 
 import jakarta.transaction.Transactional;

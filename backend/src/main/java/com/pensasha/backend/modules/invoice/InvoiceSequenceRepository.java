@@ -1,8 +1,6 @@
-package com.pensasha.backend.repository;
+package com.pensasha.backend.modules.invoice;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.pensasha.backend.modules.invoice.InvoiceSequence;
 
 public interface InvoiceSequenceRepository extends JpaRepository<InvoiceSequence, Long> {
 }
