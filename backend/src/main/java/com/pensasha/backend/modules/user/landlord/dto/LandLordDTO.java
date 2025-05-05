@@ -1,4 +1,4 @@
-package com.pensasha.backend.dto;
+package com.pensasha.backend.modules.user.landlord.dto;
 
 import java.util.Set;
 
