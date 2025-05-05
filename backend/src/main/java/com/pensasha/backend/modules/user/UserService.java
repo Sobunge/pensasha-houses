@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.pensasha.backend.dto.*;
 import com.pensasha.backend.entity.*;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
+import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import jakarta.transaction.Transactional;
 

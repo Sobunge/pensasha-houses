@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.pensasha.backend.entity.Payment;
-import com.pensasha.backend.entity.Tenant;
+import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import jakarta.persistence.*;
 import lombok.*;

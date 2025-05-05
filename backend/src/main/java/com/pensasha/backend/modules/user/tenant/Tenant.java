@@ -1,4 +1,4 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.user.tenant;
 
 import jakarta.persistence.*;
 import lombok.*;
