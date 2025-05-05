@@ -1,4 +1,4 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.payment;
 
 import java.time.LocalDate;
 

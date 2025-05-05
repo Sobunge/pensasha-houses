@@ -1,4 +1,4 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.payment;
 
 /**
  * Enum representing the available methods of payment 

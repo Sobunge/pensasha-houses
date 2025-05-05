@@ -1,7 +1,5 @@
-package com.pensasha.backend.controller;
+package com.pensasha.backend.modules.payment;
 
-import com.pensasha.backend.entity.Payment;
-import com.pensasha.backend.service.PaymentService;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 
 import jakarta.validation.Valid;
