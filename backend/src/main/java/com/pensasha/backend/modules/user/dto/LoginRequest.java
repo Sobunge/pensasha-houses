@@ -1,4 +1,4 @@
-package com.pensasha.backend.dto;
+package com.pensasha.backend.modules.user.dto;
 
 import jakarta.validation.constraints.NotBlank;  // Importing validation annotations from Jakarta API
 import lombok.Getter;  // Lombok annotation for automatic getter generation

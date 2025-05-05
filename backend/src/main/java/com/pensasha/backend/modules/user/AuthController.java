@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pensasha.backend.dto.LoginRequest;
+import com.pensasha.backend.modules.user.dto.LoginRequest;
 import com.pensasha.backend.modules.user.dto.UserDTO;
 import com.pensasha.backend.security.JWTUtils;
 
