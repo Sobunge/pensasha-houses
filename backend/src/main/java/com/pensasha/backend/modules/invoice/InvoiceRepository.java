@@ -10,15 +10,15 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
 
     Page<Invoice> findByTenantIdNumber(String idNumber, Pageable pageable);
 
-    Page<Invoice> findByTenantUnitPropertyId(Long propertyId, Pageable pageable);
+    Page<Invoice> findByTenantRentalUnitsPropertyId(Long propertyId, Pageable pageable);
 
-    Page<Invoice> findByTenantUnitPropertyIdAndInvoiceDateBetween(
+    Page<Invoice> findByTenantRentalUnitsPropertyIdAndInvoiceDateBetween(
             Long propertyId, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    Page<Invoice> findByTenantUnitPropertyIdAndStatus(
+    Page<Invoice> findByTenantRentalUnitsPropertyIdAndStatus(
             Long propertyId, InvoiceStatus status, Pageable pageable);
 
-    Page<Invoice> findByTenantUnitPropertyIdAndStatusAndInvoiceDateBetween(
+    Page<Invoice> findByTenantRentalUnitsPropertyIdAndStatusAndInvoiceDateBetween(
             Long propertyId, InvoiceStatus status, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
 }

@@ -108,27 +108,27 @@ public class InvoiceService {
     }
 
     public Page<Invoice> getInvoicesByProperty(Long propertyId, Pageable pageable) {
-        return invoiceRepository.findByTenantUnitPropertyId(propertyId, pageable);
+        return invoiceRepository.findByTenantRentalUnitsPropertyId(propertyId, pageable);
     }
 
     public Page<Invoice> getInvoicesByPropertyAndDateRange(
             Long propertyId, LocalDate startDate, LocalDate endDate, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return invoiceRepository.findByTenantUnitPropertyIdAndInvoiceDateBetween(
+        return invoiceRepository.findByTenantRentalUnitsPropertyIdAndInvoiceDateBetween(
                 propertyId, startDate, endDate, pageable);
     }
 
     public Page<Invoice> getInvoicesByPropertyAndStatus(
             Long propertyId, InvoiceStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return invoiceRepository.findByTenantUnitPropertyIdAndStatus(
+        return invoiceRepository.findByTenantRentalUnitsPropertyIdAndStatus(
                 propertyId, status, pageable);
     }
 
     public Page<Invoice> getInvoicesByPropertyStatusAndDateRange(
             Long propertyId, InvoiceStatus status, LocalDate startDate, LocalDate endDate, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return invoiceRepository.findByTenantUnitPropertyIdAndStatusAndInvoiceDateBetween(
+        return invoiceRepository.findByTenantRentalUnitsPropertyIdAndStatusAndInvoiceDateBetween(
                 propertyId, status, startDate, endDate, pageable);
     }
 
