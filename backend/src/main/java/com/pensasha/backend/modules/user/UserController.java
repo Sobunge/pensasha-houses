@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.dto.ApiResponse;
-import com.pensasha.backend.dto.UpdatePasswordDTO;
-import com.pensasha.backend.dto.UpdateUserDTO;
+import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
+import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 
 import jakarta.validation.Valid;
 

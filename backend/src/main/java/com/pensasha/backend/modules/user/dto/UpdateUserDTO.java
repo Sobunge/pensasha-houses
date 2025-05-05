@@ -1,4 +1,4 @@
-package com.pensasha.backend.dto;
+package com.pensasha.backend.modules.user.dto;
 
 import org.springframework.validation.annotation.Validated;  // Importing annotation for validation support in Spring
 import jakarta.persistence.Column;  // Importing column annotation from Jakarta Persistence

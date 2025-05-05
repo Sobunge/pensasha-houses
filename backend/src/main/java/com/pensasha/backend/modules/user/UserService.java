@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.pensasha.backend.dto.*;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.caretaker.CareTaker;
+import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
+import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.dto.UserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.tenant.Tenant;
