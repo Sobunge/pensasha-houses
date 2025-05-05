@@ -1,0 +1,115 @@
+package com.pensasha.backend.modules.unit;
+
+import com.pensasha.backend.exceptions.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * REST Controller for managing Unit entities.
+ * Provides endpoints for CRUD operations, pagination, and custom queries.
+ */
+@RestController
+@RequestMapping("/api/units")
+@Slf4j
+public class UnitController {
+
+    private final UnitService unitService;
+
+    /**
+     * Constructor-based dependency injection for UnitService.
+     */
+    @Autowired
+    public UnitController(UnitService unitService) {
+        this.unitService = unitService;
+    }
+
+    /**
+     * Adds a new unit.
+     */
+    @PostMapping
+    public ResponseEntity<Unit> addUnit(@RequestBody Unit unit) {
+        log.info("Received request to add new unit.");
+        Unit createdUnit = unitService.addUnit(unit);
+        return new ResponseEntity<>(createdUnit, HttpStatus.CREATED);
+    }
+
+    /**
+     * Retrieves a unit by its ID.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Unit> getUnitById(@PathVariable Long id) {
+        log.info("Fetching unit with ID: {}", id);
+        Unit unit = unitService.getUnitById(id);
+        return ResponseEntity.ok(unit);
+    }
+
+    /**
+     * Retrieves all units with pagination.
+     */
+    @GetMapping
+    public ResponseEntity<Page<Unit>> getAllUnits(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("Fetching all units. Page: {}, Size: {}", page, size);
+        Page<Unit> units = unitService.getAllUnits(page, size);
+        return ResponseEntity.ok(units);
+    }
+
+    /**
+     * Retrieves units by occupancy status with pagination.
+     */
+    @GetMapping("/occupied")
+    public ResponseEntity<Page<Unit>> getUnitsByOccupiedStatus(
+            @RequestParam boolean isOccupied,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("Fetching units by occupancy status: {}. Page: {}, Size: {}", isOccupied, page, size);
+        Page<Unit> units = unitService.getUnitsByOccupiedStatus(isOccupied, page, size);
+        return ResponseEntity.ok(units);
+    }
+
+    /**
+     * Updates a unit by its ID.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Unit> updateUnit(@PathVariable Long id, @RequestBody Unit unitDetails) {
+        log.info("Updating unit with ID: {}", id);
+        Unit updatedUnit = unitService.updateUnit(id, unitDetails);
+        return ResponseEntity.ok(updatedUnit);
+    }
+
+    /**
+     * Deletes a unit by its ID.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUnit(@PathVariable Long id) {
+        log.info("Deleting unit with ID: {}", id);
+        unitService.deleteUnit(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Checks if a unit is available (not occupied).
+     */
+    @GetMapping("/{id}/availability")
+    public ResponseEntity<Boolean> isUnitAvailable(@PathVariable Long id) {
+        log.info("Checking availability for unit with ID: {}", id);
+        boolean available = unitService.isUnitAvailable(id);
+        return ResponseEntity.ok(available);
+    }
+
+    /**
+     * Calculates the rent due for a unit.
+     */
+    @GetMapping("/{id}/rent-due")
+    public ResponseEntity<Double> calculateRentDue(@PathVariable Long id) {
+        log.info("Calculating rent due for unit with ID: {}", id);
+        double rentDue = unitService.calculateRentDue(id);
+        return ResponseEntity.ok(rentDue);
+    }
+}
