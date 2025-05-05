@@ -1,4 +1,4 @@
-package com.pensasha.backend.service;
+package com.pensasha.backend.modules.invoice;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

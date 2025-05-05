@@ -1,8 +1,8 @@
 package com.pensasha.backend.controller;
 
 import com.pensasha.backend.modules.invoice.Invoice;
+import com.pensasha.backend.modules.invoice.InvoiceService;
 import com.pensasha.backend.modules.invoice.InvoiceStatus;
-import com.pensasha.backend.service.InvoiceService;
 
 import lombok.RequiredArgsConstructor;
 

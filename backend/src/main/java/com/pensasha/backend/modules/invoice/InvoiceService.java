@@ -1,4 +1,4 @@
-package com.pensasha.backend.service;
+package com.pensasha.backend.modules.invoice;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,11 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pensasha.backend.modules.invoice.Invoice;
-import com.pensasha.backend.modules.invoice.InvoiceRepository;
-import com.pensasha.backend.modules.invoice.InvoiceSequence;
-import com.pensasha.backend.modules.invoice.InvoiceSequenceRepository;
-import com.pensasha.backend.modules.invoice.InvoiceStatus;
 import com.pensasha.backend.repository.TenantRepository;
 
 import jakarta.transaction.Transactional;
