@@ -1,8 +1,6 @@
-package com.pensasha.backend.controller;
+package com.pensasha.backend.modules.property;
 
 import com.pensasha.backend.dto.PropertyDTO;
-import com.pensasha.backend.entity.Property;
-import com.pensasha.backend.service.PropertyService;
 import com.pensasha.backend.utils.PropertyMapperUtil;
 import com.pensasha.backend.utils.ValidationUtil;
 

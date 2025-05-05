@@ -1,6 +1,6 @@
 package com.pensasha.backend.dto;
 
-import com.pensasha.backend.entity.Property;
+import com.pensasha.backend.modules.property.Property;
 
 import lombok.*;
 

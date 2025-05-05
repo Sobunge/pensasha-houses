@@ -1,10 +1,8 @@
-package com.pensasha.backend.service;
+package com.pensasha.backend.modules.property;
 
 import java.util.*;
 
 import com.pensasha.backend.dto.PropertyDTO;
-import com.pensasha.backend.entity.Property;
-import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.utils.PropertyMapperUtil;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.User;

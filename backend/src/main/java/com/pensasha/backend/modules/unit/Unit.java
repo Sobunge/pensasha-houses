@@ -1,6 +1,6 @@
 package com.pensasha.backend.modules.unit;
 
-import com.pensasha.backend.entity.Property;
+import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import jakarta.persistence.*;

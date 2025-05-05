@@ -2,7 +2,7 @@ package com.pensasha.backend.modules.user.landlord;
 
 import java.util.Set;
 
-import com.pensasha.backend.entity.Property;
+import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.User;
 
 import jakarta.persistence.*;

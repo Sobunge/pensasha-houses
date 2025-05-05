@@ -1,10 +1,8 @@
-package com.pensasha.backend.repository;
+package com.pensasha.backend.modules.property;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import com.pensasha.backend.entity.Property;
 
 /**
  * Repository interface for the Property entity.
