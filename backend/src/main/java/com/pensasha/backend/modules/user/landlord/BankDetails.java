@@ -1,4 +1,4 @@
-package com.pensasha.backend.entity;
+package com.pensasha.backend.modules.user.landlord;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;

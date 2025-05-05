@@ -3,7 +3,7 @@ package com.pensasha.backend.service;
 import java.util.*;
 
 import com.pensasha.backend.dto.PropertyDTO;
-import com.pensasha.backend.entity.LandLord;
+import com.pensasha.backend.modules.user.landlord;
 import com.pensasha.backend.entity.Property;
 import com.pensasha.backend.repository.PropertyRepository;
 import com.pensasha.backend.utils.PropertyMapperUtil;

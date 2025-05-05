@@ -8,8 +8,8 @@ import com.pensasha.backend.dto.CareTakerDTO;
 import com.pensasha.backend.dto.LandLordDTO;
 import com.pensasha.backend.dto.TenantDTO;
 import com.pensasha.backend.dto.UserDTO;
-import com.pensasha.backend.entity.LandLord;
 import com.pensasha.backend.modules.user.caretaker.CareTaker;
+import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import lombok.extern.slf4j.Slf4j;

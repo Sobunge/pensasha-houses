@@ -2,8 +2,8 @@ package com.pensasha.backend.dto;
 
 import java.util.Set;
 
-import com.pensasha.backend.entity.BankDetails;
 import com.pensasha.backend.entity.Property;
+import com.pensasha.backend.modules.user.landlord.BankDetails;
 
 import lombok.*;
 
