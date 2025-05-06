@@ -1,5 +1,7 @@
 package com.pensasha.backend.modules.unit.dto;
 
+import com.pensasha.backend.modules.unit.UnitStatus;
+
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
 import lombok.*;  // Importing Lombok annotations for generating boilerplate code
 
@@ -20,7 +22,7 @@ public class UnitDTO {
 
     // Occupancy status of the unit, required to be not null (true or false)
     @NotNull(message = "Occupancy status is required")  // Ensures that the occupancy status is not null
-    private Boolean isOccupied;
+    private UnitStatus status;
 
     // The property ID to which the unit belongs, required to be not null
     @NotNull(message = "Property ID is required")  // Ensures that the property ID is not null

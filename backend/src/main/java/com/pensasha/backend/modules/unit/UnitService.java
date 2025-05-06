@@ -94,7 +94,7 @@ public class UnitService {
         // Update the unit's fields with the new details.
         unit.setUnitNumber(unitDetails.getUnitNumber());
         unit.setRentAmount(unitDetails.getRentAmount());
-        unit.setOccupied(unitDetails.isOccupied());
+        unit.setStatus(unitDetails.getStatus());
         unit.setProperty(unitDetails.getProperty());
         unit.setTenant(unitDetails.getTenant());
 
@@ -124,7 +124,7 @@ public class UnitService {
      */
     public boolean isUnitAvailable(Long id) {
         Unit unit = getUnitById(id);  // Retrieve the unit to check (throws exception if not found).
-        return !unit.isOccupied();  // Return true if the unit is not occupied.
+        return unit.getStatus().equals(UnitStatus.VACANT);  // Return true if the unit is not occupied.
     }
 
     /**

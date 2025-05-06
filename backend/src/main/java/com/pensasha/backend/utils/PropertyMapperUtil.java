@@ -41,7 +41,7 @@ public class PropertyMapperUtil {
                 .map(unit -> new UnitDTO(
                         unit.getUnitNumber(), // Set the unit number
                         unit.getRentAmount(), // Set the rent amount for the unit
-                        unit.isOccupied(), // Set whether the unit is occupied
+                        unit.getStatus(), // Set whether the unit is occupied
                         unit.getProperty() != null ? unit.getProperty().getId() : null, // Set the property ID (can be null if not assigned)
                         unit.getTenant() != null ? unit.getTenant().getId() : null // Set the tenant ID (can be null if not assigned)
                 ))
