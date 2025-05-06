@@ -11,7 +11,9 @@ import lombok.*;
  * Each unit belongs to a specific property and may be assigned to a tenant.
  */
 @Entity
-@Table(name = "units")
+@Table(name = "units", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"unit_number", "property_id"})
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +32,7 @@ public class Unit {
      * Unique unit number or identifier within the property (e.g. "A1", "B2").
      * Cannot be null or duplicated.
      */
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String unitNumber;
 
     /**
