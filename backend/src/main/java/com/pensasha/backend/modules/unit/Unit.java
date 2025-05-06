@@ -2,7 +2,6 @@ package com.pensasha.backend.modules.unit;
 
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.tenant.Tenant;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,9 +29,9 @@ public class Unit {
 
     /**
      * Unique unit number or identifier within the property (e.g. "A1", "B2").
-     * Cannot be null or duplicated.
+     * Cannot be null or duplicated within the same property.
      */
-    @Column(nullable = false)
+    @Column(name = "unit_number", nullable = false)
     private String unitNumber;
 
     /**
@@ -43,10 +42,12 @@ public class Unit {
     private Double rentAmount;
 
     /**
-     * Status flag indicating whether the unit is currently occupied.
+     * The current status of the unit (e.g. OCCUPIED, VACANT, RESERVED, UNDER_MAINTENANCE).
+     * Cannot be null.
      */
-    @Column(nullable = false)
-    private UnitStatus isOccupied;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private UnitStatus status;
 
     /**
      * The property to which this unit belongs.
@@ -57,7 +58,6 @@ public class Unit {
     @JoinColumn(name = "property_id", nullable = false)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    // @JsonIgnore // Uncomment if needed during serialization
     private Property property;
 
     /**
@@ -69,6 +69,5 @@ public class Unit {
     @JoinColumn(name = "tenant_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    // @JsonIgnore // Uncomment if needed during serialization
     private Tenant tenant;
 }
