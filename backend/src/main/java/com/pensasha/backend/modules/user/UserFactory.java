@@ -15,7 +15,7 @@ import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Factory component responsible for creating specific User entity instances 
+ * Factory component responsible for creating specific User entity instances
  * based on the given UserDTO and its role.
  */
 @Component
@@ -26,11 +26,13 @@ public class UserFactory {
     private PasswordEncoder passwordEncoder; // Used to encode user passwords before saving
 
     /**
-     * Creates and returns a User entity (or a subclass of User) based on the type of UserDTO provided.
+     * Creates and returns a User entity (or a subclass of User) based on the type
+     * of UserDTO provided.
      * The role field in the DTO determines which subclass is created.
      *
      * @param userDTO The data transfer object containing user information.
-     * @return A new User (Admin, Tenant, Landlord, or CareTaker) entity with populated fields.
+     * @return A new User (Admin, Tenant, Landlord, or CareTaker) entity with
+     *         populated fields.
      */
     public User createUser(UserDTO userDTO) {
 
@@ -40,18 +42,19 @@ public class UserFactory {
         if (userDTO instanceof CareTakerDTO careTakerDTO) {
             CareTaker careTaker = new CareTaker();
             copyCommonUserAttributes(careTaker, careTakerDTO);
+            copyCareTakerAttributes(careTaker, careTakerDTO);
             log.debug("Created CareTaker: {}", careTaker.getIdNumber());
             return careTaker;
 
-        // If the DTO is a LandLordDTO, create and return a LandLord entity
+            // If the DTO is a LandLordDTO, create and return a LandLord entity
         } else if (userDTO instanceof LandLordDTO landLordDTO) {
             LandLord landLord = new LandLord();
             copyCommonUserAttributes(landLord, landLordDTO);
-            copyLandlordAttributes(landLord, null);
+            copyLandlordAttributes(landLord, landLordDTO);
             log.debug("Created LandLord: {}", landLord.getIdNumber());
             return landLord;
 
-        // If the DTO is a TenantDTO, create and return a Tenant entity
+            // If the DTO is a TenantDTO, create and return a Tenant entity
         } else if (userDTO instanceof TenantDTO tenantDTO) {
             Tenant tenant = new Tenant();
             copyCommonUserAttributes(tenant, tenantDTO);
@@ -59,7 +62,8 @@ public class UserFactory {
             log.debug("Created Tenant: {}", tenant.getIdNumber());
             return tenant;
 
-        // If the role is ADMIN but not a subclass, create a generic User entity as an admin
+            // If the role is ADMIN but not a subclass, create a generic User entity as an
+            // admin
         } else if (userDTO.getRole() == Role.ADMIN) {
             User admin = new User();
             copyCommonUserAttributes(admin, userDTO);
@@ -67,7 +71,7 @@ public class UserFactory {
             log.debug("Created Admin: {}", admin.getIdNumber());
             return admin;
 
-        // If none of the expected types match, throw an error
+            // If none of the expected types match, throw an error
         } else {
             log.error("Invalid user role: {}", userDTO.getRole());
             throw new IllegalArgumentException("Invalid user type provided for ID: " + userDTO.getIdNumber());
@@ -105,9 +109,13 @@ public class UserFactory {
         tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
     }
 
-    private void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO){
+    private void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO) {
         landLord.setProperties(landLordDTO.getProperties());
         landLord.setBankDetails(landLordDTO.getBankDetails());
+    }
+
+    private void copyCareTakerAttributes(CareTaker careTaker, CareTakerDTO careTakerDTO) {
+        careTaker.setAssignedProperty(careTakerDTO.getAssignedProperty());
     }
 
 }
