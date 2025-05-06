@@ -47,6 +47,7 @@ public class UserFactory {
         } else if (userDTO instanceof LandLordDTO landLordDTO) {
             LandLord landLord = new LandLord();
             copyCommonUserAttributes(landLord, landLordDTO);
+            copyLandlordAttributes(landLord, null);
             log.debug("Created LandLord: {}", landLord.getIdNumber());
             return landLord;
 
@@ -102,6 +103,11 @@ public class UserFactory {
         tenant.setLeaseEndDate(tenantDTO.getLeaseEndDate());
         tenant.setMonthlyRent(tenantDTO.getMonthlyRent());
         tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
+    }
+
+    private void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO){
+        landLord.setProperties(landLordDTO.getProperties());
+        landLord.setBankDetails(landLordDTO.getBankDetails());
     }
 
 }
