@@ -46,7 +46,7 @@ public class Unit {
      * Status flag indicating whether the unit is currently occupied.
      */
     @Column(nullable = false)
-    private boolean isOccupied;
+    private UnitStatus isOccupied;
 
     /**
      * The property to which this unit belongs.
