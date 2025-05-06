@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.User;
@@ -39,6 +40,7 @@ public class Tenant extends User {
      * The start date of the lease agreement.
      * Cannot be null.
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate leaseStartDate;
 
@@ -46,6 +48,7 @@ public class Tenant extends User {
      * The end date of the lease agreement.
      * Cannot be null.
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate leaseEndDate;
 

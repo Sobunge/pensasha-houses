@@ -1,5 +1,7 @@
 package com.pensasha.backend.modules.user.tenant.dto;
 
+import java.time.LocalDate;
+
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.dto.UserDTO;
 
@@ -17,12 +19,12 @@ public class TenantDTO extends UserDTO {
     private Unit rentalUnit;  // A field that links the tenant to their rental unit
 
     // The lease start date, required to be a non-blank string
-    @NotBlank(message = "Lease start date is required")  // Ensures the lease start date is not blank
-    private String leaseStartDate;
+    @NotNull(message = "Lease start date is required")  // Ensures the lease start date is not blank
+    private LocalDate leaseStartDate;
 
     // The lease end date, required to be a non-blank string
-    @NotBlank(message = "Lease end date is required")  // Ensures the lease end date is not blank
-    private String leaseEndDate;
+    @NotNull(message = "Lease end date is required")  // Ensures the lease end date is not blank
+    private LocalDate leaseEndDate;
 
     // Monthly rent amount, required to be a positive number
     @NotNull(message = "Monthly rent is required")  // Ensures that the rent is not null

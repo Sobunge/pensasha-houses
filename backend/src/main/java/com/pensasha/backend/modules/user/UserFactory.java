@@ -39,28 +39,29 @@ public class UserFactory {
         // If the DTO is a CareTakerDTO, create and return a CareTaker entity
         if (userDTO instanceof CareTakerDTO careTakerDTO) {
             CareTaker careTaker = new CareTaker();
-            copyCommonAttributes(careTaker, careTakerDTO);
+            copyCommonUserAttributes(careTaker, careTakerDTO);
             log.debug("Created CareTaker: {}", careTaker.getIdNumber());
             return careTaker;
 
         // If the DTO is a LandLordDTO, create and return a LandLord entity
         } else if (userDTO instanceof LandLordDTO landLordDTO) {
             LandLord landLord = new LandLord();
-            copyCommonAttributes(landLord, landLordDTO);
+            copyCommonUserAttributes(landLord, landLordDTO);
             log.debug("Created LandLord: {}", landLord.getIdNumber());
             return landLord;
 
         // If the DTO is a TenantDTO, create and return a Tenant entity
         } else if (userDTO instanceof TenantDTO tenantDTO) {
             Tenant tenant = new Tenant();
-            copyCommonAttributes(tenant, tenantDTO);
+            copyCommonUserAttributes(tenant, tenantDTO);
+            copyTenantAttributes(tenant, tenantDTO);
             log.debug("Created Tenant: {}", tenant.getIdNumber());
             return tenant;
 
         // If the role is ADMIN but not a subclass, create a generic User entity as an admin
         } else if (userDTO.getRole() == Role.ADMIN) {
             User admin = new User();
-            copyCommonAttributes(admin, userDTO);
+            copyCommonUserAttributes(admin, userDTO);
             admin.setRole(Role.ADMIN);
             log.debug("Created Admin: {}", admin.getIdNumber());
             return admin;
@@ -79,7 +80,7 @@ public class UserFactory {
      * @param user    The target User entity.
      * @param userDTO The source DTO with user input data.
      */
-    private void copyCommonAttributes(User user, UserDTO userDTO) {
+    private void copyCommonUserAttributes(User user, UserDTO userDTO) {
         user.setFirstName(userDTO.getFirstName());
         user.setSecondName(userDTO.getSecondName());
         user.setThirdName(userDTO.getThirdName());
@@ -94,6 +95,13 @@ public class UserFactory {
         if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
             user.setProfilePicture(userDTO.getProfilePicture());
         }
+    }
+
+    private void copyTenantAttributes(Tenant tenant, TenantDTO tenantDTO) {
+        tenant.setLeaseStartDate(tenantDTO.getLeaseStartDate());
+        tenant.setLeaseEndDate(tenantDTO.getLeaseEndDate());
+        tenant.setMonthlyRent(tenantDTO.getMonthlyRent());
+        tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
     }
 
 }
