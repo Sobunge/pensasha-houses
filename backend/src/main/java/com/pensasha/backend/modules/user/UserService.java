@@ -53,7 +53,7 @@ public class UserService {
     }
 
     /**
-     * Updates common user details.
+     * Updates common user details.s
      *
      * @param updatedUserDTO The DTO containing updated user details.
      * @return The updated User entity.
