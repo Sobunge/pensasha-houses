@@ -73,7 +73,7 @@ public class Property {
      * Cannot be null.
      */
     @ManyToOne
-    @JoinColumn(name = "landlord_id", nullable = false)
+    @JoinColumn(name = "landlord_id")
     private LandLord landLord;
 
     /**
