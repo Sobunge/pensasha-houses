@@ -21,7 +21,8 @@ import jakarta.transaction.Transactional;
 
 /**
  * Service class for managing properties.
- * Handles adding, updating, fetching, and deleting properties, as well as managing landlord and caretaker associations.
+ * Handles adding, updating, fetching, and deleting properties, as well as
+ * managing landlord and caretaker associations.
  */
 @Service
 @RequiredArgsConstructor
@@ -45,38 +46,40 @@ public class PropertyService {
         Optional<User> landlordOpt = userRepository.findByIdNumber(propertyDTO.getLandLordId());
         Optional<User> caretakerOpt = userRepository.findByIdNumber(propertyDTO.getCareTakerId());
 
-        // Validate Landlord
-        if (landlordOpt.isEmpty()) {
-            log.error("A Landlord with National ID: {} not found", propertyDTO.getLandLordId());
-            throw new RuntimeException("A Landlord with National ID: " + propertyDTO.getLandLordId() + " not found");
-        }
+        // Create Property entity
+        Property property = new Property();
 
-        User landlordUser = landlordOpt.get();
-        if (!(landlordUser instanceof LandLord)) {
-            log.error("The user with National ID: {} is not a Landlord", propertyDTO.getLandLordId());
-            throw new RuntimeException(
-                    "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
+        // Cast User to Landlord
+        if (landlordOpt.isPresent()) {
+            User landlordUser = landlordOpt.get();
+            if (!(landlordUser instanceof LandLord)) {
+                log.error("The user with National ID: {} is not a Landlord", propertyDTO.getLandLordId());
+                throw new RuntimeException(
+                        "The user with National ID: " + propertyDTO.getLandLordId() + " is not a Landlord");
+            }
+            LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
+            property.setLandLord(landlord);
         }
-        LandLord landlord = (LandLord) landlordUser; // Cast the user to Landlord
 
         // Cast the User to Caretaker
-        User caretakerUser = caretakerOpt.get();
-        if (!(caretakerUser instanceof CareTaker)) {
-            log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
-            throw new RuntimeException(
-                    "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
+        if (caretakerOpt.isPresent()) {
+            User caretakerUser = caretakerOpt.get();
+            if (!(caretakerUser instanceof CareTaker)) {
+                log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
+                throw new RuntimeException(
+                        "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
+            }
+            CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
+            property.setCareTaker(caretaker);
         }
-        CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
 
-        // Create Property entity and populate fields from DTO
-        Property property = new Property();
+        // Populate fields from DTO
+
         property.setName(propertyDTO.getName());
         property.setDescription(propertyDTO.getDescription());
         property.setLocation(propertyDTO.getLocation());
         property.setNumOfUnits(propertyDTO.getNumOfUnits());
         property.setAmenities(propertyDTO.getAmenities());
-        property.setLandLord(landlord);
-        property.setCareTaker(caretaker); // Can be null
         property.setUnits(new HashSet<>()); // Empty Set (will be added later)
 
         // Save the Property in the database
@@ -90,10 +93,11 @@ public class PropertyService {
      * Updates an existing property.
      * Validates and updates fields like name, description, landlord, and caretaker.
      * 
-     * @param propertyId The ID of the property to update.
+     * @param propertyId  The ID of the property to update.
      * @param propertyDTO DTO containing updated property details.
      * @return The updated property entity.
-     * @throws RuntimeException if the property or related entities (landlord/caretaker) are not found.
+     * @throws RuntimeException if the property or related entities
+     *                          (landlord/caretaker) are not found.
      */
     @Transactional
     public Property updateProperty(Long propertyId, PropertyDTO propertyDTO) {
@@ -198,7 +202,8 @@ public class PropertyService {
      * Deletes a property by its ID.
      * 
      * @param propertyId The ID of the property to delete.
-     * @throws ResourceNotFoundException if the property with the given ID is not found.
+     * @throws ResourceNotFoundException if the property with the given ID is not
+     *                                   found.
      */
     public void deleteProperty(Long propertyId) {
         if (propertyRepository.existsById(propertyId)) {

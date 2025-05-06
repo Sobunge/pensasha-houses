@@ -33,12 +33,10 @@ public class PropertyDTO {
     @Min(value = 1, message = "Number of units must be at least 1")  // Ensures the number of units is at least 1
     private Integer numOfUnits;
 
-    // List of amenities for the property, cannot be empty and each amenity must be non-blank
-    @NotEmpty(message = "Amenities list cannot be empty")  // Ensures the amenities list is not empty
-    private List<@NotBlank(message = "Amenity cannot be blank") String> amenities;  // Ensures each amenity in the list is not blank
+    // List of amenities for the property
+    private List<String> amenities;
 
-    // ID of the landlord, required to be non-null
-    @NotNull(message = "Landlord ID is required")  // Ensures the landlord ID is not null
+    // ID of the landlord
     private String landLordId;
 
     // ID of the caretaker, optional field
