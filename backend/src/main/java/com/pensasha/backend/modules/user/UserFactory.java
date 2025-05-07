@@ -46,7 +46,7 @@ public class UserFactory {
             log.debug("Created CareTaker: {}", careTaker.getIdNumber());
             return careTaker;
 
-            // If the DTO is a LandLordDTO, create and return a LandLord entity
+        // If the DTO is a LandLordDTO, create and return a LandLord entity
         } else if (userDTO instanceof LandLordDTO landLordDTO) {
             LandLord landLord = new LandLord();
             copyCommonUserAttributes(landLord, landLordDTO);
@@ -54,7 +54,7 @@ public class UserFactory {
             log.debug("Created LandLord: {}", landLord.getIdNumber());
             return landLord;
 
-            // If the DTO is a TenantDTO, create and return a Tenant entity
+        // If the DTO is a TenantDTO, create and return a Tenant entity
         } else if (userDTO instanceof TenantDTO tenantDTO) {
             Tenant tenant = new Tenant();
             copyCommonUserAttributes(tenant, tenantDTO);
@@ -62,8 +62,7 @@ public class UserFactory {
             log.debug("Created Tenant: {}", tenant.getIdNumber());
             return tenant;
 
-            // If the role is ADMIN but not a subclass, create a generic User entity as an
-            // admin
+        // If the role is ADMIN but not a subclass, create a generic User entity as an admin
         } else if (userDTO.getRole() == Role.ADMIN) {
             User admin = new User();
             copyCommonUserAttributes(admin, userDTO);
@@ -71,7 +70,7 @@ public class UserFactory {
             log.debug("Created Admin: {}", admin.getIdNumber());
             return admin;
 
-            // If none of the expected types match, throw an error
+        // If none of the expected types match, throw an error
         } else {
             log.error("Invalid user role: {}", userDTO.getRole());
             throw new IllegalArgumentException("Invalid user type provided for ID: " + userDTO.getIdNumber());
@@ -102,6 +101,12 @@ public class UserFactory {
         }
     }
 
+    /**
+     * Helper method to copy tenant-specific fields from a TenantDTO to a Tenant entity.
+     *
+     * @param tenant    The target Tenant entity.
+     * @param tenantDTO The source DTO containing tenant-specific details.
+     */
     private void copyTenantAttributes(Tenant tenant, TenantDTO tenantDTO) {
         tenant.setLeaseStartDate(tenantDTO.getLeaseStartDate());
         tenant.setLeaseEndDate(tenantDTO.getLeaseEndDate());
@@ -109,11 +114,23 @@ public class UserFactory {
         tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
     }
 
+    /**
+     * Helper method to copy landlord-specific fields from a LandLordDTO to a LandLord entity.
+     *
+     * @param landLord    The target LandLord entity.
+     * @param landLordDTO The source DTO containing landlord-specific details.
+     */
     private void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO) {
         landLord.setProperties(landLordDTO.getProperties());
         landLord.setBankDetails(landLordDTO.getBankDetails());
     }
 
+    /**
+     * Helper method to copy caretaker-specific fields from a CareTakerDTO to a CareTaker entity.
+     *
+     * @param careTaker    The target CareTaker entity.
+     * @param careTakerDTO The source DTO containing caretaker-specific details.
+     */
     private void copyCareTakerAttributes(CareTaker careTaker, CareTakerDTO careTakerDTO) {
         careTaker.setAssignedProperty(careTakerDTO.getAssignedProperty());
     }
