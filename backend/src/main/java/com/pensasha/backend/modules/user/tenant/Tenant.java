@@ -2,11 +2,8 @@ package com.pensasha.backend.modules.user.tenant;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.User;
@@ -31,34 +28,11 @@ public class Tenant extends User {
     private List<Unit> rentalUnits;
 
     /**
-     * List of invoices assigned to this tenant.
-     * One tenant can have multiple invoices.
+     * List of lease agreements assigned to this tenant.
+     * One tenant can have multiple leases over time.
      */
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Invoice> invoices;
-
-    /**
-     * The start date of the lease agreement.
-     * Cannot be null.
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Column(nullable = false)
-    private LocalDate leaseStartDate;
-
-    /**
-     * The end date of the lease agreement.
-     * Cannot be null.
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Column(nullable = false)
-    private LocalDate leaseEndDate;
-
-    /**
-     * The agreed monthly rent amount for the tenant.
-     * Cannot be null.
-     */
-    @Column(nullable = false)
-    private Double monthlyRent;
+    private List<Lease> leases;
 
     /**
      * Emergency contact phone number for the tenant.
@@ -66,7 +40,4 @@ public class Tenant extends User {
      */
     @Column(length = 15)
     private String emergencyContact;
-
-    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Lease> leases;
 }
