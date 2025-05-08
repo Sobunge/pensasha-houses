@@ -17,10 +17,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InvoiceDto {
-
-    /** Unique identifier for the invoice. */
-    private String invoiceNumber;
+public class CreateInvoiceDTO {
 
     /**
      * Tenant ID or identification number. Can also be replaced with a nested
