@@ -1,9 +1,15 @@
 package com.pensasha.backend.modules.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
+import com.pensasha.backend.modules.lease.Lease;
+import com.pensasha.backend.modules.lease.LeaseService;
+import com.pensasha.backend.modules.unit.Unit;
+import com.pensasha.backend.modules.unit.UnitService;
 import com.pensasha.backend.modules.user.caretaker.CareTaker;
 import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
 import com.pensasha.backend.modules.user.dto.UserDTO;
@@ -12,6 +18,7 @@ import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,11 +26,13 @@ import lombok.extern.slf4j.Slf4j;
  * based on the given UserDTO and its role.
  */
 @Component
+@AllArgsConstructor
 @Slf4j // Lombok annotation to auto-generate a logger named 'log'
 public class UserFactory {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder; // Used to encode user passwords before saving
+    private final UnitService unitService;
+    private final PasswordEncoder passwordEncoder;
+    private final LeaseService leaseService;
 
     /**
      * Creates and returns a User entity (or a subclass of User) based on the type
@@ -46,7 +55,7 @@ public class UserFactory {
             log.debug("Created CareTaker: {}", careTaker.getIdNumber());
             return careTaker;
 
-        // If the DTO is a LandLordDTO, create and return a LandLord entity
+            // If the DTO is a LandLordDTO, create and return a LandLord entity
         } else if (userDTO instanceof LandLordDTO landLordDTO) {
             LandLord landLord = new LandLord();
             copyCommonUserAttributes(landLord, landLordDTO);
@@ -54,7 +63,7 @@ public class UserFactory {
             log.debug("Created LandLord: {}", landLord.getIdNumber());
             return landLord;
 
-        // If the DTO is a TenantDTO, create and return a Tenant entity
+            // If the DTO is a TenantDTO, create and return a Tenant entity
         } else if (userDTO instanceof TenantDTO tenantDTO) {
             Tenant tenant = new Tenant();
             copyCommonUserAttributes(tenant, tenantDTO);
@@ -62,7 +71,8 @@ public class UserFactory {
             log.debug("Created Tenant: {}", tenant.getIdNumber());
             return tenant;
 
-        // If the role is ADMIN but not a subclass, create a generic User entity as an admin
+            // If the role is ADMIN but not a subclass, create a generic User entity as an
+            // admin
         } else if (userDTO.getRole() == Role.ADMIN) {
             User admin = new User();
             copyCommonUserAttributes(admin, userDTO);
@@ -70,7 +80,7 @@ public class UserFactory {
             log.debug("Created Admin: {}", admin.getIdNumber());
             return admin;
 
-        // If none of the expected types match, throw an error
+            // If none of the expected types match, throw an error
         } else {
             log.error("Invalid user role: {}", userDTO.getRole());
             throw new IllegalArgumentException("Invalid user type provided for ID: " + userDTO.getIdNumber());
@@ -102,20 +112,35 @@ public class UserFactory {
     }
 
     /**
-     * Helper method to copy tenant-specific fields from a TenantDTO to a Tenant entity.
+     * Helper method to copy tenant-specific fields from a TenantDTO to a Tenant
+     * entity.
      *
-     * @param tenant    The target Tenant entity.
+     * @param tenant    The target Tenant entity.s
      * @param tenantDTO The source DTO containing tenant-specific details.
      */
     private void copyTenantAttributes(Tenant tenant, TenantDTO tenantDTO) {
-        tenant.setLeaseStartDate(tenantDTO.getLeaseStartDate());
-        tenant.setLeaseEndDate(tenantDTO.getLeaseEndDate());
-        tenant.setMonthlyRent(tenantDTO.getMonthlyRent());
+
+        List<Unit> rentalUnits = Optional.ofNullable(tenantDTO.getRentalUnitIds())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(unitService::getUnitById)
+                .toList();
+
+        tenant.setRentalUnits(rentalUnits);
+
+        List<Lease> leases = Optional.ofNullable(tenantDTO.getLeaseIds()).orElse(Collections.emptyList())
+                .stream()
+                .map(leaseService::getLeaseById)
+                .toList();
+
+        tenant.setLeases(leases);
+
         tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
     }
 
     /**
-     * Helper method to copy landlord-specific fields from a LandLordDTO to a LandLord entity.
+     * Helper method to copy landlord-specific fields from a LandLordDTO to a
+     * LandLord entity.
      *
      * @param landLord    The target LandLord entity.
      * @param landLordDTO The source DTO containing landlord-specific details.
@@ -126,7 +151,8 @@ public class UserFactory {
     }
 
     /**
-     * Helper method to copy caretaker-specific fields from a CareTakerDTO to a CareTaker entity.
+     * Helper method to copy caretaker-specific fields from a CareTakerDTO to a
+     * CareTaker entity.
      *
      * @param careTaker    The target CareTaker entity.
      * @param careTakerDTO The source DTO containing caretaker-specific details.
