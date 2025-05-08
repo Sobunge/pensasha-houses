@@ -54,4 +54,8 @@ public class Invoice {
      */
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Payment> payments;
+
+    @ManyToOne
+    @JoinColumn(name = "lease_id")
+    private Lease lease;
 }
