@@ -74,12 +74,10 @@ public class InvoiceService {
         log.info("Generating monthly invoices for active tenants");
 
         List<Invoice> newInvoices = tenantRepository.findAll().stream()
-                .filter(tenant -> tenant.getLeaseEndDate().isAfter(LocalDate.now()))
                 .map(tenant -> {
                     Invoice invoice = new Invoice();
                     invoice.setInvoiceNumber(generateInvoiceNumber());
                     invoice.setTenant(tenant);
-                    invoice.setAmountDue(tenant.getMonthlyRent());
                     invoice.setInvoiceDate(LocalDate.now());
                     invoice.setDueDate(LocalDate.now().plusDays(5));
                     invoice.setStatus(InvoiceStatus.PENDING);
