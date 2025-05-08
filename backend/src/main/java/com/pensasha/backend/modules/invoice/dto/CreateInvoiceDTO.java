@@ -1,10 +1,6 @@
 package com.pensasha.backend.modules.invoice.dto;
 
 import java.time.LocalDate;
-import java.util.List;
-
-import com.pensasha.backend.modules.invoice.InvoiceStatus;
-import com.pensasha.backend.modules.payment.Payment;
 import lombok.*;
 
 /**
@@ -20,10 +16,10 @@ import lombok.*;
 public class CreateInvoiceDTO {
 
     /**
-     * Tenant ID or identification number. Can also be replaced with a nested
-     * TenantDto if needed.
+     * Lease ID the invoice is associated with.
+     * An invoice belongs to a lease, and indirectly to a tenant.
      */
-    private Long tenantId;
+    private String leaseId;
 
     /** Total amount due for this invoice. */
     private Double amountDue;
@@ -31,18 +27,9 @@ public class CreateInvoiceDTO {
     /** The date the invoice was created. */
     private LocalDate invoiceDate;
 
-    /** Amount that has already been paid. */
+    /** Amount that has already been paid (usually zero on creation). */
     private Double amountPaid;
 
     /** The date by which the invoice is due. */
     private LocalDate dueDate;
-
-    /** Current status of the invoice. */
-    private InvoiceStatus status;
-
-    /**
-     * Optional: List of payments related to this invoice.
-     * Could be replaced with a List of PaymentDto for cleaner API responses.
-     */
-    private List<Payment> payments;
 }
