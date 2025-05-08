@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import com.pensasha.backend.exceptions.ResourceNotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -36,13 +38,12 @@ public class LeaseService {
      * @param id the ID of the lease to retrieve.
      * @return an Optional containing the found Lease, or empty if not found.
      */
-    public Optional<Lease> getLeaseById(Long id) {
+    public Lease getLeaseById(Long id) {
         log.info("Fetching lease with ID: {}", id);
-        Optional<Lease> lease = leaseRepository.findById(id);
-        lease.ifPresentOrElse(
-                l -> log.debug("Lease found: {}", l),
-                () -> log.warn("No lease found with ID: {}", id));
-        return lease;
+        return leaseRepository.findById(id).orElseThrow(() -> {
+            log.error("Lease not found with ID: {}", id);
+            return new ResourceNotFoundException("Lease not found with id: " + id);
+        });
     }
 
     /**
