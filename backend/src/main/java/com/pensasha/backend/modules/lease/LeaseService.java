@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service class responsible for handling business logic
