@@ -1,38 +1,37 @@
 package com.pensasha.backend.modules.user.tenant.dto;
 
-import java.time.LocalDate;
-
-import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.dto.UserDTO;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
 
-import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
-import lombok.*;  // Importing Lombok annotations for generating boilerplate code
+import java.util.List;
 
-// DTO class used to represent a tenant with validation constraints
-@Getter  // Lombok annotation to generate getter methods for all fields
-@Setter  // Lombok annotation to generate setter methods for all fields
-@NoArgsConstructor  // Lombok annotation to generate a no-argument constructor
-@AllArgsConstructor  // Lombok annotation to generate an all-arguments constructor
+/**
+ * DTO for transferring tenant-specific data.
+ * Extends UserDTO and adds fields for rental units, leases, and emergency contact.
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TenantDTO extends UserDTO {
 
-    // The rental unit assigned to the tenant
-    private Unit rentalUnit;  // A field that links the tenant to their rental unit
-
-    // The lease start date, required to be a non-blank string
-    @NotNull(message = "Lease start date is required")  // Ensures the lease start date is not blank
-    private LocalDate leaseStartDate;
-
-    // The lease end date, required to be a non-blank string
-    @NotNull(message = "Lease end date is required")  // Ensures the lease end date is not blank
-    private LocalDate leaseEndDate;
-
-    // Monthly rent amount, required to be a positive number
-    @NotNull(message = "Monthly rent is required")  // Ensures that the rent is not null
-    @Positive(message = "Rent amount must be a positive number")  // Ensures the rent amount is greater than 0
-    private Double monthlyRent;
-
-    // Emergency contact number, required to follow a specific phone number pattern (10 to 15 digits)
-    @NotBlank(message = "Emergency contact is required")  // Ensures the emergency contact number is not blank
-    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid emergency contact number")  // Validates the phone number format
+    /**
+     * Emergency contact phone number for the tenant.
+     * Optional but if present, must match phone number pattern.
+     */
+    @Pattern(
+        regexp = "^(?:\\+254|0)[17][0-9]{8}$",
+        message = "Emergency contact must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)"
+    )
     private String emergencyContact;
+
+    /**
+     * List of rental unit IDs assigned to this tenant.
+     */
+    private List<Long> rentalUnitIds;
+
+    /**
+     * List of lease IDs assigned to this tenant.
+     */
+    private List<Long> leaseIds;
 }
