@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pensasha.backend.modules.invoice.Invoice;
+import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.User;
 
@@ -65,4 +66,7 @@ public class Tenant extends User {
      */
     @Column(length = 15)
     private String emergencyContact;
+
+    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Lease> leases;
 }
