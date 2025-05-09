@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.modules.user.dto.LoginRequest;
-import com.pensasha.backend.modules.user.dto.UserDTO;
+import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.security.JWTUtils;
 
 import jakarta.validation.Valid;
@@ -37,7 +37,7 @@ public class AuthController {
 
     // Register a new user
     @PostMapping("/register")
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
+    public ResponseEntity<?> addUser(@Valid @RequestBody CreateUserDTO userDTO, BindingResult result) {
 
         // Checks for input validation errors
         if (result.hasErrors()) {

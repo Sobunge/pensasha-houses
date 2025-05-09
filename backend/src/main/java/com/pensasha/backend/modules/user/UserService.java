@@ -11,7 +11,7 @@ import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.caretaker.CareTaker;
 import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
-import com.pensasha.backend.modules.user.dto.UserDTO;
+import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
@@ -46,7 +46,7 @@ public class UserService {
      * @return The created User entity.
      */
     @Transactional
-    public User addUser(UserDTO userDTO) {
+    public User addUser(CreateUserDTO userDTO) {
         User user = userFactory.createUser(userDTO);
         log.info("Created new {} with ID: {}", user.getRole(), userDTO.getIdNumber());
         return userRepository.save(user);

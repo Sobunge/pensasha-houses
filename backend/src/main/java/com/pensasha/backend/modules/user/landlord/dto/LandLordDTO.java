@@ -3,7 +3,7 @@ package com.pensasha.backend.modules.user.landlord.dto;
 import java.util.Set;
 
 import com.pensasha.backend.modules.property.Property;
-import com.pensasha.backend.modules.user.dto.UserDTO;
+import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.landlord.BankDetails;
 
 import lombok.*;
@@ -16,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 // Lombok annotation to generate an all-arguments constructor automatically
 @AllArgsConstructor
-public class LandLordDTO extends UserDTO {
+public class LandLordDTO extends CreateUserDTO {
 
     // A set of properties that belong to the landlord
     private Set<Property> Properties;

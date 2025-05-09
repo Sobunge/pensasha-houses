@@ -12,7 +12,7 @@ import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.unit.UnitService;
 import com.pensasha.backend.modules.user.caretaker.CareTaker;
 import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
-import com.pensasha.backend.modules.user.dto.UserDTO;
+import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 import com.pensasha.backend.modules.user.tenant.Tenant;
@@ -43,7 +43,7 @@ public class UserFactory {
      * @return A new User (Admin, Tenant, Landlord, or CareTaker) entity with
      *         populated fields.
      */
-    public User createUser(UserDTO userDTO) {
+    public User createUser(CreateUserDTO userDTO) {
 
         log.info("Creating user for role: {}", userDTO.getRole());
 
@@ -94,7 +94,7 @@ public class UserFactory {
      * @param user    The target User entity.
      * @param userDTO The source DTO with user input data.
      */
-    private void copyCommonUserAttributes(User user, UserDTO userDTO) {
+    private void copyCommonUserAttributes(User user, CreateUserDTO userDTO) {
         user.setFirstName(userDTO.getFirstName());
         user.setSecondName(userDTO.getSecondName());
         user.setThirdName(userDTO.getThirdName());

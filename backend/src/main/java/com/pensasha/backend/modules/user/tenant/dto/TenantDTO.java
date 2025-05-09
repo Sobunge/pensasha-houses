@@ -1,6 +1,6 @@
 package com.pensasha.backend.modules.user.tenant.dto;
 
-import com.pensasha.backend.modules.user.dto.UserDTO;
+import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TenantDTO extends UserDTO {
+public class TenantDTO extends CreateUserDTO {
 
     /**
      * Emergency contact phone number for the tenant.

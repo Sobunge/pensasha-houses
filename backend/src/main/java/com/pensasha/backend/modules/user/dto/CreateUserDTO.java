@@ -27,9 +27,9 @@ import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
     @JsonSubTypes.Type(value = LandLordDTO.class, name = "LANDLORD"),
     @JsonSubTypes.Type(value = TenantDTO.class, name = "TENANT"),
     @JsonSubTypes.Type(value = CareTakerDTO.class, name = "CARETAKER"),
-    @JsonSubTypes.Type(value = UserDTO.class, name = "ADMIN") // fallback/default
+    @JsonSubTypes.Type(value = CreateUserDTO.class, name = "ADMIN") // fallback/default
 })
-public class UserDTO {
+public class CreateUserDTO {
 
     // First name field: must not be blank and must be between 3 and 20 characters
     @NotBlank(message = "First name is required")  // Ensures that the first name is not blank
