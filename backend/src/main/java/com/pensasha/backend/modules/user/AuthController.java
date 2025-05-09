@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pensasha.backend.modules.user.dto.LoginRequest;
+import com.pensasha.backend.modules.user.dto.LoginRequestDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.security.JWTUtils;
 
@@ -75,7 +75,7 @@ public class AuthController {
 
     // User login endpoint
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request, BindingResult result) {
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequestDTO request, BindingResult result) {
 
         // Check for input validation errors in the login request
         if (result.hasErrors()) {
