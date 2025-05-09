@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.dto.ApiResponse;
+import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 
@@ -44,7 +45,7 @@ public class UserController {
         public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
                         @Valid @RequestBody UpdateUserDTO updatedUserDTO, BindingResult result) {
 
-                Optional<User> optionalUser = userService.gettingUser(idNumber);
+                Optional<GetUserDTO> optionalUser = userService.gettingUser(idNumber);
 
                 // Return 404 if the user with the given ID does not exist
                 if (optionalUser.isEmpty()) {
@@ -82,7 +83,7 @@ public class UserController {
         // Deleting a user
         @DeleteMapping("/{idNumber}")
         public ResponseEntity<EntityModel<ApiResponse>> deleteUser(@PathVariable String idNumber) {
-                Optional<User> user = userService.gettingUser(idNumber);
+                Optional<GetUserDTO> user = userService.gettingUser(idNumber);
 
                 // Return 404 if the user with the given ID does not exist
                 if (user.isEmpty()) {
@@ -103,8 +104,8 @@ public class UserController {
 
         // Getting a single user by their ID number
         @GetMapping("/{idNumber}")
-        public ResponseEntity<EntityModel<User>> gettingUser(@PathVariable String idNumber) {
-                Optional<User> user = userService.gettingUser(idNumber);
+        public ResponseEntity<EntityModel<GetUserDTO>> gettingUser(@PathVariable String idNumber) {
+                Optional<GetUserDTO> user = userService.gettingUser(idNumber);
 
                 // Return 404 if the user with the given ID does not exist
                 if (user.isEmpty()) {
@@ -112,7 +113,7 @@ public class UserController {
                 }
 
                 // Creating response model with HATEOAS links
-                EntityModel<User> response = EntityModel.of(user.get(),
+                EntityModel<GetUserDTO> response = EntityModel.of(user.get(),
                                 linkTo(methodOn(UserController.class).gettingUser(idNumber)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 

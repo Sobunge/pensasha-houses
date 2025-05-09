@@ -11,6 +11,7 @@ import com.pensasha.backend.modules.user.caretaker.CareTaker;
 import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
+import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
@@ -152,8 +153,16 @@ public class UserService {
      * @param idNumber User's ID number.
      * @return Optional containing the user if found.
      */
-    public Optional<User> gettingUser(String idNumber) {
-        return userRepository.findByIdNumber(idNumber);
+    public Optional<GetUserDTO> gettingUser(String idNumber) {
+        return userRepository.findByIdNumber(idNumber)
+                .map(user -> new GetUserDTO(
+                        user.getFirstName(),
+                        user.getSecondName(),
+                        user.getThirdName(),
+                        user.getIdNumber(),
+                        user.getPhoneNumber(),
+                        user.getProfilePicture(),
+                        user.getRole()));
     }
 
     /**

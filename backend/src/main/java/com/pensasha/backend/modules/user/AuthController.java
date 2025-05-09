@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.modules.user.dto.LoginRequestDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
+import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.security.JWTUtils;
 
 import jakarta.validation.Valid;
@@ -50,7 +51,7 @@ public class AuthController {
         }
 
         // Check if the user already exists by ID
-        Optional<User> optionalUser = userService.gettingUser(userDTO.getIdNumber());
+        Optional<GetUserDTO> optionalUser = userService.gettingUser(userDTO.getIdNumber());
 
         // If user exists, return a conflict response
         if (optionalUser.isPresent()) {
