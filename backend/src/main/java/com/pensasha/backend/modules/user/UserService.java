@@ -13,6 +13,8 @@ import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
+import com.pensasha.backend.modules.user.landlord.LandlordRepository;
+import com.pensasha.backend.modules.user.landlord.dto.UpdateLandlordDTO;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import jakarta.transaction.Transactional;
@@ -32,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final LandlordRepository landlordRepository;
     private final UserFactory userFactory;
     private final PasswordEncoder passwordEncoder;
     private final UserServiceHelper userServiceHelper;
@@ -67,6 +70,21 @@ public class UserService {
         userServiceHelper.updateCommonUserAttributes(user, updatedUserDTO);
 
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public LandLord updateLandLordDetails(String idNumber, UpdateLandlordDTO updateLandlordDTO){
+
+        LandLord landLord = landlordRepository.findByIdNumber(idNumber).orElseThrow(
+            () -> {
+                log.error("User with id: {} not found.", idNumber);
+                return new ResourceNotFoundException("User with id: " + idNumber + " could not be found");
+            });
+
+            log.info("Updating Landlord details with id: {}", landLord);
+
+
+            return landlordRepository.save(landLord);
     }
 
     /**
