@@ -2,12 +2,6 @@ package com.pensasha.backend.modules.user.dto;
 
 import org.springframework.validation.annotation.Validated;  // Importing annotation for validation support in Spring
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
-import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
-import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
-
 import jakarta.persistence.Column;  // Importing column annotation from Jakarta Persistence
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
 import lombok.*;  // Importing Lombok annotations for generating boilerplate code
@@ -17,18 +11,6 @@ import lombok.*;  // Importing Lombok annotations for generating boilerplate cod
 @NoArgsConstructor  // Lombok annotation to generate a no-argument constructor
 @AllArgsConstructor  // Lombok annotation to generate an all-arguments constructor
 @Validated  // Spring annotation to trigger validation during method execution
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,         // Use name of the class/type
-    include = JsonTypeInfo.As.PROPERTY, // Include it as a field in the JSON
-    property = "role",                  // Use the "role" field to determine type
-    visible = true                      // Make "role" available for deserialization
-)
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = LandLordDTO.class, name = "LANDLORD"),
-    @JsonSubTypes.Type(value = TenantDTO.class, name = "TENANT"),
-    @JsonSubTypes.Type(value = CareTakerDTO.class, name = "CARETAKER"),
-    @JsonSubTypes.Type(value = CreateUserDTO.class, name = "ADMIN") // fallback/default
-})
 public class UpdateUserDTO {
 
     // First name field: must not be blank and must be between 3 and 20 characters
