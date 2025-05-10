@@ -130,4 +130,8 @@ public class UserServiceHelper {
         careTaker.setAssignedProperty(careTakerDTO.getAssignedProperty());
     }
 
+    public void updateCareTakerAttributes(CareTaker careTaker, CareTakerDTO careTakerDTO) {
+        careTaker.setAssignedProperty(careTakerDTO.getAssignedProperty());
+    }
+
 }

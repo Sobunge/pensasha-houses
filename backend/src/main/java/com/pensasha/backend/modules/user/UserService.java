@@ -34,6 +34,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserFactory userFactory;
     private final PasswordEncoder passwordEncoder;
+    private final UserServiceHelper userServiceHelper;
 
     /**
      * Adds a new user based on their DTO type.
@@ -63,11 +64,7 @@ public class UserService {
 
         log.info("Updating details for user with ID: {}", updatedUserDTO.getIdNumber());
 
-        user.setFirstName(updatedUserDTO.getFirstName());
-        user.setSecondName(updatedUserDTO.getSecondName());
-        user.setThirdName(updatedUserDTO.getThirdName());
-        user.setIdNumber(updatedUserDTO.getIdNumber());
-        user.setPhoneNumber(updatedUserDTO.getPhoneNumber());
+        userServiceHelper.updateCommonUserAttributes(user, updatedUserDTO);
 
         return userRepository.save(user);
     }
@@ -192,50 +189,31 @@ public class UserService {
         return userRepository.findAllByRole(role, pageable);
     }
 
-    /**
-     * Copies common attributes from one User entity to another.
-     *
-     * @param target Target user entity.
-     * @param source Source user entity.
-     */
-    private void copyCommonAttributes(User target, User source) {
-        target.setFirstName(source.getFirstName());
-        target.setSecondName(source.getSecondName());
-        target.setThirdName(source.getThirdName());
-        target.setIdNumber(source.getIdNumber());
-        target.setPassword(source.getPassword());
-        target.setPhoneNumber(source.getPhoneNumber());
-
-        if (source.getProfilePicture() != null && !source.getProfilePicture().isEmpty()) {
-            target.setProfilePicture(source.getProfilePicture());
-        }
-    }
-
     private User createUserWithNewRole(User oldUser, Role newRole) {
         User newUser;
 
         switch (newRole) {
             case ADMIN -> {
                 newUser = new User();
-                copyCommonAttributes(newUser, oldUser);
+                userServiceHelper.copyCommonAttributes(newUser, oldUser);
                 newUser.setRole(Role.ADMIN);
                 log.debug("Created new ADMIN user: {}", oldUser.getIdNumber());
             }
             case CARETAKER -> {
                 newUser = new CareTaker();
-                copyCommonAttributes(newUser, oldUser);
+                userServiceHelper.copyCommonAttributes(newUser, oldUser);
                 newUser.setRole(Role.CARETAKER);
                 log.debug("Created new CARETAKER user: {}", oldUser.getIdNumber());
             }
             case LANDLORD -> {
                 newUser = new LandLord();
-                copyCommonAttributes(newUser, oldUser);
+                userServiceHelper.copyCommonAttributes(newUser, oldUser);
                 newUser.setRole(Role.LANDLORD);
                 log.debug("Created new LANDLORD user: {}", oldUser.getIdNumber());
             }
             case TENANT -> {
                 newUser = new Tenant();
-                copyCommonAttributes(newUser, oldUser);
+                userServiceHelper.copyCommonAttributes(newUser, oldUser);
                 newUser.setRole(Role.TENANT);
                 log.debug("Created new TENANT user: {}", oldUser.getIdNumber());
             }
@@ -244,5 +222,4 @@ public class UserService {
 
         return newUser;
     }
-
 }
