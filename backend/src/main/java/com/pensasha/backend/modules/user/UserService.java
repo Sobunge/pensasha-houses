@@ -55,8 +55,11 @@ public class UserService {
      * @param updatedUserDTO The DTO containing updated user details.
      * @return The updated User entity.
      */
-    public User updateUserDetails(UpdateUserDTO updatedUserDTO) {
-        User user = userRepository.findByIdNumber(updatedUserDTO.getIdNumber()).orElseThrow();
+    public User updateUserDetails(String idNumber, UpdateUserDTO updatedUserDTO) {
+        User user = userRepository.findByIdNumber(idNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + idNumber
+                        + " not found."));
+
         log.info("Updating details for user with ID: {}", updatedUserDTO.getIdNumber());
 
         user.setFirstName(updatedUserDTO.getFirstName());
