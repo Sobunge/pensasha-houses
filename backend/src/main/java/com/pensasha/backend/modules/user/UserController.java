@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pensasha.backend.dto.ApiResponse;
+import com.pensasha.backend.modules.user.dto.GetAllUsersDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
@@ -42,7 +43,7 @@ public class UserController {
 
         // Editing common user details (Profile update)
         @PutMapping("/update/{idNumber}")
-        public ResponseEntity<EntityModel<User>> updateProfile(@PathVariable String idNumber,
+        public ResponseEntity<EntityModel<GetUserDTO>> updateProfile(@PathVariable String idNumber,
                         @Valid @RequestBody UpdateUserDTO updatedUserDTO, BindingResult result) {
 
                 Optional<GetUserDTO> optionalUser = userService.gettingUser(idNumber);
@@ -53,11 +54,20 @@ public class UserController {
                 }
 
                 // Update the user's details
-                User savedUser = userService.updateUserDetails(updatedUserDTO);
+                User savedUser = userService.updateUserDetails(idNumber, updatedUserDTO);
+
+                GetUserDTO responseDTO = new GetUserDTO(
+                                savedUser.getFirstName(),
+                                savedUser.getSecondName(),
+                                savedUser.getThirdName(),
+                                savedUser.getIdNumber(),
+                                savedUser.getPhoneNumber(),
+                                savedUser.getProfilePicture(),
+                                savedUser.getRole());
 
                 // Creating response model with HATEOAS links
-                EntityModel<User> userModel = EntityModel.of(savedUser,
-                                linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
+                EntityModel<GetUserDTO> userModel = EntityModel.of(responseDTO,
+                                linkTo(methodOn(UserController.class).gettingUser(responseDTO.getIdNumber()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
@@ -122,12 +132,19 @@ public class UserController {
 
         // Getting all users (for admin use, paginated)
         @GetMapping("/all")
-        public ResponseEntity<PagedModel<EntityModel<User>>> getAllUsers(
+        public ResponseEntity<PagedModel<EntityModel<GetAllUsersDTO>>> getAllUsers(
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "10") int size) {
 
                 Pageable pageable = PageRequest.of(page, size);
-                Page<User> usersPage = userService.getAllUsers(pageable);
+                Page<GetAllUsersDTO> usersPage = userService.getAllUsers(pageable)
+                .map(user -> new GetAllUsersDTO(
+                        user.getFirstName() + " " + user.getThirdName(),
+                        user.getIdNumber(),
+                        user.getPhoneNumber(),
+                        user.getProfilePicture(),
+                        user.getRole()
+                ));
 
                 // Return empty response if no users are found
                 if (usersPage.isEmpty()) {
@@ -135,7 +152,7 @@ public class UserController {
                 }
 
                 // Map users to HATEOAS entity models
-                List<EntityModel<User>> userResources = usersPage.getContent().stream()
+                List<EntityModel<GetAllUsersDTO>> userResources = usersPage.getContent().stream()
                                 .map(user -> EntityModel.of(user,
                                                 linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber()))
                                                                 .withSelfRel()))
@@ -146,7 +163,7 @@ public class UserController {
                                 usersPage.getTotalElements());
 
                 // Building paginated model with HATEOAS links
-                PagedModel<EntityModel<User>> response = PagedModel.of(userResources, metadata,
+                PagedModel<EntityModel<GetAllUsersDTO>> response = PagedModel.of(userResources, metadata,
                                 linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
                                 linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(usersPage.getTotalPages() - 1, size))
