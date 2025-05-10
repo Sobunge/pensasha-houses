@@ -45,7 +45,7 @@ public class UserService {
     @Transactional
     public User addUser(CreateUserDTO userDTO) {
         User user = userFactory.createUser(userDTO);
-        log.info("Created new {} with ID: {}", user.getRole(), userDTO.getIdNumber());
+        log.info("Created new user with ID: {}", userDTO.getIdNumber());
         return userRepository.save(user);
     }
 
@@ -55,6 +55,7 @@ public class UserService {
      * @param updatedUserDTO The DTO containing updated user details.
      * @return The updated User entity.
      */
+    @Transactional
     public User updateUserDetails(String idNumber, UpdateUserDTO updatedUserDTO) {
         User user = userRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id: " + idNumber
@@ -78,6 +79,7 @@ public class UserService {
      * @param updatePasswordDTO DTO containing password information.
      * @return Status message.
      */
+    @Transactional
     public String updateUserPassword(String idNumber, UpdatePasswordDTO updatePasswordDTO) {
         Optional<User> user = userRepository.findByIdNumber(idNumber);
 
@@ -142,6 +144,7 @@ public class UserService {
      *
      * @param idNumber User's ID number.
      */
+    @Transactional
     public void deleteUser(String idNumber) {
         Optional<User> user = userRepository.findByIdNumber(idNumber);
         user.ifPresent(value -> {
