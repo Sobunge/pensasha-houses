@@ -14,6 +14,7 @@ import com.pensasha.backend.modules.unit.UnitService;
 import com.pensasha.backend.modules.user.caretaker.CareTaker;
 import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
+import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 import com.pensasha.backend.modules.user.tenant.Tenant;
@@ -51,6 +52,13 @@ public class UserServiceHelper {
         if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
             user.setProfilePicture(userDTO.getProfilePicture());
         }
+    }
+
+    public void updateCommonUserAttributes(User user, UpdateUserDTO userDTO) {
+        user.setFirstName(userDTO.getFirstName());
+        user.setSecondName(userDTO.getSecondName());
+        user.setThirdName(userDTO.getThirdName());
+        user.setIdNumber(userDTO.getIdNumber());
     }
 
     /**
