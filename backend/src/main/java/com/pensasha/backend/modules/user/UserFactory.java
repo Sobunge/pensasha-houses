@@ -45,7 +45,7 @@ public class UserFactory {
      */
     public User createUser(CreateUserDTO userDTO) {
 
-        log.info("Creating user for role: {}", userDTO.getRole());
+        log.info("Creating user with role: {}", userDTO.getRole());
 
         // If the DTO is a CareTakerDTO, create and return a CareTaker entity
         if (userDTO instanceof CareTakerDTO careTakerDTO) {
