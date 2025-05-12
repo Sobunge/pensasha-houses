@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +13,6 @@ import com.pensasha.backend.modules.property.*;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.lease.LeaseService;
-import com.pensasha.backend.modules.property.PropertyService;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.unit.UnitService;
 import com.pensasha.backend.modules.user.caretaker.CareTaker;
@@ -22,7 +20,6 @@ import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
-import com.pensasha.backend.modules.user.landlord.LandlordRepository;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.UpdateLandlordDTO;
 import com.pensasha.backend.modules.user.tenant.Tenant;
@@ -34,7 +31,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserServiceHelper {
 
-    private final LandlordRepository landlordRepository;
     private final PasswordEncoder passwordEncoder;
     private final UnitService unitService;
     private final LeaseService leaseService;
@@ -71,7 +67,7 @@ public class UserServiceHelper {
         user.setIdNumber(userDTO.getIdNumber());
         user.setPhoneNumber(userDTO.getPhoneNumber());
     }
-S
+
     /**
      * Copies common attributes from one User entity to another.
      *
@@ -126,11 +122,12 @@ S
      * @param landLordDTO The source DTO containing landlord-specific details.
      */
     public void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO) {
+
         landLord.setProperties(landLordDTO.getProperties());
         landLord.setBankDetails(landLordDTO.getBankDetails());
     }
 
-     public void updateLandlordAttributes(LandLord landLord, UpdateLandlordDTO landLordDTO) {
+    public void updateLandlordAttributes(LandLord landLord, UpdateLandlordDTO landLordDTO) {
 
         landLord.setFirstName(landLordDTO.getFirstName());
         landLord.setSecondName(landLordDTO.getSecondName());
@@ -139,17 +136,16 @@ S
         landLord.setPhoneNumber(landLordDTO.getPhoneNumber());
 
         Set<Property> properties = landLordDTO.getPropertyIds()
-        .stream()
-        .map(id -> propertyRepository.findById(id)
-        .orElseThrow(
-            () -> new ResourceNotFoundException("Property with id: " + id + " not found.")))
-        .collect(Collectors.toSet());
+                .stream()
+                .map(id -> propertyRepository.findById(id)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException("Property with id: " + id + " not found.")))
+                .collect(Collectors.toSet());
 
         landLord.setProperties(properties);
 
-        landLord.setBankDetails(new LandLordDTO(
-            updateLandLordDTO.
-        ));
+        landLord.setBankDetails(landLordDTO.getBankDetails());
+
     }
 
     /**
