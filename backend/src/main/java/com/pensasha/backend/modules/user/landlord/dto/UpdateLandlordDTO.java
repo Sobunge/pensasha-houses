@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.validation.annotation.Validated;
 
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
+import com.pensasha.backend.modules.user.landlord.BankDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,5 +30,5 @@ public class UpdateLandlordDTO extends UpdateUserDTO {
     /**
      * Bank details associated with this landlord.
      */
-    private BankDetailsDTO bankDetails;
+    private BankDetails bankDetails;
 }
