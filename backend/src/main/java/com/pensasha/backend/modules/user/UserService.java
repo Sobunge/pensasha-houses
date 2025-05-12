@@ -83,7 +83,6 @@ public class UserService {
 
             log.info("Updating Landlord details with id: {}", landLord);
 
-
             return landlordRepository.save(landLord);
     }
 
