@@ -73,17 +73,17 @@ public class UserService {
     }
 
     @Transactional
-    public LandLord updateLandLordDetails(String idNumber, UpdateLandlordDTO updateLandlordDTO) {
+    public LandLord updateLandLordDetails(String idNumber, UpdateLandlordDTO updateLandlordDTO){
 
         LandLord landLord = landlordRepository.findByIdNumber(idNumber).orElseThrow(
-                () -> {
-                    log.error("User with id: {} not found.", idNumber);
-                    return new ResourceNotFoundException("User with id: " + idNumber + " could not be found");
-                });
+            () -> {
+                log.error("User with id: {} not found.", idNumber);
+                return new ResourceNotFoundException("User with id: " + idNumber + " could not be found");
+            });
 
-        log.info("Updating Landlord details with id: {}", landLord);
+            log.info("Updating Landlord details with id: {}", landLord);
 
-        return landlordRepository.save(landLord);
+            return landlordRepository.save(landLord);
     }
 
     /**
