@@ -67,19 +67,6 @@ public class UnitService {
     }
 
     /**
-     * Retrieves units by their occupancy status with pagination support.
-     * 
-     * @param isOccupied The occupancy status of the units (true or false).
-     * @param page The page number to retrieve.
-     * @param size The size (number of units per page).
-     * @return A paginated list of units filtered by occupancy status.
-     */
-    public Page<Unit> getUnitsByOccupiedStatus(boolean isOccupied, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);  // Create Pageable object for pagination.
-        return unitRepository.findByIsOccupied(isOccupied, pageable);  // Retrieve units based on occupancy status.
-    }
-
-    /**
      * Updates an existing unit with new details.
      * 
      * @param id The ID of the unit to update.
