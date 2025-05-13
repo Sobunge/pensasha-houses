@@ -6,6 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,19 +16,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UnitService {
 
     // Injecting the UnitRepository to interact with the database.
     private final UnitRepository unitRepository;
-
-    /**
-     * Constructor-based dependency injection for the UnitRepository.
-     *
-     * @param unitRepository Unit repository for database interactions.
-     */
-    public UnitService(UnitRepository unitRepository) {
-        this.unitRepository = unitRepository;
-    }
 
     /**
      * Adds a new unit to the database.
