@@ -208,14 +208,14 @@ public class UserController {
          * @return Paginated ResponseEntity of users by role with HATEOAS links.
          */
         @GetMapping("/role/{userRole}")
-        public ResponseEntity<PagedModel<EntityModel<GetAllUsersDTO>>> getAllUserByRole(@PathVariable Role role,
+        public ResponseEntity<PagedModel<EntityModel<GetAllUsersDTO>>> getAllUserByRole(@PathVariable Role userRole,
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "10") int size) {
 
                 Pageable pageable = PageRequest.of(page, size);
 
                 // Fetch and map users with specific role
-                Page<GetAllUsersDTO> usersPage = userService.gettingUsersByRole(role, pageable)
+                Page<GetAllUsersDTO> usersPage = userService.gettingUsersByRole(userRole, pageable)
                                 .map(user -> new GetAllUsersDTO(
                                                 user.getFirstName() + " " + user.getThirdName(),
                                                 user.getIdNumber(),

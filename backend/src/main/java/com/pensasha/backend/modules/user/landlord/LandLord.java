@@ -31,7 +31,7 @@ public class LandLord extends User {
      * - `cascade = CascadeType.ALL` ensures operations like persist, merge, remove cascade to properties.
      * - `fetch = FetchType.LAZY` delays fetching properties until explicitly requested.
      */
-    @OneToMany(mappedBy = "landLord", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "landLord", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Property> Properties;
 
     /**
