@@ -53,19 +53,6 @@ public class UnitController {
     }
 
     /**
-     * Retrieves units by occupancy status with pagination.
-     */
-    @GetMapping("/occupied")
-    public ResponseEntity<Page<Unit>> getUnitsByOccupiedStatus(
-            @RequestParam boolean isOccupied,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        log.info("Fetching units by occupancy status: {}. Page: {}, Size: {}", isOccupied, page, size);
-        Page<Unit> units = unitService.getUnitsByOccupiedStatus(isOccupied, page, size);
-        return ResponseEntity.ok(units);
-    }
-
-    /**
      * Updates a unit by its ID.
      */
     @PutMapping("/{id}")
