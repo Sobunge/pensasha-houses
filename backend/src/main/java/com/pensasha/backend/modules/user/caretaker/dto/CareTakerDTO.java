@@ -1,6 +1,5 @@
 package com.pensasha.backend.modules.user.caretaker.dto;
 
-import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 
 import lombok.*;
@@ -16,5 +15,5 @@ import lombok.*;
 public class CareTakerDTO extends CreateUserDTO {
 
     // A reference to the Property object that is assigned to the caretaker
-    private Property assignedProperty;
+    private Long propertyId;
 }
