@@ -109,7 +109,7 @@ public class LandLordService {
      * @return the updated LandLord entity
      * @throws ResourceNotFoundException if the landlord doesn't exist
      */
-    public LandLord updateLandlordBankDetails(String idNumber, BankDetails bankDetails) {
+    public LandLordDTO updateLandlordBankDetails(String idNumber, BankDetails bankDetails) {
         log.info("Updating bank details for landlord with National ID: {}", idNumber);
         LandLord landLord = landLordRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> {
@@ -120,6 +120,7 @@ public class LandLordService {
         landLord.setBankDetails(bankDetails);
         LandLord updatedLandLord = landLordRepository.save(landLord);
         log.info("Successfully updated bank details for landlord with National ID: {}", idNumber);
-        return updatedLandLord;
+
+        return landLordMapper.toDTO(updatedLandLord);
     }
 }
