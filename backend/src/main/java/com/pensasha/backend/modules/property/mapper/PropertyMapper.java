@@ -11,7 +11,7 @@ import com.pensasha.backend.modules.unit.mapper.UnitMapper;
 public interface PropertyMapper {
 
     // Map from DTO to Entity
-    @Mapping(target = "id", ignore = true) // Assuming DTO doesn't have id
+    @Mapping(target = "id", ignore = true) // DTO doesn't have id
     @Mapping(target = "landLord.id", source = "landLordId")
     @Mapping(target = "careTaker.id", source = "careTakerId")
     Property toEntity(PropertyDTO propertyDTO);
