@@ -1,13 +1,14 @@
 package com.pensasha.backend.modules.user.caretaker;
 
+import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.property.PropertyRepository;
 import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
 import com.pensasha.backend.modules.user.caretaker.mapper.CaretakerMapper;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,11 +35,11 @@ public class CaretakerService {
     public CaretakerDTO updateAssignedProperty(Long caretakerId, Long propertyId) {
         // Fetch the caretaker by ID
         Caretaker caretaker = caretakerRepository.findById(caretakerId)
-                .orElseThrow(() -> new EntityNotFoundException("Caretaker not found with id: " + caretakerId));
+                .orElseThrow(() -> new ResourceNotFoundException("Caretaker not found with id: " + caretakerId));
 
         // Fetch the property by ID
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new EntityNotFoundException("Property not found with id: " + propertyId));
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + propertyId));
 
         // Assign the property to the caretaker
         caretaker.setAssignedProperty(property);
@@ -62,7 +63,7 @@ public class CaretakerService {
     public CaretakerDTO getCaretaker(Long caretakerId) {
         // Fetch the caretaker from the repository
         Caretaker caretaker = caretakerRepository.findById(caretakerId)
-                .orElseThrow(() -> new EntityNotFoundException("Caretaker not found with id: " + caretakerId));
+                .orElseThrow(() -> new ResourceNotFoundException("Caretaker not found with id: " + caretakerId));
 
         // Log the retrieval action
         log.info("Fetched caretaker details with ID {}", caretakerId);
@@ -99,7 +100,7 @@ public class CaretakerService {
     public void deleteCaretaker(Long caretakerId) {
         // Check if the caretaker exists in the repository
         if (!caretakerRepository.existsById(caretakerId)) {
-            throw new EntityNotFoundException("Caretaker not found with id: " + caretakerId);
+            throw new ResourceNotFoundException("Caretaker not found with id: " + caretakerId);
         }
 
         // Log the deletion action
