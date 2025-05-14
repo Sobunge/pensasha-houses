@@ -63,10 +63,10 @@ public class AuthController {
         }
 
         // Create and save the new user
-        User savedUser = userService.addUser(userDTO);
+        GetUserDTO savedUser = userService.addUser(userDTO);
 
         // Wrap the saved user in a HATEOAS response model, including links to the user and all users
-        EntityModel<User> userModel = EntityModel.of(savedUser,
+        EntityModel<GetUserDTO> userModel = EntityModel.of(savedUser,
                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))  // Self-link to the saved user
                         .withSelfRel(),
                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));  // Link to all users
