@@ -74,7 +74,9 @@ public class UserService {
 
         userServiceHelper.updateCommonUserAttributes(user, updatedUserDTO);
 
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.toDTO(updatedUser);
     }
 
     @Transactional
