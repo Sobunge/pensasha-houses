@@ -15,6 +15,7 @@ import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.landlord.LandlordRepository;
 import com.pensasha.backend.modules.user.landlord.dto.UpdateLandlordDTO;
+import com.pensasha.backend.modules.user.mapper.UserMapper;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import jakarta.transaction.Transactional;
@@ -38,6 +39,7 @@ public class UserService {
     private final UserFactory userFactory;
     private final PasswordEncoder passwordEncoder;
     private final UserServiceHelper userServiceHelper;
+    private final UserMapper userMapper;
 
     /**
      * Adds a new user based on their DTO type.
@@ -47,10 +49,13 @@ public class UserService {
      * @return The created User entity.
      */
     @Transactional
-    public User addUser(CreateUserDTO userDTO) {
+    public GetUserDTO addUser(CreateUserDTO userDTO) {
         User user = userFactory.createUser(userDTO);
         log.info("Created new user with ID: {}", userDTO.getIdNumber());
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return userMapper.toDTO(user);
+        
     }
 
     /**
