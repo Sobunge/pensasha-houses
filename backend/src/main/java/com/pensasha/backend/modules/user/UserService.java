@@ -13,7 +13,7 @@ import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
-import com.pensasha.backend.modules.user.landlord.LandlordRepository;
+import com.pensasha.backend.modules.user.landlord.LandLordRepository;
 import com.pensasha.backend.modules.user.landlord.dto.UpdateLandlordDTO;
 import com.pensasha.backend.modules.user.mapper.UserMapper;
 import com.pensasha.backend.modules.user.tenant.Tenant;
@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final LandlordRepository landlordRepository;
+    private final LandLordRepository landlordRepository;
     private final UserFactory userFactory;
     private final PasswordEncoder passwordEncoder;
     private final UserServiceHelper userServiceHelper;

@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.Property;
+import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
+import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 
 import java.util.List;
 import java.util.Set;
@@ -18,7 +20,8 @@ import java.util.Set;
 @Slf4j
 public class LandLordService {
 
-    private final LandlordRepository landLordRepository;
+    private final LandLordRepository landLordRepository;
+    private final LandlordMapper landLordMapper;
 
     /**
      * Retrieves a specific landlord using their national ID number.
@@ -27,13 +30,15 @@ public class LandLordService {
      * @return the LandLord entity if found
      * @throws ResourceNotFoundException if the landlord doesn't exist
      */
-    public LandLord getLandlordById(String idNumber) {
+    public LandLordDTO getLandlordById(String idNumber) {
         log.info("Fetching landlord with National ID: {}", idNumber);
-        return landLordRepository.findByIdNumber(idNumber)
+        LandLord createdLandLord = landLordRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> {
                     log.error("LandLord with National ID: {} not found.", idNumber);
                     return new ResourceNotFoundException("LandLord with National ID: " + idNumber + " not found.");
                 });
+
+                return landLordMapper.toDTO(createdLandLord);
     }
 
     /**
