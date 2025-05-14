@@ -11,6 +11,7 @@ import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Service class for handling business logic related to LandLord entities.
@@ -38,7 +39,7 @@ public class LandLordService {
                     return new ResourceNotFoundException("LandLord with National ID: " + idNumber + " not found.");
                 });
 
-                return landLordMapper.toDTO(createdLandLord);
+        return landLordMapper.toDTO(createdLandLord);
     }
 
     /**
@@ -46,9 +47,15 @@ public class LandLordService {
      *
      * @return List of LandLord entities
      */
-    public List<LandLord> getAllLandlords() {
+    public List<LandLordDTO> getAllLandlords() {
         log.info("Fetching all landlords.");
-        return landLordRepository.findAll();
+        List<LandLord> landLords = landLordRepository.findAll();
+        log.info("Found {} landlords.", landLords.size());
+
+        return landLords.stream()
+                .map(landLordMapper::toDTO)
+                .collect(Collectors.toList());
+
     }
 
     /**
