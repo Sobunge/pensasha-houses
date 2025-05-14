@@ -46,7 +46,7 @@ public class UserService {
      * Supports CareTaker, LandLord, Tenant, and Admin.
      *
      * @param userDTO The DTO containing user details.
-     * @return The created User entity.
+     * @return The created User entity in the DTO formart.
      */
     @Transactional
     public GetUserDTO addUser(CreateUserDTO userDTO) {
@@ -55,7 +55,7 @@ public class UserService {
         userRepository.save(user);
 
         return userMapper.toDTO(user);
-        
+
     }
 
     /**
@@ -78,17 +78,17 @@ public class UserService {
     }
 
     @Transactional
-    public LandLord updateLandLordDetails(String idNumber, UpdateLandlordDTO updateLandlordDTO){
+    public LandLord updateLandLordDetails(String idNumber, UpdateLandlordDTO updateLandlordDTO) {
 
         LandLord landLord = landlordRepository.findByIdNumber(idNumber).orElseThrow(
-            () -> {
-                log.error("User with id: {} not found.", idNumber);
-                return new ResourceNotFoundException("User with id: " + idNumber + " could not be found");
-            });
+                () -> {
+                    log.error("User with id: {} not found.", idNumber);
+                    return new ResourceNotFoundException("User with id: " + idNumber + " could not be found");
+                });
 
-            log.info("Updating Landlord details with id: {}", landLord);
+        log.info("Updating Landlord details with id: {}", landLord);
 
-            return landlordRepository.save(landLord);
+        return landlordRepository.save(landLord);
     }
 
     /**
