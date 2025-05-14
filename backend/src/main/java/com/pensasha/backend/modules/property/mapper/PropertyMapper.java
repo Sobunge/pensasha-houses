@@ -5,13 +5,13 @@ import org.mapstruct.Mapping;
 
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.property.dto.PropertyDTO;
+import com.pensasha.backend.modules.unit.mapper.UnitMapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = UnitMapper.class)
 public interface PropertyMapper {
 
     // Map from DTO to Entity
     @Mapping(target = "id", ignore = true) // Assuming DTO doesn't have id
-    @Mapping(target = "units", ignore = true) // You can adjust this if you need
     @Mapping(target = "landLord.id", source = "landLordId")
     @Mapping(target = "careTaker.id", source = "careTakerId")
     Property toEntity(PropertyDTO propertyDTO);
