@@ -52,9 +52,9 @@ public class UserService {
     public GetUserDTO addUser(CreateUserDTO userDTO) {
         User user = userFactory.createUser(userDTO);
         log.info("Created new user with ID: {}", userDTO.getIdNumber());
-        userRepository.save(user);
+        User createdUser = userRepository.save(user);
 
-        return userMapper.toDTO(user);
+        return userMapper.toDTO(createdUser);
 
     }
 
@@ -65,7 +65,7 @@ public class UserService {
      * @return The updated User entity.
      */
     @Transactional
-    public User updateUserDetails(String idNumber, UpdateUserDTO updatedUserDTO) {
+    public GetUserDTO updateUserDetails(String idNumber, UpdateUserDTO updatedUserDTO) {
         User user = userRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id: " + idNumber
                         + " not found."));
