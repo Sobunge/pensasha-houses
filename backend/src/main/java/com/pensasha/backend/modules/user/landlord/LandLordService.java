@@ -1,5 +1,9 @@
 package com.pensasha.backend.modules.user.landlord;
 
+import java.util.Set;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +13,6 @@ import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Service class for handling business logic related to LandLord entities.
@@ -47,15 +48,16 @@ public class LandLordService {
      *
      * @return List of LandLord entities
      */
-    public List<LandLordDTO> getAllLandlords() {
-        log.info("Fetching all landlords.");
-        List<LandLord> landLords = landLordRepository.findAll();
-        log.info("Found {} landlords.", landLords.size());
+    public Page<LandLordDTO> getAllLandlords(Pageable pageable) {
+        log.info("Fetching landlords with pagination - page: {}, size: {}", pageable.getPageNumber(),
+                pageable.getPageSize());
 
-        return landLords.stream()
-                .map(landLordMapper::toDTO)
-                .collect(Collectors.toList());
+        Page<LandLord> landLords = landLordRepository.findAll(pageable);
 
+        log.info("Found {} landlords on this page.", landLords.getNumberOfElements());
+
+        // Map each LandLord to LandLordDTO, preserving pagination metadata
+        return landLords.map(landLordMapper::toDTO);
     }
 
     /**
