@@ -61,21 +61,11 @@ public class UserController {
                 }
 
                 // Update the user's profile information
-                User savedUser = userService.updateUserDetails(idNumber, updatedUserDTO);
-
-                // Prepare the response DTO
-                GetUserDTO responseDTO = new GetUserDTO(
-                                savedUser.getFirstName(),
-                                savedUser.getSecondName(),
-                                savedUser.getThirdName(),
-                                savedUser.getIdNumber(),
-                                savedUser.getPhoneNumber(),
-                                savedUser.getProfilePicture(),
-                                savedUser.getRole());
-
+                GetUserDTO savedUser = userService.updateUserDetails(idNumber, updatedUserDTO);
+                
                 // Wrap the response with HATEOAS links
-                EntityModel<GetUserDTO> userModel = EntityModel.of(responseDTO,
-                                linkTo(methodOn(UserController.class).gettingUser(responseDTO.getIdNumber()))
+                EntityModel<GetUserDTO> userModel = EntityModel.of(savedUser,
+                                linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
                                                 .withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
 
