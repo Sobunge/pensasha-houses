@@ -11,7 +11,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +34,7 @@ public class TenantService {
                     log.error("Tenant with ID number {} not found", idNumber);
                     return new ResourceNotFoundException("Tenant with ID number " + idNumber + " not found.");
                 });
+
         return tenantMapper.toDTO(tenant);
     }
 
