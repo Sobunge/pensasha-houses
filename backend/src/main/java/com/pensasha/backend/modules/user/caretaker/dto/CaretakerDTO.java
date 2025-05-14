@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 // Lombok annotation to generate an all-arguments constructor automatically
 @AllArgsConstructor
-public class CareTakerDTO extends CreateUserDTO {
+public class CaretakerDTO extends CreateUserDTO {
 
     // A reference to the Property object that is assigned to the caretaker
     private Long propertyId;

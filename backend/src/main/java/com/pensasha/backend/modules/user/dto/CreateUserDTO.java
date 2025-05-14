@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;  // Importing valida
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.pensasha.backend.modules.user.Role;
-import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
+import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 
@@ -26,7 +26,7 @@ import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = LandLordDTO.class, name = "LANDLORD"),
     @JsonSubTypes.Type(value = TenantDTO.class, name = "TENANT"),
-    @JsonSubTypes.Type(value = CareTakerDTO.class, name = "CARETAKER"),
+    @JsonSubTypes.Type(value = CaretakerDTO.class, name = "CARETAKER"),
     @JsonSubTypes.Type(value = CreateUserDTO.class, name = "ADMIN") // fallback/default
 })
 public class CreateUserDTO {

@@ -15,8 +15,8 @@ import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.lease.LeaseService;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.unit.UnitService;
-import com.pensasha.backend.modules.user.caretaker.CareTaker;
-import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
+import com.pensasha.backend.modules.user.caretaker.Caretaker;
+import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
@@ -155,7 +155,7 @@ public class UserServiceHelper {
      * @param careTaker    The target CareTaker entity.
      * @param careTakerDTO The source DTO containing caretaker-specific details.
      */
-    public void copyCareTakerAttributes(CareTaker careTaker, CareTakerDTO careTakerDTO) {
+    public void copyCareTakerAttributes(Caretaker careTaker, CaretakerDTO careTakerDTO) {
         Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "A property with id: " + careTakerDTO.getPropertyId() + " not found."));
@@ -163,7 +163,7 @@ public class UserServiceHelper {
         careTaker.setAssignedProperty(property);
     }
 
-    public void updateCareTakerAttributes(CareTaker careTaker, CareTakerDTO careTakerDTO) {
+    public void updateCareTakerAttributes(Caretaker careTaker, CaretakerDTO careTakerDTO) {
         Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "A property with id: " + careTakerDTO.getPropertyId() + " not found."));

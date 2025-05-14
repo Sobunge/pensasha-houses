@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.pensasha.backend.modules.unit.Unit;
-import com.pensasha.backend.modules.user.caretaker.CareTaker;
+import com.pensasha.backend.modules.user.caretaker.Caretaker;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 
 /**
@@ -82,7 +82,7 @@ public class Property {
      */
     @OneToOne
     @JoinColumn(name = "caretaker_id")
-    private CareTaker careTaker;
+    private Caretaker careTaker;
 
     /**
      * Set of rental units within this property.

@@ -2,8 +2,8 @@ package com.pensasha.backend.modules.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.pensasha.backend.modules.user.caretaker.CareTaker;
-import com.pensasha.backend.modules.user.caretaker.dto.CareTakerDTO;
+import com.pensasha.backend.modules.user.caretaker.Caretaker;
+import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
@@ -37,8 +37,8 @@ public class UserFactory {
         log.info("Creating user with role: {}", userDTO.getRole());
 
         // If the DTO is a CareTakerDTO, create and return a CareTaker entity
-        if (userDTO instanceof CareTakerDTO careTakerDTO) {
-            CareTaker careTaker = new CareTaker();
+        if (userDTO instanceof CaretakerDTO careTakerDTO) {
+            Caretaker careTaker = new Caretaker();
             userServiceHelper.copyCommonUserAttributes(careTaker, careTakerDTO);
             userServiceHelper.copyCareTakerAttributes(careTaker, careTakerDTO);
             log.debug("Created CareTaker: {}", careTaker.getIdNumber());

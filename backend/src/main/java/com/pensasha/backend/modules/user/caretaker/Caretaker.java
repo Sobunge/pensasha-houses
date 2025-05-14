@@ -20,7 +20,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CareTaker extends User {
+public class Caretaker extends User {
 
     /**
      * The property assigned to this caretaker.

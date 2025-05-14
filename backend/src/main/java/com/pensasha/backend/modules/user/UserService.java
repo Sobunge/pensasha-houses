@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
-import com.pensasha.backend.modules.user.caretaker.CareTaker;
+import com.pensasha.backend.modules.user.caretaker.Caretaker;
 import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
@@ -224,7 +224,7 @@ public class UserService {
                 log.debug("Created new ADMIN user: {}", oldUser.getIdNumber());
             }
             case CARETAKER -> {
-                newUser = new CareTaker();
+                newUser = new Caretaker();
                 userServiceHelper.copyCommonAttributes(newUser, oldUser);
                 newUser.setRole(Role.CARETAKER);
                 log.debug("Created new CARETAKER user: {}", oldUser.getIdNumber());

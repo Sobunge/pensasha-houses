@@ -7,7 +7,7 @@ import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.dto.PropertyDTO;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.UserRepository;
-import com.pensasha.backend.modules.user.caretaker.CareTaker;
+import com.pensasha.backend.modules.user.caretaker.Caretaker;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 
 import lombok.RequiredArgsConstructor;
@@ -64,12 +64,12 @@ public class PropertyService {
         // Cast the User to Caretaker
         if (caretakerOpt.isPresent()) {
             User caretakerUser = caretakerOpt.get();
-            if (!(caretakerUser instanceof CareTaker)) {
+            if (!(caretakerUser instanceof Caretaker)) {
                 log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
                 throw new RuntimeException(
                         "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
-            CareTaker caretaker = (CareTaker) caretakerUser; // Cast the user to Caretaker
+            Caretaker caretaker = (Caretaker) caretakerUser; // Cast the user to Caretaker
             property.setCareTaker(caretaker);
         }
 
@@ -155,12 +155,12 @@ public class PropertyService {
                         "Caretaker with National ID: " + propertyDTO.getCareTakerId() + " not found");
             }
             User caretakerUser = caretakerOpt.get();
-            if (!(caretakerUser instanceof CareTaker)) {
+            if (!(caretakerUser instanceof Caretaker)) {
                 log.error("The user with National ID: {} is not a Caretaker", propertyDTO.getCareTakerId());
                 throw new RuntimeException(
                         "The user with National ID: " + propertyDTO.getCareTakerId() + " is not a Caretaker");
             }
-            CareTaker caretaker = (CareTaker) caretakerUser;
+            Caretaker caretaker = (Caretaker) caretakerUser;
             existingProperty.setCareTaker(caretaker);
         }
 
