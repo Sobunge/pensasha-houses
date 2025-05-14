@@ -1,7 +1,7 @@
 package com.pensasha.backend.modules.property;
 
 import com.pensasha.backend.modules.property.dto.PropertyDTO;
-import com.pensasha.backend.utils.PropertyMapperUtil;
+import com.pensasha.backend.modules.property.mapper.PropertyMapper;
 import com.pensasha.backend.utils.ValidationUtil;
 
 import jakarta.validation.Valid;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class PropertyController {
 
         private final PropertyService propertyService; // Service to handle property-related operations
+        private final PropertyMapper propertyMapper;
 
         // Add a new property
         @PostMapping
@@ -44,7 +45,7 @@ public class PropertyController {
 
                 // Add the property via the service and map it to PropertyDTO
                 Property property = propertyService.addProperty(propertyDTO);
-                PropertyDTO responseDTO = PropertyMapperUtil.mapToDTO(property);
+                PropertyDTO responseDTO = propertyMapper.toDTO(property);
 
                 // Create a HATEOAS response with links to the property and all properties
                 EntityModel<PropertyDTO> propertyModel = EntityModel.of(responseDTO,
@@ -71,7 +72,7 @@ public class PropertyController {
 
                 // Update the property using the service and map it to PropertyDTO
                 Property updatedProperty = propertyService.updateProperty(id, propertyDTO);
-                PropertyDTO updatedPropertyDTO = PropertyMapperUtil.mapToDTO(updatedProperty);
+                PropertyDTO updatedPropertyDTO = propertyMapper.toDTO(updatedProperty);
 
                 // Create a HATEOAS response with links to the updated property and all
                 // properties
@@ -113,7 +114,7 @@ public class PropertyController {
 
                 // Map each property to PropertyDTO and create HATEOAS response with links
                 List<EntityModel<PropertyDTO>> propertyDTOs = properties.stream()
-                                .map(property -> EntityModel.of(PropertyMapperUtil.mapToDTO(property),
+                                .map(property -> EntityModel.of(propertyMapper.toDTO(property),
                                                 linkTo(methodOn(PropertyController.class).getProperty(property.getId()))
                                                                 .withSelfRel(),
                                                 linkTo(methodOn(PropertyController.class).getAllProperties())
@@ -143,7 +144,7 @@ public class PropertyController {
 
                 // Map each property to PropertyDTO and create HATEOAS response with links
                 List<EntityModel<PropertyDTO>> propertyDTOs = properties.stream()
-                                .map(property -> EntityModel.of(PropertyMapperUtil.mapToDTO(property),
+                                .map(property -> EntityModel.of(propertyMapper.toDTO(property),
                                                 linkTo(methodOn(PropertyController.class).getProperty(property.getId()))
                                                                 .withSelfRel(),
                                                 linkTo(methodOn(PropertyController.class).getAllProperties())
@@ -153,7 +154,7 @@ public class PropertyController {
                 // Create a HATEOAS response with a list of properties and a link to the
                 // landlord's properties
                 CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
-                                linkTo(methodOn(PropertyController.class).getPropertiesByLandlord(idNumber,  pageable))
+                                linkTo(methodOn(PropertyController.class).getPropertiesByLandlord(idNumber, pageable))
                                                 .withSelfRel());
 
                 return ResponseEntity.ok(responseDTO); // Return 200 (OK) with landlord's properties list

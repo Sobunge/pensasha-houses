@@ -2,9 +2,9 @@ package com.pensasha.backend.modules.property;
 
 import java.util.*;
 
-import com.pensasha.backend.utils.PropertyMapperUtil;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.dto.PropertyDTO;
+import com.pensasha.backend.modules.property.mapper.PropertyMapper;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.UserRepository;
 import com.pensasha.backend.modules.user.caretaker.Caretaker;
@@ -31,6 +31,7 @@ public class PropertyService {
 
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
+    private final PropertyMapper propertyMapper;
 
     /**
      * Adds a new property.
@@ -177,7 +178,7 @@ public class PropertyService {
      */
     public Optional<PropertyDTO> getProperty(Long propertyId) {
         Optional<PropertyDTO> propertyDTO = propertyRepository.findById(propertyId)
-                .map(PropertyMapperUtil::mapToDTO); // Map Property entity to DTO
+                .map(propertyMapper::toDTO); // Map Property entity to DTO
 
         if (propertyDTO.isPresent()) {
             log.info("Fetched property with ID {}", propertyId);
