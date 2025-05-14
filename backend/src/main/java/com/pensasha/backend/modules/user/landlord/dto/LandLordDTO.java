@@ -2,9 +2,7 @@ package com.pensasha.backend.modules.user.landlord.dto;
 
 import java.util.Set;
 
-import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
-import com.pensasha.backend.modules.user.landlord.BankDetails;
 
 import lombok.*;
 
@@ -18,9 +16,10 @@ import lombok.*;
 @AllArgsConstructor
 public class LandLordDTO extends CreateUserDTO {
 
-    // A set of properties that belong to the landlord
-    private Set<Property> Properties;
+     // IDs of the properties owned by this landlord
+    private Set<Long> propertyIds;
 
-    // The bank details associated with the landlord
-    private BankDetails bankDetails;
+    // ID of the associated bank details
+    private Long bankDetailsId;
+
 }
