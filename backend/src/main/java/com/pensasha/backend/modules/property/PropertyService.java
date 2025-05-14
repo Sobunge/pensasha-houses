@@ -194,9 +194,9 @@ public class PropertyService {
      * 
      * @return A list of all property entities.
      */
-    public List<Property> getAllProperties() {
+    public Page<Property> getAllProperties(Pageable pageable) {
         log.info("Fetching all properties");
-        return propertyRepository.findAll();
+        return propertyRepository.findAll(pageable);
     }
 
     /**

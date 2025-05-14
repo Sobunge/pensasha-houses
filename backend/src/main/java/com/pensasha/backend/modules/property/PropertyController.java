@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.CollectionModel;
@@ -35,7 +36,9 @@ public class PropertyController {
         @PostMapping
         public ResponseEntity<?> addProperty(
                         @Valid @RequestBody PropertyDTO propertyDTO, // Validates the input PropertyDTO
-                        BindingResult bindingResult) { // Collects validation errors if any
+                        BindingResult bindingResult, @RequestParam(value = "page", defaultValue = "0") int page,
+                        @RequestParam(value = "size", defaultValue = "10") int size) { // Collects validation errors if
+                                                                                       // any
 
                 // If there are validation errors, return a 400 response with error details
                 if (bindingResult.hasErrors()) {
@@ -50,7 +53,7 @@ public class PropertyController {
                 // Create a HATEOAS response with links to the property and all properties
                 EntityModel<PropertyDTO> propertyModel = EntityModel.of(responseDTO,
                                 linkTo(methodOn(PropertyController.class).getProperty(property.getId())).withSelfRel(),
-                                linkTo(methodOn(PropertyController.class).getAllProperties())
+                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size))
                                                 .withRel("all-properties"));
 
                 // Return 201 (Created) with the property details and links
@@ -62,7 +65,9 @@ public class PropertyController {
         public ResponseEntity<?> updateProperty(
                         @PathVariable Long id, // Property ID to update
                         @Valid @RequestBody PropertyDTO propertyDTO, // Validates the input PropertyDTO
-                        BindingResult bindingResult) { // Collects validation errors if any
+                        BindingResult bindingResult, @RequestParam(value = "page", defaultValue = "0") int page,
+                        @RequestParam(value = "size", defaultValue = "10") int size) { // Collects validation errors if
+                                                                                       // any
 
                 // If there are validation errors, return a 400 response with error details
                 if (bindingResult.hasErrors()) {
@@ -78,7 +83,7 @@ public class PropertyController {
                 // properties
                 EntityModel<PropertyDTO> propertyModel = EntityModel.of(updatedPropertyDTO,
                                 linkTo(methodOn(PropertyController.class).getProperty(id)).withSelfRel(),
-                                linkTo(methodOn(PropertyController.class).getAllProperties())
+                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size))
                                                 .withRel("all-properties"));
 
                 // Return 200 (OK) with the updated property details and links
@@ -95,7 +100,8 @@ public class PropertyController {
                                         EntityModel<PropertyDTO> responseDTO = EntityModel.of(propertyDTO,
                                                         linkTo(methodOn(PropertyController.class).getProperty(id))
                                                                         .withSelfRel(),
-                                                        linkTo(methodOn(PropertyController.class).getAllProperties())
+                                                        linkTo(methodOn(PropertyController.class).getAllProperties(0,
+                                                                        10))
                                                                         .withRel("all-properties"));
                                         return ResponseEntity.ok(responseDTO);
                                 })
@@ -104,60 +110,81 @@ public class PropertyController {
 
         // Get all properties
         @GetMapping
-        public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getAllProperties() {
-                List<Property> properties = propertyService.getAllProperties();
+        public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getAllProperties(
+                        @RequestParam(value = "page", defaultValue = "0") int page,
+                        @RequestParam(value = "size", defaultValue = "10") int size) {
+
+                // Fetch paginated properties from the service/repository
+                Page<Property> propertyPage = propertyService.getAllProperties(PageRequest.of(page, size));
 
                 // If no properties exist, return a 204 (No Content) response
-                if (properties.isEmpty()) {
+                if (propertyPage.isEmpty()) {
                         return ResponseEntity.noContent().build();
                 }
 
                 // Map each property to PropertyDTO and create HATEOAS response with links
-                List<EntityModel<PropertyDTO>> propertyDTOs = properties.stream()
+                List<EntityModel<PropertyDTO>> propertyDTOs = propertyPage.stream()
                                 .map(property -> EntityModel.of(propertyMapper.toDTO(property),
                                                 linkTo(methodOn(PropertyController.class).getProperty(property.getId()))
                                                                 .withSelfRel(),
-                                                linkTo(methodOn(PropertyController.class).getAllProperties())
+                                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size))
                                                                 .withRel("all-properties")))
                                 .collect(Collectors.toList());
 
                 // Create a HATEOAS response with a list of properties and a link to the
                 // properties collection
                 CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
-                                linkTo(methodOn(PropertyController.class).getAllProperties()).withSelfRel());
+                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size)).withSelfRel());
+
+                // Add pagination links for next and previous pages if applicable
+                if (propertyPage.hasNext()) {
+                        responseDTO.add(linkTo(methodOn(PropertyController.class)
+                                        .getAllProperties(page + 1, size)).withRel("next"));
+                }
+                if (propertyPage.hasPrevious()) {
+                        responseDTO.add(linkTo(methodOn(PropertyController.class)
+                                        .getAllProperties(page - 1, size)).withRel("previous"));
+                }
 
                 return ResponseEntity.ok(responseDTO); // Return 200 (OK) with properties list
         }
 
-        // Get properties by landlord's ID number
         @GetMapping("/landlord/{idNumber}")
         public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getPropertiesByLandlord(
                         @PathVariable String idNumber, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
 
                 Page<Property> properties = propertyService.gettingPropertiesForLandlord(idNumber, pageable);
 
-                // If no properties are found for the landlord, return a 204 (No Content)
-                // response
                 if (properties.isEmpty()) {
                         return ResponseEntity.noContent().build();
                 }
 
-                // Map each property to PropertyDTO and create HATEOAS response with links
-                List<EntityModel<PropertyDTO>> propertyDTOs = properties.stream()
+                List<EntityModel<PropertyDTO>> propertyDTOs = properties.getContent().stream()
                                 .map(property -> EntityModel.of(propertyMapper.toDTO(property),
                                                 linkTo(methodOn(PropertyController.class).getProperty(property.getId()))
                                                                 .withSelfRel(),
-                                                linkTo(methodOn(PropertyController.class).getAllProperties())
+                                                linkTo(methodOn(PropertyController.class).getAllProperties(0, 10))
                                                                 .withRel("all-properties")))
                                 .collect(Collectors.toList());
 
-                // Create a HATEOAS response with a list of properties and a link to the
-                // landlord's properties
                 CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
                                 linkTo(methodOn(PropertyController.class).getPropertiesByLandlord(idNumber, pageable))
                                                 .withSelfRel());
 
-                return ResponseEntity.ok(responseDTO); // Return 200 (OK) with landlord's properties list
+                // Add pagination links for next and previous pages if applicable
+                if (properties.hasNext()) {
+                        Pageable nextPageable = properties.nextPageable();
+                        responseDTO.add(linkTo(methodOn(PropertyController.class)
+                                        .getPropertiesByLandlord(idNumber, nextPageable)).withRel("next"));
+                }
+
+                if (properties.hasPrevious()) {
+                        Pageable prevPageable = properties.previousPageable();
+                        responseDTO.add(linkTo(methodOn(PropertyController.class)
+                                        .getPropertiesByLandlord(idNumber, prevPageable)).withRel("previous"));
+                }
+
+                return ResponseEntity.ok(responseDTO);
         }
 
         // Delete a property by ID
