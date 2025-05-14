@@ -84,7 +84,8 @@ public class LandLordService {
      * @throws ResourceNotFoundException if the landlord doesn't exist
      */
     public LandLordDTO updateLandlordProperties(String idNumber, Set<Property> properties) {
-        log.info("Updating properties for landlord with National ID: {}", idNumber);
+        log.info("Updating {} properties for landlord with National ID: {}", properties.size(), idNumber);
+
         LandLord landLord = landLordRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> {
                     log.error("LandLord with National ID: {} not found for property update.", idNumber);
@@ -93,8 +94,9 @@ public class LandLordService {
 
         landLord.setProperties(properties);
         LandLord updatedLandLord = landLordRepository.save(landLord);
-        log.info("Successfully updated properties for landlord with National ID: {}", idNumber);
 
+        log.info("Successfully updated {} properties for landlord with National ID: {}",
+                properties.size(), idNumber);
 
         return landLordMapper.toDTO(updatedLandLord);
     }
