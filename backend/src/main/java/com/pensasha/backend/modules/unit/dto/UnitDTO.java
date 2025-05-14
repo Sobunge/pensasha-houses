@@ -11,6 +11,8 @@ import lombok.*;  // Importing Lombok annotations for generating boilerplate cod
 @AllArgsConstructor  // Lombok annotation to generate an all-arguments constructor
 public class UnitDTO {
 
+    private Long id;
+
     // The unit number, required to be a non-blank string
     @NotBlank(message = "Unit number is required")  // Ensures that the unit number is not blank
     private String unitNumber;
