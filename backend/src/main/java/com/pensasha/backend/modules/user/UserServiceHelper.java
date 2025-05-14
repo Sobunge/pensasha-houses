@@ -1,6 +1,7 @@
 package com.pensasha.backend.modules.user;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,6 +20,8 @@ import com.pensasha.backend.modules.user.caretaker.Caretaker;
 import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
+import com.pensasha.backend.modules.user.landlord.BankDetails;
+import com.pensasha.backend.modules.user.landlord.BankDetailsRepository;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.UpdateLandlordDTO;
@@ -35,6 +38,7 @@ public class UserServiceHelper {
     private final UnitService unitService;
     private final LeaseService leaseService;
     private final PropertyRepository propertyRepository;
+    private final BankDetailsRepository bankDetailsRepository;
 
     /**
      * Helper method to copy common user fields from a DTO to a User entity.
@@ -123,8 +127,20 @@ public class UserServiceHelper {
      */
     public void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO) {
 
-        landLord.setProperties(landLordDTO.getProperties());
-        landLord.setBankDetails(landLordDTO.getBankDetails());
+        Set<Property> properties = new HashSet<>();
+
+        for (Long id : landLordDTO.getPropertyIds()) {
+            Property property = propertyRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("Property with id: " + id + " could not be found."));
+            properties.add(property);
+        }
+
+        landLord.setProperties(properties);
+
+        BankDetails bankDetails = bankDetailsRepository.findById(landLordDTO.getBankDetailsId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bank Details with id: " + landLordDTO.getBankDetailsId() + " not found."));
+
+        landLord.setBankDetails(bankDetails);
     }
 
     public void updateLandlordAttributes(LandLord landLord, UpdateLandlordDTO landLordDTO) {
