@@ -66,5 +66,6 @@ public class LeaseDTO {
      * Helps track invoices without needing to load full Invoice entities.
      * Can be null or empty if no invoices are linked.
      */
-    private List<String> invoiceNumber;
+
+    private List<String> invoiceNumbers;
 }
