@@ -20,5 +20,5 @@ public class PaymentDTO {
 
     private Long tenantId;
 
-    private Long invoiceId; // nullable, since invoice is optional
+    private Long invoiceNumber; // nullable, since invoice is optional
 }
