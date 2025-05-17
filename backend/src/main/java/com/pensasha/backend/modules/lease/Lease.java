@@ -83,11 +83,13 @@ public class Lease {
      * List of invoices associated with this lease.
      * 
      * One lease can have multiple invoices.
-     * - mappedBy: specifies the field in the Invoice entity that owns the relationship.
+     * - mappedBy: specifies the field in the Invoice entity that owns the
+     * relationship.
      * - cascade = CascadeType.ALL: any operations (persist, remove, etc.) on Lease
-     *   will also cascade to its invoices.
-     * - fetch = FetchType.LAZY: invoices will be loaded on-demand, not with the Lease itself.
+     * will also cascade to its invoices.
+     * - fetch = FetchType.LAZY: invoices will be loaded on-demand, not with the
+     * Lease itself.
      */
-    @OneToMany(mappedBy = "lease", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "lease", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Invoice> invoices;
 }
