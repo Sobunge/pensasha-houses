@@ -36,22 +36,10 @@ public class LeaseDTO {
     private Long tenantId;
 
     /**
-     * Optional convenience field to carry the tenant's display name.
-     * Useful for displaying data on UI clients without requiring a separate lookup.
-     */
-    private String tenantName;
-
-    /**
      * ID of the unit associated with the lease.
      * Simplifies references without exposing the full Unit entity.
      */
     private Long unitId;
-
-    /**
-     * Optional convenience field to carry the unit's name or identifier.
-     * Helpful for UI display without needing additional queries.
-     */
-    private String unitName;
 
     /**
      * Monthly rent amount agreed upon in the lease.
