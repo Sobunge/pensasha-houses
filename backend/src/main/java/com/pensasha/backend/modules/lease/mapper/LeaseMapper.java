@@ -22,7 +22,7 @@ public interface LeaseMapper {
        @Mappings({
         @Mapping(source = "tenant.id", target = "tenantId"),
         @Mapping(source = "unit.id", target = "unitId"),
-        @Mapping(target = "invoiceNumber", expression = "java(mapInvoiceIds(lease.getInvoices()))")
+        @Mapping(target = "invoiceNumbers", expression = "java(mapInvoiceIds(lease.getInvoices()))")
     })
     LeaseDTO toDTO(Lease lease);
 
