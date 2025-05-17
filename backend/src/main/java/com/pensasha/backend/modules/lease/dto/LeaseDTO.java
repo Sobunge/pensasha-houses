@@ -21,7 +21,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LeaseDto {
+public class LeaseDTO {
 
     /**
      * Unique identifier for the lease.
