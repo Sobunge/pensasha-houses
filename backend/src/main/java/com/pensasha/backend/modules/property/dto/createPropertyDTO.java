@@ -4,6 +4,8 @@ import java.util.List; // Importing List to store amenities
 import java.util.Set; // Importing Set to store units
 
 import com.pensasha.backend.modules.unit.dto.UnitDTO;
+import com.pensasha.backend.modules.user.caretaker.Caretaker;
+import com.pensasha.backend.modules.user.landlord.LandLord;
 
 import jakarta.validation.constraints.*; // Importing validation annotations from Jakarta API
 import lombok.*; // Importing Lombok annotations for generating boilerplate code
@@ -45,10 +47,10 @@ public class createPropertyDTO {
     private List<String> amenities;
 
     // ID of the landlord
-    private String landLordId;
+    private LandLord landLordId;
 
     // ID of the caretaker, optional field
-    private String careTakerId; // Optional caretaker, hence no validation
+    private Caretaker caretakerId; // Optional caretaker, hence no validation
 
     // A set of units associated with the property, stored as UnitDTO objects
     private Set<UnitDTO> units; // A set of unit details associated with the property
