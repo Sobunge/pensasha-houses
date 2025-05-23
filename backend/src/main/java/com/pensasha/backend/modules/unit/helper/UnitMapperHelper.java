@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.unit.helper;
 
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
@@ -24,6 +25,7 @@ public class UnitMapperHelper {
      * @return the corresponding Property entity.
      * @throws IllegalArgumentException if no property is found.
      */
+    @Named("propertyIdToProperty")
     public Property getPropertyById(Long propertyId) {
         return propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + propertyId));
@@ -37,6 +39,7 @@ public class UnitMapperHelper {
      * @throws IllegalArgumentException if tenantId is not null and no tenant is
      *                                  found.
      */
+    @Named("TenantIdToTenant")
     public Tenant getTenantById(Long tenantId) {
         if (tenantId == null) {
             return null;
