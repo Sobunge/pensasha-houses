@@ -2,6 +2,8 @@ package com.pensasha.backend.modules.unit.mapper;
 
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.unit.dto.UnitDTO;
+import com.pensasha.backend.modules.unit.helper.UnitMapperHelper;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
  * This separates domain logic from data transfer operations, ensuring clean and consistent mapping.
  */
 @Component
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = UnitMapperHelper.class)
 public interface UnitMapper {
 
     /**
@@ -36,7 +38,7 @@ public interface UnitMapper {
      * @param dto the UnitDTO containing data to be converted.
      * @return a Unit entity object.
      */
-    @Mapping(target = "property", ignore = true)
-    @Mapping(target = "tenant", ignore = true)
+    @Mapping(target = "tenant", source = "tenantId", qualifiedByName = "tenantIdToTenant")
+    @Mapping(target = "property", source = "propertyId", qualifiedByName = "propertyIdToProperty")
     Unit toEntity(UnitDTO dto);
 }
