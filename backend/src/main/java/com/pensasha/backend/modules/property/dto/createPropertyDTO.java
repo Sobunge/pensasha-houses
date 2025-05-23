@@ -3,10 +3,6 @@ package com.pensasha.backend.modules.property.dto;
 import java.util.List; // Importing List to store amenities
 import java.util.Set; // Importing Set to store units
 
-import com.pensasha.backend.modules.unit.Unit;
-import com.pensasha.backend.modules.user.caretaker.Caretaker;
-import com.pensasha.backend.modules.user.landlord.LandLord;
-
 import jakarta.validation.constraints.*; // Importing validation annotations from Jakarta API
 import lombok.*; // Importing Lombok annotations for generating boilerplate code
 
