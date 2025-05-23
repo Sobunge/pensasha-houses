@@ -39,7 +39,7 @@ public class UnitMapperHelper {
      * @throws IllegalArgumentException if tenantId is not null and no tenant is
      *                                  found.
      */
-    @Named("TenantIdToTenant")
+    @Named("tenantIdToTenant")
     public Tenant getTenantById(Long tenantId) {
         if (tenantId == null) {
             return null;
