@@ -3,7 +3,7 @@ package com.pensasha.backend.modules.property.dto;
 import java.util.List; // Importing List to store amenities
 import java.util.Set; // Importing Set to store units
 
-import com.pensasha.backend.modules.unit.dto.UnitDTO;
+import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.caretaker.Caretaker;
 import com.pensasha.backend.modules.user.landlord.LandLord;
 
@@ -53,5 +53,5 @@ public class createPropertyDTO {
     private Caretaker caretakerId; // Optional caretaker, hence no validation
 
     // A set of units associated with the property, stored as UnitDTO objects
-    private Set<UnitDTO> units; // A set of unit details associated with the property
+    private Set<Unit> units; // A set of unit details associated with the property
 }
