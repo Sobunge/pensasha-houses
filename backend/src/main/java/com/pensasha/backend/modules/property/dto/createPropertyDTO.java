@@ -48,6 +48,6 @@ public class createPropertyDTO {
     // ID of the caretaker, optional field
     private Long caretakerId; // Optional caretaker, hence no validation
 
-    // A set of units associated with the property, stored as UnitDTO objects
+    // A set of units associated with the propertya, stored as UnitDTO objects
     private Set<Long> unitIds; // A set of unit details associated with the property
 }
