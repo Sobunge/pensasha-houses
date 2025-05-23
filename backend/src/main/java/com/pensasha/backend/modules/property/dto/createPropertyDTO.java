@@ -47,11 +47,11 @@ public class createPropertyDTO {
     private List<String> amenities;
 
     // ID of the landlord
-    private LandLord landLordId;
+    private Long landLordId;
 
     // ID of the caretaker, optional field
-    private Caretaker caretakerId; // Optional caretaker, hence no validation
+    private Long caretakerId; // Optional caretaker, hence no validation
 
     // A set of units associated with the property, stored as UnitDTO objects
-    private Set<Unit> units; // A set of unit details associated with the property
+    private Set<Long> unitIds; // A set of unit details associated with the property
 }
