@@ -26,18 +26,21 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String idNumber) throws UsernameNotFoundException {
 
         // Fetch the user from the database by idNumber
-        // If no user is found, throw a UsernameNotFoundException with a relevant message
+        // If no user is found, throw a UsernameNotFoundException with a relevant
+        // message
         User user = userRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // Ensure that authorities (roles) are properly set. Here we use the user's role as a granted authority.
+        // Ensure that authorities (roles) are properly set. Here we use the user's role
+        // as a granted authority.
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
 
-        // Return a UserDetails object containing the user's idNumber, password, and authorities
+        // Return a UserDetails object containing the user's idNumber, password, and
+        // authorities
         return new org.springframework.security.core.userdetails.User(
                 user.getIdNumber(), // Username (idNumber)
-                user.getPassword(),  // User's password
-                List.of(authority)   // User's roles wrapped in a list of GrantedAuthority
+                user.getPassword(), // User's password
+                List.of(authority) // User's roles wrapped in a list of GrantedAuthority
         );
     }
 }
