@@ -45,7 +45,8 @@ public class WebSecurityConfig {
                 // Configure session management to be stateless (no HTTP sessions)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Add the JWT authentication filter before the default UsernamePasswordAuthenticationFilter
+                // Add the JWT authentication filter before the default
+                // UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // Define public and protected routes
@@ -53,16 +54,14 @@ public class WebSecurityConfig {
                         // Allow unauthenticated access to registration and login endpoints
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         // All other requests require authentication
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
 
                 // Configure logout handling
                 .logout(logout -> logout
                         // Define the logout URL endpoint
                         .logoutUrl("/user/logout")
                         // Specify a custom logout success handler
-                        .logoutSuccessHandler(this::logoutSuccessHandler)
-                );
+                        .logoutSuccessHandler(this::logoutSuccessHandler));
 
         // Return the configured security filter chain
         return http.build();
@@ -96,7 +95,8 @@ public class WebSecurityConfig {
      */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        // Build and return the AuthenticationManager from the shared HttpSecurity object
+        // Build and return the AuthenticationManager from the shared HttpSecurity
+        // object
         return http.getSharedObject(AuthenticationManagerBuilder.class).build();
     }
 
