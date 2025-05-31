@@ -24,7 +24,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     // Inject dependencies: JWT utility class and custom user details service
     private final JWTUtils jwtUtils;
     private final CustomUserDetailsService userDetailsService;
-    
+
     // Logger for debugging and information logging
     private static final Logger logger = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
@@ -44,7 +44,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         // Extract the Authorization header from the request
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // If the header is missing or doesn't start with "Bearer", pass the request along the filter chain
+        // If the header is missing or doesn't start with "Bearer", pass the request
+        // along the filter chain
         if (header == null || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
@@ -55,14 +56,16 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         // Extract the username from the token
         String username = jwtUtils.extractUsername(token);
 
-        // If a username is found and the user is not already authenticated in the SecurityContext
+        // If a username is found and the user is not already authenticated in the
+        // SecurityContext
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // Load the user details using the custom user details service
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             // Validate the token with the user details
             if (jwtUtils.validateToken(token, userDetails)) {
-                // If the token is valid, create an authentication token and set it in the SecurityContext
+                // If the token is valid, create an authentication token and set it in the
+                // SecurityContext
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
