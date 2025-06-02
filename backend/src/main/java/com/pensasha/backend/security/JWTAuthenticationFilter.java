@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,22 +55,29 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         // Extract the token by removing the "Bearer " prefix
         String token = header.substring(7);
         // Extract the username from the token
-        String username = jwtUtils.extractUsername(token);
+        try {
+            String username = jwtUtils.extractUsername(token);
 
-        // If a username is found and the user is not already authenticated in the
-        // SecurityContext
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Load the user details using the custom user details service
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            // If a username is found and the user is not already authenticated in the
+            // SecurityContext
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // Load the user details using the custom user details service
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            // Validate the token with the user details
-            if (jwtUtils.validateToken(token, userDetails)) {
-                // If the token is valid, create an authentication token and set it in the
-                // SecurityContext
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-                        null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                // Validate the token with the user details
+                if (jwtUtils.validateToken(token, userDetails)) {
+                    // If the token is valid, create an authentication token and set it in the
+                    // SecurityContext
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+                            null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token expired");
+            return;
         }
 
         // Continue with the filter chain to pass the request along
