@@ -6,7 +6,8 @@ import lombok.*;
 
 // Lombok annotation to generate getter methods automatically for all fields in the class
 @Getter
-// Lombok annotation to generate setter methods automatically for all fields in the class
+// Lombok annotation to generate setter methods automatically for all fields in
+// the class
 @Setter
 // Lombok annotation to generate a no-argument constructor automatically
 @NoArgsConstructor

@@ -11,7 +11,8 @@ import lombok.*;
 
 /**
  * Entity class representing a CareTaker user.
- * Inherits from the {@link User} entity and adds a relationship to a property the caretaker is assigned to.
+ * Inherits from the {@link User} entity and adds a relationship to a property
+ * the caretaker is assigned to.
  * Mapped to the 'caretakers' table in the database.
  */
 @Entity
@@ -24,7 +25,8 @@ public class Caretaker extends User {
 
     /**
      * The property assigned to this caretaker.
-     * Represents a many-to-one relationship where multiple caretakers can be assigned to a property,
+     * Represents a many-to-one relationship where multiple caretakers can be
+     * assigned to a property,
      * though typically one caretaker manages one property.
      */
     @ManyToOne
