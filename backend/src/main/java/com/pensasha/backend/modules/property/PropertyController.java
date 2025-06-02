@@ -149,6 +149,7 @@ public class PropertyController {
                 return ResponseEntity.ok(responseDTO); // Return 200 (OK) with properties list
         }
 
+        // Gettting all properties of a landlord
         @GetMapping("/landlord/{idNumber}")
         public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getPropertiesByLandlord(
                         @PathVariable String idNumber, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
