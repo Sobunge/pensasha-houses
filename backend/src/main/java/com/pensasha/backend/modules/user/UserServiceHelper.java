@@ -1,9 +1,7 @@
 package com.pensasha.backend.modules.user;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -107,26 +105,26 @@ public class UserServiceHelper {
      * @param tenantDTO Source DTO with tenant-specific details.
      */
     public void copyTenantAttributes(Tenant tenant, TenantDTO tenantDTO) {
-        // Convert rental unit IDs to actual Unit entities
-        List<Unit> rentalUnits = Optional.ofNullable(tenantDTO.getRentalUnitIds())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(unitService::getUnitById)
-                .toList();
+        // Map rental unit IDs to Unit entities, if any
+        if (tenantDTO.getRentalUnitIds() != null && !tenantDTO.getRentalUnitIds().isEmpty()) {
+            List<Unit> rentalUnits = tenantDTO.getRentalUnitIds().stream()
+                    .map(unitService::getUnitById)
+                    .toList();
+            tenant.setRentalUnits(rentalUnits);
+        }
 
-        tenant.setRentalUnits(rentalUnits);
+        // Map lease IDs to Lease entities, if any
+        if (tenantDTO.getLeaseIds() != null && !tenantDTO.getLeaseIds().isEmpty()) {
+            List<Lease> leases = tenantDTO.getLeaseIds().stream()
+                    .map(leaseService::getLeaseById)
+                    .toList();
+            tenant.setLeases(leases);
+        }
 
-        // Convert lease IDs to actual Lease entities
-        List<Lease> leases = Optional.ofNullable(tenantDTO.getLeaseIds())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(leaseService::getLeaseById)
-                .toList();
-
-        tenant.setLeases(leases);
-
-        // Set emergency contact information
-        tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
+        // Set emergency contact information if present
+        if (tenantDTO.getEmergencyContact() != null) {
+            tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
+        }
     }
 
     /**
