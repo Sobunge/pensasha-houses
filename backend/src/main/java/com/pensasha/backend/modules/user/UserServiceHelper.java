@@ -198,12 +198,17 @@ public class UserServiceHelper {
      * @param careTakerDTO Source DTO containing caretaker-specific details.
      */
     public void copyCareTakerAttributes(Caretaker careTaker, CaretakerDTO careTakerDTO) {
-        // Retrieve property by ID, fallback to new Property() if not found
-        Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
-                .orElse(new Property());
 
-        // Associate the property with the caretaker
-        careTaker.setAssignedProperty(property);
+        // Retrieve property by ID, fallback to new Property() if not found
+        if (careTakerDTO.getPropertyId() != null) {
+            Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Property with ID: " + careTakerDTO.getPropertyId() + " not found."));
+
+            // Associate the property with the caretaker
+            careTaker.setAssignedProperty(property);
+        }
+
     }
 
     /**
