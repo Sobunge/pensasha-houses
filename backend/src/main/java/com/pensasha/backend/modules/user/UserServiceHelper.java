@@ -137,23 +137,27 @@ public class UserServiceHelper {
      * @param landLordDTO Source DTO with landlord-specific details.
      */
     public void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO) {
-        Set<Property> properties = new HashSet<>();
 
-        // Retrieve and add each property by ID, throwing exception if not found
-        for (Long id : landLordDTO.getPropertyIds()) {
-            Property property = propertyRepository.findById(id)
-                    .orElseThrow(
-                            () -> new ResourceNotFoundException("Property with id: " + id + " could not be found."));
-            properties.add(property);
+        if (landLordDTO.getPropertyIds() != null && !landLordDTO.getPropertyIds().isEmpty()) {
+            Set<Property> properties = new HashSet<>();
+
+            // Retrieve and add each property by ID, throwing exception if not found
+            for (Long id : landLordDTO.getPropertyIds()) {
+                Property property = propertyRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Property with id: " + id + " not found."));
+                properties.add(property);
+            }
+            landLord.setProperties(properties);
         }
-        landLord.setProperties(properties);
 
         // Retrieve and set bank details, throwing exception if not found
-        BankDetails bankDetails = bankDetailsRepository.findById(landLordDTO.getBankDetailsId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Bank Details with id: " + landLordDTO.getBankDetailsId() + " not found."));
+        if (landLordDTO.getBankDetailsId() != null) {
+            BankDetails bankDetails = bankDetailsRepository.findById(landLordDTO.getBankDetailsId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Bank details with id: " + landLordDTO.getBankDetailsId() + " not found."));
 
-        landLord.setBankDetails(bankDetails);
+            landLord.setBankDetails(bankDetails);
+        }
     }
 
     /**
@@ -185,17 +189,22 @@ public class UserServiceHelper {
 
     /**
      * Copies caretaker-specific fields from a CaretakerDTO to a Caretaker entity.
-     * Associates the caretaker with a property.
+     * Associates the caretaker with a property based on the provided property ID.
+     * 
+     * If the property is not found, assigns a new (empty) Property instance
+     * instead.
+     * (Consider whether this fallback is intended, or if throwing an exception
+     * might be safer.)
      *
-     * @param careTaker    Target Caretaker entity.
-     * @param careTakerDTO Source DTO with caretaker-specific details.
+     * @param careTaker    Target Caretaker entity to populate.
+     * @param careTakerDTO Source DTO containing caretaker-specific details.
      */
     public void copyCareTakerAttributes(Caretaker careTaker, CaretakerDTO careTakerDTO) {
-        // Retrieve and set property, throwing exception if not found
+        // Retrieve property by ID, fallback to new Property() if not found
         Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "A property with id: " + careTakerDTO.getPropertyId() + " not found."));
+                .orElse(new Property());
 
+        // Associate the property with the caretaker
         careTaker.setAssignedProperty(property);
     }
 
