@@ -122,6 +122,7 @@ public class UserService {
             log.error("User not found with ID: {}", idNumber);
             return "User with this id: " + idNumber + " not found.";
         }
+
     }
 
     /**

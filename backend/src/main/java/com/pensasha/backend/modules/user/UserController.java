@@ -62,7 +62,7 @@ public class UserController {
 
                 // Update the user's profile information
                 GetUserDTO savedUser = userService.updateUserDetails(idNumber, updatedUserDTO);
-                
+
                 // Wrap the response with HATEOAS links
                 EntityModel<GetUserDTO> userModel = EntityModel.of(savedUser,
                                 linkTo(methodOn(UserController.class).gettingUser(savedUser.getIdNumber()))
@@ -81,14 +81,14 @@ public class UserController {
          */
         @PutMapping("/{idNumber}/changePassword")
         public ResponseEntity<EntityModel<String>> changeUserPassword(@PathVariable String idNumber,
-                        UpdatePasswordDTO updatePasswordDTO) {
+                        @RequestBody UpdatePasswordDTO updatePasswordDTO) {
 
                 String response = userService.updateUserPassword(idNumber, updatePasswordDTO);
 
                 // Build response with HATEOAS links
                 EntityModel<String> responseModel = EntityModel.of(response,
                                 linkTo(methodOn(UserController.class).gettingUser(idNumber)).withSelfRel(),
-                                linkTo(methodOn(UserController.class).getAllUsers(1, 10)).withRel("all-users"));
+                                linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
 
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
