@@ -80,13 +80,13 @@ public class UserController {
          * @return ResponseEntity with a confirmation message and HATEOAS links.
          */
         @PutMapping("/{idNumber}/changePassword")
-        public ResponseEntity<EntityModel<String>> changeUserPassword(@PathVariable String idNumber,
+        public ResponseEntity<EntityModel<ApiResponse>> changeUserPassword(@PathVariable String idNumber,
                         @RequestBody UpdatePasswordDTO updatePasswordDTO) {
 
                 String response = userService.updateUserPassword(idNumber, updatePasswordDTO);
 
                 // Build response with HATEOAS links
-                EntityModel<String> responseModel = EntityModel.of(response,
+                EntityModel<ApiResponse> responseModel = EntityModel.of(new ApiResponse(response),
                                 linkTo(methodOn(UserController.class).gettingUser(idNumber)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
 
