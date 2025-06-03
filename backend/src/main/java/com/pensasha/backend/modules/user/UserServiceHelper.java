@@ -189,26 +189,19 @@ public class UserServiceHelper {
      * Copies caretaker-specific fields from a CaretakerDTO to a Caretaker entity.
      * Associates the caretaker with a property based on the provided property ID.
      * 
-     * If the property is not found, assigns a new (empty) Property instance
-     * instead.
-     * (Consider whether this fallback is intended, or if throwing an exception
-     * might be safer.)
+     * Throws a ResourceNotFoundException if the property is not found.
      *
      * @param careTaker    Target Caretaker entity to populate.
      * @param careTakerDTO Source DTO containing caretaker-specific details.
      */
     public void copyCareTakerAttributes(Caretaker careTaker, CaretakerDTO careTakerDTO) {
-
-        // Retrieve property by ID, fallback to new Property() if not found
+        // Associate property if property ID is provided
         if (careTakerDTO.getPropertyId() != null) {
             Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Property with ID: " + careTakerDTO.getPropertyId() + " not found."));
-
-            // Associate the property with the caretaker
             careTaker.setAssignedProperty(property);
         }
-
     }
 
     /**
