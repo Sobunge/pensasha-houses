@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserServiceHelper {
 
+    // Dependencies injected via constructor
     private final PasswordEncoder passwordEncoder;
     private final UnitService unitService;
     private final LeaseService leaseService;
@@ -41,11 +42,11 @@ public class UserServiceHelper {
     private final BankDetailsRepository bankDetailsRepository;
 
     /**
-     * Helper method to copy common user fields from a DTO to a User entity.
-     * Encodes the password and handles optional fields like profile picture.
+     * Copies common user fields from a CreateUserDTO to a User entity.
+     * Encodes the password securely and sets optional fields like profile picture.
      *
-     * @param user    The target User entity.
-     * @param userDTO The source DTO with user input data.
+     * @param user    Target User entity.
+     * @param userDTO Source DTO with user-provided input data.
      */
     public void copyCommonUserAttributes(User user, CreateUserDTO userDTO) {
         user.setFirstName(userDTO.getFirstName());
@@ -53,17 +54,23 @@ public class UserServiceHelper {
         user.setThirdName(userDTO.getThirdName());
         user.setIdNumber(userDTO.getIdNumber());
 
-        // Password is securely encoded before saving
+        // Encode and set password
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setRole(userDTO.getRole());
 
-        // Set profile picture only if it is not null or empty
+        // Only set profile picture if present and not empty
         if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
             user.setProfilePicture(userDTO.getProfilePicture());
         }
     }
 
+    /**
+     * Updates common user fields for an existing User entity from an UpdateUserDTO.
+     *
+     * @param user    Existing User entity to be updated.
+     * @param userDTO DTO containing updated user data.
+     */
     public void updateCommonUserAttributes(User user, UpdateUserDTO userDTO) {
         user.setFirstName(userDTO.getFirstName());
         user.setSecondName(userDTO.getSecondName());
@@ -73,10 +80,10 @@ public class UserServiceHelper {
     }
 
     /**
-     * Copies common attributes from one User entity to another.
+     * Copies common user attributes from one User entity to another.
      *
-     * @param target Target user entity.
-     * @param source Source user entity.
+     * @param target Target User entity.
+     * @param source Source User entity.
      */
     public void copyCommonAttributes(User target, User source) {
         target.setFirstName(source.getFirstName());
@@ -86,20 +93,21 @@ public class UserServiceHelper {
         target.setPassword(source.getPassword());
         target.setPhoneNumber(source.getPhoneNumber());
 
+        // Copy profile picture only if it exists and is not empty
         if (source.getProfilePicture() != null && !source.getProfilePicture().isEmpty()) {
             target.setProfilePicture(source.getProfilePicture());
         }
     }
 
     /**
-     * Helper method to copy tenant-specific fields from a TenantDTO to a Tenant
-     * entity.
+     * Copies tenant-specific fields from a TenantDTO to a Tenant entity.
+     * Includes rental units, leases, and emergency contact.
      *
-     * @param tenant    The target Tenant entity.s
-     * @param tenantDTO The source DTO containing tenant-specific details.
+     * @param tenant    Target Tenant entity.
+     * @param tenantDTO Source DTO with tenant-specific details.
      */
     public void copyTenantAttributes(Tenant tenant, TenantDTO tenantDTO) {
-
+        // Convert rental unit IDs to actual Unit entities
         List<Unit> rentalUnits = Optional.ofNullable(tenantDTO.getRentalUnitIds())
                 .orElse(Collections.emptyList())
                 .stream()
@@ -108,70 +116,82 @@ public class UserServiceHelper {
 
         tenant.setRentalUnits(rentalUnits);
 
-        List<Lease> leases = Optional.ofNullable(tenantDTO.getLeaseIds()).orElse(Collections.emptyList())
+        // Convert lease IDs to actual Lease entities
+        List<Lease> leases = Optional.ofNullable(tenantDTO.getLeaseIds())
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(leaseService::getLeaseById)
                 .toList();
 
         tenant.setLeases(leases);
 
+        // Set emergency contact information
         tenant.setEmergencyContact(tenantDTO.getEmergencyContact());
     }
 
     /**
-     * Helper method to copy landlord-specific fields from a LandLordDTO to a
-     * LandLord entity.
+     * Copies landlord-specific fields from a LandLordDTO to a LandLord entity.
+     * Includes associated properties and bank details.
      *
-     * @param landLord    The target LandLord entity.
-     * @param landLordDTO The source DTO containing landlord-specific details.
+     * @param landLord    Target LandLord entity.
+     * @param landLordDTO Source DTO with landlord-specific details.
      */
     public void copyLandlordAttributes(LandLord landLord, LandLordDTO landLordDTO) {
-
         Set<Property> properties = new HashSet<>();
 
+        // Retrieve and add each property by ID, throwing exception if not found
         for (Long id : landLordDTO.getPropertyIds()) {
-            Property property = propertyRepository.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException("Property with id: " + id + " could not be found."));
+            Property property = propertyRepository.findById(id)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Property with id: " + id + " could not be found."));
             properties.add(property);
         }
-
         landLord.setProperties(properties);
 
+        // Retrieve and set bank details, throwing exception if not found
         BankDetails bankDetails = bankDetailsRepository.findById(landLordDTO.getBankDetailsId())
-                .orElseThrow(() -> new ResourceNotFoundException("Bank Details with id: " + landLordDTO.getBankDetailsId() + " not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Bank Details with id: " + landLordDTO.getBankDetailsId() + " not found."));
 
         landLord.setBankDetails(bankDetails);
     }
 
+    /**
+     * Updates landlord-specific fields using an UpdateLandlordDTO.
+     * Updates personal details, associated properties, and bank details.
+     *
+     * @param landLord    Target LandLord entity.
+     * @param landLordDTO DTO with updated landlord information.
+     */
     public void updateLandlordAttributes(LandLord landLord, UpdateLandlordDTO landLordDTO) {
-
         landLord.setFirstName(landLordDTO.getFirstName());
         landLord.setSecondName(landLordDTO.getSecondName());
         landLord.setThirdName(landLordDTO.getThirdName());
         landLord.setIdNumber(landLordDTO.getIdNumber());
         landLord.setPhoneNumber(landLordDTO.getPhoneNumber());
 
+        // Convert property IDs to Property entities, throwing exception if not found
         Set<Property> properties = landLordDTO.getPropertyIds()
                 .stream()
                 .map(id -> propertyRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ResourceNotFoundException("Property with id: " + id + " not found.")))
+                        .orElseThrow(() -> new ResourceNotFoundException("Property with id: " + id + " not found.")))
                 .collect(Collectors.toSet());
 
         landLord.setProperties(properties);
 
+        // Directly set updated bank details
         landLord.setBankDetails(landLordDTO.getBankDetails());
-
     }
 
     /**
-     * Helper method to copy caretaker-specific fields from a CareTakerDTO to a
-     * CareTaker entity.
+     * Copies caretaker-specific fields from a CaretakerDTO to a Caretaker entity.
+     * Associates the caretaker with a property.
      *
-     * @param careTaker    The target CareTaker entity.
-     * @param careTakerDTO The source DTO containing caretaker-specific details.
+     * @param careTaker    Target Caretaker entity.
+     * @param careTakerDTO Source DTO with caretaker-specific details.
      */
     public void copyCareTakerAttributes(Caretaker careTaker, CaretakerDTO careTakerDTO) {
+        // Retrieve and set property, throwing exception if not found
         Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "A property with id: " + careTakerDTO.getPropertyId() + " not found."));
@@ -179,12 +199,19 @@ public class UserServiceHelper {
         careTaker.setAssignedProperty(property);
     }
 
+    /**
+     * Updates caretaker-specific fields for an existing Caretaker entity.
+     * Associates caretaker with a different property if needed.
+     *
+     * @param careTaker    Target Caretaker entity.
+     * @param careTakerDTO DTO with updated caretaker-specific details.
+     */
     public void updateCareTakerAttributes(Caretaker careTaker, CaretakerDTO careTakerDTO) {
+        // Retrieve and set new property assignment
         Property property = propertyRepository.findById(careTakerDTO.getPropertyId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "A property with id: " + careTakerDTO.getPropertyId() + " not found."));
 
         careTaker.setAssignedProperty(property);
     }
-
 }
