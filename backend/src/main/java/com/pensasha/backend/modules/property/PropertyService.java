@@ -224,6 +224,6 @@ public class PropertyService {
      */
     public Page<Property> gettingPropertiesForLandlord(String idNumber, Pageable pageable) {
         log.info("Fetching properties for landlord with ID number {}", idNumber);
-        return propertyRepository.findByLandLordId(idNumber, pageable);
+        return propertyRepository.findByLandLordIdNumber(idNumber, pageable);
     }
 }
