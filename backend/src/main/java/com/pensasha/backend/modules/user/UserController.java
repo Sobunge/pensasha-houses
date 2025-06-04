@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import com.pensasha.backend.modules.user.dto.GetAllUsersDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
+import com.pensasha.backend.modules.user.helper.ParseRoleHelper;
 
 import jakarta.validation.Valid;
 
@@ -190,21 +192,42 @@ public class UserController {
         }
 
         /**
-         * Get a paginated list of users filtered by their role.
+         * Retrieves a paginated list of users filtered by their role.
          * 
-         * @param role User role.
-         * @param page Page number.
-         * @param size Number of records per page.
-         * @return Paginated ResponseEntity of users by role with HATEOAS links.
+         * This endpoint accepts a role as a path variable and optional pagination
+         * parameters
+         * (page number and page size). It validates the role input, parses it into the
+         * Role enum,
+         * fetches the users with that role from the service layer, and maps them to
+         * DTOs.
+         * The response is paginated and enhanced with HATEOAS links to facilitate
+         * client navigation.
+         * 
+         * @param role the user role to filter by (case-insensitive)
+         * @param page the page number to retrieve (default is 0)
+         * @param size the number of records per page (default is 10)
+         * @return a ResponseEntity containing a paginated collection model of user DTOs
+         *         wrapped with HATEOAS links
+         * @throws BadRequestException if the role is null, empty, or invalid
          */
-        @GetMapping("/role/{userRole}")
-        public ResponseEntity<PagedModel<EntityModel<GetAllUsersDTO>>> getAllUserByRole(@PathVariable Role userRole,
+        @GetMapping("/role/{role}")
+        public ResponseEntity<PagedModel<EntityModel<GetAllUsersDTO>>> getAllUserByRole(
+                        @PathVariable String role,
                         @RequestParam(defaultValue = "0") int page,
-                        @RequestParam(defaultValue = "10") int size) {
+                        @RequestParam(defaultValue = "10") int size) throws BadRequestException {
 
+                // Validate that the role parameter is provided and not blank
+                if (role == null || role.isBlank()) {
+                        throw new BadRequestException("Role parameter cannot be null or empty");
+                }
+
+                // Create Pageable object for pagination
                 Pageable pageable = PageRequest.of(page, size);
 
-                // Fetch and map users with specific role
+                // Parse the string role to the Role enum, throws BadRequestException if invalid
+                Role userRole = ParseRoleHelper.parseRole(role);
+
+                // Fetch users by role and map to DTOs
                 Page<GetAllUsersDTO> usersPage = userService.gettingUsersByRole(userRole, pageable)
                                 .map(user -> new GetAllUsersDTO(
                                                 user.getFirstName() + " " + user.getThirdName(),
@@ -213,28 +236,32 @@ public class UserController {
                                                 user.getProfilePicture(),
                                                 user.getRole()));
 
+                // If no users found, return an empty paged response
                 if (usersPage.isEmpty()) {
                         return ResponseEntity.ok(PagedModel.empty());
                 }
 
-                // Wrap user DTOs with HATEOAS links
+                // Wrap each user DTO in an EntityModel with a self link (HATEOAS)
                 List<EntityModel<GetAllUsersDTO>> userResources = usersPage.getContent().stream()
                                 .map(user -> EntityModel.of(user,
                                                 linkTo(methodOn(UserController.class).gettingUser(user.getIdNumber()))
                                                                 .withSelfRel()))
                                 .collect(Collectors.toList());
 
-                // Pagination metadata
+                // Create pagination metadata for the response
                 PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page,
                                 usersPage.getTotalElements());
 
-                // Build paginated HATEOAS response
+                // Build the PagedModel with user resources and pagination links: first, self,
+                // and last pages
                 PagedModel<EntityModel<GetAllUsersDTO>> response = PagedModel.of(userResources, metadata,
                                 linkTo(methodOn(UserController.class).getAllUsers(0, size)).withRel("first-page"),
                                 linkTo(methodOn(UserController.class).getAllUsers(page, size)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(usersPage.getTotalPages() - 1, size))
                                                 .withRel("last-page"));
 
+                // Return the paginated HATEOAS response with HTTP 200 OK status
                 return ResponseEntity.ok(response);
         }
+
 }
