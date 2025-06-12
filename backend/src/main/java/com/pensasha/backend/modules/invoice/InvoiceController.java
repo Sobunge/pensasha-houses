@@ -64,8 +64,7 @@ public class InvoiceController {
         Page<Invoice> invoices = invoiceService.getAllInvoices(pageable);
         PagedModel<EntityModel<Invoice>> resources = PagedModel.of(
                 invoices.map(this::toModel).getContent(),
-                new PagedModel.PageMetadata(invoices.getSize(), invoices.getNumber(), invoices.getTotalElements())
-        );
+                new PagedModel.PageMetadata(invoices.getSize(), invoices.getNumber(), invoices.getTotalElements()));
         return ResponseEntity.ok(resources);
     }
 
@@ -131,8 +130,7 @@ public class InvoiceController {
 
         PagedModel<EntityModel<Invoice>> resources = PagedModel.of(
                 invoices.map(this::toModel).getContent(),
-                new PagedModel.PageMetadata(invoices.getSize(), invoices.getNumber(), invoices.getTotalElements())
-        );
+                new PagedModel.PageMetadata(invoices.getSize(), invoices.getNumber(), invoices.getTotalElements()));
         return ResponseEntity.ok(resources);
     }
 
@@ -145,10 +143,9 @@ public class InvoiceController {
     private EntityModel<Invoice> toModel(Invoice invoice) {
         return EntityModel.of(invoice,
                 linkTo(methodOn(InvoiceController.class).getInvoice(invoice.getInvoiceNumber())).withSelfRel(),
-                linkTo(methodOn(InvoiceController.class).updateInvoiceStatus(invoice.getInvoiceNumber(), InvoiceStatus.PAID)).withRel("mark-paid"),
+                linkTo(methodOn(InvoiceController.class).updateInvoiceStatus(invoice.getInvoiceNumber(),
+                        InvoiceStatus.PAID)).withRel("mark-paid"),
                 linkTo(methodOn(InvoiceController.class).deleteInvoice(invoice.getInvoiceNumber())).withRel("delete"),
-                linkTo(methodOn(InvoiceController.class).getAllInvoices(Pageable.unpaged())).withRel("all-invoices")
-        );
+                linkTo(methodOn(InvoiceController.class).getAllInvoices(Pageable.unpaged())).withRel("all-invoices"));
     }
 }
-
