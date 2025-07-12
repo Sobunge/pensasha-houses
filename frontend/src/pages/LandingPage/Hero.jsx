@@ -1,16 +1,36 @@
 import { Box, Typography, Button, Container } from '@mui/material';
+import backgroundImage from '../../assets/background.jpg';
 
 function Hero() {
     return (
         <Box
             sx={{
-                backgroundColor: '#2A2A2A',
+                position: 'relative',
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 color: '#FFFFFF',
-                py: 10, // padding top & bottom
                 textAlign: 'center',
+                backgroundImage: `url(${backgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                px: 2,
             }}
         >
-            <Container maxWidth="md">
+            {/* Overlay */}
+            <Box
+                sx={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 0,
+                }}
+            />
+
+            {/* Content */}
+            <Container sx={{ position: 'relative', zIndex: 1 }} maxWidth="md">
                 <Typography
                     variant="h2"
                     sx={{
