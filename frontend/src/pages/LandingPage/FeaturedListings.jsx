@@ -1,4 +1,13 @@
-import { Box, Typography, Grid, Card, CardMedia, CardContent, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Button,
+  Container,
+} from '@mui/material';
 
 const listings = [
   {
@@ -6,7 +15,7 @@ const listings = [
     name: 'Modern Bedsitter',
     location: 'Kisumu CBD',
     price: 'Ksh 8,000/mo',
-    image: '/assets/images/house1.jpg', // adjust path as needed
+    image: '/assets/images/house1.jpg',
   },
   {
     id: 2,
@@ -26,58 +35,69 @@ const listings = [
 
 function FeaturedListings() {
   return (
-    <Box sx={{ backgroundColor: '#F7F7F7', py: 8 }}>
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{ fontWeight: 'bold', mb: 4, color: '#111111' }}
-      >
-        Featured Listings
-      </Typography>
-
-      <Grid container spacing={4} justifyContent="center">
-        {listings.map((listing) => (
-          <Grid item xs={12} sm={6} md={4} key={listing.id}>
-            <Card sx={{ maxWidth: 345, mx: 'auto', boxShadow: 3 }}>
-              <CardMedia
-                component="img"
-                height="200"
-                image={listing.image}
-                alt={listing.name}
-              />
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  {listing.name}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  {listing.location}
-                </Typography>
-                <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                  {listing.price}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      <Box textAlign="center" mt={6}>
-        <Button
-          variant="contained"
-          href="/houses"
-          sx={{
-            backgroundColor: '#F8B500',
-            color: '#111111',
-            textTransform: 'none',
-            fontWeight: '600',
-            px: 4,
-            py: 1.5,
-            '&:hover': { backgroundColor: '#C59000' },
-          }}
+    <Box
+      sx={{
+        backgroundColor: '#F7F7F7',
+        minHeight: '100vh', // 👈 makes this section fullscreen
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        py: 8,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Typography
+          variant="h4"
+          align="center"
+          sx={{ fontWeight: 'bold', mb: 4, color: '#111111' }}
         >
-          See All Listings
-        </Button>
-      </Box>
+          Featured Listings
+        </Typography>
+
+        <Grid container spacing={4} justifyContent="center">
+          {listings.map((listing) => (
+            <Grid item xs={12} sm={6} md={4} key={listing.id}>
+              <Card sx={{ maxWidth: 345, mx: 'auto', boxShadow: 3 }}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={listing.image}
+                  alt={listing.name}
+                />
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    {listing.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    {listing.location}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontWeight: '600' }}>
+                    {listing.price}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Box textAlign="center" mt={6}>
+          <Button
+            variant="contained"
+            href="/houses"
+            sx={{
+              backgroundColor: '#F8B500',
+              color: '#111111',
+              textTransform: 'none',
+              fontWeight: '600',
+              px: 4,
+              py: 1.5,
+              '&:hover': { backgroundColor: '#C59000' },
+            }}
+          >
+            See All Listings
+          </Button>
+        </Box>
+      </Container>
     </Box>
   );
 }
