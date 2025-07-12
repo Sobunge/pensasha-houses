@@ -3,6 +3,8 @@ import Navbar from '../../components/Navbar';
 import Hero from '../../pages/LandingPage/Hero'
 import FeaturedListings from '../../pages/LandingPage/FeaturedListings'
 import HotDeals from '../../pages/LandingPage/HotDeals'
+import Categories from './Categories';
+import HowItWorks from './HowItWorks';
 
 function LandingPage() {
     return (
@@ -11,6 +13,8 @@ function LandingPage() {
             <Hero />
             <FeaturedListings />
             <HotDeals />
+            <Categories />
+            <HowItWorks />
         </ Box>
     );
 }
