@@ -5,6 +5,7 @@ import FeaturedListings from '../../pages/LandingPage/FeaturedListings'
 import HotDeals from '../../pages/LandingPage/HotDeals'
 import Categories from './Categories';
 import HowItWorks from './HowItWorks';
+import FinalCTA from './FinalCTA';
 
 function LandingPage() {
     return (
@@ -15,6 +16,7 @@ function LandingPage() {
             <HotDeals />
             <Categories />
             <HowItWorks />
+            <FinalCTA />
         </ Box>
     );
 }
