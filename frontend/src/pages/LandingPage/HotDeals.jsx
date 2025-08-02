@@ -1,4 +1,6 @@
+import React from 'react';
 import { Box, Typography, Button, Container } from '@mui/material';
+import WhatshotIcon from '@mui/icons-material/Whatshot'; // 🔥 Icon
 
 function HotDeals() {
   return (
@@ -17,14 +19,20 @@ function HotDeals() {
             color: '#111111',
             mb: 3,
             fontSize: { xs: '28px', md: '36px' },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
           }}
         >
+          <WhatshotIcon sx={{ color: '#D32F2F', fontSize: '32px' }} />
           Hot Deals in Kisumu & Nairobi
         </Typography>
 
         <Button
           variant="contained"
           href="/houses"
+          endIcon={<WhatshotIcon />}
           sx={{
             backgroundColor: '#111111',
             color: '#FFFFFF',
