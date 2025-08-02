@@ -4,7 +4,6 @@ import {
   Box,
   Toolbar,
   IconButton,
-  Typography,
   Button,
   Drawer,
   List,
@@ -12,6 +11,7 @@ import {
   ListItemText,
   ListItemIcon,
   Container,
+  Typography,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -47,9 +47,28 @@ function Navbar() {
         paddingTop: 2,
       }}
     >
-      <Typography variant="h6" sx={{ textAlign: 'center', mb: 2, fontWeight: 'bold' }}>
-        Pensasha
-      </Typography>
+      <Box
+        component="a"
+        href="/"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mb: 2,
+          gap: 1,
+          textDecoration: 'none',
+        }}
+      >
+        <Box
+          component="img"
+          src="/assets/images/logo.svg"
+          alt="Pensasha Logo"
+          sx={{ height: 30 }}
+        />
+        <Typography variant="h6" sx={{ fontWeight: 600, color: '#000000' }}>
+          Pensasha Houses
+        </Typography>
+      </Box>
       <List>
         {navItems.map((item) => (
           <ListItem
@@ -66,7 +85,10 @@ function Navbar() {
             <ListItemIcon sx={{ color: '#111111', minWidth: 40 }}>
               {item.icon}
             </ListItemIcon>
-            <ListItemText primary={item.label} sx={{ color: '#111111' }} />
+            <ListItemText
+              primary={item.label}
+              sx={{ color: '#111111' }}
+            />
           </ListItem>
         ))}
       </List>
@@ -78,18 +100,46 @@ function Navbar() {
       <AppBar position="static" sx={{ backgroundColor: '#2A2A2A' }}>
         <Container>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
-            <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-              Pensasha
-            </Typography>
+            {/* Logo + Text */}
+            <Box
+              component="a"
+              href="/"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                textDecoration: 'none',
+              }}
+            >
+              <Box
+                component="img"
+                src="/assets/images/logo.svg"
+                alt="Pensasha Logo"
+                sx={{ height: 30 }}
+              />
+              <Typography variant="h6" sx={{ fontWeight: 600, color: '#ffffff' }}>
+                Pensasha Houses
+              </Typography>
+            </Box>
 
+            {/* Desktop Navigation */}
             {!isMobile && (
               <Box sx={{ display: 'flex', gap: '20px' }}>
-                <Button color="inherit" href="/">Home</Button>
-                <Button color="inherit" href="/houses">Browse Houses</Button>
-                <Button color="inherit" href="/list-property">List a Property</Button>
+                {navItems.slice(0, 3).map((item) => (
+                  <Button
+                    key={item.label}
+                    color="inherit"
+                    href={item.link}
+                    startIcon={item.icon}
+                    sx={{ textTransform: 'none', fontWeight: 500 }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
                 <Button
                   variant="contained"
-                  href="/login"
+                  href={navItems[3].link}
+                  startIcon={navItems[3].icon}
                   sx={{
                     backgroundColor: '#F8B500',
                     color: '#111111',
@@ -98,11 +148,12 @@ function Navbar() {
                     '&:hover': { backgroundColor: '#c59000' },
                   }}
                 >
-                  Login / Sign Up
+                  {navItems[3].label}
                 </Button>
               </Box>
             )}
 
+            {/* Mobile Toggle Icon */}
             {isMobile && (
               <IconButton
                 color="inherit"
@@ -117,6 +168,7 @@ function Navbar() {
         </Container>
       </AppBar>
 
+      {/* Mobile Drawer */}
       <Drawer
         anchor="right"
         open={mobileOpen}
