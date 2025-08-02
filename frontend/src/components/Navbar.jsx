@@ -5,20 +5,16 @@ function Navbar() {
     <AppBar position="static" sx={{ backgroundColor: '#2A2A2A' }}>
       <Container>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          {/* Left side nav links */}
-          <Box sx={{ display: 'flex', gap: '20px' }}>
-            <Button color="inherit" href="/">Home</Button>
-            <Button color="inherit" href="/houses">Browse Houses</Button>
-            <Button color="inherit" href="/list-property">List a Property</Button>
-          </Box>
-
-          {/* Center App Name */}
-          <Typography variant="h6" sx={{ flexGrow: 0, fontWeight: 'bold' }}>
+          {/* Logo / App Name on the left */}
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             Pensasha
           </Typography>
 
-          {/* Right side login button */}
-          <Box>
+          {/* All other links on the right */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <Button color="inherit" href="/">Home</Button>
+            <Button color="inherit" href="/houses">Browse Houses</Button>
+            <Button color="inherit" href="/list-property">List a Property</Button>
             <Button
               variant="contained"
               href="/login"
