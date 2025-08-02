@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -6,13 +6,10 @@ import {
   CardMedia,
   CardContent,
   Button,
-  IconButton,
   Container,
 } from '@mui/material';
-import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import { useKeenSlider } from 'keen-slider/react';
+import 'keen-slider/keen-slider.min.css';
 
 const listings = [
   { id: 1, name: 'Modern Bedsitter', location: 'Kisumu CBD', price: 'Ksh 8,000/mo', image: '/assets/images/house.jpg' },
@@ -26,40 +23,34 @@ const listings = [
 ];
 
 const FeaturedListings = () => {
-  const sliderRef = useRef(null);
+  const [sliderRef, instanceRef] = useKeenSlider({
+    loop: true,
+    renderMode: 'performance',
+    slides: {
+      perView: 3,
+      spacing: 16,
+    },
+    breakpoints: {
+      '(max-width: 1200px)': {
+        slides: { perView: 2, spacing: 12 },
+      },
+      '(max-width: 768px)': {
+        slides: { perView: 1, spacing: 8 },
+      },
+    },
+  });
 
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    autoplay: true,
-    autoplaySpeed: 3500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    arrows: false,
-    pauseOnHover: true,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: { slidesToShow: 2 },
-      },
-      {
-        breakpoint: 768,
-        settings: { slidesToShow: 1 },
-      },
-    ],
-  };
+  // Auto-slide every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      instanceRef.current?.next();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [instanceRef]);
 
   return (
-    <Box
-      sx={{
-        backgroundColor: '#F9FAFB',
-        py: { xs: 6, md: 10 },
-        minHeight: '80vh',
-        position: 'relative',
-      }}
-    >
-      <Container maxWidth="lg">
+    <Box sx={{ backgroundColor: '#F9FAFB', py: { xs: 6, md: 10 } }}>
+      <Container>
         <Typography
           variant="h4"
           align="center"
@@ -74,101 +65,69 @@ const FeaturedListings = () => {
           Featured Listings
         </Typography>
 
-        {/* Navigation Buttons */}
-        <IconButton
-          onClick={() => sliderRef.current?.slickPrev()}
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: { xs: 5, sm: 10 },
-            transform: 'translateY(-50%)',
-            zIndex: 10,
-            backgroundColor: '#fff',
-            boxShadow: 3,
-            '&:hover': { backgroundColor: '#F3F4F6' },
-            width: 40,
-            height: 40,
-          }}
-        >
-          <ArrowBackIos fontSize="small" />
-        </IconButton>
-
-        <IconButton
-          onClick={() => sliderRef.current?.slickNext()}
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            right: { xs: 5, sm: 10 },
-            transform: 'translateY(-50%)',
-            zIndex: 10,
-            backgroundColor: '#fff',
-            boxShadow: 3,
-            '&:hover': { backgroundColor: '#F3F4F6' },
-            width: 40,
-            height: 40,
-          }}
-        >
-          <ArrowForwardIos fontSize="small" />
-        </IconButton>
-
-        {/* Slider */}
-        <Box sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
-          <Slider ref={sliderRef} {...settings}>
-            {listings.map((listing) => (
-              <Box key={listing.id} px={1} py={2}>
-                <Card
+        <Box ref={sliderRef} className="keen-slider">
+          {listings.map((listing) => (
+            <Box className="keen-slider__slide" key={listing.id}>
+              <Card
+                sx={{
+                  maxWidth: 320,
+                  height: 380,
+                  mx: 'auto',
+                  my: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  boxShadow: 3,
+                  borderRadius: 4,
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.02)',
+                    boxShadow: 6,
+                  },
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={listing.image}
+                  alt={listing.name}
+                  height="180"
+                  sx={{ objectFit: 'cover' }}
+                />
+                <CardContent
                   sx={{
-                    borderRadius: 4,
-                    height: 380,
-                    maxWidth: 340,
-                    mx: 'auto',
+                    flexGrow: 1,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    boxShadow: 3,
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                    '&:hover': {
-                      transform: 'scale(1.02)',
-                      boxShadow: 6,
-                    },
                   }}
                 >
-                  <CardMedia
-                    component="img"
-                    image={listing.image}
-                    alt={listing.name}
-                    height="180"
-                    sx={{ objectFit: 'cover' }}
-                  />
-                  <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                        {listing.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {listing.location}
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        {listing.price}
-                      </Typography>
-                    </Box>
-                    <Box mt={2}>
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        sx={{
-                          backgroundColor: '#3B82F6',
-                          '&:hover': { backgroundColor: '#2563EB' },
-                        }}
-                      >
-                        View Details
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Box>
-            ))}
-          </Slider>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                      {listing.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {listing.location}
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {listing.price}
+                    </Typography>
+                  </Box>
+                  <Box mt={2}>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      sx={{
+                        backgroundColor: '#3B82F6',
+                        '&:hover': { backgroundColor: '#2563EB' },
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+          ))}
         </Box>
       </Container>
     </Box>
