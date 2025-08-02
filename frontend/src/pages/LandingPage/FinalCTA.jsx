@@ -1,4 +1,6 @@
 import { Box, Typography, Button, Stack, Container } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search'; // For "Find a House"
+import UploadHouseIcon from '@mui/icons-material/HouseOutlined'; // For "Post a Property"
 
 function FinalCTA() {
   return (
@@ -29,6 +31,7 @@ function FinalCTA() {
           <Button
             variant="contained"
             href="/houses"
+            startIcon={<SearchIcon />}
             sx={{
               backgroundColor: '#FFFFFF',
               color: '#111111',
@@ -45,6 +48,7 @@ function FinalCTA() {
           <Button
             variant="contained"
             href="/list-property"
+            startIcon={<UploadHouseIcon />}
             sx={{
               backgroundColor: '#F8B500',
               color: '#FFFFFF',
