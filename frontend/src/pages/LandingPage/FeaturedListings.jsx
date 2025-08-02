@@ -8,8 +8,13 @@ import {
   Button,
   Container,
 } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
+import PlaceIcon from '@mui/icons-material/Place';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
+import { Link } from 'react-router-dom';
 
 const listings = [
   { id: 1, name: 'Modern Bedsitter', location: 'Kisumu CBD', price: 'Ksh 8,000/mo', image: '/assets/images/house.jpg' },
@@ -40,7 +45,6 @@ const FeaturedListings = () => {
     },
   });
 
-  // Auto-slide every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       instanceRef.current?.next();
@@ -71,7 +75,7 @@ const FeaturedListings = () => {
               <Card
                 sx={{
                   maxWidth: 320,
-                  height: 380,
+                  height: 400,
                   mx: 'auto',
                   my: 2,
                   display: 'flex',
@@ -102,23 +106,32 @@ const FeaturedListings = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <HomeIcon fontSize="small" />
                       {listing.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <PlaceIcon fontSize="small" />
                       {listing.location}
                     </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <AttachMoneyIcon fontSize="small" />
                       {listing.price}
                     </Typography>
                   </Box>
+
                   <Box mt={2}>
                     <Button
+                      component={Link}
+                      to={`/listing/${listing.id}`}
                       variant="contained"
                       fullWidth
+                      endIcon={<ArrowForwardIcon />}
                       sx={{
                         backgroundColor: '#3B82F6',
                         '&:hover': { backgroundColor: '#2563EB' },
+                        textTransform: 'none',
+                        fontWeight: 600,
                       }}
                     >
                       View Details
