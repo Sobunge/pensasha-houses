@@ -87,14 +87,6 @@ function Footer() {
 
         </Grid>
 
-        {/* Copyright */}
-        <Typography
-          variant="body2"
-          sx={{ textAlign: 'center', mt: 4, color: '#CCCCCC' }}
-        >
-          &copy; {new Date().getFullYear()} Pensasha Houses. All rights reserved.
-        </Typography>
-
       </Container>
     </Box>
   );
