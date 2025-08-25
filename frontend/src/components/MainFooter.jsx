@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Typography, Stack, Link } from "@mui/material";
+import { Box, Container, Typography, Stack } from "@mui/material";
 
 function MainFooter() {
   return (
