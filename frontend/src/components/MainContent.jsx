@@ -6,15 +6,17 @@ function MainContent({ children }) {
     <Box
       component="main"
       sx={{
-        flexGrow: 1,
-        mt: "64px", // adjust according to AppBar height
-        mb: "64px", // optional: add bottom spacing if needed above footer
-        minHeight: "calc(100vh - 128px)", // ensures footer stays at bottom
-        backgroundColor: "#f9f9f9", // optional background
-        py: 3, // vertical padding
+        minHeight: "81.11vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        py: 6,
+        backgroundColor: "#f9f9f9",
       }}
     >
-      <Container maxWidth="lg">{children}</Container>
+      <Container>{children}</Container>
     </Box>
   );
 }
