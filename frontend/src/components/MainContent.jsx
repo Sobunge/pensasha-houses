@@ -6,14 +6,11 @@ function MainContent({ children }) {
     <Box
       component="main"
       sx={{
-        minHeight: "81.11vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        py: 6,
+        flexGrow: 1,
+        mt: { xs: "56px", md: "64px" }, // account for fixed navbar
+        mb: "64px", // optional bottom spacing for footer
         backgroundColor: "#f9f9f9",
+        py: 3,
       }}
     >
       <Container>{children}</Container>
