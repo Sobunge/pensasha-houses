@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import AppLayout from "./components/AppLayout";
+import ListingsPage from "./pages/ListingsPage/ListingsPage";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
         {/* Wrap all main routes in AppLayout */}
         <Route element={<AppLayout />}>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/properties" element={<ListingsPage />} />
 
           {/* Future routes */}
           {/* <Route path="/houses" element={<BrowseHouses />} /> */}

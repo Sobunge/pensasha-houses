@@ -1,5 +1,8 @@
-function ListingsPage (){
+import PropertySearch from "./PropertySearch";
 
+function ListingsPage() {
+
+    <PropertySearch />
 
 }
 
