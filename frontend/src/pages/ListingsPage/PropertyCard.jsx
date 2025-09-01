@@ -8,6 +8,12 @@ import {
   Box,
 } from "@mui/material";
 
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import HomeIcon from "@mui/icons-material/Home";
+import BedIcon from "@mui/icons-material/Bed";
+import BathtubIcon from "@mui/icons-material/Bathtub";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
 export default function PropertyCard({ property }) {
   return (
     <Card
@@ -26,7 +32,7 @@ export default function PropertyCard({ property }) {
         },
       }}
     >
-      {/* Image Box */}
+      {/* Property Image */}
       <Box
         sx={{
           position: "relative",
@@ -49,36 +55,59 @@ export default function PropertyCard({ property }) {
         />
       </Box>
 
-      {/* Content */}
+      {/* Property Details */}
       <CardContent sx={{ flexGrow: 1, p: 2 }}>
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 600, color: "#111111", mb: 1 }}
-        >
+        <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", mb: 1 }}>
           {property.title}
         </Typography>
-        <Typography variant="body2" sx={{ color: "#666", mb: 1 }}>
-          {property.location}
-        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center", color: "#666", mb: 1 }}>
+          <LocationOnIcon fontSize="small" sx={{ mr: 0.5 }} />
+          <Typography variant="body2">{property.location}</Typography>
+        </Box>
+
         <Typography
           variant="h6"
           sx={{ color: "#1976d2", fontWeight: 700, mb: 1 }}
         >
           Ksh {property.price.toLocaleString()}
         </Typography>
-        <Typography variant="body2" sx={{ color: "#2a2a2a" }}>
-          {property.type} · {property.beds} Beds · {property.baths} Baths
-        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 2,
+            color: "#2a2a2a",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <HomeIcon fontSize="small" />
+            <Typography variant="body2">{property.type}</Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <BedIcon fontSize="small" />
+            <Typography variant="body2">{property.beds} Beds</Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <BathtubIcon fontSize="small" />
+            <Typography variant="body2">{property.baths} Baths</Typography>
+          </Box>
+        </Box>
       </CardContent>
 
-      {/* Button */}
+      {/* Action Button */}
       <CardActions sx={{ p: 2, pt: 0 }}>
         <Button
           fullWidth
           variant="contained"
+          startIcon={<VisibilityIcon />}
           sx={{
             backgroundColor: "#f8b500",
-            color: "#111111",
+            color: "#111",
             fontWeight: 600,
             textTransform: "none",
             borderRadius: "12px",
