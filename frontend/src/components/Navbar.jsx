@@ -15,10 +15,6 @@ import {
   useTheme,
   useMediaQuery,
   Divider,
-  Modal,
-  Tabs,
-  Tab,
-  TextField,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
@@ -26,6 +22,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import LoginIcon from "@mui/icons-material/Login";
 import { useLocation } from "react-router-dom";
+import AuthModal from "../pages/Auth/AuthModal"; // ✅ Import modal
 
 const navItems = [
   { label: "Home", link: "/", icon: <HomeIcon /> },
@@ -35,13 +32,15 @@ const navItems = [
 
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [tab, setTab] = useState(0);
+  const [authOpen, setAuthOpen] = useState(false); // ✅ For modal
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
 
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   const handleAuthOpen = () => setAuthOpen(true);
   const handleAuthClose = () => setAuthOpen(false);
 
@@ -83,41 +82,47 @@ function Navbar() {
 
       {/* Drawer Nav Items */}
       <List sx={{ flexGrow: 1 }}>
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.link;
-          return (
-            <ListItem
-              key={item.label}
-              component="a"
-              href={item.link}
+        {navItems.map((item) => (
+          <ListItem
+            key={item.label}
+            component="a"
+            href={item.link}
+            sx={{
+              px: 3,
+              py: 1.5,
+              borderRadius: 1,
+              textDecoration: "none",
+              color:
+                location.pathname === item.link ? "#f8b500" : "#111111",
+              fontWeight:
+                location.pathname === item.link ? 600 : 400,
+              "&:hover": {
+                backgroundColor: "#FFF6E0",
+              },
+            }}
+          >
+            <ListItemIcon
               sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 1,
-                textDecoration: "none",
-                color: isActive ? "#f8b500" : "#111111",
-                fontWeight: isActive ? 700 : 400,
-                backgroundColor: isActive ? "#FFF6E0" : "transparent",
-                "&:hover": {
-                  backgroundColor: "#FFF6E0",
-                },
+                minWidth: 40,
+                color:
+                  location.pathname === item.link ? "#f8b500" : "#111111",
               }}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: 40,
-                  color: isActive ? "#f8b500" : "#111111",
-                }}
-              >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItem>
-          );
-        })}
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItem>
+        ))}
+
+        {/* Login/Signup in Drawer */}
+        <ListItem button onClick={handleAuthOpen}>
+          <ListItemIcon>
+            <LoginIcon />
+          </ListItemIcon>
+          <ListItemText primary="Login / Sign Up" />
+        </ListItem>
       </List>
 
-      {/* Drawer Footer */}
       <Box sx={{ p: 2, textAlign: "center", fontSize: "0.8rem", color: "#777" }}>
         © {new Date().getFullYear()} Pensasha Houses
       </Box>
@@ -126,14 +131,7 @@ function Navbar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar
-        position="fixed"
-        elevation={1}
-        sx={{
-          backgroundColor: "#2A2A2A",
-          backdropFilter: "blur(6px)",
-        }}
-      >
+      <AppBar position="fixed" elevation={1} sx={{ backgroundColor: "#2A2A2A" }}>
         <Container maxWidth="lg">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             {/* Logo */}
@@ -153,10 +151,7 @@ function Navbar() {
                 alt="Pensasha Logo"
                 sx={{ height: 32 }}
               />
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, color: "#ffffff" }}
-              >
+              <Typography variant="h6" sx={{ fontWeight: 600, color: "#ffffff" }}>
                 Pensasha Houses
               </Typography>
             </Box>
@@ -164,31 +159,31 @@ function Navbar() {
             {/* Desktop Menu */}
             {!isMobile && (
               <Box sx={{ display: "flex", gap: 3 }}>
-                {navItems.map((item) => {
-                  const isActive = location.pathname === item.link;
-                  return (
-                    <Button
-                      key={item.label}
-                      href={item.link}
-                      startIcon={item.icon}
-                      sx={{
-                        color: isActive ? "#f8b500" : "#ffffff",
-                        fontWeight: isActive ? 700 : 500,
-                        textTransform: "none",
-                        borderBottom: isActive ? "2px solid #f8b500" : "none",
-                        "&:hover": { color: "#f8b500" },
-                      }}
-                    >
-                      {item.label}
-                    </Button>
-                  );
-                })}
+                {navItems.map((item) => (
+                  <Button
+                    key={item.label}
+                    href={item.link}
+                    startIcon={item.icon}
+                    sx={{
+                      color:
+                        location.pathname === item.link
+                          ? "#f8b500"
+                          : "#ffffff",
+                      textTransform: "none",
+                      fontWeight:
+                        location.pathname === item.link ? 600 : 500,
+                      "&:hover": { color: "#f8b500" },
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
 
-                {/* CTA Auth Button */}
+                {/* CTA Login/Signup */}
                 <Button
                   variant="contained"
-                  onClick={handleAuthOpen}
                   startIcon={<LoginIcon />}
+                  onClick={handleAuthOpen}
                   sx={{
                     backgroundColor: "#f8b500",
                     color: "#111111",
@@ -210,7 +205,6 @@ function Navbar() {
                 color="inherit"
                 edge="end"
                 onClick={handleDrawerToggle}
-                aria-label="open navigation menu"
               >
                 <MenuIcon />
               </IconButton>
@@ -225,68 +219,14 @@ function Navbar() {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         sx={{
-          "& .MuiDrawer-paper": {
-            width: 260,
-            backgroundColor: "#f7f7f7",
-          },
+          "& .MuiDrawer-paper": { width: 260, backgroundColor: "#f7f7f7" },
         }}
       >
         {drawer}
       </Drawer>
 
       {/* Auth Modal */}
-      <Modal open={authOpen} onClose={handleAuthClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "#fff",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-            width: 400,
-            maxWidth: "90%",
-          }}
-        >
-          <Tabs
-            value={tab}
-            onChange={(e, newValue) => setTab(newValue)}
-            centered
-            sx={{ mb: 3 }}
-          >
-            <Tab label="Login" />
-            <Tab label="Sign Up" />
-          </Tabs>
-
-          {/* Login Form */}
-          {tab === 0 && (
-            <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <TextField label="Email" type="email" fullWidth />
-              <TextField label="Password" type="password" fullWidth />
-              <Button variant="contained" fullWidth sx={{ backgroundColor: "#f8b500", "&:hover": { backgroundColor: "#c59000" } }}>
-                Login
-              </Button>
-              <Typography variant="body2" sx={{ textAlign: "center", mt: 1 }}>
-                Forgot password?
-              </Typography>
-            </Box>
-          )}
-
-          {/* Sign Up Form */}
-          {tab === 1 && (
-            <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <TextField label="Full Name" fullWidth />
-              <TextField label="Email" type="email" fullWidth />
-              <TextField label="Password" type="password" fullWidth />
-              <Button variant="contained" fullWidth sx={{ backgroundColor: "#f8b500", "&:hover": { backgroundColor: "#c59000" } }}>
-                Create Account
-              </Button>
-            </Box>
-          )}
-        </Box>
-      </Modal>
+      <AuthModal open={authOpen} onClose={handleAuthClose} />
     </Box>
   );
 }

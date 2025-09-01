@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, Tabs, Tab, Box } from "@mui/material";
-import LoginForm from "./LoginForm";
-import RegistrationForm from "./RegistrationForm";
+import LoginForm from "../Auth/LoginPage/LoginForm";
+import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 
 function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0); // 0 = Login, 1 = Sign Up
