@@ -13,7 +13,7 @@ function MainContent({ children }) {
         py: 3,
       }}
     >
-      <Container>{children}</Container>
+      <Container maxWidth="xl">{children}</Container>
     </Box>
   );
 }
