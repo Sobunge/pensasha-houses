@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useNavigate } from "react-router-dom";
 
 function NotFound() {
@@ -8,7 +9,7 @@ function NotFound() {
   return (
     <Box
       sx={{
-        minHeight: "60vh",
+        minHeight: "80vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -19,6 +20,16 @@ function NotFound() {
       }}
     >
       <Container maxWidth="sm">
+        {/* Not Found Icon */}
+        <ErrorOutlineIcon
+          sx={{
+            fontSize: { xs: 60, md: 80 },
+            color: "#f8b500",
+            mb: 2,
+          }}
+        />
+
+        {/* 404 */}
         <Typography
           variant="h1"
           sx={{
@@ -29,18 +40,24 @@ function NotFound() {
         >
           404
         </Typography>
+
+        {/* Subheading */}
         <Typography
           variant="h5"
           sx={{ color: "#2A2A2A", mb: 2, fontWeight: 500 }}
         >
           Oops! Page Not Found
         </Typography>
+
+        {/* Description */}
         <Typography
           variant="body1"
           sx={{ color: "#555555", mb: 4 }}
         >
           The page you are looking for might have been removed or the URL is incorrect.
         </Typography>
+
+        {/* Go Home Button */}
         <Button
           variant="contained"
           sx={{

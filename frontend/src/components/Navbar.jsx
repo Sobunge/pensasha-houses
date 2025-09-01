@@ -26,7 +26,7 @@ import AuthModal from "../pages/Auth/AuthModal"; // ✅ Import modal
 
 const navItems = [
   { label: "Home", link: "/", icon: <HomeIcon /> },
-  { label: "Browse Listings", link: "/houses", icon: <SearchIcon /> },
+  { label: "Browse Listings", link: "/properties", icon: <SearchIcon /> },
   { label: "List a Property", link: "/list-property", icon: <AddBoxIcon /> },
 ];
 

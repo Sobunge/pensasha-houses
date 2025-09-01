@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import AppLayout from "./components/AppLayout";
 import ListingsPage from "./pages/ListingsPage/ListingsPage";
+import NotFound from "./pages/NotFoundPage/NotFound";
 
 function App() {
   return (
@@ -12,22 +13,9 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/properties" element={<ListingsPage />} />
 
-          {/* Future routes */}
-          {/* <Route path="/houses" element={<BrowseHouses />} /> */}
-          {/* <Route path="/list-property" element={<ListProperty />} /> */}
+          {/* 404 Fallback */}
+          <Route path="*" element={<NotFound />} />
         </Route>
-
-        {/* 404 Fallback */}
-        <Route
-          path="*"
-          element={
-            <AppLayout>
-              <h1 style={{ padding: "2rem", textAlign: "center" }}>
-                404 - Page Not Found
-              </h1>
-            </AppLayout>
-          }
-        />
       </Routes>
     </Router>
   );
