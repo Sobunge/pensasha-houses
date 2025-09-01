@@ -6,6 +6,10 @@ import MusicVideoIcon from '@mui/icons-material/MusicVideo';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import HomeIcon from '@mui/icons-material/Home';
+import HouseIcon from '@mui/icons-material/House';
+import InfoIcon from '@mui/icons-material/Info';
+import ContactMailIcon from '@mui/icons-material/ContactMail';
 
 function Footer() {
   return (
@@ -26,7 +30,7 @@ function Footer() {
           Connecting tenants to homes and landlords to tenants — faster, simpler, smarter.
         </Typography>
 
-        <Grid container spacing={4} justifyContent="center" >
+        <Grid container spacing={4} justifyContent="center">
 
           {/* Quick Links */}
           <Grid item xs={12} sm={6} md={2}>
@@ -34,10 +38,31 @@ function Footer() {
               Quick Links
             </Typography>
             <Stack spacing={1}>
-              <Link href="/" underline="hover" color="#F7F7F7">Home</Link>
-              <Link href="/houses" underline="hover" color="#F7F7F7">Browse Houses</Link>
-              <Link href="/how-it-works" underline="hover" color="#F7F7F7">How It Works</Link>
-              <Link href="/contact" underline="hover" color="#F7F7F7">Contact Us</Link>
+              {[
+                { href: '/', icon: <HomeIcon />, text: 'Home' },
+                { href: '/houses', icon: <HouseIcon />, text: 'Browse Houses' },
+                { href: '/how-it-works', icon: <InfoIcon />, text: 'How It Works' },
+                { href: '/contact', icon: <ContactMailIcon />, text: 'Contact Us' },
+              ].map((link) => (
+                <Link
+                  key={link.text}
+                  href={link.href}
+                  underline="none"
+                  color="#F7F7F7"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      color: '#F8B500',
+                      transform: 'scale(1.05)',
+                    },
+                    svg: { mr: 1, transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } },
+                  }}
+                >
+                  {link.icon} {link.text}
+                </Link>
+              ))}
             </Stack>
           </Grid>
 
@@ -52,17 +77,14 @@ function Footer() {
               Contact Info
             </Typography>
             <Stack spacing={1} alignItems="center">
-              <Typography variant="body2">
-                <PhoneIcon sx={{ fontSize: 18, mr: 1 }} />
-                +254 707 335 375
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } }}>
+                <PhoneIcon sx={{ fontSize: 18, mr: 1 }} /> +254 707 335 375
               </Typography>
-              <Typography variant="body2">
-                <EmailIcon sx={{ fontSize: 18, mr: 1 }} />
-                support@pensasha.co.ke
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } }}>
+                <EmailIcon sx={{ fontSize: 18, mr: 1 }} /> support@pensasha.co.ke
               </Typography>
-              <Typography variant="body2">
-                <LocationOnIcon sx={{ fontSize: 18, mr: 1 }} />
-                Kisumu, Kenya
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } }}>
+                <LocationOnIcon sx={{ fontSize: 18, mr: 1 }} /> Kisumu, Kenya
               </Typography>
             </Stack>
           </Grid>
@@ -78,10 +100,22 @@ function Footer() {
               Social Links
             </Typography>
             <Stack direction="row" spacing={2} justifyContent="center">
-              <IconButton href="#" sx={{ color: '#F7F7F7' }}><FacebookIcon /></IconButton>
-              <IconButton href="#" sx={{ color: '#F7F7F7' }}><TwitterIcon /></IconButton>
-              <IconButton href="#" sx={{ color: '#F7F7F7' }}><InstagramIcon /></IconButton>
-              <IconButton href="#" sx={{ color: '#F7F7F7' }}><MusicVideoIcon /></IconButton>
+              {[FacebookIcon, TwitterIcon, InstagramIcon, MusicVideoIcon].map((Icon, idx) => (
+                <IconButton
+                  key={idx}
+                  href="#"
+                  sx={{
+                    color: '#F7F7F7',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      color: '#F8B500',
+                      transform: 'scale(1.2)',
+                    },
+                  }}
+                >
+                  <Icon />
+                </IconButton>
+              ))}
             </Stack>
           </Grid>
 
