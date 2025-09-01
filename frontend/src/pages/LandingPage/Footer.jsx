@@ -26,7 +26,7 @@ function Footer() {
           Connecting tenants to homes and landlords to tenants — faster, simpler, smarter.
         </Typography>
 
-        <Grid container spacing={4} justifyContent="center">
+        <Grid container spacing={4} justifyContent="center" >
 
           {/* Quick Links */}
           <Grid item xs={12} sm={6} md={2}>

@@ -1,15 +1,17 @@
-// src/components/Layout/AppLayout.jsx
-import { Box } from '@mui/material';
-import MainFooter from './MainFooter';
+import React from "react";
+import Navbar from "./Navbar";
+import MainFooter from "./MainFooter";
+import { Outlet } from "react-router-dom";
 
-function AppLayout({ children }) {
+function AppLayout() {
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh">
-      <Box component="main" flex="1">
-        {children}
-      </Box>
+    <>
+      <Navbar />
+      <main>
+        <Outlet />
+      </main>
       <MainFooter />
-    </Box>
+    </>
   );
 }
 

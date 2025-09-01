@@ -11,7 +11,6 @@ import Footer from './Footer';
 function LandingPage() {
     return (
         <Box>
-            <Navbar />
             <Hero />
             <FeaturedListings />
             <HotDeals />

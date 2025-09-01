@@ -7,7 +7,7 @@ function Hero() {
         <Box
             sx={{
                 position: 'relative',
-                minHeight: '70vh',
+                minHeight: '76vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
