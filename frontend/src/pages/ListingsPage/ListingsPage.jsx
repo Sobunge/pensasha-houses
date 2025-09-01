@@ -9,7 +9,7 @@ const properties = Array.from({ length: 20 }, (_, i) => ({
   id: i + 1,
   title: `Property ${i + 1}`,
   location: ["Karen", "Westlands", "Runda", "Kileleshwa"][i % 4] + ", Nairobi",
-  price: 5000000 + i * 1000000,
+  price: 5000 + i * 1000,
   type: ["Apartment", "Villa", "House"][i % 3],
   beds: 2 + (i % 4),
   baths: 1 + (i % 3),
