@@ -9,7 +9,7 @@ function NotFound() {
   return (
     <Box
       sx={{
-        minHeight: "80vh",
+        minHeight: "81.11vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
