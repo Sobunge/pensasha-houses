@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, Tabs, Tab, Box } from "@mui/material";
+import {
+  Dialog,
+  DialogContent,
+  Tabs,
+  Tab,
+  Box,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import LoginForm from "../Auth/LoginPage/LoginForm";
 import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 
@@ -15,12 +23,30 @@ function AuthModal({ open, onClose }) {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
+      {/* Top Bar with Tabs + Close Button */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          variant="fullWidth"
+          sx={{ flex: 1 }}
+        >
           <Tab label="Login" />
           <Tab label="Sign Up" />
         </Tabs>
+
+        {/* Close Button */}
+        <IconButton onClick={onClose} sx={{ mr: 1 }}>
+          <CloseIcon />
+        </IconButton>
       </Box>
 
       {/* Content */}
@@ -28,7 +54,10 @@ function AuthModal({ open, onClose }) {
         {activeTab === 0 ? (
           <LoginForm onSuccess={onClose} switchToSignup={switchToSignup} />
         ) : (
-          <RegistrationForm onSuccess={onClose} switchToLogin={switchToLogin} />
+          <RegistrationForm
+            onSuccess={onClose}
+            switchToLogin={switchToLogin}
+          />
         )}
       </DialogContent>
     </Dialog>
