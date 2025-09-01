@@ -8,6 +8,8 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import LoginIcon from "@mui/icons-material/Login";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LoginForm from "../Auth/LoginPage/LoginForm";
 import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 
@@ -39,8 +41,16 @@ function AuthModal({ open, onClose }) {
           variant="fullWidth"
           sx={{ flex: 1 }}
         >
-          <Tab label="Login" />
-          <Tab label="Sign Up" />
+          <Tab
+            icon={<LoginIcon />}
+            iconPosition="start"
+            label="Login"
+          />
+          <Tab
+            icon={<PersonAddIcon />}
+            iconPosition="start"
+            label="Sign Up"
+          />
         </Tabs>
 
         {/* Close Button */}
