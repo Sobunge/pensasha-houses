@@ -36,7 +36,6 @@ export default function LoginForm({ onSuccess, switchToSignup }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        p: { xs: 3, sm: 4 },
       }}
     >
       {/* Icon */}
