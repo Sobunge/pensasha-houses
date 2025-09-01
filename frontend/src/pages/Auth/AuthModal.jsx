@@ -10,15 +10,14 @@ function AuthModal({ open, onClose }) {
     setActiveTab(newValue);
   };
 
+  const switchToLogin = () => setActiveTab(0);
+  const switchToSignup = () => setActiveTab(1);
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="fullWidth"
-        >
+        <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
           <Tab label="Login" />
           <Tab label="Sign Up" />
         </Tabs>
@@ -27,9 +26,9 @@ function AuthModal({ open, onClose }) {
       {/* Content */}
       <DialogContent>
         {activeTab === 0 ? (
-          <LoginForm onSuccess={onClose} />
+          <LoginForm onSuccess={onClose} switchToSignup={switchToSignup} />
         ) : (
-          <RegistrationForm onSuccess={onClose} />
+          <RegistrationForm onSuccess={onClose} switchToLogin={switchToLogin} />
         )}
       </DialogContent>
     </Dialog>

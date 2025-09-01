@@ -1,146 +1,173 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  Avatar,
-  MenuItem,
   Stack,
+  TextField,
+  Button,
+  Typography,
+  MenuItem,
+  Avatar,
   Divider,
 } from "@mui/material";
-import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
-import { Link } from "react-router-dom";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
-export default function RegistrationForm() {
-  const [role, setRole] = React.useState("");
+function RegistrationForm({ onSuccess, switchToLogin }) {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    password: "",
+    role: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("User Registration Data:", formData);
+    onSuccess(); // Close modal on success
+  };
 
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
+        mt: 2,
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        mt: "69px",
-        bgcolor: "#f7f7f7", // light background
       }}
     >
-      <Paper
-        elevation={3}
+      {/* Icon */}
+      <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
+        <PersonAddIcon />
+      </Avatar>
+
+      {/* Heading */}
+      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+        Create Your Account
+      </Typography>
+
+      {/* Short intro text */}
+      <Typography
+        variant="body2"
         sx={{
-          p: { xs: 2.5, sm: 3.5 },
-          maxWidth: { xs: 320, sm: 400 },
-          width: "100%",
+          color: "text.secondary",
           textAlign: "center",
-          borderRadius: 3,
-          my: "20px",
-          bgcolor: "#f7f7f7",
+          mb: 2,
+          maxWidth: 360,
         }}
       >
-        {/* Icon + Heading */}
-        <Avatar
-          sx={{
-            bgcolor: "#f8b500",
-            width: 48,
-            height: 48,
-            mx: "auto",
-            mb: 1.5,
-          }}
-        >
-          <PersonAddAltIcon fontSize="small" />
-        </Avatar>
-        <Typography
-          variant="h6"
-          component="h1"
-          sx={{ fontWeight: 600, color: "#111111", mb: 2 }}
-        >
-          Create Account
-        </Typography>
+        Fill in your details below to join and get started.
+      </Typography>
 
-        {/* Form Fields */}
-        <Stack spacing={1.5}>
-          {/* Names */}
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-            <TextField fullWidth label="First Name" size="small" />
-            <TextField fullWidth label="Second Name" size="small" />
-            <TextField fullWidth label="Third Name" size="small" />
-          </Stack>
-
+      {/* Fields */}
+      <Stack spacing={2} sx={{ width: "100%" }}>
+        {/* Name group */}
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
+            label="First Name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
             fullWidth
-            label="ID Number"
-            type="number"
             size="small"
-            helperText="National ID or passport"
+            required
           />
           <TextField
+            label="Last Name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
             fullWidth
-            label="Phone Number"
-            type="tel"
             size="small"
-            helperText="+254 712 345 678"
+            required
           />
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            size="small"
-            helperText="Minimum 8 characters"
-          />
-
-          <Button variant="outlined" component="label" fullWidth size="small">
-            Upload Profile Picture
-            <input type="file" hidden accept="image/*" />
-          </Button>
-
-          <TextField
-            select
-            fullWidth
-            label="Role"
-            size="small"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <MenuItem value="tenant">Tenant</MenuItem>
-            <MenuItem value="landlord">Landlord</MenuItem>
-          </TextField>
         </Stack>
 
-        {/* Submit */}
-        <Button
+        <TextField
+          label="Phone Number"
+          name="phone"
+          type="tel"
+          value={formData.phone}
+          onChange={handleChange}
           fullWidth
+          size="small"
+          required
+          helperText="e.g. +254 712 345 678"
+        />
+
+        <TextField
+          label="Password"
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          required
+          helperText="At least 8 characters"
+        />
+
+        <TextField
+          select
+          label="Role"
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          required
+        >
+          <MenuItem value="tenant">Tenant</MenuItem>
+          <MenuItem value="landlord">Landlord</MenuItem>
+        </TextField>
+
+        {/* Sign Up Button */}
+        <Button
+          type="submit"
           variant="contained"
+          fullWidth
           sx={{
-            mt: 2.5,
-            mb: 1,
-            fontWeight: "bold",
-            textTransform: "none",
-            py: 1,
+            mt: 1,
+            py: 1.2,
             bgcolor: "#f8b500",
-            color: "#111111",
-            "&:hover": { bgcolor: "#ffc62c" },
+            color: "#111",
+            fontWeight: 600,
+            "&:hover": { bgcolor: "#e0a400" },
           }}
         >
-          Register
+          Sign Up
         </Button>
 
-        {/* Divider + Login */}
-        <Divider sx={{ my: 1 }}>or</Divider>
-        <Typography variant="body2" sx={{ color: "#2a2a2a" }}>
+        {/* Divider */}
+        <Divider sx={{ my: 1 }} />
+
+        {/* Switch to Login */}
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{ mt: 1, color: "text.secondary" }}
+        >
           Already have an account?{" "}
-          <Link
-            to="/login"
+          <span
             style={{
-              color: "#c59000",
-              fontWeight: 500,
-              textDecoration: "none",
+              color: "#f8b500",
+              cursor: "pointer",
+              fontWeight: 600,
             }}
+            onClick={switchToLogin}
           >
             Sign In
-          </Link>
+          </span>
         </Typography>
-      </Paper>
+      </Stack>
     </Box>
   );
 }
+
+export default RegistrationForm;
