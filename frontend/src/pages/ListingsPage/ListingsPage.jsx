@@ -1,21 +1,52 @@
 import React, { useState } from "react";
-import { Box, Grid, Drawer, IconButton, Button, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Button,
+  Drawer,
+  IconButton,
+  useMediaQuery,
+  Pagination,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import SidebarFilter from "./SidebarFilter";
+import PropertyGrid from "./PropertyGrid";
 
 const ListingsPage = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
-  // Mobile breakpoint at 768px
-  const isMobile = useMediaQuery("(max-width:768px)");
-
+  // Drawer for tablet and smaller devices
+  const isTabletOrMobile = useMediaQuery("(max-width:1224px)");
   const toggleDrawer = (open) => () => setDrawerOpen(open);
 
+  // Example properties
+  const properties = Array.from({ length: 20 }, (_, i) => ({
+    id: i + 1,
+    title: `Property ${i + 1}`,
+    location: ["Nairobi", "Mombasa", "Kisumu"][i % 3],
+    price: 50000 + i * 5000,
+    type: ["Apartment", "Villa", "Studio"][i % 3],
+    beds: (i % 4) + 1,
+    baths: (i % 3) + 1,
+    image: `/assets/images/house.jpg`,
+  }));
+
+  // 12 properties per page
+  const propertiesPerPage = 12;
+  const totalPages = Math.ceil(properties.length / propertiesPerPage);
+
+  const displayedProperties = properties.slice(
+    (page - 1) * propertiesPerPage,
+    page * propertiesPerPage
+  );
+
+  const handlePageChange = (event, value) => setPage(value);
+
   return (
-    <Box sx={{ mt: { xs: 8, md: 0 }, px: { xs: 2, md: 4 }, pb: 6 }}>
-      {/* Mobile filter button */}
-      {isMobile && (
+    <Box sx={{ mt: { xs: 8, md: 8 }, px: { xs: 2, md: 2 }, pb: 1 }}>
+      {/* Drawer button for tablets & mobile */}
+      {isTabletOrMobile && (
         <Box sx={{ mb: 2 }}>
           <Button
             variant="contained"
@@ -29,39 +60,33 @@ const ListingsPage = () => {
         </Box>
       )}
 
-      <Grid container spacing={3}>
+      {/* Main layout: sidebar (desktop only) + property grid */}
+      <Box sx={{ display: { xs: "block", md: "flex" }, alignItems: "flex-start" }}>
         {/* Desktop sidebar */}
-        {!isMobile && (
-          <Grid item xs={12} md={3}>
-            <Box
-              sx={{
-                position: "sticky",
-                top: 120,
-              }}
-            >
-              <SidebarFilter />
-            </Box>
-          </Grid>
+        {!isTabletOrMobile && (
+          <Box sx={{ flex: "0 0 300px", position: "sticky", top: 120 }}>
+            <SidebarFilter />
+          </Box>
         )}
 
-        {/* Listings */}
-        <Grid item xs={12} md={isMobile ? 12 : 9}>
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              p: { xs: 2, md: 3 },
-              borderRadius: 2,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              minHeight: "80vh",
-            }}
-          >
-            Listings content goes here...
-          </Box>
-        </Grid>
-      </Grid>
+        {/* Property grid */}
+        <Box sx={{ flex: 1, mt: { xs: 2, md: 2 } }}>
+          <PropertyGrid properties={displayedProperties} />
 
-      {/* Mobile drawer */}
-      {isMobile && (
+          {/* Pagination */}
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Drawer for tablet & mobile */}
+      {isTabletOrMobile && (
         <Drawer
           anchor="left"
           open={drawerOpen}
@@ -70,14 +95,13 @@ const ListingsPage = () => {
           PaperProps={{
             sx: {
               width: "80vw",
-              maxWidth: 300,   // keeps drawer readable on tablets
+              maxWidth: 300,
               boxSizing: "border-box",
               bgcolor: "#fff",
               height: "100vh",
             },
           }}
         >
-          {/* Close button */}
           <IconButton
             onClick={toggleDrawer(false)}
             sx={{ position: "absolute", top: 8, right: 8 }}
@@ -86,8 +110,7 @@ const ListingsPage = () => {
             <CloseIcon />
           </IconButton>
 
-          {/* Sidebar content */}
-          <Box sx={{ mt: 4, pl: 1, pr: 3 }}>
+          <Box sx={{ mt: 4, pl: 3 }}>
             <SidebarFilter />
           </Box>
         </Drawer>

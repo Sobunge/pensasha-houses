@@ -14,21 +14,16 @@ export default function PropertyGrid({ properties }) {
   return (
     <Box
       sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "center",  // center cards
-        gap: 3,                    // spacing between cards (24px)
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        columnGap: 1, // horizontal spacing between cards
+        rowGap: 3,    // vertical spacing between rows
+        width: "100%",
+        justifyContent: "center", // center cards if row is not full
       }}
     >
       {properties.map((property) => (
-        <Box
-          key={property.id}
-          sx={{
-            flex: "0 1 calc(25% - 18px)", // four cards per row, accounting for gap
-            maxWidth: 300,                // optional max width for consistency
-            minWidth: 250,                // optional min width for responsiveness
-          }}
-        >
+        <Box key={property.id} sx={{ width: "100%", maxWidth: 280, margin: "0 auto" }}>
           <PropertyCard property={property} />
         </Box>
       ))}

@@ -72,8 +72,8 @@ const SidebarFilter = ({ onFilter }) => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: 300,
-        p: { xs: 1, sm: 2 },
+        maxWidth: 230,
+        pl: { xs: 1, sm: 2 },
         bgcolor: "#fff",
         display: "flex",
         flexDirection: "column",

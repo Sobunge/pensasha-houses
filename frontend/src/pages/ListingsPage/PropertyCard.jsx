@@ -7,7 +7,6 @@ import {
   Button,
   Box,
 } from "@mui/material";
-
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import HomeIcon from "@mui/icons-material/Home";
 import BedIcon from "@mui/icons-material/Bed";
@@ -18,29 +17,30 @@ export default function PropertyCard({ property }) {
   return (
     <Card
       sx={{
-        height: "100%",
         display: "flex",
         flexDirection: "column",
-        maxWidth: 360,
-        margin: "0 auto",
-        borderRadius: "16px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease",
+        height: "100%",
+        borderRadius: 8,
+        overflow: "hidden",
+        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+        transition: "transform 0.3s ease, box-shadow 0.3s ease",
         "&:hover": {
-          transform: "translateY(-6px)",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+          transform: "translateY(-4px)",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
         },
+        width: 280,
+        minWidth: 280,
+        flex: "0 0 auto",
+        backgroundColor: "#fff",
       }}
     >
-      {/* Property Image */}
+      {/* Image */}
       <Box
         sx={{
-          position: "relative",
           width: "100%",
-          height: 220,
+          height: 150,
           overflow: "hidden",
-          borderTopLeftRadius: "16px",
-          borderTopRightRadius: "16px",
+          position: "relative",
         }}
       >
         <img
@@ -50,57 +50,74 @@ export default function PropertyCard({ property }) {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            transition: "transform 0.3s ease",
           }}
         />
       </Box>
 
-      {/* Property Details */}
-      <CardContent sx={{ flexGrow: 1, p: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", mb: 1 }}>
+      {/* Details */}
+      <CardContent sx={{ flexGrow: 1, p: 1.5 }}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 600,
+            mb: 0.5,
+            fontSize: "0.85rem",
+            lineHeight: 1.2,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+          title={property.title}
+        >
           {property.title}
         </Typography>
 
-        <Box sx={{ display: "flex", alignItems: "center", color: "#666", mb: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", color: "#555", mb: 0.5 }}>
           <LocationOnIcon fontSize="small" sx={{ mr: 0.5 }} />
-          <Typography variant="body2">{property.location}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: "0.75rem",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+            title={property.location}
+          >
+            {property.location}
+          </Typography>
         </Box>
 
         <Typography
-          variant="h6"
-          sx={{ color: "#1976d2", fontWeight: 700, mb: 1 }}
+          variant="subtitle2"
+          sx={{ color: "#1976d2", fontWeight: 700, mb: 1, fontSize: "0.85rem" }}
         >
           Ksh {property.price.toLocaleString()}
         </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
-            color: "#2a2a2a",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8, color: "#333" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
             <HomeIcon fontSize="small" />
-            <Typography variant="body2">{property.type}</Typography>
+            <Typography variant="body2" sx={{ fontSize: "0.73rem" }}>
+              {property.type}
+            </Typography>
           </Box>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
             <BedIcon fontSize="small" />
-            <Typography variant="body2">{property.beds} Beds</Typography>
+            <Typography variant="body2" sx={{ fontSize: "0.73rem" }}>
+              {property.beds} Beds
+            </Typography>
           </Box>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
             <BathtubIcon fontSize="small" />
-            <Typography variant="body2">{property.baths} Baths</Typography>
+            <Typography variant="body2" sx={{ fontSize: "0.73rem" }}>
+              {property.baths} Baths
+            </Typography>
           </Box>
         </Box>
       </CardContent>
 
-      {/* Action Button */}
-      <CardActions sx={{ p: 2, pt: 0 }}>
+      <CardActions sx={{ p: 1.5, pt: 0 }}>
         <Button
           fullWidth
           variant="contained"
@@ -110,10 +127,9 @@ export default function PropertyCard({ property }) {
             color: "#111",
             fontWeight: 600,
             textTransform: "none",
-            borderRadius: "12px",
-            "&:hover": {
-              backgroundColor: "#ffc62c",
-            },
+            fontSize: "0.73rem",
+            borderRadius: 6,
+            "&:hover": { backgroundColor: "#ffc62c" },
           }}
         >
           View Details

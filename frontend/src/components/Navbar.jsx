@@ -108,7 +108,7 @@ function Navbar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" elevation={1} sx={{ backgroundColor: "#2A2A2A" }}>
         <Container maxWidth="lg">
-          <Toolbar sx={{ justifyContent: "space-between", minHeight: { xs: 56, md: 64 } }}>
+          <Toolbar sx={{ justifyContent: "space-between", minHeight: { xs: 56, md: 56 } }}>
             {/* Logo */}
             <Box
               component="a"
@@ -128,7 +128,7 @@ function Navbar() {
 
             {/* Desktop Menu */}
             {!isMobile && (
-              <Box sx={{ display: "flex", gap: 3 }}>
+              <Box sx={{ display: "flex", gap: 2 }}>
                 {navItems.map((item) => (
                   <Button
                     key={item.label}
