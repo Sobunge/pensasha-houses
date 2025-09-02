@@ -7,7 +7,8 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PlaceIcon from '@mui/icons-material/Place';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import HomeIcon from "@mui/icons-material/Home";
 import BedIcon from "@mui/icons-material/Bed";
 import BathtubIcon from "@mui/icons-material/Bathtub";
@@ -66,14 +67,26 @@ export default function PropertyCard({ property }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.3, // space between icon and text
           }}
           title={property.title}
         >
+          <HomeIcon fontSize="small" />
           {property.title}
         </Typography>
 
-        <Box sx={{ display: "flex", alignItems: "center", color: "#555", mb: 0.5 }}>
-          <LocationOnIcon fontSize="small" sx={{ mr: 0.5 }} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            color: "#555",
+            mb: 0.5,
+            gap: 0.5, // adds consistent spacing between icon and text
+          }}
+        >
+          <PlaceIcon fontSize="small" />
           <Typography
             variant="body2"
             sx={{
@@ -90,8 +103,17 @@ export default function PropertyCard({ property }) {
 
         <Typography
           variant="subtitle2"
-          sx={{ color: "#1976d2", fontWeight: 700, mb: 1, fontSize: "0.85rem" }}
+          sx={{
+            color: "#1976d2",
+            fontWeight: 700,
+            mb: 1,
+            fontSize: "0.85rem",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.3, // space between icon and text
+          }}
         >
+          <AttachMoneyIcon fontSize="small" />
           Ksh {property.price.toLocaleString()}
         </Typography>
 
