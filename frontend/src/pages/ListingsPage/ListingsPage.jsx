@@ -1,87 +1,83 @@
 import React, { useState } from "react";
-import { Box, Typography, Pagination } from "@mui/material";
-import MainContent from "../../components/MainContent";
-import PropertySearch from "./PropertySearch";
-import PropertyGrid from "./PropertyGrid";
+import { Box, Grid, Drawer, IconButton, Button } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
+import SidebarFilter from "./SidebarFilter";
 
-// Generate 20 dummy properties
-const properties = Array.from({ length: 20 }, (_, i) => ({
-  id: i + 1,
-  title: `Property ${i + 1}`,
-  location: ["Karen", "Westlands", "Runda", "Kileleshwa"][i % 4] + ", Nairobi",
-  price: 5000 + i * 1000,
-  type: ["Apartment", "Villa", "House"][i % 3],
-  beds: 2 + (i % 4),
-  baths: 1 + (i % 3),
-  image: `/assets/images/house.jpg`,
-}));
-
-const ITEMS_PER_PAGE = 8;
-
-export default function ListingsPage() {
-  const [filteredProperties, setFilteredProperties] = useState(properties);
-  const [page, setPage] = useState(1);
-
-  const handleSearch = (searchData) => {
-    const filtered = properties.filter((prop) => {
-      const matchLocation = searchData.location
-        ? prop.location.toLowerCase().includes(searchData.location.toLowerCase())
-        : true;
-      const matchType = searchData.type
-        ? prop.type.toLowerCase() === searchData.type.toLowerCase()
-        : true;
-      const matchMinPrice = searchData.minPrice
-        ? prop.price >= Number(searchData.minPrice)
-        : true;
-      const matchMaxPrice = searchData.maxPrice
-        ? prop.price <= Number(searchData.maxPrice)
-        : true;
-
-      return matchLocation && matchType && matchMinPrice && matchMaxPrice;
-    });
-
-    setFilteredProperties(filtered);
-    setPage(1); // Reset to first page
-  };
-
-  // Pagination slice
-  const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const paginatedProperties = filteredProperties.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
-
-  const handlePageChange = (_, value) => {
-    setPage(value);
-  };
+const ListingsPage = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const toggleDrawer = (open) => () => setDrawerOpen(open);
 
   return (
-    <MainContent>
-      {/* Search Bar */}
-      <PropertySearch onSearch={handleSearch} />
+    <Box sx={{ mt: { xs: 8, md: 0 }, px: { xs: 2, md: 4 }, pb: 6 }}>
+      {/* Mobile filter button */}
+      <Box sx={{ display: { xs: "block", md: "none" }, mb: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<MenuIcon />}
+          onClick={toggleDrawer(true)}
+          size="small"
+          sx={{ fontSize: "0.75rem", py: 0.5, px: 1.5 }}
+        >
+          Filters
+        </Button>
+      </Box>
 
-      {/* Property Grid */}
-      {paginatedProperties.length > 0 ? (
-        <>
-          <PropertyGrid properties={paginatedProperties} />
-
-          {/* Pagination */}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-            <Pagination
-              count={Math.ceil(filteredProperties.length / ITEMS_PER_PAGE)}
-              page={page}
-              onChange={handlePageChange}
-              color="primary"
-            />
+      <Grid container spacing={3}>
+        {/* Desktop sidebar */}
+        <Grid item xs={12} md={3}>
+          <Box
+            sx={{
+              display: { xs: "none", md: "block" },
+              position: "sticky",
+              top: 120,
+            }}
+          >
+            <SidebarFilter />
           </Box>
-        </>
-      ) : (
-        <Box sx={{ mt: 4, textAlign: "center" }}>
-          <Typography variant="h6" color="text.secondary">
-            No properties found. Try adjusting your filters.
-          </Typography>
+        </Grid>
+
+        {/* Listings */}
+        <Grid item xs={12} md={9}>
+          <Box
+            sx={{
+              bgcolor: "background.paper",
+              p: 3,
+              borderRadius: 2,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              minHeight: "80vh",
+            }}
+          >
+            Listings content goes here...
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* Mobile drawer */}
+      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
+        <Box
+          sx={{
+            width: 240, // fits nicely
+            height: "100vh",
+            overflowY: "auto",
+            position: "relative",
+            p: 1,
+          }}
+        >
+          <IconButton
+            onClick={toggleDrawer(false)}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+            size="small"
+          >
+            <CloseIcon />
+          </IconButton>
+          <Box sx={{ mt: 4 }}>
+            <SidebarFilter />
+          </Box>
         </Box>
-      )}
-    </MainContent>
+      </Drawer>
+    </Box>
   );
-}
+};
+
+export default ListingsPage;
