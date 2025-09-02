@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Container,
-  Grid,
   Stack,
   IconButton,
   Button,
@@ -21,7 +20,7 @@ import HouseIcon from '@mui/icons-material/House';
 import InfoIcon from '@mui/icons-material/Info';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ContactModal from './ContactModal'; // Import the contact modal component
+import ContactModal from './ContactModal'; // Your contact modal
 
 export default function Footer({ howItWorksRef }) {
   const [contactOpen, setContactOpen] = useState(false);
@@ -64,10 +63,20 @@ export default function Footer({ howItWorksRef }) {
           Connecting tenants to homes and landlords to tenants — faster, simpler, smarter.
         </Typography>
 
-        <Grid container spacing={4} justifyContent="space-between">
+        {/* Columns */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
+        >
           {/* Quick Links */}
-          <Grid item xs={100} md={30} sx={{ mb: { xs: 4, md: 0 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}>
+          <Box sx={{ width: { xs: '100%', sm: '48%', md: '30%' }, mb: { xs: 4, md: 0 } }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}
+            >
               Quick Links
             </Typography>
             <Stack spacing={2} alignItems={{ xs: 'center', md: 'flex-start' }}>
@@ -76,11 +85,14 @@ export default function Footer({ howItWorksRef }) {
               <FooterLink onClick={scrollToHowItWorks} icon={<InfoIcon />} text="How It Works" />
               <FooterLink onClick={handleContactOpen} icon={<ContactMailIcon />} text="Contact Us" />
             </Stack>
-          </Grid>
+          </Box>
 
           {/* Contact Info */}
-          <Grid item xs={100} md={30} sx={{ mb: { xs: 4, md: 0 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}>
+          <Box sx={{ width: { xs: '100%', sm: '48%', md: '30%' }, mb: { xs: 4, md: 0 } }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}
+            >
               Contact Info
             </Typography>
             <Stack spacing={2} alignItems={{ xs: 'center', md: 'flex-start' }}>
@@ -88,18 +100,17 @@ export default function Footer({ howItWorksRef }) {
               <ContactItem icon={<EmailIcon />} text="support@pensasha.co.ke" />
               <ContactItem icon={<LocationOnIcon />} text="Kisumu, Kenya" />
             </Stack>
-          </Grid>
+          </Box>
 
           {/* Social Links */}
-          <Grid item xs={100} md={30}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}>
+          <Box sx={{ width: { xs: '100%', sm: '48%', md: '30%' }, mb: { xs: 4, md: 0 } }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}
+            >
               Follow Us
             </Typography>
-            <Stack
-              direction="row"
-              spacing={3}
-              justifyContent={{ xs: 'center', md: 'flex-start' }}
-            >
+            <Stack direction="row" spacing={3} justifyContent={{ xs: 'center', md: 'flex-start' }}>
               {[FacebookIcon, TwitterIcon, InstagramIcon, MusicVideoIcon].map((Icon, idx) => (
                 <IconButton
                   key={idx}
@@ -115,8 +126,8 @@ export default function Footer({ howItWorksRef }) {
                 </IconButton>
               ))}
             </Stack>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         {/* Back to Top */}
         <Button
@@ -136,7 +147,6 @@ export default function Footer({ howItWorksRef }) {
         >
           Back to Top
         </Button>
-
       </Container>
 
       {/* Contact Modal */}
