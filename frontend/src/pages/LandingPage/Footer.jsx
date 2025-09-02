@@ -1,4 +1,14 @@
-import { Box, Typography, Container, Grid, Link, Stack, IconButton } from '@mui/material';
+import { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Container,
+  Grid,
+  Stack,
+  IconButton,
+  Button,
+  Link as MuiLink,
+} from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -10,107 +20,95 @@ import HomeIcon from '@mui/icons-material/Home';
 import HouseIcon from '@mui/icons-material/House';
 import InfoIcon from '@mui/icons-material/Info';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ContactModal from './ContactModal'; // Import the contact modal component
 
-function Footer() {
+export default function Footer({ howItWorksRef }) {
+  const [contactOpen, setContactOpen] = useState(false);
+
+  const scrollToHowItWorks = (e) => {
+    e.preventDefault();
+    if (howItWorksRef?.current) {
+      howItWorksRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleContactOpen = () => setContactOpen(true);
+  const handleContactClose = () => setContactOpen(false);
+
   return (
-    <Box sx={{ backgroundColor: '#2A2A2A', color: '#F7F7F7', textAlign: 'center', py: 6 }}>
-      <Container>
-
+    <Box
+      sx={{
+        background: 'linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%)',
+        color: '#F7F7F7',
+        py: 8,
+        textAlign: 'center',
+      }}
+    >
+      <Container maxWidth="lg">
         {/* Brand */}
         <Typography
-          variant="h6"
-          sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '28px', md: '36px' } }}
+          variant="h5"
+          sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '24px', md: '32px' } }}
         >
           Pensasha Houses
         </Typography>
         <Typography
           variant="body2"
-          sx={{ fontSize: { xs: '16px', md: '18px' }, mb: 5 }}
+          sx={{ mb: 6, color: '#CCCCCC', fontSize: { xs: '14px', md: '16px' } }}
         >
           Connecting tenants to homes and landlords to tenants — faster, simpler, smarter.
         </Typography>
 
-        <Grid container spacing={4} justifyContent="center">
-
+        <Grid container spacing={4} justifyContent="space-between">
           {/* Quick Links */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Grid item xs={100} md={30} sx={{ mb: { xs: 4, md: 0 } }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}>
               Quick Links
             </Typography>
-            <Stack spacing={1}>
-              {[
-                { href: '/', icon: <HomeIcon />, text: 'Home' },
-                { href: '/houses', icon: <HouseIcon />, text: 'Browse Houses' },
-                { href: '/how-it-works', icon: <InfoIcon />, text: 'How It Works' },
-                { href: '/contact', icon: <ContactMailIcon />, text: 'Contact Us' },
-              ].map((link) => (
-                <Link
-                  key={link.text}
-                  href={link.href}
-                  underline="none"
-                  color="#F7F7F7"
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      color: '#F8B500',
-                      transform: 'scale(1.05)',
-                    },
-                    svg: { mr: 1, transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } },
-                  }}
-                >
-                  {link.icon} {link.text}
-                </Link>
-              ))}
+            <Stack spacing={2} alignItems={{ xs: 'center', md: 'flex-start' }}>
+              <FooterLink href="/" icon={<HomeIcon />} text="Home" />
+              <FooterLink href="/properties" icon={<HouseIcon />} text="Browse Houses" />
+              <FooterLink onClick={scrollToHowItWorks} icon={<InfoIcon />} text="How It Works" />
+              <FooterLink onClick={handleContactOpen} icon={<ContactMailIcon />} text="Contact Us" />
             </Stack>
           </Grid>
-
-          {/* Divider */}
-          <Grid item xs={false} sm={0} md={0.05}
-            sx={{ display: { xs: 'none', md: 'block' }, borderLeft: '1px solid #444', height: 'auto' }}
-          />
 
           {/* Contact Info */}
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Grid item xs={100} md={30} sx={{ mb: { xs: 4, md: 0 } }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}>
               Contact Info
             </Typography>
-            <Stack spacing={1} alignItems="center">
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } }}>
-                <PhoneIcon sx={{ fontSize: 18, mr: 1 }} /> +254 707 335 375
-              </Typography>
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } }}>
-                <EmailIcon sx={{ fontSize: 18, mr: 1 }} /> support@pensasha.co.ke
-              </Typography>
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', transition: 'all 0.3s ease', '&:hover': { color: '#F8B500' } }}>
-                <LocationOnIcon sx={{ fontSize: 18, mr: 1 }} /> Kisumu, Kenya
-              </Typography>
+            <Stack spacing={2} alignItems={{ xs: 'center', md: 'flex-start' }}>
+              <ContactItem icon={<PhoneIcon />} text="+254 707 335 375" />
+              <ContactItem icon={<EmailIcon />} text="support@pensasha.co.ke" />
+              <ContactItem icon={<LocationOnIcon />} text="Kisumu, Kenya" />
             </Stack>
           </Grid>
 
-          {/* Divider */}
-          <Grid item xs={false} sm={0} md={0.05}
-            sx={{ display: { xs: 'none', md: 'block' }, borderLeft: '1px solid #444', height: 'auto' }}
-          />
-
           {/* Social Links */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-              Social Links
+          <Grid item xs={100} md={30}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, textAlign: { xs: 'center', md: 'left' } }}>
+              Follow Us
             </Typography>
-            <Stack direction="row" spacing={2} justifyContent="center">
+            <Stack
+              direction="row"
+              spacing={3}
+              justifyContent={{ xs: 'center', md: 'flex-start' }}
+            >
               {[FacebookIcon, TwitterIcon, InstagramIcon, MusicVideoIcon].map((Icon, idx) => (
                 <IconButton
                   key={idx}
                   href="#"
                   sx={{
                     color: '#F7F7F7',
+                    fontSize: 24,
                     transition: 'all 0.3s ease',
-                    '&:hover': {
-                      color: '#F8B500',
-                      transform: 'scale(1.2)',
-                    },
+                    '&:hover': { color: '#F8B500', transform: 'scale(1.3)' },
                   }}
                 >
                   <Icon />
@@ -118,12 +116,74 @@ function Footer() {
               ))}
             </Stack>
           </Grid>
-
         </Grid>
 
+        {/* Back to Top */}
+        <Button
+          onClick={scrollToTop}
+          variant="contained"
+          sx={{
+            mt: 6,
+            backgroundColor: '#f8b500',
+            color: '#111111',
+            textTransform: 'none',
+            borderRadius: 3,
+            px: 3,
+            py: 1,
+            '&:hover': { backgroundColor: '#c59000' },
+          }}
+          startIcon={<ArrowUpwardIcon />}
+        >
+          Back to Top
+        </Button>
+
       </Container>
+
+      {/* Contact Modal */}
+      <ContactModal open={contactOpen} onClose={handleContactClose} />
     </Box>
   );
 }
 
-export default Footer;
+// Footer Link Component
+function FooterLink({ href, icon, text, onClick }) {
+  return (
+    <MuiLink
+      href={href || '#'}
+      onClick={onClick}
+      underline="none"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        color: '#F7F7F7',
+        fontWeight: 500,
+        transition: 'all 0.3s ease',
+        '&:hover': { color: '#F8B500', transform: 'translateX(4px)' },
+      }}
+    >
+      {icon} {text}
+    </MuiLink>
+  );
+}
+
+// Contact Item Component
+function ContactItem({ icon, text }) {
+  return (
+    <Typography
+      variant="body2"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        color: '#CCCCCC',
+        fontWeight: 400,
+        transition: 'all 0.3s ease',
+        '&:hover': { color: '#F8B500', transform: 'translateX(3px)' },
+        cursor: 'pointer',
+      }}
+    >
+      {icon} {text}
+    </Typography>
+  );
+}
