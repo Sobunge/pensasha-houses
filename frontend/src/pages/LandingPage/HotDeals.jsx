@@ -31,7 +31,7 @@ function HotDeals() {
 
         <Button
           variant="contained"
-          href="/houses"
+          href="/properties"
           endIcon={<WhatshotIcon />}
           sx={{
             backgroundColor: '#111111',
