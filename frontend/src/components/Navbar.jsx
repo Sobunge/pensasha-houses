@@ -24,10 +24,12 @@ import LoginIcon from "@mui/icons-material/Login";
 import { useLocation } from "react-router-dom";
 import AuthModal from "../pages/Auth/AuthModal";
 
+// Navigation items for desktop links
 const navItems = [
   { label: "Home", link: "/", icon: <HomeIcon /> },
   { label: "Browse Listings", link: "/properties", icon: <SearchIcon /> },
-  { label: "List a Property", link: "/list-property", icon: <AddBoxIcon /> },
+  // Remove link, handle via modal
+  { label: "List a Property", icon: <AddBoxIcon />, requiresAuth: true },
 ];
 
 function Navbar() {
@@ -71,8 +73,10 @@ function Navbar() {
         {navItems.map((item) => (
           <ListItem
             key={item.label}
-            component="a"
-            href={item.link}
+            button
+            onClick={item.requiresAuth ? handleAuthOpen : undefined}
+            component={item.requiresAuth ? "div" : "a"}
+            href={!item.requiresAuth ? item.link : undefined}
             sx={{
               px: 3,
               py: 1.5,
@@ -92,6 +96,7 @@ function Navbar() {
           </ListItem>
         ))}
 
+        {/* Always show Login / Sign Up */}
         <ListItem button onClick={handleAuthOpen}>
           <ListItemIcon><LoginIcon /></ListItemIcon>
           <ListItemText primary="Login / Sign Up" />
@@ -115,12 +120,7 @@ function Navbar() {
               href="/"
               sx={{ display: "flex", alignItems: "center", gap: 1, textDecoration: "none" }}
             >
-              <Box
-                component="img"
-                src="/assets/images/logo.svg"
-                alt="Pensasha Logo"
-                sx={{ height: 32 }}
-              />
+              <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
               <Typography variant="h6" sx={{ fontWeight: 600, color: "#ffffff" }}>
                 Pensasha Houses
               </Typography>
@@ -132,7 +132,8 @@ function Navbar() {
                 {navItems.map((item) => (
                   <Button
                     key={item.label}
-                    href={item.link}
+                    href={item.requiresAuth ? undefined : item.link}
+                    onClick={item.requiresAuth ? handleAuthOpen : undefined}
                     startIcon={item.icon}
                     sx={{
                       color: location.pathname === item.link ? "#f8b500" : "#ffffff",
