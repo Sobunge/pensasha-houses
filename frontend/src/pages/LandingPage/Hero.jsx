@@ -58,7 +58,7 @@ function Hero() {
                     </Typography>
 
                     <Button
-                        href="/houses"
+                        href="/properties"
                         startIcon={<SearchIcon />}
                         variant="contained"
                         sx={{
