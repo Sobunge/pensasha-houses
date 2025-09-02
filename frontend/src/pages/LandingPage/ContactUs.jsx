@@ -37,7 +37,6 @@ export default function ContactModal({ open, onClose }) {
   };
 
   const handleSubmit = () => {
-    // Simple validation
     const newErrors = {};
     if (!formData.name) newErrors.name = 'Name is required';
     if (!formData.email) newErrors.email = 'Email is required';
@@ -68,6 +67,7 @@ export default function ContactModal({ open, onClose }) {
         <Stack spacing={2}>
           <TextField
             label="Name"
+            placeholder="Enter your full name"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -77,6 +77,7 @@ export default function ContactModal({ open, onClose }) {
           />
           <TextField
             label="Email"
+            placeholder="Enter your email address"
             name="email"
             type="email"
             value={formData.email}
@@ -87,6 +88,7 @@ export default function ContactModal({ open, onClose }) {
           />
           <TextField
             label="Message"
+            placeholder="Write your message here"
             name="message"
             value={formData.message}
             onChange={handleChange}
