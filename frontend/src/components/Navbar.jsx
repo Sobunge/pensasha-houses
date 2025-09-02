@@ -22,7 +22,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import LoginIcon from "@mui/icons-material/Login";
 import { useLocation } from "react-router-dom";
-import AuthModal from "../pages/Auth/AuthModal"; // ✅ Import modal
+import AuthModal from "../pages/Auth/AuthModal";
 
 const navItems = [
   { label: "Home", link: "/", icon: <HomeIcon /> },
@@ -32,27 +32,19 @@ const navItems = [
 
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false); // ✅ For modal
+  const [authOpen, setAuthOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const handleAuthOpen = () => setAuthOpen(true);
   const handleAuthClose = () => setAuthOpen(false);
 
   const drawer = (
     <Box
       onClick={handleDrawerToggle}
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        bgcolor: "#f7f7f7",
-      }}
+      sx={{ height: "100%", display: "flex", flexDirection: "column", bgcolor: "#f7f7f7" }}
     >
       {/* Logo */}
       <Box
@@ -67,12 +59,7 @@ function Navbar() {
           textDecoration: "none",
         }}
       >
-        <Box
-          component="img"
-          src="/assets/images/logo.svg"
-          alt="Pensasha Logo"
-          sx={{ height: 30 }}
-        />
+        <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 30 }} />
         <Typography variant="h6" sx={{ fontWeight: 600, color: "#111111" }}>
           Pensasha Houses
         </Typography>
@@ -80,7 +67,6 @@ function Navbar() {
 
       <Divider />
 
-      {/* Drawer Nav Items */}
       <List sx={{ flexGrow: 1 }}>
         {navItems.map((item) => (
           <ListItem
@@ -92,21 +78,13 @@ function Navbar() {
               py: 1.5,
               borderRadius: 1,
               textDecoration: "none",
-              color:
-                location.pathname === item.link ? "#f8b500" : "#111111",
-              fontWeight:
-                location.pathname === item.link ? 600 : 400,
-              "&:hover": {
-                backgroundColor: "#FFF6E0",
-              },
+              color: location.pathname === item.link ? "#f8b500" : "#111111",
+              fontWeight: location.pathname === item.link ? 600 : 400,
+              "&:hover": { backgroundColor: "#FFF6E0" },
             }}
           >
             <ListItemIcon
-              sx={{
-                minWidth: 40,
-                color:
-                  location.pathname === item.link ? "#f8b500" : "#111111",
-              }}
+              sx={{ minWidth: 40, color: location.pathname === item.link ? "#f8b500" : "#111111" }}
             >
               {item.icon}
             </ListItemIcon>
@@ -114,11 +92,8 @@ function Navbar() {
           </ListItem>
         ))}
 
-        {/* Login/Signup in Drawer */}
         <ListItem button onClick={handleAuthOpen}>
-          <ListItemIcon>
-            <LoginIcon />
-          </ListItemIcon>
+          <ListItemIcon><LoginIcon /></ListItemIcon>
           <ListItemText primary="Login / Sign Up" />
         </ListItem>
       </List>
@@ -133,17 +108,12 @@ function Navbar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" elevation={1} sx={{ backgroundColor: "#2A2A2A" }}>
         <Container maxWidth="lg">
-          <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Toolbar sx={{ justifyContent: "space-between", minHeight: { xs: 56, md: 64 } }}>
             {/* Logo */}
             <Box
               component="a"
               href="/"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                textDecoration: "none",
-              }}
+              sx={{ display: "flex", alignItems: "center", gap: 1, textDecoration: "none" }}
             >
               <Box
                 component="img"
@@ -165,13 +135,9 @@ function Navbar() {
                     href={item.link}
                     startIcon={item.icon}
                     sx={{
-                      color:
-                        location.pathname === item.link
-                          ? "#f8b500"
-                          : "#ffffff",
+                      color: location.pathname === item.link ? "#f8b500" : "#ffffff",
                       textTransform: "none",
-                      fontWeight:
-                        location.pathname === item.link ? 600 : 500,
+                      fontWeight: location.pathname === item.link ? 600 : 500,
                       "&:hover": { color: "#f8b500" },
                     }}
                   >
@@ -179,7 +145,6 @@ function Navbar() {
                   </Button>
                 ))}
 
-                {/* CTA Login/Signup */}
                 <Button
                   variant="contained"
                   startIcon={<LoginIcon />}
@@ -201,11 +166,7 @@ function Navbar() {
 
             {/* Mobile Menu Button */}
             {isMobile && (
-              <IconButton
-                color="inherit"
-                edge="end"
-                onClick={handleDrawerToggle}
-              >
+              <IconButton color="inherit" edge="end" onClick={handleDrawerToggle}>
                 <MenuIcon />
               </IconButton>
             )}
@@ -218,9 +179,7 @@ function Navbar() {
         anchor="right"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        sx={{
-          "& .MuiDrawer-paper": { width: 260, backgroundColor: "#f7f7f7" },
-        }}
+        sx={{ "& .MuiDrawer-paper": { width: 260, backgroundColor: "#f7f7f7" } }}
       >
         {drawer}
       </Drawer>
