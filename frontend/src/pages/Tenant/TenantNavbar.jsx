@@ -12,8 +12,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
 import ProfileMenu from "./ProfileMenu";
-import ActivityFeedCard from "./ActivityFeedCard";
-import MessagesCard from "./MessagesCard"; // new component
+import ActivityFeedCard from "../../components/cards/ActivityFeedCard";
+import MessagesCard from "../../components/cards/MessagesCard"; // new component
 
 function TenantNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);

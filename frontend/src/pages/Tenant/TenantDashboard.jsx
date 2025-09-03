@@ -5,11 +5,11 @@ import PaymentIcon from "@mui/icons-material/Payment";
 
 import TenantNavbar from "./TenantNavbar";
 import TenantSidebar from "./TenantSidebar";
-import PropertyInfoCard from "./PropertyInfoCard";
-import MaintenanceCard from "./MaintenanceCard";
-import AnnouncementsCard from "./AnnouncementsCard";
-import DocumentsCard from "./DocumentsCard";
-import PaymentsCard from "./PaymentsCard";
+import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
+import MaintenanceCard from "../../components/cards/MaintenanceCard";
+import AnnouncementsCard from "../../components/cards/AnnouncementsCard";
+import DocumentsCard from "../../components/cards/DocumentsCard";
+import PaymentsCard from "../../components/cards/PaymentsCard";
 
 function TenantDashboard() {
   const [mobileOpen, setMobileOpen] = useState(false);
