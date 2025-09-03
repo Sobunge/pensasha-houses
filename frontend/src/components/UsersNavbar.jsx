@@ -11,11 +11,11 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
-import ProfileMenu from "./ProfileMenu";
-import ActivityFeedCard from "../../components/cards/ActivityFeedCard";
-import MessagesCard from "../../components/cards/MessagesCard"; // new component
+import ProfileMenu from "../pages/Tenant/ProfileMenu";
+import ActivityFeedCard from "./cards/ActivityFeedCard";
+import MessagesCard from "./cards/MessagesCard"; // new component
 
-function TenantNavbar({ onMenuClick }) {
+function UsersNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
   const [anchorElMessages, setAnchorElMessages] = useState(null);
 
@@ -143,4 +143,4 @@ function TenantNavbar({ onMenuClick }) {
   );
 }
 
-export default TenantNavbar;
+export default UsersNavbar;

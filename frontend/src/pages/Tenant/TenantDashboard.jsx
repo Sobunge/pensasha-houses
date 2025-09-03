@@ -3,7 +3,7 @@ import { Box, Toolbar, Typography, Card, Button, Avatar } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PaymentIcon from "@mui/icons-material/Payment";
 
-import TenantNavbar from "./TenantNavbar";
+import UsersNavbar from "../../components/UsersNavbar";
 import TenantSidebar from "./TenantSidebar";
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
 import MaintenanceCard from "../../components/cards/MaintenanceCard";
@@ -29,7 +29,7 @@ function TenantDashboard() {
   return (
     <Box sx={{ display: "flex" }}>
       {/* Navbar & Sidebar */}
-      <TenantNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
+      <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
       <TenantSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       {/* Main Content */}
