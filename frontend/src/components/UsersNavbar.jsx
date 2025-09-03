@@ -79,8 +79,8 @@ function UsersNavbar({ onMenuClick }) {
             alt="Pensasha Logo"
             sx={{ height: 32 }}
           />
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#111" }}>
-            Pensasha Houses – Dashboard
+          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", pl: 26 }}>
+            Tenant – Dashboard
           </Typography>
         </Box>
 

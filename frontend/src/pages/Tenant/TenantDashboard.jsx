@@ -75,6 +75,7 @@ function TenantDashboard() {
             <Box sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}>
               <Button
                 variant="outlined"
+                size="small"
                 endIcon={<ArrowForwardIcon />}
                 sx={{
                   width: "100%",
@@ -82,7 +83,6 @@ function TenantDashboard() {
                   borderRadius: 3,
                   textTransform: "none",
                   fontWeight: 600,
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
                   "&:hover": { backgroundColor: "#fef2b2", borderColor: "#f8b500" },
                 }}
                 onClick={() => navigate("/tenant/properties")} // <-- Navigate to properties page
