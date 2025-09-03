@@ -1,9 +1,10 @@
 import React from "react";
 import { Card, CardContent, Typography, Button, Box } from "@mui/material";
 import BuildIcon from "@mui/icons-material/Build";
+import AddIcon from "@mui/icons-material/Add"; // Import plus icon
 
 function MaintenanceCard() {
-  // Placeholder data (later this can come from your API)
+  // Number of open maintenance requests
   const openRequests = 2;
 
   return (
@@ -15,7 +16,7 @@ function MaintenanceCard() {
       }}
     >
       <CardContent>
-        {/* Title with Icon */}
+        {/* Title Section with Icon */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <BuildIcon sx={{ color: "#f8b500" }} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
@@ -23,15 +24,16 @@ function MaintenanceCard() {
           </Typography>
         </Box>
 
-        {/* Status Info */}
+        {/* Status Information */}
         <Typography variant="body1" sx={{ color: "#555", mb: 2 }}>
           You currently have <strong>{openRequests}</strong> open request
           {openRequests !== 1 && "s"}.
         </Typography>
 
-        {/* Action Button */}
+        {/* Action Button with + Icon */}
         <Button
           variant="contained"
+          startIcon={<AddIcon />} // Use plus icon here
           sx={{
             bgcolor: "#f8b500",
             color: "#111",
