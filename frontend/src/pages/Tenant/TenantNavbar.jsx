@@ -1,75 +1,143 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   IconButton,
+  Typography,
   Box,
   Badge,
-  useTheme,
+  Popover,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import MailIcon from "@mui/icons-material/Mail";
+import ProfileMenu from "./ProfileMenu";
+import ActivityFeedCard from "./ActivityFeedCard";
+import MessagesCard from "./MessagesCard"; // new component
 
 function TenantNavbar({ onMenuClick }) {
-  const theme = useTheme();
+  const [anchorElNotifications, setAnchorElNotifications] = useState(null);
+  const [anchorElMessages, setAnchorElMessages] = useState(null);
+
+  // Notifications popover
+  const handleOpenNotifications = (event) => setAnchorElNotifications(event.currentTarget);
+  const handleCloseNotifications = () => setAnchorElNotifications(null);
+
+  // Messages popover
+  const handleOpenMessages = (event) => setAnchorElMessages(event.currentTarget);
+  const handleCloseMessages = () => setAnchorElMessages(null);
 
   return (
     <AppBar
       position="fixed"
-      elevation={1}
       sx={{
-        backgroundColor: "#2a2a2a",
-        zIndex: theme.zIndex.drawer + 1,
+        backgroundColor: "#fff",
+        color: "#111",
+        boxShadow: 2,
+        borderBottom: "1px solid #eee",
       }}
     >
-      <Toolbar sx={{ justifyContent: "space-between", minHeight: 56 }}>
-        {/* Sidebar Toggle (Mobile) */}
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        {/* Sidebar Menu (mobile) */}
         <IconButton
           edge="start"
+          color="inherit"
+          aria-label="menu"
           onClick={onMenuClick}
-          sx={{
-            display: { md: "none" },
-            color: "#f7f7f7",
-            "&:hover": { color: "#ffc62c" },
-          }}
+          sx={{ mr: 2, display: { md: "none" } }}
         >
           <MenuIcon />
         </IconButton>
 
-        {/* Logo + Title */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {/* Logo (mobile centered) */}
+        <Box
+          sx={{
+            display: { xs: "flex", md: "none" },
+            flexGrow: 1,
+            justifyContent: "center",
+          }}
+        >
           <Box
             component="img"
             src="/assets/images/logo.svg"
             alt="Pensasha Logo"
-            sx={{ height: 30 }}
+            sx={{ height: 32 }}
           />
-          <Typography
-            variant="h6"
-            noWrap
-            sx={{ fontWeight: 600, color: "#f8b500" }}
-          >
-            Pensasha Houses
+        </Box>
+
+        {/* Logo + Dashboard Title (desktop) */}
+        <Box
+          sx={{
+            display: { xs: "none", md: "flex" },
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Box
+            component="img"
+            src="/assets/images/logo.svg"
+            alt="Pensasha Logo"
+            sx={{ height: 32 }}
+          />
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#111" }}>
+            Pensasha Houses – Dashboard
           </Typography>
         </Box>
 
-        {/* Right Side Actions */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <IconButton
-            sx={{ color: "#f7f7f7", "&:hover": { color: "#ffc62c" } }}
-          >
-            <Badge badgeContent={2} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton
-            sx={{ color: "#f7f7f7", "&:hover": { color: "#ffc62c" } }}
-          >
-            <AccountCircleIcon />
-          </IconButton>
-        </Box>
+        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "block" } }} />
+
+        {/* ===== Messages Dropdown ===== */}
+        <IconButton color="inherit" onClick={handleOpenMessages}>
+          <Badge badgeContent={5} color="primary">
+            <MailIcon />
+          </Badge>
+        </IconButton>
+        <Popover
+          open={Boolean(anchorElMessages)}
+          anchorEl={anchorElMessages}
+          onClose={handleCloseMessages}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          PaperProps={{
+            sx: { mt: 1.5, borderRadius: 3, boxShadow: 4, width: 320 },
+          }}
+        >
+          <MessagesCard compact />
+        </Popover>
+
+        {/* ===== Notifications Dropdown ===== */}
+        <IconButton color="inherit" onClick={handleOpenNotifications}>
+          <Badge badgeContent={3} color="error">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+        <Popover
+          open={Boolean(anchorElNotifications)}
+          anchorEl={anchorElNotifications}
+          onClose={handleCloseNotifications}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          PaperProps={{
+            sx: { mt: 1.5, borderRadius: 3, boxShadow: 4, width: 320 },
+          }}
+        >
+          <ActivityFeedCard compact />
+        </Popover>
+
+        {/* Profile Menu */}
+        <ProfileMenu />
       </Toolbar>
     </AppBar>
   );
