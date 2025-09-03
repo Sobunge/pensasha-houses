@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import TenantNavbar from "./TenantNavbar";
 import TenantSidebar from "./TenantSidebar";
+import PaymentIcon from "@mui/icons-material/Payment";
+
 
 // Import cards
 import RentStatusCard from "./RentStatusCard";
@@ -76,6 +78,7 @@ function TenantDashboard() {
 
           <Button
             variant="contained"
+            startIcon={<PaymentIcon />}
             sx={{
               backgroundColor: "#f8b500",
               color: "#111",

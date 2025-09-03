@@ -8,8 +8,13 @@ import {
   ListItem,
   ListItemText,
   Button,
+  ListItemIcon,
 } from "@mui/material";
 import PaymentIcon from "@mui/icons-material/Payment";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 function PaymentsCard() {
   // Placeholder recent payments
@@ -18,6 +23,20 @@ function PaymentsCard() {
     { date: "Jul 2025", amount: "Ksh 12,000", status: "Paid" },
     { date: "Jun 2025", amount: "Ksh 12,000", status: "Paid" },
   ];
+
+  // Choose icon based on status
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "Paid":
+        return <CheckCircleIcon sx={{ color: "#4caf50" }} />;
+      case "Pending":
+        return <HourglassEmptyIcon sx={{ color: "#f8b500" }} />;
+      case "Failed":
+        return <CancelIcon sx={{ color: "#f44336" }} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <Card sx={{ borderRadius: 3, boxShadow: 2, bgcolor: "#fff" }}>
@@ -34,6 +53,7 @@ function PaymentsCard() {
         <List dense>
           {recentPayments.map((payment, index) => (
             <ListItem key={index} sx={{ px: 0 }}>
+              <ListItemIcon>{getStatusIcon(payment.status)}</ListItemIcon>
               <ListItemText
                 primary={`${payment.date} – ${payment.amount}`}
                 secondary={payment.status}
@@ -48,6 +68,7 @@ function PaymentsCard() {
         <Button
           variant="contained"
           size="small"
+          startIcon={<ArrowForwardIcon />}
           sx={{
             mt: 1,
             bgcolor: "#f8b500",
