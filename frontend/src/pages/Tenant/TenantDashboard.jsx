@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box, Toolbar, Typography, Card, Button, Avatar } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PaymentIcon from "@mui/icons-material/Payment";
@@ -25,6 +26,7 @@ function TenantDashboard() {
 
   // Show first 3 properties for desktop
   const visibleDesktop = tenantProperties.slice(0, 3);
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -83,7 +85,7 @@ function TenantDashboard() {
                   fontSize: { xs: "0.9rem", sm: "1rem" },
                   "&:hover": { backgroundColor: "#fef2b2", borderColor: "#f8b500" },
                 }}
-                onClick={() => alert("Navigate to full properties page")}
+                onClick={() => navigate("/tenant/properties")} // <-- Navigate to properties page
               >
                 View All Properties
               </Button>

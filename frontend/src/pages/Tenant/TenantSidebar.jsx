@@ -22,7 +22,7 @@ const drawerWidth = 240;
 
 const tenantMenu = [
   { label: "Dashboard", icon: <DashboardIcon />, link: "/tenant" },
-  { label: "My Properties", icon: <HomeWorkIcon />, link: "/tenant/property" },
+  { label: "My Properties", icon: <HomeWorkIcon />, link: "/tenant/properties" },
   { label: "Rent & Payments", icon: <PaymentIcon />, link: "/tenant/payments" },
   { label: "Maintenance Requests", icon: <BuildIcon />, link: "/tenant/maintenance" },
   { label: "Announcements", icon: <CampaignIcon />, link: "/tenant/announcements" },

@@ -4,6 +4,7 @@ import AppLayout from "./components/AppLayout";
 import ListingsPage from "./pages/ListingsPage/ListingsPage";
 import NotFound from "./pages/NotFoundPage/NotFound";
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
+import PropertiesPage from "./pages/PropertiesPage/PropertiesPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/properties" element={<ListingsPage />} />
           <Route path="/tenant" element={<TenantDashboard />} />
+          <Route path="/tenant/properties" element={<PropertiesPage />} />
 
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
