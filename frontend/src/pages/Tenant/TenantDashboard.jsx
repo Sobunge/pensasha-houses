@@ -17,10 +17,10 @@ function TenantDashboard() {
 
   // Sample tenant properties
   const tenantProperties = [
-    { name: "Sunrise Apartments", unit: "A-203", lease: "Jan 2024 – Dec 2024", rentStatus: "Pending", rentAmount: "Ksh 12,000" },
-    { name: "Pensasha Towers", unit: "B-102", lease: "Feb 2024 – Jan 2025", rentStatus: "Paid", rentAmount: "Ksh 15,000" },
-    { name: "Lakeview Residences", unit: "C-405", lease: "Mar 2024 – Feb 2025", rentStatus: "Pending", rentAmount: "Ksh 18,000" },
-    { name: "Garden Court", unit: "D-110", lease: "Apr 2024 – Mar 2025", rentStatus: "Paid", rentAmount: "Ksh 14,000" },
+    { id: 1, name: "Sunrise Apartments", unit: "A-203", lease: "Jan 2024 – Dec 2024", rentStatus: "Pending", rentAmount: "Ksh 12,000" },
+    { id: 2, name: "Pensasha Towers", unit: "B-102", lease: "Feb 2024 – Jan 2025", rentStatus: "Paid", rentAmount: "Ksh 15,000" },
+    { id: 3, name: "Lakeview Residences", unit: "C-405", lease: "Mar 2024 – Feb 2025", rentStatus: "Pending", rentAmount: "Ksh 18,000" },
+    { id: 4, name: "Garden Court", unit: "D-110", lease: "Apr 2024 – Mar 2025", rentStatus: "Paid", rentAmount: "Ksh 14,000" },
     // ...more properties
   ];
 
@@ -64,8 +64,8 @@ function TenantDashboard() {
         {/* Properties & Rent */}
         <SectionTitle title="Your Properties & Rent" />
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 4 }}>
-          {visibleDesktop.map((property, index) => (
-            <Box key={index} sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}>
+          {visibleDesktop.map((property) => (
+            <Box key={property.id} sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}>
               <PropertyInfoCard property={property} />
             </Box>
           ))}

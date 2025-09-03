@@ -5,6 +5,7 @@ import ListingsPage from "./pages/ListingsPage/ListingsPage";
 import NotFound from "./pages/NotFoundPage/NotFound";
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
 import PropertiesPage from "./pages/PropertiesPage/PropertiesPage";
+import PropertyPage from "./pages/PropertiesPage/PropertyPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/properties" element={<ListingsPage />} />
           <Route path="/tenant" element={<TenantDashboard />} />
           <Route path="/tenant/properties" element={<PropertiesPage />} />
+          <Route path="/tenant/properties/:id" element={<PropertyPage />} />
 
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />

@@ -3,20 +3,26 @@ import { Card, CardContent, Typography, Box, Chip } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import EventIcon from "@mui/icons-material/Event";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { useNavigate } from "react-router-dom";
 
 const PropertyInfoCard = ({ property }) => {
-  const { name, unit, lease, rentStatus, rentAmount } = property;
+  const navigate = useNavigate();
+  const { id, name, unit, lease, rentStatus, rentAmount } = property;
 
   // Determine chip color based on rent status
   const statusColor = rentStatus === "Paid" ? "success" : "warning";
 
+  // Navigate to property page on click
+  const handleClick = () => navigate(`/tenant/properties/${id}`);
+
   return (
     <Card
+      onClick={handleClick}
       sx={{
         borderRadius: 3,
         boxShadow: 2,
-        width: { xs: "100%", sm: 400 }, // full width on mobile, fixed 300px on larger screens
-        maxWidth: 400,                 // ensure it doesn't stretch beyond 300px
+        maxWidth: 400,             // Fixed width
+        cursor: "pointer",         // Pointer on hover
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -46,15 +52,8 @@ const PropertyInfoCard = ({ property }) => {
           </Typography>
         </Box>
 
-        {/* Rent Amount & Status */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mt: 2,
-          }}
-        >
+        {/* Rent & Status */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <AttachMoneyIcon sx={{ fontSize: 18, mr: 0.5, color: "#111" }} />
             <Typography variant="body2" sx={{ fontWeight: 600, color: "#111" }}>
