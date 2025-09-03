@@ -22,9 +22,10 @@ function DocumentsCard() {
           You have <strong>{availableDocs}</strong> documents available.
         </Typography>
 
-        {/* Action */}
+        {/* Action Button with Icon */}
         <Button
           variant="contained"
+          startIcon={<DescriptionIcon />} // Add icon here
           sx={{
             bgcolor: "#f8b500",
             color: "#111",
