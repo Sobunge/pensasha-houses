@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, Typography, Button, Box } from "@mui/material";
+import PaymentIcon from "@mui/icons-material/Payment";
 
 function RentStatusCard() {
   // later you can pass props like rent status, amount, etc.
@@ -25,6 +26,7 @@ function RentStatusCard() {
           <Box>
             <Button
               variant="contained"
+              startIcon={<PaymentIcon />}
               sx={{
                 bgcolor: "#f8b500",
                 color: "#111",
