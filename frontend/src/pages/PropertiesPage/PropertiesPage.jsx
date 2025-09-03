@@ -110,7 +110,7 @@ function PropertiesPage() {
         }}
       >
         {/* Page Title */}
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, pt: 1, textAlign: 'center' }}>
           Your Properties
         </Typography>
 
