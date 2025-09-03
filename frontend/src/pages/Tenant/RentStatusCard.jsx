@@ -1,11 +1,28 @@
 import React from "react";
 import { Card, CardContent, Typography, Button, Box } from "@mui/material";
 import PaymentIcon from "@mui/icons-material/Payment";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
 
 function RentStatusCard() {
-  // later you can pass props like rent status, amount, etc.
-  const rentStatus = "Pending"; 
+  // Example props – later you can fetch this dynamically
+  const rentStatus = "Pending"; // "Pending" | "Paid" | "Overdue"
   const amount = "Ksh 12,000";
+
+  // Pick icon + color based on status
+  const getStatusIcon = () => {
+    switch (rentStatus) {
+      case "Paid":
+        return <CheckCircleIcon sx={{ color: "green" }} />;
+      case "Pending":
+        return <WarningAmberIcon sx={{ color: "#f8b500" }} />;
+      case "Overdue":
+        return <ErrorIcon sx={{ color: "red" }} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <Card
@@ -16,13 +33,21 @@ function RentStatusCard() {
       }}
     >
       <CardContent>
+        {/* Title */}
         <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: "#111" }}>
           Rent Status
         </Typography>
-        <Typography variant="body1" sx={{ mb: 1 }}>
-          {rentStatus} – {amount}
-        </Typography>
-        {rentStatus === "Pending" && (
+
+        {/* Status Row with Icon */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+          {getStatusIcon()}
+          <Typography variant="body1">
+            {rentStatus} – {amount}
+          </Typography>
+        </Box>
+
+        {/* Show button only if Pending/Overdue */}
+        {(rentStatus === "Pending" || rentStatus === "Overdue") && (
           <Box>
             <Button
               variant="contained"
