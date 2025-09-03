@@ -23,12 +23,12 @@ function PropertiesPage() {
       <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
       <TenantSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-      <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, bgcolor: "#f7f7f7", minHeight: "100vh" }}>
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, mt:6, bgcolor: "#f7f7f7", minHeight: "81.11vh" }}>
         <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
           Your Properties
         </Typography>
 
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           {properties.map((property) => (
             <Box key={property.id} sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}>
               <PropertyInfoCard property={property} />

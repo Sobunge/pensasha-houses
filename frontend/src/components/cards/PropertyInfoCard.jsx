@@ -15,7 +15,8 @@ const PropertyInfoCard = ({ property }) => {
       sx={{
         borderRadius: 3,
         boxShadow: 2,
-        height: "100%",
+        width: { xs: "100%", sm: 400 }, // full width on mobile, fixed 300px on larger screens
+        maxWidth: 400,                 // ensure it doesn't stretch beyond 300px
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -24,10 +25,12 @@ const PropertyInfoCard = ({ property }) => {
       }}
     >
       <CardContent sx={{ pb: 2 }}>
+        {/* Property Name */}
         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
           {name}
         </Typography>
 
+        {/* Unit */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
           <HomeIcon sx={{ fontSize: 18, mr: 1, color: "#555" }} />
           <Typography variant="body2" sx={{ color: "#555" }}>
@@ -35,6 +38,7 @@ const PropertyInfoCard = ({ property }) => {
           </Typography>
         </Box>
 
+        {/* Lease */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
           <EventIcon sx={{ fontSize: 18, mr: 1, color: "#555" }} />
           <Typography variant="body2" sx={{ color: "#555" }}>
@@ -42,7 +46,15 @@ const PropertyInfoCard = ({ property }) => {
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2 }}>
+        {/* Rent Amount & Status */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mt: 2,
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <AttachMoneyIcon sx={{ fontSize: 18, mr: 0.5, color: "#111" }} />
             <Typography variant="body2" sx={{ fontWeight: 600, color: "#111" }}>

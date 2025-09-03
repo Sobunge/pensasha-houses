@@ -63,7 +63,7 @@ function TenantDashboard() {
 
         {/* Properties & Rent */}
         <SectionTitle title="Your Properties & Rent" />
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 4 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 4 }}>
           {visibleDesktop.map((property, index) => (
             <Box key={index} sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}>
               <PropertyInfoCard property={property} />
