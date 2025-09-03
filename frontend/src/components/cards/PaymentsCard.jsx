@@ -44,7 +44,7 @@ function PaymentsCard() {
         {/* Title with Icon */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <PaymentIcon sx={{ color: "#f8b500" }} />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111" }}>
             Payments History
           </Typography>
         </Box>

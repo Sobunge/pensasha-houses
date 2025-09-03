@@ -28,14 +28,14 @@ function AnnouncementsCard() {
         {/* Title with Icon */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
           <CampaignIcon sx={{ color: "#f8b500" }} />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111111" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111111" }}>
             Announcements
           </Typography>
         </Box>
 
         {/* Latest Announcement */}
         <Typography
-          variant="body1"
+          variant="body2"
           sx={{ color: "#555", mb: 2, lineHeight: 1.6 }}
         >
           {latestAnnouncement}

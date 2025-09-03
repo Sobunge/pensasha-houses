@@ -16,7 +16,7 @@ const PropertyMedia = ({ media }) => {
       }}
     >
       {media.map((src, idx) => (
-        <Card key={idx} sx={{ width: 400, borderRadius: 2 }}>
+        <Card key={idx} sx={{ width: 300, borderRadius: 2 }}>
           <img
             src={src}
             alt={`Property media ${idx}`}

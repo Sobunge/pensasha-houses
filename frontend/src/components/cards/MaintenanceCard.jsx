@@ -19,13 +19,13 @@ function MaintenanceCard() {
         {/* Title Section with Icon */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <BuildIcon sx={{ color: "#f8b500" }} />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111" }}>
             Maintenance Requests
           </Typography>
         </Box>
 
         {/* Status Information */}
-        <Typography variant="body1" sx={{ color: "#555", mb: 2 }}>
+        <Typography variant="body2" sx={{ color: "#555", mb: 2 }}>
           You currently have <strong>{openRequests}</strong> open request
           {openRequests !== 1 && "s"}.
         </Typography>
@@ -33,6 +33,7 @@ function MaintenanceCard() {
         {/* Action Button with + Icon */}
         <Button
           variant="contained"
+          size="small"
           startIcon={<AddIcon />} // Use plus icon here
           sx={{
             bgcolor: "#f8b500",

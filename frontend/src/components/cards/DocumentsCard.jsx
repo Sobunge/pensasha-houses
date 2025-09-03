@@ -12,19 +12,20 @@ function DocumentsCard() {
         {/* Title with Icon */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <DescriptionIcon sx={{ color: "#f8b500" }} />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111" }}>
             Documents
           </Typography>
         </Box>
 
         {/* Document Info */}
-        <Typography variant="body1" sx={{ color: "#555", mb: 2 }}>
+        <Typography variant="body2" sx={{ color: "#555", mb: 2 }}>
           You have <strong>{availableDocs}</strong> documents available.
         </Typography>
 
         {/* Action Button with Icon */}
         <Button
           variant="contained"
+          size="small"
           startIcon={<DescriptionIcon />} // Add icon here
           sx={{
             bgcolor: "#f8b500",

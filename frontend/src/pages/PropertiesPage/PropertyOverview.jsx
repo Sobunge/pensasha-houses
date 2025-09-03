@@ -11,7 +11,7 @@ const PropertyOverview = ({ property }) => {
       {/* Landlord Info */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
-          <Typography variant="h6" sx={{ mb: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
             Landlord Info
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -38,7 +38,7 @@ const PropertyOverview = ({ property }) => {
       {property.caretaker && (
         <Card sx={{ mb: 2 }}>
           <CardContent>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
               Caretaker Info
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -65,7 +65,7 @@ const PropertyOverview = ({ property }) => {
       {/* Rent Details */}
       <Card>
         <CardContent>
-          <Typography variant="h6" sx={{ mb: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
             Rent Details
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
