@@ -37,7 +37,8 @@ function TenantSidebar({ mobileOpen, onClose }) {
     <Box
       sx={{
         height: "100%",
-        bgcolor: "#f7f7f7",
+        bgcolor: "#111", // 🔥 Black background
+        color: "#fff", // Default text color white
         display: "flex",
         flexDirection: "column",
       }}
@@ -58,12 +59,12 @@ function TenantSidebar({ mobileOpen, onClose }) {
           alt="Pensasha Logo"
           sx={{ height: 30 }}
         />
-        <Typography variant="h6" sx={{ fontWeight: 600, color: "#111111" }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, color: "#fff" }}>
           Pensasha Houses
         </Typography>
       </Box>
 
-      <Divider />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
       {/* Navigation Menu */}
       <List sx={{ flexGrow: 1, p: 1 }}>
@@ -74,15 +75,15 @@ function TenantSidebar({ mobileOpen, onClose }) {
             href={item.link}
             sx={{
               borderRadius: 1,
-              color: "#2a2a2a",
+              color: "#ddd",
               "&:hover": {
-                backgroundColor: "#fff6e0",
-                color: "#f8b500",
+                backgroundColor: "#222", // Dark gray hover
+                color: "#f8b500", // Accent color
                 "& .MuiListItemIcon-root": { color: "#f8b500" },
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 40, color: "#2a2a2a" }}>
+            <ListItemIcon sx={{ minWidth: 40, color: "#aaa" }}>
               {item.icon}
             </ListItemIcon>
             <ListItemText
@@ -99,7 +100,7 @@ function TenantSidebar({ mobileOpen, onClose }) {
           p: 2,
           textAlign: "center",
           fontSize: "0.8rem",
-          color: "#777",
+          color: "rgba(255,255,255,0.6)",
         }}
       >
         © {new Date().getFullYear()} Pensasha Houses
