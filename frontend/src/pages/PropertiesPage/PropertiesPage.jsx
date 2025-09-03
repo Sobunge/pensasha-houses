@@ -11,12 +11,84 @@ function PropertiesPage() {
 
   // Example properties (replace with API data)
   const properties = [
-    { id: 1, name: "Sunrise Apartments", unit: "A-203", lease: "Jan 2024 – Dec 2024", rentStatus: "Pending", rentAmount: "Ksh 12,000" },
-    { id: 2, name: "Pensasha Towers", unit: "B-102", lease: "Feb 2024 – Jan 2025", rentStatus: "Paid", rentAmount: "Ksh 15,000" },
-    { id: 3, name: "Lakeview Residences", unit: "C-405", lease: "Mar 2024 – Feb 2025", rentStatus: "Pending", rentAmount: "Ksh 18,000" },
-    { id: 4, name: "Garden Court", unit: "D-110", lease: "Apr 2024 – Mar 2025", rentStatus: "Paid", rentAmount: "Ksh 14,000" },
-    // ... more properties
-  ];
+  {
+    id: 1,
+    name: "Sunrise Apartments",
+    unit: "A-203",
+    lease: "Jan 2024 – Dec 2024",
+    rentStatus: "Pending",
+    rentAmount: "Ksh 12,000",
+    landlord: { name: "John Doe", email: "john@example.com", phone: "0712345678" },
+    caretaker: { name: "James Mwangi", email: "james@example.com", phone: "0711002000" },
+    documents: ["Lease.pdf"],
+    payments: [{ month: "Jan", amount: "Ksh 12,000", status: "Pending" }],
+    maintenance: [{ issue: "Leaky faucet", status: "Resolved" }],
+    media: [
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg"
+    ],
+  },
+  {
+    id: 2,
+    name: "Pensasha Towers",
+    unit: "B-102",
+    lease: "Feb 2024 – Jan 2025",
+    rentStatus: "Paid",
+    rentAmount: "Ksh 15,000",
+    landlord: { name: "Jane Smith", email: "jane@example.com", phone: "0723456789" },
+    caretaker: { name: "Mary Otieno", email: "mary@example.com", phone: "0722003000" },
+    documents: ["Lease.pdf"],
+    payments: [{ month: "Feb", amount: "Ksh 15,000", status: "Paid" }],
+    maintenance: [{ issue: "Broken window", status: "Pending" }],
+    media: [
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg"
+    ],
+  },
+  {
+    id: 3,
+    name: "Lakeview Residences",
+    unit: "C-405",
+    lease: "Mar 2024 – Feb 2025",
+    rentStatus: "Pending",
+    rentAmount: "Ksh 18,000",
+    landlord: { name: "Mike Johnson", email: "mike@example.com", phone: "0734567890" },
+    caretaker: { name: "Peter Njoroge", email: "peter@example.com", phone: "0733004000" },
+    documents: ["Lease.pdf"],
+    payments: [{ month: "Mar", amount: "Ksh 18,000", status: "Pending" }],
+    maintenance: [{ issue: "Clogged drain", status: "Resolved" }],
+    media: [
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg"
+    ],
+  },
+  {
+    id: 4,
+    name: "Garden Court",
+    unit: "D-110",
+    lease: "Apr 2024 – Mar 2025",
+    rentStatus: "Paid",
+    rentAmount: "Ksh 14,000",
+    landlord: { name: "Sarah Lee", email: "sarah@example.com", phone: "0745678901" },
+    caretaker: { name: "Lucy Wambui", email: "lucy@example.com", phone: "0744005000" },
+    documents: ["Lease.pdf"],
+    payments: [{ month: "Apr", amount: "Ksh 14,000", status: "Paid" }],
+    maintenance: [{ issue: "Broken door", status: "Pending" }],
+    media: [
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg",
+      "/assets/images/house.jpg"
+    ],
+  },
+];
+
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -43,7 +115,7 @@ function PropertiesPage() {
         </Typography>
 
         {/* Property Cards */}
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2}}>
           {properties.map((property) => (
             <Box
               key={property.id}
