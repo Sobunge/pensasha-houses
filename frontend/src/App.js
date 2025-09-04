@@ -7,6 +7,7 @@ import TenantDashboard from "./pages/Tenant/TenantDashboard";
 import PropertiesPage from "./pages/PropertiesPage/PropertiesPage";
 import PropertyPage from "./pages/PropertiesPage/PropertyPage";
 import AnnouncementsPage from "./pages/AnnouncementPage/AnnouncementsPage";
+import MessagesPage from "./pages/MessagesPage/MessagesPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/tenant/properties" element={<PropertiesPage />} />
           <Route path="/tenant/properties/:id" element={<PropertyPage />} />
           <Route path="/tenant/announcements" element={<AnnouncementsPage />} />
+          <Route path="/tenant/messages" element={<MessagesPage />} />
 
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
