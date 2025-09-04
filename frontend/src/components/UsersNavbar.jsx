@@ -14,7 +14,6 @@ import MailIcon from "@mui/icons-material/Mail";
 import ProfileMenu from "../pages/Tenant/ProfileMenu";
 import ActivityFeedCard from "./cards/ActivityFeedCard";
 import MessagesCard from "./cards/MessagesCard";
-import { useNavigate } from "react-router-dom";
 
 // Sample messages (replace with actual state from backend)
 const sampleMessages = [
@@ -27,8 +26,6 @@ const sampleMessages = [
 function UsersNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
   const [anchorElMessages, setAnchorElMessages] = useState(null);
-
-  const navigate = useNavigate();
 
   // Notifications popover
   const handleOpenNotifications = (event) => setAnchorElNotifications(event.currentTarget);
