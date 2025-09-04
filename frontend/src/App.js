@@ -9,6 +9,7 @@ import PropertyPage from "./pages/PropertiesPage/PropertyPage";
 import AnnouncementsPage from "./pages/AnnouncementPage/AnnouncementsPage";
 import MessagesPage from "./pages/MessagesPage/MessagesPage";
 import ConversationPage from "./pages/MessagesPage/ConversationPage";
+import DocumentsPage from "./pages/DocumentPage/DocumentsPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/tenant/announcements" element={<AnnouncementsPage />} />
           <Route path="/tenant/messages" element={<MessagesPage />} />
           <Route path="/tenant/messages/:id" element={<ConversationPage />} />
+          <Route path="/tenant/documents" element={<DocumentsPage />} />
 
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
