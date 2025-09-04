@@ -58,7 +58,16 @@ function TenantSidebar({ mobileOpen, onClose }) {
       {/* Navigation */}
       <List sx={{ flexGrow: 1, p: 1 }}>
         {tenantMenu.map((item) => {
-          const isActive = location.pathname === item.link;
+          let isActive = false;
+
+          if (item.link === "/tenant") {
+            // Dashboard only active on exact path
+            isActive = location.pathname === item.link;
+          } else {
+            // Other items active if exact or subpath
+            isActive =
+              location.pathname === item.link || location.pathname.startsWith(item.link + "/");
+          }
 
           return (
             <ListItemButton
@@ -84,7 +93,7 @@ function TenantSidebar({ mobileOpen, onClose }) {
                 primary={item.label}
                 primaryTypographyProps={{
                   fontWeight: isActive ? 600 : 500,
-                  fontSize: "0.875rem", // smaller font size
+                  fontSize: "0.875rem",
                 }}
               />
             </ListItemButton>
