@@ -8,7 +8,6 @@ import {
   Divider,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 
@@ -18,11 +17,17 @@ function ProfileMenu() {
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
+  const hoverStyle = {
+    backgroundColor: "#f8b500", // light gold
+    color: "#111",
+    "& .MuiListItemIcon-root": { color: "#111" },
+  };
+
   return (
     <>
       {/* Profile Icon Button */}
       <IconButton color="inherit" onClick={handleOpen}>
-        <AccountCircleIcon />
+        <AccountCircleIcon sx={{ fontSize: 28, color: "#111" }} />
       </IconButton>
 
       {/* Dropdown Menu */}
@@ -35,36 +40,51 @@ function ProfileMenu() {
             mt: 1.5,
             borderRadius: 2,
             minWidth: 200,
-            boxShadow: 3,
+            boxShadow: 4,
+            bgcolor: "#fff", // white background
+            color: "#111",   // black text
           },
         }}
       >
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
+        {/* My Profile */}
+        <MenuItem
+          onClick={handleClose}
+          sx={{
+            px: 2,
+            py: 1,
+            transition: "background-color 0.3s",
+            "&:hover": hoverStyle,
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 36 }}>
             <PersonIcon fontSize="small" />
           </ListItemIcon>
-          <Typography variant="body2">My Profile</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            My Profile
+          </Typography>
         </MenuItem>
 
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <SettingsIcon fontSize="small" />
-          </ListItemIcon>
-          <Typography variant="body2">Settings</Typography>
-        </MenuItem>
+        <Divider sx={{ borderColor: "#eee" }} />
 
-        <Divider />
-
+        {/* Logout */}
         <MenuItem
           onClick={() => {
             handleClose();
             console.log("Logout clicked");
           }}
+          sx={{
+            px: 2,
+            py: 1,
+            transition: "background-color 0.3s",
+            "&:hover": hoverStyle,
+          }}
         >
-          <ListItemIcon>
+          <ListItemIcon sx={{ minWidth: 36 }}>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <Typography variant="body2">Logout</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            Logout
+          </Typography>
         </MenuItem>
       </Menu>
     </>
