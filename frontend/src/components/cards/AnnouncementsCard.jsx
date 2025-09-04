@@ -8,6 +8,7 @@ import {
   Divider,
 } from "@mui/material";
 import CampaignIcon from "@mui/icons-material/Campaign";
+import { Link } from "react-router-dom";
 
 function AnnouncementsCard() {
   // Placeholder data
@@ -46,6 +47,8 @@ function AnnouncementsCard() {
       <Divider />
       <Box sx={{ p: 2, textAlign: "right" }}>
         <Button
+          component={Link}
+          to="/tenant/announcements"
           size="small"
           sx={{
             color: "#f8b500",
