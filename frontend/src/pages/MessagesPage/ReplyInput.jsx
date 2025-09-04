@@ -1,6 +1,6 @@
 // src/pages/MessagesPage/ReplyInput.jsx
 import React, { useState } from "react";
-import { Box, TextField, IconButton, Paper } from "@mui/material";
+import { TextField, IconButton, Paper } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
 function ReplyInput({ onSend }) {
