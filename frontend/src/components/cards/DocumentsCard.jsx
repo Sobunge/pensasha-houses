@@ -1,10 +1,15 @@
 import React from "react";
 import { Card, CardContent, Typography, Button, Box } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
+import { useNavigate } from "react-router-dom";
 
 function DocumentsCard() {
-  // Placeholder count
+  const navigate = useNavigate();
   const availableDocs = 3;
+
+  const handleNavigate = () => {
+    navigate("/tenant/documents");
+  };
 
   return (
     <Card sx={{ borderRadius: 3, boxShadow: 2, bgcolor: "#fff" }}>
@@ -22,11 +27,12 @@ function DocumentsCard() {
           You have <strong>{availableDocs}</strong> documents available.
         </Typography>
 
-        {/* Action Button with Icon */}
+        {/* Action Button */}
         <Button
           variant="contained"
           size="small"
-          startIcon={<DescriptionIcon />} // Add icon here
+          startIcon={<DescriptionIcon />}
+          onClick={handleNavigate} // Navigate to documents page
           sx={{
             bgcolor: "#f8b500",
             color: "#111",
