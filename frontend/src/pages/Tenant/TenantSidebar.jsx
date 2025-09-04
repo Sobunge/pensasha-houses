@@ -1,3 +1,4 @@
+// src/components/TenantSidebar.jsx
 import React from "react";
 import {
   Box,
@@ -17,6 +18,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import BuildIcon from "@mui/icons-material/Build";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import DescriptionIcon from "@mui/icons-material/Description";
+import MailIcon from "@mui/icons-material/Mail";
 
 const drawerWidth = 240;
 
@@ -24,13 +26,14 @@ const tenantMenu = [
   { label: "Dashboard", icon: <DashboardIcon />, link: "/tenant" },
   { label: "My Properties", icon: <HomeWorkIcon />, link: "/tenant/properties" },
   { label: "Rent & Payments", icon: <PaymentIcon />, link: "/tenant/payments" },
+  { label: "Messages", icon: <MailIcon />, link: "/tenant/messages" },
   { label: "Maintenance Requests", icon: <BuildIcon />, link: "/tenant/maintenance" },
   { label: "Announcements", icon: <CampaignIcon />, link: "/tenant/announcements" },
   { label: "Documents", icon: <DescriptionIcon />, link: "/tenant/documents" },
 ];
 
 function TenantSidebar({ mobileOpen, onClose }) {
-  const location = useLocation(); // Get current path
+  const location = useLocation();
 
   const drawerContent = (
     <Box
@@ -55,17 +58,17 @@ function TenantSidebar({ mobileOpen, onClose }) {
       {/* Navigation */}
       <List sx={{ flexGrow: 1, p: 1 }}>
         {tenantMenu.map((item) => {
-          const isActive = location.pathname === item.link; // Check if this item is active
+          const isActive = location.pathname === item.link;
 
           return (
             <ListItemButton
               key={item.label}
-              component={Link} // Use React Router Link
+              component={Link}
               to={item.link}
-              onClick={onClose} // Close drawer on mobile
+              onClick={onClose}
               sx={{
                 borderRadius: 1,
-                color: isActive ? "#f8b500" : "#ddd", // Active color
+                color: isActive ? "#f8b500" : "#ddd",
                 backgroundColor: isActive ? "#222" : "transparent",
                 "&:hover": {
                   backgroundColor: "#222",
@@ -79,7 +82,10 @@ function TenantSidebar({ mobileOpen, onClose }) {
               </ListItemIcon>
               <ListItemText
                 primary={item.label}
-                primaryTypographyProps={{ fontWeight: isActive ? 600 : 500 }}
+                primaryTypographyProps={{
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: "0.875rem", // smaller font size
+                }}
               />
             </ListItemButton>
           );
