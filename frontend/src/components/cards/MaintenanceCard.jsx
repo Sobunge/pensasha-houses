@@ -1,11 +1,16 @@
 import React from "react";
 import { Card, CardContent, Typography, Button, Box } from "@mui/material";
 import BuildIcon from "@mui/icons-material/Build";
-import AddIcon from "@mui/icons-material/Add"; // Import plus icon
+import VisibilityIcon from "@mui/icons-material/Visibility"; // Icon for button
+import { useNavigate } from "react-router-dom";
 
 function MaintenanceCard() {
-  // Number of open maintenance requests
+  const navigate = useNavigate();
   const openRequests = 2;
+
+  const handleNavigate = () => {
+    navigate("/tenant/maintenance-requests");
+  };
 
   return (
     <Card
@@ -30,11 +35,12 @@ function MaintenanceCard() {
           {openRequests !== 1 && "s"}.
         </Typography>
 
-        {/* Action Button with + Icon */}
+        {/* Action Button */}
         <Button
           variant="contained"
           size="small"
-          startIcon={<AddIcon />} // Use plus icon here
+          startIcon={<VisibilityIcon />} // Added icon
+          onClick={handleNavigate}
           sx={{
             bgcolor: "#f8b500",
             color: "#111",
@@ -44,7 +50,7 @@ function MaintenanceCard() {
             "&:hover": { bgcolor: "#c59000" },
           }}
         >
-          New Request
+          View Requests
         </Button>
       </CardContent>
     </Card>

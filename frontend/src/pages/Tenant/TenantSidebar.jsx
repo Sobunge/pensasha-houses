@@ -27,7 +27,7 @@ const tenantMenu = [
   { label: "My Properties", icon: <HomeWorkIcon />, link: "/tenant/properties" },
   { label: "Rent & Payments", icon: <PaymentIcon />, link: "/tenant/payments" },
   { label: "Messages", icon: <MailIcon />, link: "/tenant/messages" },
-  { label: "Maintenance Requests", icon: <BuildIcon />, link: "/tenant/maintenance" },
+  { label: "Maintenance Requests", icon: <BuildIcon />, link: "/tenant/maintenance-requests" },
   { label: "Announcements", icon: <CampaignIcon />, link: "/tenant/announcements" },
   { label: "Documents", icon: <DescriptionIcon />, link: "/tenant/documents" },
 ];
