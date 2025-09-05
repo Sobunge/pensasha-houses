@@ -12,6 +12,7 @@ import ConversationPage from "./pages/MessagesPage/ConversationPage";
 import DocumentsPage from "./pages/DocumentPage/DocumentsPage";
 import MaintenanceRequestsPage from "./pages/MaintenanceRequestPage/MaintenanceRequestsPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage/ActivityFeedPage";
+import RentPaymentsPage from "./pages/RentPaymentPage/RentPaymentsPage";
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/tenant/documents" element={<DocumentsPage />} />
           <Route path="/tenant/maintenance-requests" element={<MaintenanceRequestsPage />} />
           <Route path="/tenant/activities" element={<ActivityFeedPage />} />
+          <Route path="/tenant/rent-payments" element={<RentPaymentsPage />} />
 
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
