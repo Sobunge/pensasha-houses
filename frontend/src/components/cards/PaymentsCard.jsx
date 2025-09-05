@@ -10,6 +10,7 @@ import {
   Button,
   ListItemIcon,
 } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import PaymentIcon from "@mui/icons-material/Payment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
@@ -17,14 +18,12 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 function PaymentsCard() {
-  // Placeholder recent payments
   const recentPayments = [
     { date: "Aug 2025", amount: "Ksh 12,000", status: "Paid" },
     { date: "Jul 2025", amount: "Ksh 12,000", status: "Paid" },
     { date: "Jun 2025", amount: "Ksh 12,000", status: "Paid" },
   ];
 
-  // Choose icon based on status
   const getStatusIcon = (status) => {
     switch (status) {
       case "Paid":
@@ -41,7 +40,7 @@ function PaymentsCard() {
   return (
     <Card sx={{ borderRadius: 3, boxShadow: 2, bgcolor: "#fff" }}>
       <CardContent>
-        {/* Title with Icon */}
+        {/* Title */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <PaymentIcon sx={{ color: "#f8b500" }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111" }}>
@@ -49,7 +48,7 @@ function PaymentsCard() {
           </Typography>
         </Box>
 
-        {/* Recent Payments List */}
+        {/* Recent Payments */}
         <List dense>
           {recentPayments.map((payment, index) => (
             <ListItem key={index} sx={{ px: 0 }}>
@@ -64,8 +63,10 @@ function PaymentsCard() {
           ))}
         </List>
 
-        {/* Action */}
+        {/* View All Button */}
         <Button
+          component={RouterLink}
+          to="/tenant/rent-payments"
           variant="contained"
           size="small"
           startIcon={<ArrowForwardIcon />}
