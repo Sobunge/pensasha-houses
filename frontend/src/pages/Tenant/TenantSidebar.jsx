@@ -19,6 +19,7 @@ import BuildIcon from "@mui/icons-material/Build";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import DescriptionIcon from "@mui/icons-material/Description";
 import MailIcon from "@mui/icons-material/Mail";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 
 const drawerWidth = 240;
 
@@ -28,6 +29,7 @@ const tenantMenu = [
   { label: "Rent & Payments", icon: <PaymentIcon />, link: "/tenant/payments" },
   { label: "Messages", icon: <MailIcon />, link: "/tenant/messages" },
   { label: "Maintenance Requests", icon: <BuildIcon />, link: "/tenant/maintenance-requests" },
+  { label: "Activities", icon: <NotificationsActiveIcon />, link: "/tenant/activities" },
   { label: "Announcements", icon: <CampaignIcon />, link: "/tenant/announcements" },
   { label: "Documents", icon: <DescriptionIcon />, link: "/tenant/documents" },
 ];
