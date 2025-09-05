@@ -11,6 +11,8 @@ import MessagesPage from "./pages/MessagesPage/MessagesPage";
 import ConversationPage from "./pages/MessagesPage/ConversationPage";
 import DocumentsPage from "./pages/DocumentPage/DocumentsPage";
 import MaintenanceRequestsPage from "./pages/MaintenanceRequestPage/MaintenanceRequestsPage";
+import ActivityFeedPage from "./pages/ActivityFeedPage/ActivityFeedPage";
+
 
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
           <Route path="/tenant/messages/:id" element={<ConversationPage />} />
           <Route path="/tenant/documents" element={<DocumentsPage />} />
           <Route path="/tenant/maintenance-requests" element={<MaintenanceRequestsPage />} />
+          <Route path="/tenant/activities" element={<ActivityFeedPage />} />
 
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
