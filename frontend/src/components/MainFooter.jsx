@@ -15,23 +15,18 @@ function MainFooter() {
     >
       <Container>
         <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
+          direction="column"
+          spacing={1.5}
           alignItems="center"
-          justifyContent="space-between"
-          textAlign={{ xs: "center", sm: "left" }}
+          textAlign="center"
         >
           {/* Copyright */}
           <Typography variant="body2" sx={{ color: "#BDBDBD" }}>
-            &copy; {new Date().getFullYear()}{" "}
-            <Box component="span" sx={{ color: "#f8b500", fontWeight: 600 }}>
-              Pensasha Houses
-            </Box>{" "}
-            · All rights reserved
+            All rights reserved
           </Typography>
 
           {/* Quick Links */}
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={2} justifyContent="center">
             <Link
               href="#"
               underline="hover"
