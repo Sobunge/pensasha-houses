@@ -13,6 +13,7 @@ import DocumentsPage from "./pages/DocumentPage/DocumentsPage";
 import MaintenanceRequestsPage from "./pages/MaintenanceRequestPage/MaintenanceRequestsPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage/ActivityFeedPage";
 import RentPaymentsPage from "./pages/RentPaymentPage/RentPaymentsPage";
+import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/tenant/maintenance-requests" element={<MaintenanceRequestsPage />} />
           <Route path="/tenant/activities" element={<ActivityFeedPage />} />
           <Route path="/tenant/rent-payments" element={<RentPaymentsPage />} />
+          <Route path="/tenant/user-profile" element={<UserProfilePage />} />
 
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />

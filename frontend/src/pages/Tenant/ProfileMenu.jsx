@@ -7,6 +7,7 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
@@ -42,12 +43,14 @@ function ProfileMenu() {
             minWidth: 200,
             boxShadow: 4,
             bgcolor: "#fff", // white background
-            color: "#111",   // black text
+            color: "#111", // black text
           },
         }}
       >
-        {/* My Profile */}
+        {/* My Profile (links to /tenant/user-profile) */}
         <MenuItem
+          component={Link}
+          to="/tenant/user-profile"
           onClick={handleClose}
           sx={{
             px: 2,

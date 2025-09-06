@@ -20,11 +20,13 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import DescriptionIcon from "@mui/icons-material/Description";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import PersonIcon from "@mui/icons-material/Person";
 
 const drawerWidth = 240;
 
 const tenantMenu = [
   { label: "Dashboard", icon: <DashboardIcon />, link: "/tenant" },
+  { label: "My Profile", icon: <PersonIcon />, link: "/tenant/user-profile" },
   { label: "My Properties", icon: <HomeWorkIcon />, link: "/tenant/properties" },
   { label: "Rent & Payments", icon: <PaymentIcon />, link: "/tenant/rent-payments" },
   { label: "Messages", icon: <MailIcon />, link: "/tenant/messages" },
