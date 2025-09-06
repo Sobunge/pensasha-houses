@@ -13,6 +13,8 @@ import {
   ListItem,
   ListItemText,
   useMediaQuery,
+  useTheme,
+  Toolbar,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import EmailIcon from "@mui/icons-material/Email";
@@ -24,18 +26,19 @@ import PeopleIcon from "@mui/icons-material/People";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useTheme } from "@mui/material/styles";
 
-// ✅ Layout components
+// Components
 import UsersNavbar from "../../components/UsersNavbar";
 import TenantSidebar from "../Tenant/TenantSidebar";
-
-// ✅ Edit Dialog
 import EditProfileDialog from "./EditProfileDialog";
 
 function UserProfilePage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Sidebar state
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const toggleSidebar = () => setMobileOpen(!mobileOpen);
 
   const [user, setUser] = useState({
     name: "Jane Doe",
@@ -46,7 +49,6 @@ function UserProfilePage() {
   });
 
   const [openEdit, setOpenEdit] = useState(false);
-
   const handleEditOpen = () => setOpenEdit(true);
   const handleEditClose = () => setOpenEdit(false);
 
@@ -81,21 +83,19 @@ function UserProfilePage() {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "93.33vh", bgcolor: "#f5f6fa" }}>
-      {!isMobile && <TenantSidebar />}
-      <Box sx={{ flexGrow: 1 }}>
-        <UsersNavbar />
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f6fa" }}>
+      {/* Sidebar */}
+      <TenantSidebar mobileOpen={mobileOpen} onClose={toggleSidebar} />
 
-        <Box sx={{ p: { xs: 2, sm: 3 }, mt: 8 }}>
-          {/* ✅ Page Title */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center", // ✅ always centered
-              mb: 3,
-            }}
-          >
+      {/* Main Content */}
+      <Box sx={{ flexGrow: 1 }}>
+        {/* Navbar */}
+        <UsersNavbar onMenuClick={toggleSidebar} />
+        <Toolbar />
+
+        <Box sx={{ p: { xs: 2, sm: 3 }, mt: 2 }}>
+          {/* Page Title */}
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mb: 3 }}>
             <AccountCircleIcon sx={{ fontSize: 32, color: "#f8b500", mr: 1 }} />
             <Typography variant="h5" fontWeight={700} sx={{ color: "#111" }}>
               Profile
@@ -113,13 +113,9 @@ function UserProfilePage() {
                 gap: 2,
               }}
             >
-              <Avatar sx={{ bgcolor: "#f8b500", width: 64, height: 64 }}>
-                {user.name.charAt(0)}
-              </Avatar>
+              <Avatar sx={{ bgcolor: "#f8b500", width: 64, height: 64 }}>{user.name.charAt(0)}</Avatar>
               <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" fontWeight={600}>
-                  {user.name}
-                </Typography>
+                <Typography variant="h6" fontWeight={600}>{user.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   {user.role} • Joined {user.joinDate}
                 </Typography>
@@ -129,13 +125,7 @@ function UserProfilePage() {
                 variant="contained"
                 startIcon={<EditIcon />}
                 onClick={handleEditOpen}
-                sx={{
-                  bgcolor: "#f8b500",
-                  color: "#111",
-                  textTransform: "none",
-                  borderRadius: 2,
-                  "&:hover": { bgcolor: "#c59000" },
-                }}
+                sx={{ bgcolor: "#f8b500", color: "#111", textTransform: "none", borderRadius: 2, "&:hover": { bgcolor: "#c59000" } }}
               >
                 Edit Profile
               </Button>
@@ -166,18 +156,26 @@ function UserProfilePage() {
             </CardContent>
           </Card>
 
-          {/* Quick Stats */}
+          {/* Quick Stats with hover effect */}
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             {getQuickStats().map((stat, idx) => (
-              <Card key={idx} sx={{ flex: 1, borderRadius: 3, boxShadow: 2 }}>
+              <Card
+                key={idx}
+                sx={{
+                  flex: 1,
+                  borderRadius: 3,
+                  boxShadow: 2,
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: 6,
+                  },
+                }}
+              >
                 <CardContent sx={{ textAlign: "center" }}>
                   {stat.icon}
-                  <Typography variant="h6" fontWeight={600} sx={{ mt: 1 }}>
-                    {stat.value}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {stat.label}
-                  </Typography>
+                  <Typography variant="h6" fontWeight={600} sx={{ mt: 1 }}>{stat.value}</Typography>
+                  <Typography variant="body2" color="text.secondary">{stat.label}</Typography>
                 </CardContent>
               </Card>
             ))}
@@ -185,7 +183,7 @@ function UserProfilePage() {
         </Box>
       </Box>
 
-      {/* ✅ Edit Profile Dialog */}
+      {/* Edit Profile Dialog */}
       <EditProfileDialog
         open={openEdit}
         handleClose={handleEditClose}

@@ -19,6 +19,10 @@ function RentPaymentsPage() {
   const [filters, setFilters] = useState({ search: "", status: "", method: "" });
   const [selectedPayment, setSelectedPayment] = useState(null);
 
+  // ✅ Sidebar state
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const toggleSidebar = () => setMobileOpen(!mobileOpen);
+
   // Handlers
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -30,31 +34,29 @@ function RentPaymentsPage() {
   const handlePay = (updatedPayment) =>
     setPayments((prev) => prev.map((p) => (p.id === updatedPayment.id ? updatedPayment : p)));
 
-  // Filter logic: search by invoiceNo, period, or dueDate
   const filteredPayments = payments.filter((p) => {
     const searchLower = filters.search.toLowerCase();
-
     const matchSearch = filters.search
-      ? p.invoiceNo.toLowerCase().includes(searchLower) || // invoice number
-        p.period.toLowerCase().includes(searchLower) ||    // month/period
-        p.dueDate.includes(filters.search)                // exact date (YYYY-MM-DD)
+      ? p.invoiceNo.toLowerCase().includes(searchLower) ||
+        p.period.toLowerCase().includes(searchLower) ||
+        p.dueDate.includes(filters.search)
       : true;
-
     const matchStatus = filters.status ? p.status === filters.status : true;
     const matchMethod = filters.method ? p.method === filters.method : true;
-
     return matchSearch && matchStatus && matchMethod;
   });
 
   return (
-    <Box sx={{ display: "flex", height: "93.40vh", bgcolor: "#f5f6fa" }}>
-      <TenantSidebar />
+    <Box sx={{ display: "flex", height: "93.4vh", bgcolor: "#f5f6fa" }}>
+      {/* Sidebar */}
+      <TenantSidebar mobileOpen={mobileOpen} onClose={toggleSidebar} />
+
+      {/* Main Content */}
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-        <UsersNavbar />
+        <UsersNavbar onMenuClick={toggleSidebar} />
 
         {/* Page Content */}
         <Box sx={{ p: 3, flexGrow: 1, overflowY: "auto", mt: 8 }}>
-          {/* Centered Title with Icon */}
           <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{ mb: 2 }}>
             <PaymentsIcon sx={{ color: "#1976d2", fontSize: 30 }} />
             <Typography variant="h5" fontWeight="bold">

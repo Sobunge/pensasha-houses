@@ -11,9 +11,11 @@ import { Link as RouterLink } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
+import { useNotification } from "../../components/NotificationProvider";
 
 function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
+  const { notify } = useNotification(); // hook must be inside component
 
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -22,6 +24,11 @@ function ProfileMenu() {
     backgroundColor: "#f8b500",
     color: "#111",
     "& .MuiListItemIcon-root": { color: "#111" },
+  };
+
+  const handleLogout = () => {
+    handleClose();
+    notify("You have logged out successfully!", "success"); // success alert
   };
 
   return (
@@ -66,9 +73,9 @@ function ProfileMenu() {
 
         {/* Logout */}
         <MenuItem
-          onClick={handleClose}
           component={RouterLink}
           to="/"
+          onClick={handleLogout} // call success notification
           sx={{ px: 2, py: 1, transition: "background-color 0.3s", "&:hover": hoverStyle }}
         >
           <ListItemIcon sx={{ minWidth: 36 }}>

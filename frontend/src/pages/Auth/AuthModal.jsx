@@ -13,6 +13,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LoginForm from "../Auth/LoginPage/LoginForm";
 import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
+import { useNotification } from "../../components/NotificationProvider";
 
 function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0);
@@ -24,10 +25,12 @@ function AuthModal({ open, onClose }) {
 
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
+  const { notify } = useNotification();
 
   // This function will be passed to forms
   const handleSuccess = () => {
     onClose?.();        // Close the modal
+    notify("Login successful!", "success");
     navigate("/tenant"); // Redirect to tenant page
   };
 
