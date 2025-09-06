@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 
 function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0);
+  const navigate = useNavigate();
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -22,6 +24,12 @@ function AuthModal({ open, onClose }) {
 
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
+
+  // This function will be passed to forms
+  const handleSuccess = () => {
+    onClose?.();        // Close the modal
+    navigate("/tenant"); // Redirect to tenant page
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -41,16 +49,8 @@ function AuthModal({ open, onClose }) {
           variant="fullWidth"
           sx={{ flex: 1 }}
         >
-          <Tab
-            icon={<LoginIcon />}
-            iconPosition="start"
-            label="Login"
-          />
-          <Tab
-            icon={<PersonAddIcon />}
-            iconPosition="start"
-            label="Sign Up"
-          />
+          <Tab icon={<LoginIcon />} iconPosition="start" label="Login" />
+          <Tab icon={<PersonAddIcon />} iconPosition="start" label="Sign Up" />
         </Tabs>
 
         {/* Close Button */}
@@ -62,10 +62,10 @@ function AuthModal({ open, onClose }) {
       {/* Content */}
       <DialogContent>
         {activeTab === 0 ? (
-          <LoginForm onSuccess={onClose} switchToSignup={switchToSignup} />
+          <LoginForm onSuccess={handleSuccess} switchToSignup={switchToSignup} />
         ) : (
           <RegistrationForm
-            onSuccess={onClose}
+            onSuccess={handleSuccess}
             switchToLogin={switchToLogin}
           />
         )}

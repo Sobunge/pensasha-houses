@@ -7,7 +7,7 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
@@ -19,7 +19,7 @@ function ProfileMenu() {
   const handleClose = () => setAnchorEl(null);
 
   const hoverStyle = {
-    backgroundColor: "#f8b500", // light gold
+    backgroundColor: "#f8b500",
     color: "#111",
     "& .MuiListItemIcon-root": { color: "#111" },
   };
@@ -42,22 +42,17 @@ function ProfileMenu() {
             borderRadius: 2,
             minWidth: 200,
             boxShadow: 4,
-            bgcolor: "#fff", // white background
-            color: "#111", // black text
+            bgcolor: "#fff",
+            color: "#111",
           },
         }}
       >
-        {/* My Profile (links to /tenant/user-profile) */}
+        {/* My Profile */}
         <MenuItem
-          component={Link}
+          component={RouterLink}
           to="/tenant/user-profile"
           onClick={handleClose}
-          sx={{
-            px: 2,
-            py: 1,
-            transition: "background-color 0.3s",
-            "&:hover": hoverStyle,
-          }}
+          sx={{ px: 2, py: 1, transition: "background-color 0.3s", "&:hover": hoverStyle }}
         >
           <ListItemIcon sx={{ minWidth: 36 }}>
             <PersonIcon fontSize="small" />
@@ -71,21 +66,15 @@ function ProfileMenu() {
 
         {/* Logout */}
         <MenuItem
-          onClick={() => {
-            handleClose();
-            console.log("Logout clicked");
-          }}
-          sx={{
-            px: 2,
-            py: 1,
-            transition: "background-color 0.3s",
-            "&:hover": hoverStyle,
-          }}
+          onClick={handleClose}
+          component={RouterLink}
+          to="/"
+          sx={{ px: 2, py: 1, transition: "background-color 0.3s", "&:hover": hoverStyle }}
         >
           <ListItemIcon sx={{ minWidth: 36 }}>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          <Typography variant="body2" sx={{ fontWeight: 500, color: "inherit" }}>
             Logout
           </Typography>
         </MenuItem>
