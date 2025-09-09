@@ -14,6 +14,7 @@ import MaintenanceRequestsPage from "./pages/MaintenanceRequestPage/MaintenanceR
 import ActivityFeedPage from "./pages/ActivityFeedPage/ActivityFeedPage";
 import RentPaymentsPage from "./pages/RentPaymentPage/RentPaymentsPage";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
+import LandlordDashboard from "./pages/LandlordPage/LandlordDashboard";
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route path="/tenant/rent-payments" element={<RentPaymentsPage />} />
           <Route path="/tenant/user-profile" element={<UserProfilePage />} />
 
+          <Route path="/landlord" element={<LandlordDashboard />} />
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
         </Route>
