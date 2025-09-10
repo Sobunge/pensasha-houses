@@ -76,7 +76,7 @@ function LandlordDashboard() {
         >
           <Card
             sx={{
-              mb: 4,
+              mb: 3,
               p: { xs: 2, sm: 3 },
               display: "flex",
               flexWrap: "wrap",
