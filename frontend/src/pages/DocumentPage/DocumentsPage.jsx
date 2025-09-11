@@ -1,7 +1,8 @@
+// src/pages/Documents/DocumentsPage.jsx
 import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import UsersNavbar from "../../components/UsersNavbar";
-import TenantSidebar from "../Tenant/TenantSidebar";
+import UserSidebar from "../../components/UserSidebar"; // ✅ use new sidebar
 import DocumentsList from "./DocumentsList";
 import UploadDocumentForm from "./UploadDocumentForm";
 
@@ -21,7 +22,7 @@ function DocumentsPage() {
       <UsersNavbar onMenuClick={handleDrawerToggle} />
 
       {/* Sidebar */}
-      <TenantSidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
+      <UserSidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
 
       {/* Main Content */}
       <Box

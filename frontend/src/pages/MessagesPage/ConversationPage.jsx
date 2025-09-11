@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, Stack, Typography, Toolbar, Paper } from "@mui/material";
 import UsersNavbar from "../../components/UsersNavbar";
-import TenantSidebar from "../Tenant/TenantSidebar";
+import UserSidebar from "../../components/UserSidebar"; // ✅ replace import
 import MessageBubble from "./MessageBubble";
 import ReplyInput from "./ReplyInput";
 import ChatIcon from "@mui/icons-material/Chat";
@@ -56,7 +56,8 @@ function ConversationPage() {
   return (
     <Box sx={{ display: "flex" }}>
       <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-      <TenantSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} /> 
+      {/* ✅ replaced TenantSidebar */}
 
       <Box
         component="main"

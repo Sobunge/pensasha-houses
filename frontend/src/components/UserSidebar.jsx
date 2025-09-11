@@ -1,4 +1,4 @@
-// src/components/TenantSidebar.jsx
+// src/components/UserSidebar.jsx
 import React from "react";
 import {
   Box,
@@ -12,31 +12,9 @@ import {
 } from "@mui/material";
 import { useLocation, Link } from "react-router-dom";
 
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import HomeWorkIcon from "@mui/icons-material/HomeWork";
-import PaymentIcon from "@mui/icons-material/Payment";
-import BuildIcon from "@mui/icons-material/Build";
-import CampaignIcon from "@mui/icons-material/Campaign";
-import DescriptionIcon from "@mui/icons-material/Description";
-import MailIcon from "@mui/icons-material/Mail";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import PersonIcon from "@mui/icons-material/Person";
-
 const drawerWidth = 240;
 
-const tenantMenu = [
-  { label: "Dashboard", icon: <DashboardIcon />, link: "/tenant" },
-  { label: "My Profile", icon: <PersonIcon />, link: "/tenant/user-profile" },
-  { label: "My Properties", icon: <HomeWorkIcon />, link: "/tenant/properties" },
-  { label: "Rent & Payments", icon: <PaymentIcon />, link: "/tenant/rent-payments" },
-  { label: "Messages", icon: <MailIcon />, link: "/tenant/messages" },
-  { label: "Maintenance Requests", icon: <BuildIcon />, link: "/tenant/maintenance-requests" },
-  { label: "Activities", icon: <NotificationsActiveIcon />, link: "/tenant/activities" },
-  { label: "Announcements", icon: <CampaignIcon />, link: "/tenant/announcements" },
-  { label: "Documents", icon: <DescriptionIcon />, link: "/tenant/documents" },
-];
-
-function TenantSidebar({ mobileOpen, onClose }) {
+function UserSidebar({ mobileOpen, onClose, menuItems }) {
   const location = useLocation();
 
   const drawerContent = (
@@ -61,14 +39,11 @@ function TenantSidebar({ mobileOpen, onClose }) {
 
       {/* Navigation */}
       <List sx={{ flexGrow: 1, p: 1 }}>
-        {tenantMenu.map((item) => {
+        {menuItems.map((item) => {
           let isActive = false;
-
-          if (item.link === "/tenant") {
-            // Dashboard only active on exact path
+          if (["/tenant", "/landlord", "/admin", "/caretaker"].includes(item.link)) {
             isActive = location.pathname === item.link;
           } else {
-            // Other items active if exact or subpath
             isActive =
               location.pathname === item.link || location.pathname.startsWith(item.link + "/");
           }
@@ -143,4 +118,4 @@ function TenantSidebar({ mobileOpen, onClose }) {
   );
 }
 
-export default TenantSidebar;
+export default UserSidebar;

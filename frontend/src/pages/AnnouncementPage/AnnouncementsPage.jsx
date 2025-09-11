@@ -16,7 +16,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import UsersNavbar from "../../components/UsersNavbar";
-import TenantSidebar from "../Tenant/TenantSidebar";
+import UserSidebar from "../../components/UserSidebar"; // ✅ Unified Sidebar
 import AnnouncementModal from "./AnnouncementModal";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import SearchIcon from "@mui/icons-material/Search";
@@ -65,7 +65,17 @@ function AnnouncementsPage() {
   // Columns (desktop)
   const columns = [
     { field: "title", headerName: "Title", flex: 1 },
-    { field: "category", headerName: "Category", flex: 1 },
+    {
+      field: "category",
+      headerName: "Category",
+      flex: 1,
+      renderCell: (params) => (
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <CategoryIcon sx={{ fontSize: 18, color: "#c59000" }} />
+          <Typography variant="body2">{params.value}</Typography>
+        </Stack>
+      ),
+    },
     { field: "date", headerName: "Date", flex: 1 },
     {
       field: "status",
@@ -74,14 +84,19 @@ function AnnouncementsPage() {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Typography
-          sx={{
-            fontWeight: params.value === "Unread" ? 600 : 400,
-            color: params.value === "Unread" ? "#c59000" : "#2a2a2a",
-          }}
-        >
-          {params.value}
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={0.5} justifyContent="center">
+          {params.value === "Unread" && (
+            <MarkEmailUnreadIcon sx={{ fontSize: 18, color: "#c59000" }} />
+          )}
+          <Typography
+            sx={{
+              fontWeight: params.value === "Unread" ? 600 : 400,
+              color: params.value === "Unread" ? "#c59000" : "#2a2a2a",
+            }}
+          >
+            {params.value}
+          </Typography>
+        </Stack>
       ),
     },
     {
@@ -97,7 +112,7 @@ function AnnouncementsPage() {
           size="small"
           startIcon={<VisibilityIcon />}
           sx={{
-            bgcolor: "#1976d2", // Blue
+            bgcolor: "#1976d2",
             color: "#fff",
             fontWeight: 600,
             "&:hover": { bgcolor: "#1565c0" },
@@ -131,7 +146,7 @@ function AnnouncementsPage() {
     <Box sx={{ display: "flex" }}>
       {/* Navbar & Sidebar */}
       <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-      <TenantSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} /> {/* ✅ Unified Sidebar */}
 
       {/* Main Content */}
       <Box
@@ -189,9 +204,6 @@ function AnnouncementsPage() {
             onChange={handleFilterChange}
             label="Category"
             size="small"
-            InputProps={{
-              startAdornment: <CategoryIcon sx={{ mr: 1, color: "#c59000" }} />,
-            }}
             sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
           >
             <MenuItem value="">All</MenuItem>
@@ -207,9 +219,6 @@ function AnnouncementsPage() {
             onChange={handleFilterChange}
             label="Status"
             size="small"
-            InputProps={{
-              startAdornment: <MarkEmailUnreadIcon sx={{ mr: 1, color: "#c59000" }} />,
-            }}
             sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
           >
             <MenuItem value="">All</MenuItem>
@@ -260,24 +269,37 @@ function AnnouncementsPage() {
                     <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                       {a.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {a.category} • {a.date}
-                    </Typography>
+
+                    {/* Category with Icon */}
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <CategoryIcon sx={{ fontSize: 18, color: "#c59000" }} />
+                      <Typography variant="body2" color="text.secondary">
+                        {a.category} • {a.date}
+                      </Typography>
+                    </Stack>
+
+                    {/* Status + Action */}
                     <Stack
                       direction="row"
                       justifyContent="space-between"
                       alignItems="center"
                       sx={{ mt: 1 }}
                     >
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontWeight: a.status === "Unread" ? 600 : 400,
-                          color: a.status === "Unread" ? "#c59000" : "#2a2a2a",
-                        }}
-                      >
-                        {a.status}
-                      </Typography>
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        {a.status === "Unread" && (
+                          <MarkEmailUnreadIcon sx={{ fontSize: 18, color: "#c59000" }} />
+                        )}
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: a.status === "Unread" ? 600 : 400,
+                            color: a.status === "Unread" ? "#c59000" : "#2a2a2a",
+                          }}
+                        >
+                          {a.status}
+                        </Typography>
+                      </Stack>
+
                       <Button
                         variant="contained"
                         size="small"

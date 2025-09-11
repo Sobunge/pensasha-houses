@@ -1,3 +1,4 @@
+// src/pages/tenant/PropertyPage.jsx
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -22,7 +23,7 @@ import BuildIcon from "@mui/icons-material/Build";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 
 import UsersNavbar from "../../components/UsersNavbar";
-import TenantSidebar from "../Tenant/TenantSidebar";
+import UserSidebar from "../../components/UserSidebar"; // ✅ unified sidebar
 
 import PropertyOverview from "./PropertyOverview";
 import PropertyDocuments from "./PropertyDocuments";
@@ -44,12 +45,7 @@ export const exampleProperties = [
     documents: ["Lease.pdf"],
     payments: [{ month: "Jan", amount: "Ksh 12,000", status: "Pending" }],
     maintenance: [{ issue: "Leaky faucet", status: "Resolved" }],
-    media: [
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg"
-    ],
+    media: ["/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg"],
   },
   {
     id: 2,
@@ -63,12 +59,7 @@ export const exampleProperties = [
     documents: ["Lease.pdf"],
     payments: [{ month: "Feb", amount: "Ksh 15,000", status: "Paid" }],
     maintenance: [{ issue: "Broken window", status: "Pending" }],
-    media: [
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg"
-    ],
+    media: ["/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg"],
   },
   {
     id: 3,
@@ -82,12 +73,7 @@ export const exampleProperties = [
     documents: ["Lease.pdf"],
     payments: [{ month: "Mar", amount: "Ksh 18,000", status: "Pending" }],
     maintenance: [{ issue: "Clogged drain", status: "Resolved" }],
-    media: [
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg"
-    ],
+    media: ["/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg"],
   },
   {
     id: 4,
@@ -101,12 +87,7 @@ export const exampleProperties = [
     documents: ["Lease.pdf"],
     payments: [{ month: "Apr", amount: "Ksh 14,000", status: "Paid" }],
     maintenance: [{ issue: "Broken door", status: "Pending" }],
-    media: [
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg",
-      "/assets/images/house.jpg"
-    ],
+    media: ["/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg", "/assets/images/house.jpg"],
   },
 ];
 
@@ -129,7 +110,7 @@ const PropertyPage = () => {
     return (
       <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f7f7f7" }}>
         <UsersNavbar />
-        <TenantSidebar mobileOpen={false} onClose={() => { }} />
+        <UserSidebar mobileOpen={false} onClose={() => {}} /> {/* ✅ replaced TenantSidebar */}
         <Box
           component="main"
           sx={{
@@ -175,16 +156,13 @@ const PropertyPage = () => {
   return (
     <Box sx={{ display: "flex", bgcolor: "#f7f7f7" }}>
       <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-      <TenantSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} /> {/* ✅ unified sidebar */}
       <Box
         component="main"
         sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, mt: 8, minHeight: "100vh" }}
       >
         {/* Property Header */}
-        <Typography
-          variant="h5"
-          sx={{ mb: 2, fontWeight: 600, color: "#111111" }}
-        >
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: "#111111" }}>
           {property.name}
         </Typography>
 
@@ -271,7 +249,12 @@ const PropertyPage = () => {
             }}
           >
             {tabOptions.map((tab) => (
-              <Tab key={tab.value} icon={tab.icon} iconPosition="start" label={tab.label} />
+              <Tab
+                key={tab.value}
+                icon={tab.icon}
+                iconPosition="start"
+                label={tab.label}
+              />
             ))}
           </Tabs>
         )}

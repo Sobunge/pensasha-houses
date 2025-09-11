@@ -14,7 +14,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import UsersNavbar from "../../components/UsersNavbar";
-import TenantSidebar from "../Tenant/TenantSidebar";
+import UserSidebar from "../../components/UserSidebar"; // ✅ use dynamic sidebar
 import ActivityFilters from "./ActivityFilters";
 import ActivityModal from "./ActivityModal";
 
@@ -156,10 +156,8 @@ function ActivityFeedPage() {
     <Box sx={{ display: "flex" }}>
       {/* Navbar + Sidebar */}
       <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-      <TenantSidebar
-        mobileOpen={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-      />
+      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} /> 
+      {/* ✅ Dynamic sidebar based on logged-in role */}
 
       {/* Main Content */}
       <Box

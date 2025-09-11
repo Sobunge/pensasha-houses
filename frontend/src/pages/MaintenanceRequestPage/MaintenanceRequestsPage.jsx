@@ -1,8 +1,8 @@
-// MaintenanceRequestsPage.jsx
+// src/pages/MaintenanceRequests/MaintenanceRequestsPage.jsx
 import React, { useState } from "react";
 import { Box } from "@mui/material";
 import UsersNavbar from "../../components/UsersNavbar";
-import TenantSidebar from "../Tenant/TenantSidebar";
+import UserSidebar from "../../components/UserSidebar"; // ✅ use unified sidebar
 import MaintenanceRequestsHeader from "./MaintenanceRequestsHeader";
 import MaintenanceRequestList from "./MaintenanceRequestList";
 import MaintenanceRequestForm from "./MaintenanceRequestForm";
@@ -23,13 +23,12 @@ const dummyRequests = Array.from({ length: 20 }, (_, i) => {
     title: `${type} Issue #${i + 1}`,
     type,
     priority,
-    status, // Added status
+    status,
     description: `This is a description for ${type.toLowerCase()} issue #${i + 1}.`,
     date: `2025-09-${(i % 30 + 1).toString().padStart(2, "0")}`,
     file: null,
   };
 });
-
 
 function MaintenanceRequestsPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -43,9 +42,13 @@ function MaintenanceRequestsPage() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" } }}>
+      {/* Navbar */}
       <UsersNavbar onMenuClick={handleDrawerToggle} />
-      <TenantSidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
 
+      {/* Sidebar */}
+      <UserSidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
+
+      {/* Main Content */}
       <Box
         component="main"
         sx={{

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/components/modals/AuthModal.jsx
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -15,9 +16,17 @@ import LoginForm from "../Auth/LoginPage/LoginForm";
 import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 import { useNotification } from "../../components/NotificationProvider";
 
+// ⬅️ import AuthContext + users
+import { AuthContext } from "./AuthContext";
+import { users } from "../../config/Users";
+
 function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
+  const { notify } = useNotification();
+
+  // from context
+  const { loginAs } = useContext(AuthContext);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -25,13 +34,36 @@ function AuthModal({ open, onClose }) {
 
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
-  const { notify } = useNotification();
 
-  // This function will be passed to forms
-  const handleSuccess = () => {
-    onClose?.();        // Close the modal
-    notify("Login successful!", "success");
-    navigate("/tenant"); // Redirect to tenant page
+  // ✅ This function will simulate login with our hardcoded users
+  const handleSuccess = (email) => {
+    const user = users.find((u) => u.email === email);
+
+    if (user) {
+      loginAs(user); // ✅ now storing full user object in context
+      onClose?.();
+      notify(`Welcome back, ${user.name}!`, "success");
+
+      // redirect based on role
+      switch (user.role) {
+        case "tenant":
+          navigate("/tenant");
+          break;
+        case "landlord":
+          navigate("/landlord");
+          break;
+        case "caretaker":
+          navigate("/caretaker");
+          break;
+        case "admin":
+          navigate("/admin");
+          break;
+        default:
+          navigate("/");
+      }
+    } else {
+      notify("User not found!", "error");
+    }
   };
 
   return (
@@ -56,7 +88,6 @@ function AuthModal({ open, onClose }) {
           <Tab icon={<PersonAddIcon />} iconPosition="start" label="Sign Up" />
         </Tabs>
 
-        {/* Close Button */}
         <IconButton onClick={onClose} sx={{ mr: 1 }}>
           <CloseIcon />
         </IconButton>
@@ -65,7 +96,10 @@ function AuthModal({ open, onClose }) {
       {/* Content */}
       <DialogContent>
         {activeTab === 0 ? (
-          <LoginForm onSuccess={handleSuccess} switchToSignup={switchToSignup} />
+          <LoginForm
+            onSuccess={handleSuccess} // ✅ passes email, we map to user
+            switchToSignup={switchToSignup}
+          />
         ) : (
           <RegistrationForm
             onSuccess={handleSuccess}
