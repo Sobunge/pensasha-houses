@@ -1,12 +1,25 @@
 // src/pages/TenantPage/TenantDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Toolbar, Typography, Card, Button, Avatar } from "@mui/material";
+import {
+  Box,
+  Toolbar,
+  Typography,
+  Card,
+  Button,
+  Avatar,
+} from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PaymentIcon from "@mui/icons-material/Payment";
+import HomeIcon from "@mui/icons-material/Home";
+import AnnouncementIcon from "@mui/icons-material/Announcement";
+import MessageIcon from "@mui/icons-material/Message";
+import DescriptionIcon from "@mui/icons-material/Description";
+import BuildIcon from "@mui/icons-material/Build";
+import PersonIcon from "@mui/icons-material/Person";
 
 import UsersNavbar from "../../components/UsersNavbar";
-import UserSidebar from "../../components/UserSidebar"; // ✅ use dynamic sidebar
+import UserSidebar from "../../components/UserSidebar"; 
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
 import MaintenanceCard from "../../components/cards/MaintenanceCard";
 import AnnouncementsCard from "../../components/cards/AnnouncementsCard";
@@ -18,7 +31,19 @@ function TenantDashboard() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ Load user from localStorage on mount
+  // ✅ Tenant sidebar menu items
+  const tenantMenuItems = [
+    { label: "Dashboard", link: "/tenant", icon: <HomeIcon /> },
+    { label: "Properties", link: "/tenant/properties", icon: <HomeIcon /> },
+    { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
+    { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
+    { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
+    { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
+    { label: "Profile", link: "/tenant/user-profile", icon: <PersonIcon /> },
+  ];
+
+  // ✅ Load user from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) {
@@ -45,7 +70,7 @@ function TenantDashboard() {
       {/* Navbar & Sidebar */}
       <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
       <UserSidebar
-        role={user.role} // ✅ show menu based on role
+        menuItems={tenantMenuItems} // ✅ FIXED: pass menuItems
         mobileOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
       />

@@ -17,8 +17,8 @@ import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 import { useNotification } from "../../components/NotificationProvider";
 
 // ⬅️ import AuthContext + users
-import { AuthContext } from "./AuthContext";
-import { users } from "../../config/Users";
+import { AuthContext } from "./AuthContext"; // ✅ check path
+import { users } from "../../config/users"; // ✅ lowercase file name
 
 function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0);
@@ -35,14 +35,16 @@ function AuthModal({ open, onClose }) {
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
 
-  // ✅ This function will simulate login with our hardcoded users
-  const handleSuccess = (email) => {
-    const user = users.find((u) => u.email === email);
+  // ✅ Updated: check both email + password
+  const handleSuccess = (email, password) => {
+    const user = users.find(
+      (u) => u.email === email && u.password === password
+    );
 
     if (user) {
-      loginAs(user); // ✅ now storing full user object in context
-      onClose?.();
+      loginAs(user); // store full user object in context
       notify(`Welcome back, ${user.name}!`, "success");
+      onClose?.(); // Close modal
 
       // redirect based on role
       switch (user.role) {
@@ -62,7 +64,7 @@ function AuthModal({ open, onClose }) {
           navigate("/");
       }
     } else {
-      notify("User not found!", "error");
+      notify("Invalid email or password!", "error");
     }
   };
 
@@ -97,7 +99,8 @@ function AuthModal({ open, onClose }) {
       <DialogContent>
         {activeTab === 0 ? (
           <LoginForm
-            onSuccess={handleSuccess} // ✅ passes email, we map to user
+            onSuccess={handleSuccess} // expects (email, password)
+            onClose={onClose} // <-- Pass onClose to LoginForm
             switchToSignup={switchToSignup}
           />
         ) : (

@@ -1,3 +1,4 @@
+// src/components/Auth/LoginPage/LoginForm.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -14,13 +15,15 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import { useNotification } from "../../../components/NotificationProvider";
+import { useAuth } from "../AuthContext";
+import { users } from "../../../config/users";
+import { useNavigate } from "react-router-dom";
 
-// ⬅️ Import hardcoded users
-import { users } from "../../../config/Users";
-
-export default function LoginForm({ onSuccess, switchToSignup }) {
+export default function LoginForm({ switchToSignup, onClose }) {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const { notify } = useNotification();
+  const { loginAs } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,16 +33,32 @@ export default function LoginForm({ onSuccess, switchToSignup }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 🔎 check user exists
     const user = users.find(
       (u) =>
         u.email.toLowerCase() === formData.email.toLowerCase() &&
-        u.password === formData.password // you can skip this if no password needed
+        u.password === formData.password
     );
 
     if (user) {
-      console.log("Login Success:", user);
-      onSuccess?.(user.email); // pass email up to AuthModal
+      loginAs({ email: user.email, role: user.role, name: user.name });
+      localStorage.setItem("user", JSON.stringify(user));
+
+      notify("Login successful!", "success");
+
+      const roleRedirects = {
+        tenant: "/tenant",
+        landlord: "/landlord",
+        caretaker: "/caretaker",
+        admin: "/admin",
+      };
+
+      // ✅ close modal first
+      if (onClose) onClose();
+
+      // ✅ then navigate after short delay
+      setTimeout(() => {
+        navigate(roleRedirects[user.role] || "/");
+      }, 200);
     } else {
       notify("Invalid email or password!", "error");
     }
@@ -49,18 +68,12 @@ export default function LoginForm({ onSuccess, switchToSignup }) {
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {/* Icon */}
       <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
         <LockOutlinedIcon />
       </Avatar>
 
-      {/* Heading */}
       <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
         Welcome Back
       </Typography>
@@ -68,7 +81,6 @@ export default function LoginForm({ onSuccess, switchToSignup }) {
         Please log in to continue
       </Typography>
 
-      {/* Inputs */}
       <Stack spacing={2} sx={{ width: "100%" }}>
         <TextField
           fullWidth
@@ -106,14 +118,12 @@ export default function LoginForm({ onSuccess, switchToSignup }) {
         />
       </Stack>
 
-      {/* Forgot Password */}
       <Box sx={{ width: "100%", textAlign: "right", mt: 1 }}>
         <MuiLink href="/forgot-password" fontSize="0.85rem">
           Forgot password?
         </MuiLink>
       </Box>
 
-      {/* Actions */}
       <Stack spacing={1.5} sx={{ width: "100%", mt: 2 }}>
         <Button
           fullWidth
