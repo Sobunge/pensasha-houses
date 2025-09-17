@@ -2,7 +2,6 @@ import React from "react";
 import { Stack, TextField, MenuItem, Button } from "@mui/material";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import SearchIcon from "@mui/icons-material/Search";
-import PaymentIcon from "@mui/icons-material/Payment";
 
 function PaymentFilters({ filters, onChange, onReset }) {
   return (

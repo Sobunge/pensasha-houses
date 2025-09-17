@@ -25,7 +25,7 @@ function TenantDashboard() {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) {
-      navigate("/login"); // redirect if not logged in
+      navigate("/");
     } else {
       setUser(storedUser);
     }

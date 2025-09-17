@@ -1,4 +1,3 @@
-// src/pages/MessagesPage/MessageBubble.jsx
 import React from "react";
 import { Box, Typography, Stack } from "@mui/material";
 import DoneIcon from "@mui/icons-material/Done";
@@ -37,11 +36,24 @@ function MessageBubble({ message, isSender }) {
           p: 1.5,
           borderRadius: 2,
           boxShadow: 1,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <Typography variant="body2">{message.text}</Typography>
-        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0.5}>
-          <Typography variant="caption" sx={{ color: "#555" }}>
+        {/* Message text */}
+        <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+          {message.text}
+        </Typography>
+
+        {/* Time and status */}
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          alignItems="center"
+          spacing={0.5}
+          sx={{ mt: 0.5 }}
+        >
+          <Typography variant="caption" sx={{ color: "#555", fontSize: 10 }}>
             {message.time}
           </Typography>
           {renderStatusIcon()}

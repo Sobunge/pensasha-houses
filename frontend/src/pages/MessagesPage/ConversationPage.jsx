@@ -1,114 +1,82 @@
-// src/pages/MessagesPage/ConversationPage.jsx
-import React, { useState, useEffect, useRef } from "react";
-import { Box, Stack, Typography, Toolbar, Paper } from "@mui/material";
-import UsersNavbar from "../../components/UsersNavbar";
-import UserSidebar from "../../components/UserSidebar"; // ✅ replace import
+import React, { useState } from "react";
+import { Box, Stack, Typography, Paper, Button, Avatar } from "@mui/material";
+import ChatIcon from "@mui/icons-material/Chat";
 import MessageBubble from "./MessageBubble";
 import ReplyInput from "./ReplyInput";
-import ChatIcon from "@mui/icons-material/Chat";
 
-// Sample messages
-const initialMessages = [
-  { text: "Hello!", time: "10:00 AM", sender: "other", status: "read" },
-  { text: "Hi, how are you?", time: "10:01 AM", sender: "me", status: "read" },
-  { text: "I'm good, thanks!", time: "10:02 AM", sender: "other", status: "read" },
-];
+const PAGE_SIZE = 5;
 
-function ConversationPage() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+const initialMessages = Array.from({ length: 50 }, (_, i) => ({
+  text: `Message ${i + 1}`,
+  time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  sender: i % 2 === 0 ? "me" : "other",
+}));
+
+export default function ConversationPage() {
   const [messages, setMessages] = useState(initialMessages);
-  const messagesEndRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Scroll to bottom whenever messages update
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-  useEffect(scrollToBottom, [messages]);
+  const totalPages = Math.ceil(messages.length / PAGE_SIZE);
+
+  // Get messages for current page (newest messages at the bottom)
+  const startIndex = Math.max(messages.length - currentPage * PAGE_SIZE, 0);
+  const endIndex = messages.length - (currentPage - 1) * PAGE_SIZE;
+  const pageMessages = messages.slice(startIndex, endIndex);
 
   const handleSend = (text) => {
     const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-    setMessages((prev) => [
-      ...prev,
-      { text, time: timeString, sender: "me", status: "sent" },
-    ]);
-
-    // Simulate message delivered
-    setTimeout(() => {
-      setMessages((prev) =>
-        prev.map((m, idx) =>
-          idx === prev.length - 1 ? { ...m, status: "delivered" } : m
-        )
-      );
-    }, 500);
-
-    // Simulate message read
-    setTimeout(() => {
-      setMessages((prev) =>
-        prev.map((m, idx) =>
-          idx === prev.length - 1 ? { ...m, status: "read" } : m
-        )
-      );
-    }, 1500);
+    const newMsg = {
+      text,
+      time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      sender: "me",
+    };
+    setMessages((prev) => [...prev, newMsg]);
+    setCurrentPage(1); // jump to latest page
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} /> 
-      {/* ✅ replaced TenantSidebar */}
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "80vh", p: 2, gap: 1 }}>
+      {/* Header */}
+      <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
+        <ChatIcon sx={{ color: "#f8b500" }} />
+        <Typography variant="h5" sx={{ fontWeight: 600 }}>
+          Conversation
+        </Typography>
+      </Stack>
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: { xs: 2, md: 3 },
-          bgcolor: "#f7f7f7",
-          minHeight: "87.25vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Toolbar />
-
-        {/* Conversation Title */}
-        <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mb: 3 }}>
-          <ChatIcon sx={{ color: "#f8b500" }} />
-          <Typography variant="h5" sx={{ fontWeight: 600, color: "#111111" }}>
-            Conversation
-          </Typography>
+      {/* Messages */}
+      <Paper sx={{ flex: 1, display: "flex", flexDirection: "column", borderRadius: 3, p: 1.5, overflow: "hidden" }}>
+        {/* Pagination Controls */}
+        <Stack direction="row" justifyContent="space-between" mb={1}>
+          <Button size="small" onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))} disabled={currentPage >= totalPages}>
+            Older
+          </Button>
+          <Button size="small" onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage <= 1}>
+            Newer
+          </Button>
         </Stack>
 
-        {/* Messages Card */}
-        <Paper
-          elevation={3}
-          sx={{
-            flexGrow: 1,
-            p: 2,
-            borderRadius: 3,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-            mb: 2,
-            bgcolor: "#fff",
-            maxHeight: "70vh",
-            overflowY: "auto",
-          }}
-        >
-          <Stack spacing={1}>
-            {messages.map((msg, index) => (
-              <MessageBubble key={index} message={msg} isSender={msg.sender === "me"} />
-            ))}
-            <div ref={messagesEndRef} />
-          </Stack>
-        </Paper>
+        {/* Message list */}
+        {pageMessages.map((msg, i) => {
+          // Compute global index in the full messages array
+          const globalIndex = startIndex + i;
+          const prevMsg = globalIndex > 0 ? messages[globalIndex - 1] : null;
+          const showAvatar = !prevMsg || prevMsg.sender !== msg.sender;
 
-        {/* Reply Input */}
+          return (
+            <Box key={globalIndex} sx={{ display: "flex", justifyContent: msg.sender === "me" ? "flex-end" : "flex-start", mb: 0.8 }}>
+              {msg.sender === "other" && showAvatar && <Avatar sx={{ mr: 1, width: 32, height: 32 }}>O</Avatar>}
+              <MessageBubble message={msg} isSender={msg.sender === "me"} />
+              {msg.sender === "me" && showAvatar && <Avatar sx={{ ml: 1, width: 32, height: 32 }}>Me</Avatar>}
+            </Box>
+          );
+        })}
+      </Paper>
+
+      {/* Reply input */}
+      <Box sx={{ mt: 0.5 }}>
         <ReplyInput onSend={handleSend} />
       </Box>
     </Box>
   );
 }
-
-export default ConversationPage;

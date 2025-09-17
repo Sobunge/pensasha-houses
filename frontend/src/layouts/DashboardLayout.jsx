@@ -7,7 +7,7 @@ import UserSidebar from "../components/UserSidebar";
 import MainFooter from "../components/MainFooter";
 import { useAuth } from "../pages/Auth/AuthContext";
 
-function DashboardLayout({ menuItems }) {
+function DashboardLayout() {
   const { user } = useAuth(); // Get logged-in user
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -18,7 +18,6 @@ function DashboardLayout({ menuItems }) {
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* Sidebar */}
       <UserSidebar
-        menuItems={menuItems}
         mobileOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
       />

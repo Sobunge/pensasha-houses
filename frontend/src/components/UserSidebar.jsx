@@ -11,11 +11,38 @@ import {
   Typography,
 } from "@mui/material";
 import { useLocation, Link } from "react-router-dom";
+import { useAuth } from "../pages/Auth/AuthContext"; 
+import {
+  tenantMenuItems,
+  landlordMenuItems,
+  caretakerMenuItems,
+  adminMenuItems,
+} from "../config/menuItems";
 
 const drawerWidth = 240;
 
-function UserSidebar({ mobileOpen, onClose, menuItems }) {
+function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
+  const { user } = useAuth();
+
+  // Pick menuItems by role
+  let menuItems = [];
+  switch (user?.role) {
+    case "tenant":
+      menuItems = tenantMenuItems;
+      break;
+    case "landlord":
+      menuItems = landlordMenuItems;
+      break;
+    case "caretaker":
+      menuItems = caretakerMenuItems;
+      break;
+    case "admin":
+      menuItems = adminMenuItems;
+      break;
+    default:
+      menuItems = [];
+  }
 
   const drawerContent = (
     <Box
@@ -45,7 +72,8 @@ function UserSidebar({ mobileOpen, onClose, menuItems }) {
             isActive = location.pathname === item.link;
           } else {
             isActive =
-              location.pathname === item.link || location.pathname.startsWith(item.link + "/");
+              location.pathname === item.link ||
+              location.pathname.startsWith(item.link + "/");
           }
 
           return (

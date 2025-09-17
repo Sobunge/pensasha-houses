@@ -8,6 +8,7 @@ import RentSummaryCard from "./RentSummaryCard";
 import PaymentsTable from "./PaymentsTable";
 import PaymentModal from "./PaymentModal";
 import UsersSidebar from "../../components/UserSidebar"; // ✅ Unified sidebar
+import { useAuth } from "../Auth/AuthContext";
 
 function RentPaymentsPage() {
   const { user } = useAuth(); // get logged-in user (with role)
