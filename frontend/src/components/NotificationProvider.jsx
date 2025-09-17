@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from "react";
-import { Snackbar, Alert, Slide } from "@mui/material";
+// src/providers/NotificationProvider.jsx
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { Snackbar, Alert, Slide, Button } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Info";
@@ -11,16 +12,31 @@ export const useNotification = () => useContext(NotificationContext);
 const SlideDown = (props) => <Slide {...props} direction="down" />;
 
 export const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState([]);
+  const [queue, setQueue] = useState([]);   // waiting notifications
+  const [current, setCurrent] = useState(null); // active notification
 
-  const notify = (message, severity = "info") => {
+  const notify = (
+    message,
+    severity = "info",
+    duration = 4000,
+    position = { vertical: "top", horizontal: "center" },
+    action = null // optional button
+  ) => {
     const id = Date.now();
-    setNotifications((prev) => [...prev, { id, message, severity }]);
+    setQueue((prev) => [
+      ...prev,
+      { id, message, severity, duration, position, action },
+    ]);
   };
 
-  const removeNotification = (id) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  useEffect(() => {
+    if (!current && queue.length > 0) {
+      setCurrent(queue[0]);
+      setQueue((prev) => prev.slice(1));
+    }
+  }, [queue, current]);
+
+  const handleClose = () => setCurrent(null);
 
   const severityIcons = {
     success: <CheckCircleIcon />,
@@ -29,7 +45,6 @@ export const NotificationProvider = ({ children }) => {
     info: <InfoIcon />,
   };
 
-  // Renowned semantic colors for UX
   const severityColors = {
     success: "#4CAF50", // green
     error: "#F44336",   // red
@@ -41,41 +56,56 @@ export const NotificationProvider = ({ children }) => {
     <NotificationContext.Provider value={{ notify }}>
       {children}
 
-      {notifications.map((n) => (
+      {current && (
         <Snackbar
-          key={n.id}
+          key={current.id}
           open
-          autoHideDuration={4000}
-          onClose={() => removeNotification(n.id)}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          autoHideDuration={current.duration}
+          onClose={handleClose}
+          anchorOrigin={current.position}
           TransitionComponent={SlideDown}
         >
           <Alert
-            onClose={() => removeNotification(n.id)}
-            severity={n.severity}
-            icon={severityIcons[n.severity]}
+            role="alert"
+            onClose={handleClose}
+            severity={current.severity}
+            icon={severityIcons[current.severity]}
             sx={{
-              bgcolor: "#ffffff",                  // white background
-              border: `2px solid ${severityColors[n.severity]}`, // outline color matches severity
+              bgcolor: "#ffffff",
+              border: `2px solid ${severityColors[current.severity]}`,
               borderRadius: 3,
               width: { xs: "90%", sm: "400px" },
               boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
               display: "flex",
               alignItems: "center",
-              "& .MuiAlert-icon": { color: severityColors[n.severity] }, // icon in semantic color
+              "& .MuiAlert-icon": { color: severityColors[current.severity] },
               "& .MuiAlert-message": {
                 flex: 1,
                 textAlign: "center",
                 fontSize: "0.95rem",
-                color: severityColors[n.severity], // text matches severity
+                color: severityColors[current.severity],
                 fontWeight: 600,
               },
             }}
+            action={
+              current.action ? (
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    current.action();
+                    handleClose();
+                  }}
+                >
+                  {current.actionLabel || "ACTION"}
+                </Button>
+              ) : null
+            }
           >
-            {n.message}
+            {current.message}
           </Alert>
         </Snackbar>
-      ))}
+      )}
     </NotificationContext.Provider>
   );
 };

@@ -43,7 +43,8 @@ export default function LoginForm({ switchToSignup, onClose }) {
       loginAs({ email: user.email, role: user.role, name: user.name });
       localStorage.setItem("user", JSON.stringify(user));
 
-      notify("Login successful!", "success");
+      // ✅ success notification with longer duration (3s)
+      notify("Login successful!", "success", 3000);
 
       const roleRedirects = {
         tenant: "/tenant",
@@ -60,7 +61,8 @@ export default function LoginForm({ switchToSignup, onClose }) {
         navigate(roleRedirects[user.role] || "/");
       }, 200);
     } else {
-      notify("Invalid email or password!", "error");
+      // ❌ error notification with slightly shorter duration (3.5s)
+      notify("Invalid email or password!", "error", 3500);
     }
   };
 
