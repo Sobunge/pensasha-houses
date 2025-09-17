@@ -14,7 +14,7 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 // Tenant menu
 export const tenantMenuItems = [
   { label: "Dashboard", link: "/tenant", icon: <HomeIcon /> },
-  { label: "Properties", link: "/tenant/properties", icon: <HomeIcon /> },
+  { label: "Properties", link: "/tenant/properties", icon: <HomeWorkIcon />},
   { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
   { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
