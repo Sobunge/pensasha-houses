@@ -2,14 +2,30 @@ import React from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Auth/AuthContext"; // adjust path
 
 function NotFound() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Determine fallback route
+  const getRedirectPath = () => {
+    if (!user) return "/"; // not logged in → home page
+
+    const roleRedirects = {
+      tenant: "/tenant",
+      landlord: "/landlord",
+      caretaker: "/caretaker",
+      admin: "/admin",
+    };
+
+    return roleRedirects[user.role] || "/";
+  };
 
   return (
     <Box
       sx={{
-        minHeight: "81.11vh",
+        minHeight: "74.11vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -20,7 +36,6 @@ function NotFound() {
       }}
     >
       <Container maxWidth="sm">
-        {/* Not Found Icon */}
         <ErrorOutlineIcon
           sx={{
             fontSize: { xs: 60, md: 80 },
@@ -29,7 +44,6 @@ function NotFound() {
           }}
         />
 
-        {/* 404 */}
         <Typography
           variant="h1"
           sx={{
@@ -41,7 +55,6 @@ function NotFound() {
           404
         </Typography>
 
-        {/* Subheading */}
         <Typography
           variant="h5"
           sx={{ color: "#2A2A2A", mb: 2, fontWeight: 500 }}
@@ -49,7 +62,6 @@ function NotFound() {
           Oops! Page Not Found
         </Typography>
 
-        {/* Description */}
         <Typography
           variant="body1"
           sx={{ color: "#555555", mb: 4 }}
@@ -57,7 +69,6 @@ function NotFound() {
           The page you are looking for might have been removed or the URL is incorrect.
         </Typography>
 
-        {/* Go Home Button */}
         <Button
           variant="contained"
           sx={{
@@ -68,9 +79,9 @@ function NotFound() {
             px: 4,
             "&:hover": { backgroundColor: "#c59000" },
           }}
-          onClick={() => navigate("/")}
+          onClick={() => navigate(getRedirectPath())} // ✅ redirect based on role
         >
-          Go Back Home
+          Go Back
         </Button>
       </Container>
     </Box>
