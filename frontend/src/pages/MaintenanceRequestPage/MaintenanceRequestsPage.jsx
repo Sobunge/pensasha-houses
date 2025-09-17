@@ -1,8 +1,6 @@
 // src/pages/MaintenanceRequests/MaintenanceRequestsPage.jsx
 import React, { useState } from "react";
 import { Box } from "@mui/material";
-import UsersNavbar from "../../components/UsersNavbar";
-import UserSidebar from "../../components/UserSidebar"; // ✅ use unified sidebar
 import MaintenanceRequestsHeader from "./MaintenanceRequestsHeader";
 import MaintenanceRequestList from "./MaintenanceRequestList";
 import MaintenanceRequestForm from "./MaintenanceRequestForm";
@@ -16,7 +14,7 @@ const dummyRequests = Array.from({ length: 20 }, (_, i) => {
 
   const type = types[i % types.length];
   const priority = priorities[i % priorities.length];
-  const status = statuses[i % statuses.length]; // Cycle through statuses
+  const status = statuses[i % statuses.length];
 
   return {
     id: i + 1,
@@ -31,44 +29,32 @@ const dummyRequests = Array.from({ length: 20 }, (_, i) => {
 });
 
 function MaintenanceRequestsPage() {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
 
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const handleFormToggle = () => setShowForm(!showForm);
   const handleViewRequest = (request) => setSelectedRequest(request);
   const handleCloseModal = () => setSelectedRequest(null);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" } }}>
-      {/* Navbar */}
-      <UsersNavbar onMenuClick={handleDrawerToggle} />
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        p: { xs: 2, md: 3 },
+        bgcolor: "#f7f7f7",
+        minHeight: "79.11vh",
+      }}
+    >
+      <MaintenanceRequestsHeader showForm={showForm} onToggleForm={handleFormToggle} />
 
-      {/* Sidebar */}
-      <UserSidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
+      {showForm && <MaintenanceRequestForm onClose={handleFormToggle} />}
 
-      {/* Main Content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: { xs: 2, md: 3 },
-          mt: { xs: 7, md: 8 },
-          bgcolor: "#f7f7f7",
-          minHeight: "79.11vh",
-        }}
-      >
-        <MaintenanceRequestsHeader showForm={showForm} onToggleForm={handleFormToggle} />
+      <MaintenanceRequestList requests={dummyRequests} onView={handleViewRequest} />
 
-        {showForm && <MaintenanceRequestForm onClose={handleFormToggle} />}
-
-        <MaintenanceRequestList requests={dummyRequests} onView={handleViewRequest} />
-
-        {selectedRequest && (
-          <MaintenanceRequestModal request={selectedRequest} onClose={handleCloseModal} />
-        )}
-      </Box>
+      {selectedRequest && (
+        <MaintenanceRequestModal request={selectedRequest} onClose={handleCloseModal} />
+      )}
     </Box>
   );
 }
