@@ -12,13 +12,21 @@ import {
 import { motion } from "framer-motion";
 
 import UsersNavbar from "../../components/UsersNavbar";
-import LandlordSidebar from "./LandlordSidebar";
+import UserSidebar from "../../components/UserSidebar";
 import DashboardStats from "./DashboardStats";
 import PropertyManagementCard from "./PropertyManagementCard";
 import FinancialOverviewCard from "./FinancialOverviewCard";
 import TenantSummaryCard from "./TenantSummaryCard";
 import RecentPaymentsCard from "./RecentPaymentsCard";
 import MaintenanceRequestsCard from "./MaintenanceRequestsCard";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import PersonIcon from "@mui/icons-material/Person";
+import BuildIcon from "@mui/icons-material/Build";
+import PaymentIcon from "@mui/icons-material/Payment";
+import DescriptionIcon from "@mui/icons-material/Description";
+import MailIcon from "@mui/icons-material/Mail";
+import CampaignIcon from "@mui/icons-material/Campaign";
 
 // Reusable Section Title
 const SectionTitle = ({ children }) => (
@@ -47,11 +55,24 @@ function LandlordDashboard() {
     { title: "Maintenance Requests", component: <MaintenanceRequestsCard /> },
   ];
 
+  // ✅ Landlord sidebar menu items
+  const landlordMenu = [
+  { label: "Dashboard", icon: <DashboardIcon />, link: "/landlord" },
+  { label: "My Properties", icon: <HomeWorkIcon />, link: "/landlord/properties" },
+  { label: "Tenants", icon: <PersonIcon />, link: "/landlord/tenants" },
+  { label: "Caretakers", icon: <BuildIcon />, link: "/landlord/caretakers" },
+  { label: "Finances", icon: <PaymentIcon />, link: "/landlord/finances" },
+  { label: "Reports", icon: <DescriptionIcon />, link: "/landlord/reports" },
+  { label: "Messages", icon: <MailIcon />, link: "/landlord/messages" },
+  { label: "Announcements", icon: <CampaignIcon />, link: "/landlord/announcements" },
+];
+
   return (
     <Box sx={{ display: "flex", bgcolor: "#f7f7f7" }}>
       {/* Navbar + Sidebar */}
       <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-      <LandlordSidebar
+       <UserSidebar
+        menuItems={landlordMenu} // ✅ FIXED: pass menuItems
         mobileOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
       />

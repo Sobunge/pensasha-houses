@@ -14,6 +14,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import ProfileMenu from "../pages/Tenant/ProfileMenu";
 import ActivityFeedCard from "./cards/ActivityFeedCard";
 import MessagesCard from "./cards/MessagesCard";
+import { useAuth } from "../pages/Auth/AuthContext"; // ✅ import your auth context
 
 // Sample messages (replace with actual state from backend)
 const sampleMessages = [
@@ -27,6 +28,8 @@ function UsersNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
   const [anchorElMessages, setAnchorElMessages] = useState(null);
 
+  const { user } = useAuth(); // ✅ get logged-in user info
+
   // Notifications popover
   const handleOpenNotifications = (event) => setAnchorElNotifications(event.currentTarget);
   const handleCloseNotifications = () => setAnchorElNotifications(null);
@@ -34,6 +37,11 @@ function UsersNavbar({ onMenuClick }) {
   // Messages popover
   const handleOpenMessages = (event) => setAnchorElMessages(event.currentTarget);
   const handleCloseMessages = () => setAnchorElMessages(null);
+
+  // Capitalize role for display
+  const roleLabel = user?.role
+    ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+    : "User";
 
   return (
     <AppBar
@@ -58,15 +66,31 @@ function UsersNavbar({ onMenuClick }) {
         </IconButton>
 
         {/* Logo (mobile centered) */}
-        <Box sx={{ display: { xs: "flex", md: "none" }, flexGrow: 1, justifyContent: "center" }}>
-          <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
+        <Box
+          sx={{
+            display: { xs: "flex", md: "none" },
+            flexGrow: 1,
+            justifyContent: "center",
+          }}
+        >
+          <Box
+            component="img"
+            src="/assets/images/logo.svg"
+            alt="Pensasha Logo"
+            sx={{ height: 32 }}
+          />
         </Box>
 
         {/* Logo + Dashboard Title (desktop) */}
         <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
-          <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
+          <Box
+            component="img"
+            src="/assets/images/logo.svg"
+            alt="Pensasha Logo"
+            sx={{ height: 32 }}
+          />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", pl: 26 }}>
-            Tenant – Dashboard
+            {roleLabel} – Dashboard
           </Typography>
         </Box>
 
