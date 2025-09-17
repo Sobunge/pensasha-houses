@@ -7,7 +7,6 @@ import {
   TextField,
   MenuItem,
   Button,
-  Toolbar,
   useMediaQuery,
   Card,
   CardContent,
@@ -15,8 +14,6 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CampaignIcon from "@mui/icons-material/Campaign";
-import UsersNavbar from "../../components/UsersNavbar";
-import UserSidebar from "../../components/UserSidebar"; // ✅ Unified Sidebar
 import AnnouncementModal from "./AnnouncementModal";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import SearchIcon from "@mui/icons-material/Search";
@@ -34,7 +31,6 @@ const sampleAnnouncements = Array.from({ length: 45 }).map((_, i) => ({
 }));
 
 function AnnouncementsPage() {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [announcements, setAnnouncements] = useState(sampleAnnouncements);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [filters, setFilters] = useState({ search: "", category: "", status: "" });
@@ -64,11 +60,19 @@ function AnnouncementsPage() {
 
   // Columns (desktop)
   const columns = [
-    { field: "title", headerName: "Title", flex: 1 },
+    {
+      field: "title",
+      headerName: "Title",
+      flex: 1,
+      align: "left",
+      headerAlign: "left",
+    },
     {
       field: "category",
       headerName: "Category",
       flex: 1,
+      align: "left",
+      headerAlign: "left",
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={1}>
           <CategoryIcon sx={{ fontSize: 18, color: "#c59000" }} />
@@ -76,7 +80,13 @@ function AnnouncementsPage() {
         </Stack>
       ),
     },
-    { field: "date", headerName: "Date", flex: 1 },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      align: "left",
+      headerAlign: "left",
+    },
     {
       field: "status",
       headerName: "Status",
@@ -84,7 +94,13 @@ function AnnouncementsPage() {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Stack direction="row" alignItems="center" spacing={0.5} justifyContent="center">
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          spacing={0.5}
+          sx={{ width: "100%" }}
+        >
           {params.value === "Unread" && (
             <MarkEmailUnreadIcon sx={{ fontSize: 18, color: "#c59000" }} />
           )}
@@ -127,12 +143,8 @@ function AnnouncementsPage() {
 
   // Apply filters
   const filteredAnnouncements = announcements.filter((a) => {
-    const matchesSearch = a.title
-      .toLowerCase()
-      .includes(filters.search.toLowerCase());
-    const matchesCategory = filters.category
-      ? a.category === filters.category
-      : true;
+    const matchesSearch = a.title.toLowerCase().includes(filters.search.toLowerCase());
+    const matchesCategory = filters.category ? a.category === filters.category : true;
     const matchesStatus = filters.status ? a.status === filters.status : true;
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -143,244 +155,189 @@ function AnnouncementsPage() {
     : filteredAnnouncements;
 
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* Navbar & Sidebar */}
-      <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} /> {/* ✅ Unified Sidebar */}
-
-      {/* Main Content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: { xs: 2, md: 3 },
-          bgcolor: "#f7f7f7",
-          minHeight: "87.25vh",
-        }}
-      >
-        <Toolbar />
-
-        {/* Page Title */}
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          spacing={1}
-          sx={{ mb: 2 }}
+    <Box sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, bgcolor: "#f7f7f7" }}>
+      {/* Page Title */}
+      <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} sx={{ mb: 2 }}>
+        <CampaignIcon sx={{ color: "#f8b500" }} />
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: "bold", color: "#111111", textAlign: "center" }}
         >
-          <CampaignIcon sx={{ color: "#f8b500" }} />
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: "bold", color: "#111111", textAlign: "center" }}
-          >
-            Announcements
-          </Typography>
-        </Stack>
+          Announcements
+        </Typography>
+      </Stack>
 
-        {/* Filters */}
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={2}
-          sx={{ mb: 2 }}
+      {/* Filters */}
+      <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mb: 2 }}>
+        <TextField
+          name="search"
+          value={filters.search}
+          onChange={handleFilterChange}
+          placeholder="Search announcements..."
+          size="small"
+          InputProps={{ startAdornment: <SearchIcon sx={{ mr: 1, color: "#c59000" }} /> }}
+          sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
+        />
+        <TextField
+          select
+          name="category"
+          value={filters.category}
+          onChange={handleFilterChange}
+          label="Category"
+          size="small"
+          sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
         >
-          {/* Search Field */}
-          <TextField
-            name="search"
-            value={filters.search}
-            onChange={handleFilterChange}
-            placeholder="Search announcements..."
-            size="small"
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: "#c59000" }} />,
-            }}
-            sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
-          />
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="Maintenance">Maintenance</MenuItem>
+          <MenuItem value="Finance">Finance</MenuItem>
+        </TextField>
+        <TextField
+          select
+          name="status"
+          value={filters.status}
+          onChange={handleFilterChange}
+          label="Status"
+          size="small"
+          sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
+        >
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="Unread">Unread</MenuItem>
+          <MenuItem value="Read">Read</MenuItem>
+        </TextField>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<RestartAltIcon fontSize="small" />}
+          sx={{
+            bgcolor: "#f8b500",
+            color: "#111111",
+            fontWeight: 600,
+            fontSize: "0.85rem",
+            px: 2,
+            py: 0.8,
+            borderRadius: 2,
+            minWidth: 100,
+            alignSelf: { xs: "stretch", md: "center" },
+            "&:hover": { bgcolor: "#ffc62c" },
+          }}
+          onClick={() => setFilters({ search: "", category: "", status: "" })}
+        >
+          Reset
+        </Button>
+      </Stack>
 
-          {/* Category Filter */}
-          <TextField
-            select
-            name="category"
-            value={filters.category}
-            onChange={handleFilterChange}
-            label="Category"
-            size="small"
-            sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="Maintenance">Maintenance</MenuItem>
-            <MenuItem value="Finance">Finance</MenuItem>
-          </TextField>
-
-          {/* Status Filter */}
-          <TextField
-            select
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-            label="Status"
-            size="small"
-            sx={{ bgcolor: "#fff", borderRadius: 2, flex: 1 }}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="Unread">Unread</MenuItem>
-            <MenuItem value="Read">Read</MenuItem>
-          </TextField>
-
-          {/* Reset Button */}
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<RestartAltIcon fontSize="small" />}
-            sx={{
-              bgcolor: "#f8b500",
-              color: "#111111",
-              fontWeight: 600,
-              fontSize: "0.85rem",
-              px: 2,
-              py: 0.8,
-              borderRadius: 2,
-              minWidth: 100,
-              alignSelf: { xs: "stretch", md: "center" },
-              "&:hover": { bgcolor: "#ffc62c" },
-            }}
-            onClick={() => setFilters({ search: "", category: "", status: "" })}
-          >
-            Reset
-          </Button>
-        </Stack>
-
-        {/* Responsive Announcements */}
-        {isMobile ? (
-          <>
-            {/* Mobile → Card List with pagination */}
-            <Stack spacing={2}>
-              {paginatedAnnouncements.map((a) => (
-                <Card
-                  key={a.id}
-                  sx={{
-                    borderLeft:
-                      a.status === "Unread"
-                        ? "4px solid #f8b500"
-                        : "4px solid transparent",
-                    "&:hover": { bgcolor: "#fffbe6" },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {a.title}
+      {/* Responsive Announcements */}
+      {isMobile ? (
+        <>
+          {/* Mobile → Card List with pagination */}
+          <Stack spacing={2}>
+            {paginatedAnnouncements.map((a) => (
+              <Card
+                key={a.id}
+                sx={{
+                  borderLeft: a.status === "Unread" ? "4px solid #f8b500" : "4px solid transparent",
+                  "&:hover": { bgcolor: "#fffbe6" },
+                }}
+              >
+                <CardContent>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    {a.title}
+                  </Typography>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <CategoryIcon sx={{ fontSize: 18, color: "#c59000" }} />
+                    <Typography variant="body2" color="text.secondary">
+                      {a.category} • {a.date}
                     </Typography>
-
-                    {/* Category with Icon */}
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <CategoryIcon sx={{ fontSize: 18, color: "#c59000" }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {a.category} • {a.date}
+                  </Stack>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ mt: 1 }}
+                  >
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                      {a.status === "Unread" && (
+                        <MarkEmailUnreadIcon sx={{ fontSize: 18, color: "#c59000" }} />
+                      )}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: a.status === "Unread" ? 600 : 400,
+                          color: a.status === "Unread" ? "#c59000" : "#2a2a2a",
+                        }}
+                      >
+                        {a.status}
                       </Typography>
                     </Stack>
-
-                    {/* Status + Action */}
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      sx={{ mt: 1 }}
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<VisibilityIcon />}
+                      sx={{
+                        bgcolor: "#1976d2",
+                        color: "#fff",
+                        fontWeight: 600,
+                        "&:hover": { bgcolor: "#1565c0" },
+                      }}
+                      onClick={() => handleAnnouncementClick(a)}
                     >
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        {a.status === "Unread" && (
-                          <MarkEmailUnreadIcon sx={{ fontSize: 18, color: "#c59000" }} />
-                        )}
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            fontWeight: a.status === "Unread" ? 600 : 400,
-                            color: a.status === "Unread" ? "#c59000" : "#2a2a2a",
-                          }}
-                        >
-                          {a.status}
-                        </Typography>
-                      </Stack>
-
-                      <Button
-                        variant="contained"
-                        size="small"
-                        startIcon={<VisibilityIcon />}
-                        sx={{
-                          bgcolor: "#1976d2",
-                          color: "#fff",
-                          fontWeight: 600,
-                          "&:hover": { bgcolor: "#1565c0" },
-                        }}
-                        onClick={() => handleAnnouncementClick(a)}
-                      >
-                        View
-                      </Button>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
-
-            {/* Pagination Controls */}
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ mt: 2 }}
+                      View
+                    </Button>
+                  </Stack>
+                </CardContent>
+              </Card>
+            ))}
+          </Stack>
+          {/* Pagination Controls */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 2 }}>
+            <Button variant="outlined" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+              Previous
+            </Button>
+            <Typography variant="body2" sx={{ color: "#2a2a2a" }}>
+              Page {page} of {totalPages}
+            </Typography>
+            <Button
+              variant="outlined"
+              disabled={page === totalPages}
+              onClick={() => setPage((p) => p + 1)}
             >
-              <Button
-                variant="outlined"
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Previous
-              </Button>
-              <Typography variant="body2" sx={{ color: "#2a2a2a" }}>
-                Page {page} of {totalPages}
-              </Typography>
-              <Button
-                variant="outlined"
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </Button>
-            </Stack>
-          </>
-        ) : (
-          // Desktop → DataGrid
-          <Box
-            sx={{
-              height: 500,
-              width: "100%",
-              "& .MuiDataGrid-root": { border: "none" },
-              "& .MuiDataGrid-columnHeaders": {
-                bgcolor: "#f8b500",
-                color: "#111111",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                fontWeight: "bold !important",
-              },
-              "& .MuiDataGrid-row:hover": { bgcolor: "#fffbe6" },
-              "& .MuiDataGrid-footerContainer": { bgcolor: "#f7f7f7" },
-            }}
-          >
-            <DataGrid
-              rows={filteredAnnouncements}
-              columns={columns}
-              pageSize={10}
-              rowsPerPageOptions={[10, 20, 50]}
-              disableSelectionOnClick
-              getRowId={(row) => row.id}
-            />
-          </Box>
-        )}
+              Next
+            </Button>
+          </Stack>
+        </>
+      ) : (
+        // Desktop → DataGrid
+        <Box
+          sx={{
+            height: 500,
+            width: "100%",
+            "& .MuiDataGrid-root": { border: "none" },
+            "& .MuiDataGrid-columnHeaders": { bgcolor: "#f8b500", color: "#111111" },
+            "& .MuiDataGrid-columnHeaderTitle": { fontWeight: "bold !important" },
+            "& .MuiDataGrid-row:hover": { bgcolor: "#fffbe6" },
+            "& .MuiDataGrid-footerContainer": { bgcolor: "#f7f7f7" },
+            "& .MuiDataGrid-cell": {
+              display: "flex",
+              alignItems: "center",   // ✅ vertical center
+            },
+          }}
+        >
+          <DataGrid
+            rows={filteredAnnouncements}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[10, 20, 50]}
+            disableSelectionOnClick
+            getRowId={(row) => row.id}
+          />
+        </Box>
+      )}
 
-        {/* Modal */}
-        <AnnouncementModal
-          announcement={selectedAnnouncement}
-          onClose={() => setSelectedAnnouncement(null)}
-        />
-      </Box>
+      {/* Modal */}
+      <AnnouncementModal
+        announcement={selectedAnnouncement}
+        onClose={() => setSelectedAnnouncement(null)}
+      />
     </Box>
   );
 }
