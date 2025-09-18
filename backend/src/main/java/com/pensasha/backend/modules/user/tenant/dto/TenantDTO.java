@@ -2,7 +2,10 @@ package com.pensasha.backend.modules.user.tenant.dto;
 
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 

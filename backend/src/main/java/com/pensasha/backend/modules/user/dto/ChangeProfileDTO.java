@@ -1,6 +1,8 @@
 package com.pensasha.backend.modules.user.dto;
 
-import lombok.*;  // Importing Lombok annotations for generating boilerplate code
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;  // Importing Lombok annotations for generating boilerplate code
 
 /**
  * DTO class for updating a user's profile picture.

@@ -4,7 +4,9 @@ import org.springframework.validation.annotation.Validated;  // Importing annota
 
 import jakarta.persistence.Column;  // Importing column annotation from Jakarta Persistence
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
-import lombok.*;  // Importing Lombok annotations for generating boilerplate code
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;  // Importing Lombok annotations for generating boilerplate code
 
 // DTO class for updating user details, with validation constraints
 @Data  // Lombok annotation to generate getters, setters, toString, equals, and hashCode methods

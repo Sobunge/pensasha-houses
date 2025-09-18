@@ -4,7 +4,9 @@ import java.util.List; // Importing List to store amenities
 import java.util.Set; // Importing Set to store units
 
 import jakarta.validation.constraints.*; // Importing validation annotations from Jakarta API
-import lombok.*; // Importing Lombok annotations for generating boilerplate code
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor; // Importing Lombok annotations for generating boilerplate code
 
 // DTO class used to represent a property with validation constraints
 @Data // Lombok annotation to generate getter, setter, equals, hashCode, and toString

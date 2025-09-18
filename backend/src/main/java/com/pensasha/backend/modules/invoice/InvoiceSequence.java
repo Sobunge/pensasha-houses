@@ -2,7 +2,10 @@ package com.pensasha.backend.modules.invoice;
 
 // Import necessary annotations and classes
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Entity class representing the invoice number sequence tracker.

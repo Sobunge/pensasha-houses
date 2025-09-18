@@ -1,7 +1,9 @@
 package com.pensasha.backend.modules.user.dto;
 
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
-import lombok.*;  // Importing Lombok annotations for generating boilerplate code
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;  // Importing Lombok annotations for generating boilerplate code
 import org.springframework.validation.annotation.Validated;  // Importing validation support from Spring
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;

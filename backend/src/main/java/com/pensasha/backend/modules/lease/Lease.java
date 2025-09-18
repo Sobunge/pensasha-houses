@@ -10,7 +10,10 @@ import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Entity class representing a Lease record.
