@@ -10,6 +10,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
 import MailIcon from "@mui/icons-material/Mail";
 import CampaignIcon from "@mui/icons-material/Campaign";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 // Tenant menu
 export const tenantMenuItems = [
@@ -18,6 +19,7 @@ export const tenantMenuItems = [
   { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
   { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
+   { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
   { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
   { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
   { label: "Profile", link: "/tenant/user-profile", icon: <PersonIcon /> },

@@ -55,7 +55,7 @@ function HowItWorks() {
 
       <Grid container spacing={4} justifyContent="center">
         {steps.map((step) => (
-          <Grid item key={step.id}>
+          <Grid key={step.id}>
             <Card
               sx={{
                 width: 300,
