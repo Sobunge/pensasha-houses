@@ -3,7 +3,9 @@ package com.pensasha.backend.modules.unit.dto;
 import com.pensasha.backend.modules.unit.UnitStatus;
 
 import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
-import lombok.*;  // Importing Lombok annotations for generating boilerplate code
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;  // Importing Lombok annotations for generating boilerplate code
 
 // DTO class used to represent a unit with validation constraints
 @Data  // Lombok annotation to generate getters, setters, toString, equals, and hashCode methods

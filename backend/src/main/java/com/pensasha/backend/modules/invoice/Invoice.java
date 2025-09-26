@@ -8,7 +8,10 @@ import com.pensasha.backend.modules.payment.Payment;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Represents an invoice issued to a tenant.

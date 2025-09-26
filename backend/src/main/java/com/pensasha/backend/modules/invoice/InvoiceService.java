@@ -49,7 +49,7 @@ public class InvoiceService {
         invoiceSequenceRepository.save(sequence);
 
         String year = String.valueOf(LocalDate.now().getYear());
-        String invoiceNumber = String.format("INV-%s-%04d", year, newNumber);
+        String invoiceNumber = "INV-%s-%04d".formatted(year, newNumber);
 
         log.info("Generated invoice number: {}", invoiceNumber);
         return invoiceNumber;

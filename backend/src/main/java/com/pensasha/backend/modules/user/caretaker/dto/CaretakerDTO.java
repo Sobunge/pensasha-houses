@@ -2,7 +2,10 @@ package com.pensasha.backend.modules.user.caretaker.dto;
 
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 // Lombok annotation to generate getter methods automatically for all fields in the class
 @Getter

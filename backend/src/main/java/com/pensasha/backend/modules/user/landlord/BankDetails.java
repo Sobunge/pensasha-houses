@@ -2,7 +2,9 @@ package com.pensasha.backend.modules.user.landlord;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Entity class representing a user's bank account details.
