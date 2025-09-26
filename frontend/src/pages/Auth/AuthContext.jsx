@@ -1,30 +1,25 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from "react";
+// src/pages/Auth/AuthContext.jsx
+import React, { createContext, useContext, useState } from "react";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ track loading
-
-  // 🔄 Load user from localStorage when app starts
-  useEffect(() => {
+  // ✅ initialize user directly from localStorage
+  const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false); // ✅ done loading
-  }, []);
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-  // ✅ store full user object
+  const [loading ] = useState(false); // ✅ no artificial delay
+
   const loginAs = (userObj) => {
     setUser(userObj);
-    localStorage.setItem("user", JSON.stringify(userObj)); // save in storage
+    localStorage.setItem("user", JSON.stringify(userObj));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user"); // clear on logout
+    localStorage.removeItem("user");
   };
 
   return (
@@ -34,5 +29,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// easy hook to use in components
 export const useAuth = () => useContext(AuthContext);

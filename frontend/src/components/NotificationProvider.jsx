@@ -1,4 +1,3 @@
-// src/providers/NotificationProvider.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Snackbar, Alert, Slide, Button } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -20,15 +19,25 @@ export const NotificationProvider = ({ children }) => {
     severity = "info",
     duration = 4000,
     position = { vertical: "top", horizontal: "center" },
-    action = null // optional button
+    action = null,
+    actionLabel = null
   ) => {
-    const id = Date.now();
+    // Dedupe: if identical message+severity is already current or queued, ignore
+    if (
+      (current && current.message === message && current.severity === severity) ||
+      queue.some((q) => q.message === message && q.severity === severity)
+    ) {
+      return;
+    }
+
+    const id = Date.now() + Math.random();
     setQueue((prev) => [
       ...prev,
-      { id, message, severity, duration, position, action },
+      { id, message, severity, duration, position, action, actionLabel },
     ]);
   };
 
+  // When no current is shown, pop the next one from the queue
   useEffect(() => {
     if (!current && queue.length > 0) {
       setCurrent(queue[0]);
@@ -36,7 +45,11 @@ export const NotificationProvider = ({ children }) => {
     }
   }, [queue, current]);
 
-  const handleClose = () => setCurrent(null);
+  const handleClose = (event, reason) => {
+    // ignore clickaway so user can click elsewhere without closing accidentally
+    if (reason === "clickaway") return;
+    setCurrent(null);
+  };
 
   const severityIcons = {
     success: <CheckCircleIcon />,
@@ -46,10 +59,10 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const severityColors = {
-    success: "#4CAF50", // green
-    error: "#F44336",   // red
-    warning: "#FF9800", // orange
-    info: "#2196F3",    // blue
+    success: "#4CAF50",
+    error: "#F44336",
+    warning: "#FF9800",
+    info: "#2196F3",
   };
 
   return (

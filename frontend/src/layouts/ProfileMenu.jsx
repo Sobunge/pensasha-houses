@@ -11,11 +11,13 @@ import { Link as RouterLink } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
-import { useNotification } from "../../components/NotificationProvider";
+import { useNotification } from "../components/NotificationProvider";
+import { useAuth } from "../pages/Auth/AuthContext";
 
 function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
   const { notify } = useNotification(); // hook must be inside component
+  const { logout } = useAuth();
 
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -28,6 +30,7 @@ function ProfileMenu() {
 
   const handleLogout = () => {
     handleClose();
+    logout();
     notify("You have logged out successfully!", "success"); // success alert
   };
 

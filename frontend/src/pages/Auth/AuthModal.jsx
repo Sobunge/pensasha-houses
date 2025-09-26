@@ -18,7 +18,7 @@ import { useNotification } from "../../components/NotificationProvider";
 
 // ⬅️ import AuthContext + users
 import { AuthContext } from "./AuthContext"; // ✅ check path
-import { users } from "../../config/users"; // ✅ lowercase file name
+import { users } from "../../config/users" // ✅ lowercase file name
 
 function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0);
