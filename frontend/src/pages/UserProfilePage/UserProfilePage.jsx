@@ -1,5 +1,5 @@
 // src/pages/UserProfilePage/UserProfilePage.jsx
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -7,68 +7,154 @@ import {
   Avatar,
   Divider,
   Grid,
+  Stack,
 } from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import BadgeIcon from "@mui/icons-material/Badge";
 import { useAuth } from "../Auth/AuthContext";
-import UserSidebar from "../../components/UserSidebar";
 
-function UserProfilePage() {
+export default function UserProfilePage() {
   const { user } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
 
   if (!user) {
     return (
-      <Typography variant="h6" sx={{ p: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ p: 2, textAlign: "center", color: "text.secondary" }}
+      >
         Please log in to view your profile.
       </Typography>
     );
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* ✅ Sidebar based on logged-in user role */}
-      <UserSidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
-
-      <Box
-        component="main"
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        py: 1,
+        px: 2,
+        bgcolor: "#f5f5f5",
+      }}
+    >
+      <Paper
+        elevation={4}
         sx={{
-          flexGrow: 1,
-          p: 3,
-          mt: 2,
+          p: { xs: 3, sm: 5 },
+          borderRadius: 4,
+          maxWidth: 800,
+          width: "100%",
         }}
       >
-        <Paper sx={{ p: 4, borderRadius: 3, maxWidth: 800, mx: "auto" }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item>
-              <Avatar sx={{ width: 80, height: 80 }}>
-                {user.name.charAt(0)}
-              </Avatar>
-            </Grid>
-            <Grid item>
-              <Typography variant="h5" gutterBottom>
-                {user.name}
-              </Typography>
-              <Typography variant="subtitle1" color="text.secondary">
+        {/* Header: Avatar + Name */}
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={3}
+          alignItems="center"
+          mb={4}
+        >
+          <Avatar
+            sx={{
+              width: { xs: 80, sm: 100 },
+              height: { xs: 80, sm: 100 },
+              bgcolor: "#f8b500",
+              fontSize: { xs: 32, sm: 40 },
+            }}
+          >
+            {user.name.charAt(0)}
+          </Avatar>
+          <Box textAlign={{ xs: "center", sm: "left" }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, wordBreak: "break-word" }}
+            >
+              {user.name}
+            </Typography>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent={{ xs: "center", sm: "flex-start" }}
+              spacing={1}
+              mt={1}
+            >
+              <BadgeIcon sx={{ color: "#f8b500" }} />
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 600, color: "text.secondary" }}
+              >
                 {user.role.toUpperCase()}
               </Typography>
-            </Grid>
+            </Stack>
+          </Box>
+        </Stack>
+
+        <Divider sx={{ mb: 4 }} />
+
+        {/* User Details */}
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <Paper
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                bgcolor: "#fff8e1",
+                boxShadow: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+              }}
+            >
+              <EmailIcon sx={{ color: "#f8b500" }} />
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Email
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {user.email}
+                </Typography>
+              </Box>
+            </Paper>
           </Grid>
 
-          <Divider sx={{ my: 3 }} />
+          <Grid item xs={12} sm={6}>
+            <Paper
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                bgcolor: "#fff8e1",
+                boxShadow: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+              }}
+            >
+              <PhoneIcon sx={{ color: "#f8b500" }} />
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Phone
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {user.phone}
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
 
-          <Typography variant="body1">
-            <strong>Email:</strong> {user.email}
-          </Typography>
-          <Typography variant="body1">
-            <strong>Phone:</strong> {user.phone}
-          </Typography>
-        </Paper>
-      </Box>
+        {/* Optional: About / Bio */}
+        {user.bio && (
+          <>
+            <Divider sx={{ my: 4 }} />
+            <Typography variant="h6" gutterBottom>
+              About Me
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {user.bio}
+            </Typography>
+          </>
+        )}
+      </Paper>
     </Box>
   );
 }
-
-export default UserProfilePage;
