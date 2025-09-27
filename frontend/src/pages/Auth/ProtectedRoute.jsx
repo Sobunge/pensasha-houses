@@ -1,56 +1,27 @@
 import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
-import { useNotification } from "../../components/NotificationProvider"; // correct path
+import { useNotification } from "../../components/NotificationProvider";
 
-// helper that triggers a single notify (provider dedupe prevents duplicates) then redirects
-const RedirectWithNotify = ({ to, message, severity = "info", duration = 2000, state }) => {
-  const { notify } = useNotification();
-  const notifiedRef = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!notifiedRef.current) {
-      notify(message, severity, duration);
-      notifiedRef.current = true;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, severity, duration]);
-
-  return <Navigate to={to} replace state={state} />;
-};
-
+// ProtectedRoute handles role-based access and redirects
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
-  const location = useLocation();
+  const { notify } = useNotification();
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
 
+  // If user is not logged in, just redirect to landing page (no notification)
   if (!user) {
-    return (
-      <RedirectWithNotify
-        to="/"
-        message="Not logged in! Please log in."
-        severity="error"
-        duration={2000}
-        state={{ from: location }}
-      />
-    );
+    return <Navigate to="/" replace />;
   }
 
+  // If user is logged in but doesn't have required role
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return (
-      <RedirectWithNotify
-        to="/"
-        message="Unauthorized access!"
-        severity="warning"
-        duration={2000}
-        state={{ from: location }}
-      />
-    );
+    notify("Unauthorized access!", "warning", 2000);
+    return <Navigate to="/" replace />;
   }
 
+  // User is logged in and authorized
   return children;
 };
 

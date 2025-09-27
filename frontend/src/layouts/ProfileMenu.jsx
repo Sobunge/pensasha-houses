@@ -13,11 +13,13 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import { useNotification } from "../components/NotificationProvider";
 import { useAuth } from "../pages/Auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
-  const { notify } = useNotification(); // hook must be inside component
+  const { notify } = useNotification();
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -30,15 +32,16 @@ function ProfileMenu() {
 
   const handleLogout = () => {
     try {
-      handleClose(); // close menu/modal
-      logout();      // clear user auth
+      handleClose(); // close menu
+      logout();      // clear user
       notify("You have logged out successfully!", "success"); // success alert
+      navigate("/"); // redirect to landing page, skip ProtectedRoute notify
     } catch (error) {
       console.error("Logout failed:", error);
       notify("Logout failed. Please try again.", "error");
     }
   };
-  
+
   return (
     <>
       {/* Profile Icon Button */}
@@ -81,9 +84,7 @@ function ProfileMenu() {
 
         {/* Logout */}
         <MenuItem
-          component={RouterLink}
-          to="/"
-          onClick={handleLogout} // call success notification
+          onClick={handleLogout} // call success notification + redirect
           sx={{ px: 2, py: 1, transition: "background-color 0.3s", "&:hover": hoverStyle }}
         >
           <ListItemIcon sx={{ minWidth: 36 }}>
