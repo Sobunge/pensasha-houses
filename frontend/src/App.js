@@ -44,71 +44,75 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public routes wrapped in AppLayout */}
+          {/* Public routes */}
           <Route element={<AppLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/properties" element={<ListingsPage />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} /> {/* Public catch-all */}
           </Route>
 
-          {/* Tenant routes (protected) */}
+          {/* Tenant routes */}
           <Route
+            path="/tenant/*"
             element={
               <ProtectedRoute allowedRoles={["tenant"]}>
                 <DashboardLayout menuItems={tenantMenuItems} />
               </ProtectedRoute>
             }
           >
-            <Route path="/tenant" element={<TenantDashboard />} />
-            <Route path="/tenant/properties" element={<PropertiesPage />} />
-            <Route path="/tenant/properties/:id" element={<PropertyPage />} />
-            <Route path="/tenant/announcements" element={<AnnouncementsPage />} />
-            <Route path="/tenant/messages" element={<MessagesPage />} />
-            <Route path="/tenant/messages/:id" element={<ConversationPage />} />
-            <Route path="/tenant/documents" element={<DocumentsPage />} />
-            <Route path="/tenant/maintenance-requests" element={<MaintenanceRequestsPage />} />
-            <Route path="/tenant/activities" element={<ActivityFeedPage />} />
-            <Route path="/tenant/rent-payments" element={<RentPaymentsPage />} />
-            <Route path="/tenant/user-profile" element={<UserProfilePage />} />
+            <Route index element={<TenantDashboard />} />
+            <Route path="properties" element={<PropertiesPage />} />
+            <Route path="properties/:id" element={<PropertyPage />} />
+            <Route path="announcements" element={<AnnouncementsPage />} />
+            <Route path="messages" element={<MessagesPage />} />
+            <Route path="messages/:id" element={<ConversationPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
+            <Route path="maintenance-requests" element={<MaintenanceRequestsPage />} />
+            <Route path="activities" element={<ActivityFeedPage />} />
+            <Route path="rent-payments" element={<RentPaymentsPage />} />
+            <Route path="user-profile" element={<UserProfilePage />} />
+            <Route path="*" element={<NotFound />} /> {/* Tenant catch-all */}
           </Route>
 
-          {/* Landlord routes (protected) */}
+          {/* Landlord routes */}
           <Route
+            path="/landlord/*"
             element={
               <ProtectedRoute allowedRoles={["landlord"]}>
                 <DashboardLayout menuItems={landlordMenuItems} />
               </ProtectedRoute>
             }
           >
-            <Route path="/landlord" element={<LandlordDashboard />} />
-            <Route path="/landlord/properties" element={<PropertiesPage />} />
-            {/* Add additional landlord routes here */}
+            <Route index element={<LandlordDashboard />} />
+            <Route path="properties" element={<PropertiesPage />} />
+            <Route path="*" element={<NotFound />} /> {/* Landlord catch-all */}
           </Route>
 
-          {/* Caretaker routes (protected) */}
+          {/* Caretaker routes */}
           <Route
+            path="/caretaker/*"
             element={
               <ProtectedRoute allowedRoles={["caretaker"]}>
-                <DashboardLayout menuItems={[]} /> {/* Add caretaker menu later */}
+                <DashboardLayout menuItems={[]} />
               </ProtectedRoute>
             }
           >
-            <Route path="/caretaker" element={<CaretakerDashboard />} />
+            <Route index element={<CaretakerDashboard />} />
+            <Route path="*" element={<NotFound />} /> {/* Caretaker catch-all */}
           </Route>
 
-          {/* Admin routes (protected) */}
+          {/* Admin routes */}
           <Route
+            path="/admin/*"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
-                <DashboardLayout menuItems={[]} /> {/* Add admin menu later */}
+                <DashboardLayout menuItems={[]} />
               </ProtectedRoute>
             }
           >
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route index element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} /> {/* Admin catch-all */}
           </Route>
-
-          {/* Catch all */}
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider>
