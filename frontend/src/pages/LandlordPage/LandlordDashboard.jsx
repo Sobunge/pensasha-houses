@@ -1,6 +1,6 @@
 // src/pages/LandlordPage/LandlordDashboard.jsx
 import React from "react";
-import { Box, Typography, Card, Avatar, Button, Grid, Toolbar } from "@mui/material";
+import { Box, Typography, Card, Avatar, Button, Grid } from "@mui/material";
 import { motion } from "framer-motion";
 
 import DashboardStats from "./DashboardStats";
