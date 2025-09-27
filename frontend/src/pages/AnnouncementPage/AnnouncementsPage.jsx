@@ -309,7 +309,7 @@ function AnnouncementsPage() {
         // Desktop → DataGrid
         <Box
           sx={{
-            height: 500,
+            height: 520,
             width: "100%",
             "& .MuiDataGrid-root": { border: "none" },
             "& .MuiDataGrid-columnHeaders": { bgcolor: "#f8b500", color: "#111111" },
