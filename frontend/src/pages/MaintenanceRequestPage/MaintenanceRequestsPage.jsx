@@ -43,7 +43,7 @@ function MaintenanceRequestsPage() {
         flexGrow: 1,
         p: { xs: 2, md: 3 },
         bgcolor: "#f7f7f7",
-        minHeight: "79.11vh",
+        minHeight: "70.11vh",
       }}
     >
       <MaintenanceRequestsHeader showForm={showForm} onToggleForm={handleFormToggle} />
