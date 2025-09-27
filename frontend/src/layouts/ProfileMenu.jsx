@@ -29,11 +29,16 @@ function ProfileMenu() {
   };
 
   const handleLogout = () => {
-    handleClose();
-    logout();
-    notify("You have logged out successfully!", "success"); // success alert
+    try {
+      handleClose(); // close menu/modal
+      logout();      // clear user auth
+      notify("You have logged out successfully!", "success"); // success alert
+    } catch (error) {
+      console.error("Logout failed:", error);
+      notify("Logout failed. Please try again.", "error");
+    }
   };
-
+  
   return (
     <>
       {/* Profile Icon Button */}
