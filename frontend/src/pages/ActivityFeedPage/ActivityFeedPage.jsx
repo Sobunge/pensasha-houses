@@ -243,7 +243,7 @@ function ActivityFeedPage() {
       ) : (
         <Box
           sx={{
-            height: 500,
+            height: 520,
             width: "100%",
             "& .MuiDataGrid-root": { border: "none" },
             "& .MuiDataGrid-columnHeaders": {
