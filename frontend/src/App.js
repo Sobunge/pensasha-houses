@@ -81,6 +81,7 @@ function App() {
             }
           >
             <Route path="/landlord" element={<LandlordDashboard />} />
+            <Route path="/landlord/properties" element={<PropertiesPage />} />
             {/* Add additional landlord routes here */}
           </Route>
 
