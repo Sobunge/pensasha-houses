@@ -154,6 +154,7 @@ const LandlordTenants = () => {
         <TextField
           fullWidth
           variant="outlined"
+          size="small"
           placeholder="Search by name, email, property, status, or date (YYYY-MM-DD)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}

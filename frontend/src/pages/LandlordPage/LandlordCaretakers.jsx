@@ -1,5 +1,5 @@
 // src/pages/LandlordPage/LandlordCaretakers.jsx
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -19,6 +19,7 @@ import {
   Tooltip,
   Stack,
   Divider,
+  TextField,
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -54,6 +55,7 @@ const LandlordCaretakers = () => {
   const [orderBy, setOrderBy] = useState("name");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -72,7 +74,24 @@ const LandlordCaretakers = () => {
     setPage(0);
   };
 
-  const sortedCaretakers = [...dummyCaretakers].sort(getComparator(order, orderBy));
+  // Filter caretakers based on search
+  const filteredCaretakers = useMemo(() => {
+    return dummyCaretakers.filter((caretaker) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        caretaker.name.toLowerCase().includes(query) ||
+        caretaker.property.toLowerCase().includes(query) ||
+        caretaker.email.toLowerCase().includes(query) ||
+        caretaker.phone.toLowerCase().includes(query) ||
+        caretaker.status.toLowerCase().includes(query)
+      );
+    });
+  }, [searchQuery]);
+
+  const sortedCaretakers = [...filteredCaretakers].sort(
+    getComparator(order, orderBy)
+  );
+
   const paginatedCaretakers = sortedCaretakers.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -131,6 +150,17 @@ const LandlordCaretakers = () => {
         </Card>
       </motion.div>
 
+      {/* Search Bar */}
+      <TextField
+        placeholder="Search by name, property, email, phone, or status..."
+        variant="outlined"
+        size="small"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        fullWidth
+        sx={{ mb: 3 }}
+      />
+
       {/* Caretaker List */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -153,10 +183,26 @@ const LandlordCaretakers = () => {
                         Name
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell>Property</TableCell>
+                    <TableCell sortDirection={orderBy === "property" ? order : false}>
+                      <TableSortLabel
+                        active={orderBy === "property"}
+                        direction={orderBy === "property" ? order : "asc"}
+                        onClick={() => handleSort("property")}
+                      >
+                        Property
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell>Email</TableCell>
                     <TableCell>Phone</TableCell>
-                    <TableCell>Status</TableCell>
+                    <TableCell sortDirection={orderBy === "status" ? order : false}>
+                      <TableSortLabel
+                        active={orderBy === "status"}
+                        direction={orderBy === "status" ? order : "asc"}
+                        onClick={() => handleSort("status")}
+                      >
+                        Status
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell align="center">Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -165,7 +211,9 @@ const LandlordCaretakers = () => {
                     <TableRow key={caretaker.id} hover>
                       <TableCell
                         sx={{ cursor: "pointer" }}
-                        onClick={() => navigate(`/landlord/caretakers/${caretaker.id}`)}
+                        onClick={() =>
+                          navigate(`/landlord/caretakers/${caretaker.id}`)
+                        }
                       >
                         {caretaker.name}
                       </TableCell>
@@ -196,7 +244,9 @@ const LandlordCaretakers = () => {
                       <TableCell align="center">
                         <Tooltip title="View Details">
                           <IconButton
-                            onClick={() => navigate(`/landlord/caretakers/${caretaker.id}`)}
+                            onClick={() =>
+                              navigate(`/landlord/caretakers/${caretaker.id}`)
+                            }
                           >
                             <VisibilityIcon />
                           </IconButton>
@@ -231,7 +281,7 @@ const LandlordCaretakers = () => {
             {/* Pagination */}
             <TablePagination
               component="div"
-              count={dummyCaretakers.length}
+              count={filteredCaretakers.length}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}
@@ -284,7 +334,12 @@ const LandlordCaretakers = () => {
                 <Divider sx={{ my: 1 }} />
 
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
-                  <IconButton size="small" onClick={() => navigate(`/landlord/caretakers/${caretaker.id}`)}>
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      navigate(`/landlord/caretakers/${caretaker.id}`)
+                    }
+                  >
                     <VisibilityIcon fontSize="small" />
                   </IconButton>
                   <IconButton size="small">
@@ -306,7 +361,7 @@ const LandlordCaretakers = () => {
             {/* Pagination for mobile */}
             <TablePagination
               component="div"
-              count={dummyCaretakers.length}
+              count={filteredCaretakers.length}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}
