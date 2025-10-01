@@ -10,6 +10,7 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 import ListingsPage from "./pages/ListingsPage/ListingsPage";
 import NotFound from "./pages/NotFoundPage/NotFound";
 import LandlordTenants from "./pages/LandlordPage/LandlordTenants";
+import LandlordCaretakerDetails from "./pages/LandlordPage/LandlordCaretakerDetails";
 
 // Tenant
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
@@ -40,6 +41,7 @@ import { tenantMenuItems, landlordMenuItems } from "./config/menuItems";
 import { AuthProvider } from "./pages/Auth/AuthContext";
 import ProtectedRoute from "./pages/Auth/ProtectedRoute";
 import TenantDetails from "./pages/LandlordPage/TenantDetails";
+import LandlordCaretakers from "./pages/LandlordPage/LandlordCaretakers";
 
 function App() {
   return (
@@ -87,8 +89,10 @@ function App() {
           >
             <Route index element={<LandlordDashboard />} />
             <Route path="properties" element={<PropertiesPage />} />
-            <Route path="tenants" element={<LandlordTenants />} /> 
-             <Route path="tenants/:id" element={<TenantDetails />} /> 
+            <Route path="tenants" element={<LandlordTenants />} />
+            <Route path="tenants/:id" element={<TenantDetails />} />
+            <Route path="caretakers" element={<LandlordCaretakers />} />
+            <Route path="caretakers/:id" element={<LandlordCaretakerDetails />} />
             <Route path="*" element={<NotFound />} /> {/* Landlord catch-all */}
           </Route>
 
