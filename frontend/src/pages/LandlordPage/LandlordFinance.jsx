@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextField,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -59,6 +60,7 @@ const LandlordFinance = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedTxn, setSelectedTxn] = useState(null); // modal state
 
   const theme = useTheme();
@@ -76,7 +78,15 @@ const LandlordFinance = () => {
     setPage(0);
   };
 
-  const sortedData = [...dummyTransactions].sort(getComparator(order, orderBy));
+  // Filter by search (includes date now)
+  const filteredData = dummyTransactions.filter((txn) =>
+    [txn.date, txn.type, txn.property, txn.status, txn.reference]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
+
+  const sortedData = [...filteredData].sort(getComparator(order, orderBy));
   const paginatedData = sortedData.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -135,6 +145,18 @@ const LandlordFinance = () => {
         </Card>
       </motion.div>
 
+      {/* Search Bar */}
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          size="small"
+          placeholder="Search by date, type, property, status, or reference..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Box>
+
       {/* Transactions List */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -157,10 +179,34 @@ const LandlordFinance = () => {
                         Date
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Property</TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === "type"}
+                        direction={orderBy === "type" ? order : "asc"}
+                        onClick={() => handleSort("type")}
+                      >
+                        Type
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === "property"}
+                        direction={orderBy === "property" ? order : "asc"}
+                        onClick={() => handleSort("property")}
+                      >
+                        Property
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell align="right">Amount</TableCell>
-                    <TableCell>Status</TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === "status"}
+                        direction={orderBy === "status" ? order : "asc"}
+                        onClick={() => handleSort("status")}
+                      >
+                        Status
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell align="center">Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -213,7 +259,7 @@ const LandlordFinance = () => {
             {/* Pagination */}
             <TablePagination
               component="div"
-              count={dummyTransactions.length}
+              count={filteredData.length}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}
@@ -225,10 +271,7 @@ const LandlordFinance = () => {
           /* Mobile Cards */
           <Stack spacing={2}>
             {paginatedData.map((txn) => (
-              <Card
-                key={txn.id}
-                sx={{ p: 2, borderRadius: 2, boxShadow: 2 }}
-              >
+              <Card key={txn.id} sx={{ p: 2, borderRadius: 2, boxShadow: 2 }}>
                 <Stack spacing={1}>
                   <Typography variant="subtitle2" fontWeight={600}>
                     {txn.type}
@@ -243,7 +286,11 @@ const LandlordFinance = () => {
                     {txn.amount > 0 ? `+${txn.amount}` : txn.amount} Ksh
                   </Typography>
                   <Divider />
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography
                       variant="caption"
                       sx={{
@@ -274,7 +321,7 @@ const LandlordFinance = () => {
             {/* Pagination */}
             <TablePagination
               component="div"
-              count={dummyTransactions.length}
+              count={filteredData.length}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}
