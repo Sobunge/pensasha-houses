@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFoundPage/NotFound";
 import LandlordTenants from "./pages/LandlordPage/LandlordTenants";
 import LandlordCaretakerDetails from "./pages/LandlordPage/LandlordCaretakerDetails";
 import LandlordFinance from "./pages/LandlordPage/LandlordFinance";
+import LandlordReports from "./pages/LandlordPage/LandlordReports";
 
 // Tenant
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
@@ -95,6 +96,7 @@ function App() {
             <Route path="caretakers" element={<LandlordCaretakers />} />
             <Route path="caretakers/:id" element={<LandlordCaretakerDetails />} />
             <Route path="finances" element={<LandlordFinance />} /> 
+            <Route path="reports" element={<LandlordReports />} />
             <Route path="*" element={<NotFound />} /> {/* Landlord catch-all */}
           </Route>
 
