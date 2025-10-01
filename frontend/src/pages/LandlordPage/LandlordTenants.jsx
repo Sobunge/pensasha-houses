@@ -20,6 +20,7 @@ import {
   Stack,
   Divider,
   useMediaQuery,
+  TextField,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -39,6 +40,11 @@ const dummyTenants = Array.from({ length: 120 }).map((_, i) => ({
   property: i % 2 === 0 ? "Greenwood Apartments" : "Lakeview Villas",
   email: `tenant${i + 1}@example.com`,
   status: i % 3 === 0 ? "Pending" : "Active",
+  dateJoined: new Date(
+    2024,
+    Math.floor(Math.random() * 12),
+    Math.floor(Math.random() * 28) + 1
+  ).toISOString().split("T")[0], // YYYY-MM-DD
 }));
 
 // Sorting helper
@@ -53,6 +59,7 @@ const LandlordTenants = () => {
   const [orderBy, setOrderBy] = useState("name");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const theme = useTheme();
@@ -64,16 +71,26 @@ const LandlordTenants = () => {
     setOrderBy(property);
   };
 
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage);
-  };
+  const handleChangePage = (_, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const sortedTenants = [...dummyTenants].sort(getComparator(order, orderBy));
+  // Filtering tenants by search query (name, email, property, status, date)
+  const filteredTenants = dummyTenants.filter((tenant) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      tenant.name.toLowerCase().includes(query) ||
+      tenant.email.toLowerCase().includes(query) ||
+      tenant.property.toLowerCase().includes(query) ||
+      tenant.status.toLowerCase().includes(query) ||
+      tenant.dateJoined.includes(query)
+    );
+  });
+
+  const sortedTenants = [...filteredTenants].sort(getComparator(order, orderBy));
   const paginatedTenants = sortedTenants.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -109,7 +126,7 @@ const LandlordTenants = () => {
                 Tenant Management
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                You currently have {dummyTenants.length} tenants
+                You currently have {filteredTenants.length} tenants
               </Typography>
             </Box>
           </Box>
@@ -132,6 +149,17 @@ const LandlordTenants = () => {
         </Card>
       </motion.div>
 
+      {/* Search Bar */}
+      <Box mb={3}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Search by name, email, property, status, or date (YYYY-MM-DD)"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Box>
+
       {/* Responsive Tenant List */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -145,6 +173,7 @@ const LandlordTenants = () => {
               <Table>
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#f8f8f8" }}>
+                    {/* Sort by Name */}
                     <TableCell sortDirection={orderBy === "name" ? order : false}>
                       <TableSortLabel
                         active={orderBy === "name"}
@@ -154,8 +183,21 @@ const LandlordTenants = () => {
                         Name
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell>Property</TableCell>
+
+                    {/* Sort by Property */}
+                    <TableCell sortDirection={orderBy === "property" ? order : false}>
+                      <TableSortLabel
+                        active={orderBy === "property"}
+                        direction={orderBy === "property" ? order : "asc"}
+                        onClick={() => handleSort("property")}
+                      >
+                        Property
+                      </TableSortLabel>
+                    </TableCell>
+
                     <TableCell>Email</TableCell>
+
+                    {/* Sort by Status */}
                     <TableCell sortDirection={orderBy === "status" ? order : false}>
                       <TableSortLabel
                         active={orderBy === "status"}
@@ -165,9 +207,22 @@ const LandlordTenants = () => {
                         Status
                       </TableSortLabel>
                     </TableCell>
+
+                    {/* Sort by Date */}
+                    <TableCell sortDirection={orderBy === "dateJoined" ? order : false}>
+                      <TableSortLabel
+                        active={orderBy === "dateJoined"}
+                        direction={orderBy === "dateJoined" ? order : "asc"}
+                        onClick={() => handleSort("dateJoined")}
+                      >
+                        Date Joined
+                      </TableSortLabel>
+                    </TableCell>
+
                     <TableCell align="center">Actions</TableCell>
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {paginatedTenants.map((tenant) => (
                     <TableRow key={tenant.id} hover>
@@ -200,12 +255,11 @@ const LandlordTenants = () => {
                           {tenant.status}
                         </Typography>
                       </TableCell>
+                      <TableCell>{tenant.dateJoined}</TableCell>
                       <TableCell align="center">
                         <Tooltip title="View Details">
                           <IconButton
-                            onClick={() =>
-                              navigate(`/landlord/tenants/${tenant.id}`)
-                            }
+                            onClick={() => navigate(`/landlord/tenants/${tenant.id}`)}
                           >
                             <VisibilityIcon />
                           </IconButton>
@@ -235,7 +289,7 @@ const LandlordTenants = () => {
             {/* Pagination */}
             <TablePagination
               component="div"
-              count={dummyTenants.length}
+              count={filteredTenants.length}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}
@@ -263,6 +317,9 @@ const LandlordTenants = () => {
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {tenant.email}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Joined: {tenant.dateJoined}
                     </Typography>
                   </Box>
                   <Typography
@@ -308,7 +365,7 @@ const LandlordTenants = () => {
             {/* Pagination for mobile */}
             <TablePagination
               component="div"
-              count={dummyTenants.length}
+              count={filteredTenants.length}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}
