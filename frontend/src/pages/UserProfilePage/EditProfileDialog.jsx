@@ -50,9 +50,7 @@ function EditProfileDialog({ open, handleClose, user, onSave }) {
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{
-        sx: { borderRadius: 3, p: 1.5 },
-      }}
+      PaperProps={{ sx: { borderRadius: 3, p: 1.5 } }}
     >
       {/* Header */}
       <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 2 }}>

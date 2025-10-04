@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -6,6 +6,7 @@ import {
   Avatar,
   Divider,
   Stack,
+  Link,
 } from "@mui/material";
 import BadgeIcon from "@mui/icons-material/Badge";
 import { useAuth } from "../Auth/AuthContext";
@@ -15,9 +16,13 @@ import TenantProfile from "./TenantProfile";
 import LandlordProfile from "./LandlordProfile";
 import CaretakerProfile from "./CaretakerProfile";
 import AdminProfile from "./AdminProfile";
+import EditProfileDialog from "./EditProfileDialog"; // optional: for profile editing
+import ChangeProfilePicDialog from "./ChangeProfilePicDialog"; // new dialog
 
 export default function UserProfilePage() {
   const { user } = useAuth();
+  const [openEditProfile, setOpenEditProfile] = useState(false);
+  const [openChangePic, setOpenChangePic] = useState(false);
 
   if (!user) {
     return (
@@ -33,13 +38,13 @@ export default function UserProfilePage() {
   const renderRoleProfile = (role) => {
     switch (role) {
       case "tenant":
-        return <TenantProfile user={user} />;
+        return <TenantProfile user={user} onUpdate={() => {}} />;
       case "landlord":
-        return <LandlordProfile user={user} />;
+        return <LandlordProfile user={user} onUpdate={() => {}} />;
       case "caretaker":
-        return <CaretakerProfile user={user} />;
+        return <CaretakerProfile user={user} onUpdate={() => {}} />;
       case "admin":
-        return <AdminProfile user={user} />;
+        return <AdminProfile user={user} onUpdate={() => {}} />;
       default:
         return null;
     }
@@ -50,7 +55,7 @@ export default function UserProfilePage() {
       sx={{
         display: "flex",
         justifyContent: "center",
-        py: 1,
+        py: 2,
         px: 2,
         bgcolor: "#f5f5f5",
       }}
@@ -69,18 +74,30 @@ export default function UserProfilePage() {
           direction={{ xs: "column", sm: "row" }}
           spacing={3}
           alignItems="center"
-          mb={4}
+          mb={2}
         >
-          <Avatar
-            sx={{
-              width: { xs: 80, sm: 100 },
-              height: { xs: 80, sm: 100 },
-              bgcolor: "#f8b500",
-              fontSize: { xs: 32, sm: 40 },
-            }}
-          >
-            {user.name?.charAt(0) || "U"}
-          </Avatar>
+          <Box textAlign="center">
+            <Avatar
+              sx={{
+                width: { xs: 80, sm: 100 },
+                height: { xs: 80, sm: 100 },
+                bgcolor: "#f8b500",
+                fontSize: { xs: 32, sm: 40 },
+                mx: "auto",
+              }}
+            >
+              {user.name?.charAt(0) || "U"}
+            </Avatar>
+            {/* Change Profile Picture Link */}
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => setOpenChangePic(true)}
+              sx={{ mt: 1, display: "block", color: "#1976d2" }}
+            >
+              Change Profile Picture
+            </Link>
+          </Box>
           <Box textAlign={{ xs: "center", sm: "left" }}>
             <Typography
               variant="h4"
@@ -106,10 +123,30 @@ export default function UserProfilePage() {
           </Box>
         </Stack>
 
-        <Divider sx={{ mb: 4 }} />
+        <Divider sx={{ mb: 3 }} />
 
         {/* Role-specific content */}
         {renderRoleProfile(user.role)}
+
+        {/* Edit Profile Dialog */}
+        {openEditProfile && (
+          <EditProfileDialog
+            open={openEditProfile}
+            handleClose={() => setOpenEditProfile(false)}
+            user={user}
+            onSave={(data) => console.log("Save profile:", data)}
+          />
+        )}
+
+        {/* Change Profile Picture Dialog */}
+        {openChangePic && (
+          <ChangeProfilePicDialog
+            open={openChangePic}
+            handleClose={() => setOpenChangePic(false)}
+            user={user}
+            onSave={(newPic) => console.log("Profile pic updated:", newPic)}
+          />
+        )}
       </Paper>
     </Box>
   );
