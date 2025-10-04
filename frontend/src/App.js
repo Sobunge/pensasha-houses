@@ -91,6 +91,7 @@ function App() {
           >
             <Route index element={<LandlordDashboard />} />
             <Route path="properties" element={<PropertiesPage />} />
+            <Route path="properties/:id" element={<PropertyPage />} />
             <Route path="tenants" element={<LandlordTenants />} />
             <Route path="tenants/:id" element={<TenantDetails />} />
             <Route path="caretakers" element={<LandlordCaretakers />} />
@@ -116,6 +117,7 @@ function App() {
           >
             <Route index element={<CaretakerDashboard />} />
             <Route path="user-profile" element={<UserProfilePage />} />
+            <Route path="properties/:id" element={<PropertyPage />} />
             <Route path="*" element={<NotFound />} /> {/* Caretaker catch-all */}
           </Route>
 
@@ -130,6 +132,7 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="user-profile" element={<UserProfilePage />} />
+            <Route path="properties/:id" element={<PropertyPage />} />
             <Route path="*" element={<NotFound />} /> {/* Admin catch-all */}
           </Route>
         </Routes>
