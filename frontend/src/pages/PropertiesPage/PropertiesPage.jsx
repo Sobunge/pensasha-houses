@@ -1,14 +1,11 @@
 // src/pages/PropertiesPage/PropertiesPage.jsx
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Grid } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
-import { useAuth } from "../Auth/AuthContext";
 
 function PropertiesPage() {
-  const { user } = useAuth();
-
   // Sample properties
   const sampleProperties = [
     { id: 1, name: "Sunrise Apartments", unit: "A-203", lease: "Jan 2024 – Dec 2024", rentAmount: "Ksh 12,000", rentStatus: "Pending" },
@@ -19,6 +16,7 @@ function PropertiesPage() {
 
   return (
     <Box sx={{ mb: 3, px: 2 }}>
+      {/* Page Title */}
       <Typography
         variant="h5"
         sx={{ fontWeight: 600, mb: 3, textAlign: "center", color: "#111111" }}
@@ -26,6 +24,7 @@ function PropertiesPage() {
         Your Properties
       </Typography>
 
+      {/* Empty state */}
       {sampleProperties.length === 0 ? (
         <Box
           sx={{
@@ -44,35 +43,43 @@ function PropertiesPage() {
           <Typography sx={{ color: "#2a2a2a", mb: 3 }}>
             It looks like you don’t have any properties linked to your account yet.
           </Typography>
-          {user.role === "landlord" && (
-            <Button
-              variant="contained"
-              sx={{
-                borderRadius: 3,
-                px: 3,
-                py: 1,
-                fontWeight: 600,
-                backgroundColor: "#f8b500",
-                "&:hover": { backgroundColor: "#ffc62c" },
-              }}
-            >
-              Add Your First Property
-            </Button>
-          )}
+          <Button
+            variant="contained"
+            sx={{
+              borderRadius: 3,
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              backgroundColor: "#f8b500",
+              "&:hover": { backgroundColor: "#ffc62c" },
+            }}
+          >
+            Add Your First Property
+          </Button>
         </Box>
       ) : (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+        <Grid
+          container
+          spacing={3}
+          justifyContent="center" // center cards horizontally
+        >
           {sampleProperties.map((property) => (
-            <Box
+            <Grid
+              item
+              xs={12}   // full width on mobile
+              sm={6}    // two cards per row on small screens
+              md={4}    // three cards per row on medium screens
+              lg={3}    // four cards per row on large screens
               key={property.id}
-              sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}
+              sx={{ display: "flex", justifyContent: "center" }} // center each card
             >
               <PropertyInfoCard property={property} />
-            </Box>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       )}
 
+      {/* Load more button if needed */}
       {sampleProperties.length > 6 && (
         <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
           <Button

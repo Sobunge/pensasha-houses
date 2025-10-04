@@ -43,7 +43,7 @@ const PropertyInfoCard = ({ property }) => {
       sx={{
         borderRadius: 3,
         boxShadow: 2,
-        maxWidth: 400,
+        minWidth: 350,
         cursor: "pointer",
         display: "flex",
         flexDirection: "column",
