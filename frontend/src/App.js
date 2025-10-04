@@ -100,6 +100,7 @@ function App() {
             <Route path="messages" element={<MessagesPage  />} />
             <Route path="messages/:id" element={<ConversationPage />} />
             <Route path="announcements" element={<AnnouncementsPage />} />
+            <Route path="activities" element={<ActivityFeedPage />} />
             <Route path="*" element={<NotFound />} /> {/* Landlord catch-all */}
           </Route>
 

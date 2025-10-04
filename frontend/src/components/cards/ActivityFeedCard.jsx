@@ -1,36 +1,120 @@
-import React from "react";
-import { Box, Stack, Typography, Divider, Avatar, Button } from "@mui/material";
+// src/components/ActivityFeedCard.jsx
+import React, { useState } from "react";
+import {
+  Box,
+  Stack,
+  Typography,
+  Divider,
+  Avatar,
+  Button,
+  IconButton,
+} from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../pages/Auth/AuthContext";
+import ActivityModal from "../../pages/ActivityFeedPage/ActivityModal";
 
-function ActivityFeedCard({ activities = [], compact = false }) {
+function ActivityFeedCard({ activities = [], compact = false, onClose }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // Sample data if none provided
+  // Default to tenant role
+  const role = user?.role || "tenant";
+
+  // Fallback activities
   const defaultActivities = [
-    { id: 1, title: "Payment Received", description: "Rent payment for Sept.", time: "10:00 AM" },
-    { id: 2, title: "Maintenance Update", description: "Plumbing request approved.", time: "11:30 AM" },
-    { id: 3, title: "New Announcement", description: "Community meeting scheduled.", time: "1:00 PM" },
+    {
+      id: 1,
+      type: "Payment Received",
+      message: "Rent payment for Sept.",
+      date: "10:00 AM",
+      status: "Unread",
+    },
+    {
+      id: 2,
+      type: "Maintenance Update",
+      message: "Plumbing request approved.",
+      date: "11:30 AM",
+      status: "Read",
+    },
+    {
+      id: 3,
+      type: "New Announcement",
+      message: "Community meeting scheduled.",
+      date: "1:00 PM",
+      status: "Unread",
+    },
   ];
 
-  const displayActivities = activities.length ? activities : defaultActivities;
-  const itemsToShow = compact ? displayActivities.slice(0, 3) : displayActivities;
+  const [activityList, setActivityList] = useState(
+    activities.length ? activities : defaultActivities
+  );
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
+  // Show fewer in compact mode
+  const itemsToShow = compact ? activityList.slice(0, 3) : activityList;
+
+  // Open activity (auto-mark read if unread)
+  const handleOpenActivity = (activity) => {
+    let updated = activity;
+    if (activity.status === "Unread") {
+      setActivityList((prev) =>
+        prev.map((a) =>
+          a.id === activity.id ? { ...a, status: "Read" } : a
+        )
+      );
+      updated = { ...activity, status: "Read" };
+    }
+    setSelectedActivity(updated);
+  };
+
+  // Mark as read explicitly (from modal)
+  const handleMarkRead = (id) => {
+    let updated;
+    setActivityList((prev) =>
+      prev.map((a) => {
+        if (a.id === id) {
+          updated = { ...a, status: "Read" };
+          return updated;
+        }
+        return a;
+      })
+    );
+    if (selectedActivity?.id === id) {
+      setSelectedActivity(updated);
+    }
+    setSelectedActivity(null); // ✅ close modal after marking
+  };
+
+  // Navigate to full activity feed
+  const handleViewAll = () => {
+    navigate(`/${role}/activities`);
+    if (onClose) onClose(); // ✅ close drawer/popover when navigating
+  };
 
   return (
     <Box sx={{ p: 2 }}>
-      {/* Header / Title */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <NotificationsIcon sx={{ color: "#1976d2" }} />
-        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+      {/* Header with Close Button */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <NotificationsIcon sx={{ color: "#1976d2", mr: 1 }} />
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, flexGrow: 1 }}>
           Activity Feed
         </Typography>
+        {onClose && (
+          <IconButton size="small" onClick={onClose}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
+      {/* Activity List */}
       <Stack spacing={compact ? 1.5 : 2}>
         {itemsToShow.map((activity) => (
           <Box
             key={activity.id}
+            onClick={() => handleOpenActivity(activity)}
             sx={{
               display: "flex",
               alignItems: "flex-start",
@@ -38,31 +122,38 @@ function ActivityFeedCard({ activities = [], compact = false }) {
               p: 1,
               borderRadius: 2,
               cursor: "pointer",
-              bgcolor: "#f7f7f7",
+              bgcolor: activity.status === "Unread" ? "#fffbe6" : "#f7f7f7",
               "&:hover": { bgcolor: "#e9ecef" },
             }}
-            onClick={() => !compact && console.log("Clicked activity", activity.id)}
           >
             <Avatar sx={{ bgcolor: "#1976d2", width: 36, height: 36 }}>
-              {activity.title[0]}
+              {activity.type[0]}
             </Avatar>
+
             <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }} noWrap>
-                {activity.title}
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: activity.status === "Unread" ? 700 : 600,
+                }}
+                noWrap
+              >
+                {activity.type}
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
-                {activity.description}
+                {activity.message}
               </Typography>
             </Box>
+
             {!compact && (
               <Typography variant="caption" color="text.secondary">
-                {activity.time}
+                {activity.date}
               </Typography>
             )}
           </Box>
         ))}
 
-        {/* View All button for compact mode */}
+        {/* View All Button */}
         {compact && (
           <>
             <Divider sx={{ my: 1 }} />
@@ -72,13 +163,21 @@ function ActivityFeedCard({ activities = [], compact = false }) {
               size="small"
               sx={{ bgcolor: "#1976d2", "&:hover": { bgcolor: "#115293" } }}
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate("/tenant/activities")}
+              onClick={handleViewAll}
             >
               View All
             </Button>
           </>
         )}
       </Stack>
+
+      {/* Activity Modal */}
+      <ActivityModal
+        open={!!selectedActivity}
+        activity={selectedActivity}
+        onClose={() => setSelectedActivity(null)} // ✅ only closes modal
+        onMarkRead={handleMarkRead} // ✅ mark & close
+      />
     </Box>
   );
 }

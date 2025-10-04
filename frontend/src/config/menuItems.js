@@ -9,17 +9,16 @@ import PersonIcon from "@mui/icons-material/Person";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
 import MailIcon from "@mui/icons-material/Mail";
-import CampaignIcon from "@mui/icons-material/Campaign";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
 // Tenant menu
 export const tenantMenuItems = [
   { label: "Dashboard", link: "/tenant", icon: <HomeIcon /> },
-  { label: "Properties", link: "/tenant/properties", icon: <HomeWorkIcon />},
+  { label: "Properties", link: "/tenant/properties", icon: <HomeWorkIcon /> },
   { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
   { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
-   { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
+  { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
   { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
   { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
   { label: "Profile", link: "/tenant/user-profile", icon: <PersonIcon /> },
@@ -29,12 +28,13 @@ export const tenantMenuItems = [
 export const landlordMenuItems = [
   { label: "Dashboard", icon: <DashboardIcon />, link: "/landlord" },
   { label: "My Properties", icon: <HomeWorkIcon />, link: "/landlord/properties" },
+  { label: "Announcements", icon: <AnnouncementIcon />, link: "/landlord/announcements" },
   { label: "Tenants", icon: <PersonIcon />, link: "/landlord/tenants" },
   { label: "Caretakers", icon: <BuildIcon />, link: "/landlord/caretakers" },
   { label: "Finances", icon: <PaymentIcon />, link: "/landlord/finances" },
   { label: "Reports", icon: <DescriptionIcon />, link: "/landlord/reports" },
+  { label: "Activity Feeds", link: "/landlord/activities", icon: <NotificationsIcon /> },
   { label: "Messages", icon: <MailIcon />, link: "/landlord/messages" },
-  { label: "Announcements", icon: <CampaignIcon />, link: "/landlord/announcements" },
 ];
 
 // Caretaker menu

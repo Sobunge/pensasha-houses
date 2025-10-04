@@ -1,5 +1,5 @@
 // src/pages/ActivityFeed/ActivityFeedPage.jsx
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -12,6 +12,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useAuth } from "../Auth/AuthContext"; // ✅ role-aware
 import ActivityFilters from "./ActivityFilters";
 import ActivityModal from "./ActivityModal";
 
@@ -25,9 +26,12 @@ const sampleActivities = Array.from({ length: 120 }).map((_, i) => ({
       : `Maintenance request ${i + 1} created`,
   date: `2025-09-${(i % 30) + 1}`,
   status: i % 3 === 0 ? "Unread" : "Read",
+  role: i % 4 === 0 ? "tenant" : i % 4 === 1 ? "landlord" : i % 4 === 2 ? "caretaker" : "admin", // ✅ simulate role ownership
 }));
 
 function ActivityFeedPage() {
+  const { user } = useAuth();
+  const role = user?.role || "tenant"; // ✅ default fallback
   const [activities, setActivities] = useState(sampleActivities);
   const [page, setPage] = useState(1);
   const [selectedActivity, setSelectedActivity] = useState(null);
@@ -36,6 +40,12 @@ function ActivityFeedPage() {
   const pageSize = 5;
   const totalPages = Math.ceil(activities.length / pageSize);
   const isMobile = useMediaQuery("(max-width:900px)");
+
+  // ✅ Role-based filtering
+  const roleActivities = useMemo(() => {
+    if (role === "admin") return activities;
+    return activities.filter((a) => a.role === role);
+  }, [role, activities]);
 
   // Handle filter changes
   const handleFilterChange = (e) => {
@@ -47,7 +57,7 @@ function ActivityFeedPage() {
   const handleResetFilters = () => setFilters({ search: "", type: "", status: "" });
 
   // Apply filters
-  const filteredActivities = activities.filter((a) => {
+  const filteredActivities = roleActivities.filter((a) => {
     const searchMatch =
       !filters.search || a.message.toLowerCase().includes(filters.search.toLowerCase());
     const typeMatch = !filters.type || a.type === filters.type;
@@ -93,7 +103,7 @@ function ActivityFeedPage() {
     if (selectedActivity?.id === id) setSelectedActivity(updated);
   };
 
-  // Table columns for DataGrid
+  // DataGrid columns
   const columns = [
     { field: "type", headerName: "Type", flex: 1 },
     { field: "message", headerName: "Message", flex: 2 },
@@ -150,7 +160,7 @@ function ActivityFeedPage() {
       >
         <NotificationsActiveIcon sx={{ color: "#f8b500" }} />
         <Typography variant="h5" sx={{ fontWeight: "bold", color: "#111111" }}>
-          Activity Feed
+          {role.charAt(0).toUpperCase() + role.slice(1)} – Activity Feed
         </Typography>
       </Stack>
 

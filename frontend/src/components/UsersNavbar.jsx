@@ -1,3 +1,4 @@
+// src/components/UsersNavbar.jsx
 import React, { useState } from "react";
 import {
   AppBar,
@@ -14,9 +15,9 @@ import MailIcon from "@mui/icons-material/Mail";
 import ProfileMenu from "../layouts/ProfileMenu";
 import ActivityFeedCard from "./cards/ActivityFeedCard";
 import MessagesCard from "./cards/MessagesCard";
-import { useAuth } from "../pages/Auth/AuthContext"; // ✅ import your auth context
+import { useAuth } from "../pages/Auth/AuthContext"; 
 
-// Sample messages (replace with actual state from backend)
+// Sample messages (replace with backend data)
 const sampleMessages = [
   { id: 1, sender: "Alice", lastMessage: "Hi there!", unread: true },
   { id: 2, sender: "Bob", lastMessage: "Please review the payment.", unread: false },
@@ -28,7 +29,7 @@ function UsersNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
   const [anchorElMessages, setAnchorElMessages] = useState(null);
 
-  const { user } = useAuth(); // ✅ get logged-in user info
+  const { user } = useAuth();
 
   // Notifications popover
   const handleOpenNotifications = (event) => setAnchorElNotifications(event.currentTarget);
@@ -113,7 +114,8 @@ function UsersNavbar({ onMenuClick }) {
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           PaperProps={{ sx: { mt: 1.5, borderRadius: 3, boxShadow: 4, width: 320 } }}
         >
-          <MessagesCard messages={sampleMessages} compact />
+          {/* ✅ Pass onClose so MessagesCard can close popover */}
+          <MessagesCard messages={sampleMessages} compact onClose={handleCloseMessages} />
         </Popover>
 
         {/* ===== Notifications Dropdown ===== */}
@@ -130,7 +132,8 @@ function UsersNavbar({ onMenuClick }) {
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           PaperProps={{ sx: { mt: 1.5, borderRadius: 3, boxShadow: 4, width: 320 } }}
         >
-          <ActivityFeedCard compact />
+          {/* ✅ Pass onClose so ActivityFeedCard can close popover */}
+          <ActivityFeedCard compact onClose={handleCloseNotifications} />
         </Popover>
 
         {/* Profile Menu */}
