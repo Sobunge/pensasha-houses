@@ -4,6 +4,8 @@ import { Box, Stack, Typography, Button } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import MessageFilters from "./MessageFilters";
 import ThreadCard from "./ThreadCard";
+import { useAuth } from "../Auth/AuthContext"; // ✅ Import auth context
+import { useNavigate } from "react-router-dom"; // ✅ Import navigate
 
 // Sample Data: 200 threads
 const sampleThreads = Array.from({ length: 200 }).map((_, i) => ({
@@ -15,6 +17,9 @@ const sampleThreads = Array.from({ length: 200 }).map((_, i) => ({
 }));
 
 function MessagesPage() {
+  const { user } = useAuth(); // ✅ Get logged-in user with role
+  const navigate = useNavigate();
+
   const [filters, setFilters] = useState({ search: "", status: "" });
   const [threads, setThreads] = useState(sampleThreads);
   const [page, setPage] = useState(1);
@@ -42,7 +47,10 @@ function MessagesPage() {
     setThreads((prev) =>
       prev.map((t) => (t.id === thread.id ? { ...t, unread: false } : t))
     );
-    window.location.href = `/tenant/messages/${thread.id}`;
+
+    // ✅ Role-based navigation
+    const role = user?.role || "tenant"; 
+    navigate(`/${role}/messages/${thread.id}`);
   };
 
   return (

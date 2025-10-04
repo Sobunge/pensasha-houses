@@ -44,7 +44,6 @@ import { AuthProvider } from "./pages/Auth/AuthContext";
 import ProtectedRoute from "./pages/Auth/ProtectedRoute";
 import TenantDetails from "./pages/LandlordPage/TenantDetails";
 import LandlordCaretakers from "./pages/LandlordPage/LandlordCaretakers";
-import LandlordMessages from "./pages/LandlordPage/LandlordMessages";
 
 function App() {
   return (
@@ -98,7 +97,8 @@ function App() {
             <Route path="caretakers/:id" element={<LandlordCaretakerDetails />} />
             <Route path="finances" element={<LandlordFinance />} /> 
             <Route path="reports" element={<LandlordReports />} />
-            <Route path="messages" element={<LandlordMessages />} />
+            <Route path="messages" element={<MessagesPage  />} />
+            <Route path="messages/:id" element={<ConversationPage />} />
             <Route path="*" element={<NotFound />} /> {/* Landlord catch-all */}
           </Route>
 
