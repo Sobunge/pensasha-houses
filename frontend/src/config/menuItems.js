@@ -18,10 +18,10 @@ export const tenantMenuItems = [
   { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
   { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
+  { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
 
   // Role-specific
   { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
-  { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
   { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
 ];
 
@@ -33,6 +33,7 @@ export const landlordMenuItems = [
   { label: "Announcements", link: "/landlord/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/landlord/messages", icon: <MailIcon /> },
   { label: "Activity Feeds", link: "/landlord/activities", icon: <NotificationsIcon /> },
+  { label: "Maintenance Requests", link: "/landlord/maintenance-requests", icon: <BuildIcon /> },
 
   // Role-specific
   { label: "Tenants", link: "/landlord/tenants", icon: <PersonIcon /> },
@@ -49,6 +50,7 @@ export const caretakerMenuItems = [
   { label: "Announcements", link: "/caretaker/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/caretaker/messages", icon: <MailIcon /> },
   { label: "Activity Feeds", link: "/caretaker/activities", icon: <NotificationsIcon /> },
+  { label: "Maintenance Requests", link: "/caretaker/maintenance-requests", icon: <BuildIcon /> },
 
   // Role-specific
   { label: "Tasks", link: "/caretaker/tasks", icon: <BuildIcon /> },
@@ -63,6 +65,7 @@ export const adminMenuItems = [
   { label: "Announcements", link: "/admin/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/admin/messages", icon: <MailIcon /> },
   { label: "Activity Feeds", link: "/admin/activities", icon: <NotificationsIcon /> },
+  { label: "Maintenance Requests", link: "/admin/maintenance-requests", icon: <BuildIcon /> },
 
   // Role-specific
   { label: "Users", link: "/admin/users", icon: <PersonIcon /> },

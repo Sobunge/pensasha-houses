@@ -103,6 +103,7 @@ function App() {
             <Route path="announcements" element={<AnnouncementsPage />} />
             <Route path="activities" element={<ActivityFeedPage />} />
             <Route path="user-profile" element={<UserProfilePage />} />
+            <Route path="maintenance-requests" element={<MaintenanceRequestsPage />} />
             <Route path="*" element={<NotFound />} /> {/* Landlord catch-all */}
           </Route>
 
@@ -118,6 +119,7 @@ function App() {
             <Route index element={<CaretakerDashboard />} />
             <Route path="user-profile" element={<UserProfilePage />} />
             <Route path="properties/:id" element={<PropertyPage />} />
+            <Route path="maintenance-requests" element={<MaintenanceRequestsPage />} />
             <Route path="*" element={<NotFound />} /> {/* Caretaker catch-all */}
           </Route>
 
@@ -133,6 +135,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="user-profile" element={<UserProfilePage />} />
             <Route path="properties/:id" element={<PropertyPage />} />
+            <Route path="maintenance-requests" element={<MaintenanceRequestsPage />} />
             <Route path="*" element={<NotFound />} /> {/* Admin catch-all */}
           </Route>
         </Routes>

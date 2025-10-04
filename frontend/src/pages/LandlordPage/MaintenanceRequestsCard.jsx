@@ -55,7 +55,7 @@ function MaintenanceRequestsCard() {
           <Button
             variant="outlined"
             startIcon={<BuildIcon />}
-            onClick={() => navigate("/landlord/maintenance")}
+            onClick={() => navigate("/landlord/maintenance-requests")}
             sx={{
               borderRadius: 3,
               px: 3,
