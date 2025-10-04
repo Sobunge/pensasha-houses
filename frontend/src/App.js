@@ -101,6 +101,7 @@ function App() {
             <Route path="messages/:id" element={<ConversationPage />} />
             <Route path="announcements" element={<AnnouncementsPage />} />
             <Route path="activities" element={<ActivityFeedPage />} />
+            <Route path="user-profile" element={<UserProfilePage />} />
             <Route path="*" element={<NotFound />} /> {/* Landlord catch-all */}
           </Route>
 
@@ -114,6 +115,7 @@ function App() {
             }
           >
             <Route index element={<CaretakerDashboard />} />
+            <Route path="user-profile" element={<UserProfilePage />} />
             <Route path="*" element={<NotFound />} /> {/* Caretaker catch-all */}
           </Route>
 
@@ -127,6 +129,7 @@ function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="user-profile" element={<UserProfilePage />} />
             <Route path="*" element={<NotFound />} /> {/* Admin catch-all */}
           </Route>
         </Routes>
