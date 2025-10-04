@@ -9,8 +9,11 @@ import {
   Avatar,
   Stack,
   Divider,
+  Button,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import { useNavigate } from "react-router-dom";
 
 const tenants = [
   {
@@ -34,6 +37,8 @@ const tenants = [
 ];
 
 function TenantSummaryCard() {
+  const navigate = useNavigate();
+
   return (
     <Card
       sx={{
@@ -41,22 +46,12 @@ function TenantSummaryCard() {
         boxShadow: 3,
         p: 2,
         background: "linear-gradient(135deg, #ffffff, #fafafa)",
+        width: "100%",
+        maxWidth: 350,
+        mx: "auto",
       }}
     >
       <CardContent>
-        {/* Title */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            mb: 3,
-            color: "#111",
-            letterSpacing: 0.5,
-          }}
-        >
-          Tenant Summary
-        </Typography>
-
         {/* Tenant List */}
         <Stack spacing={3}>
           {tenants.map((tenant, index) => (
@@ -66,7 +61,7 @@ function TenantSummaryCard() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  mb: 1,
+                  mb: 0,
                 }}
               >
                 {/* Left: Avatar + Tenant Info */}
@@ -117,6 +112,31 @@ function TenantSummaryCard() {
             </Box>
           ))}
         </Stack>
+
+        {/* Outlined Button at the bottom */}
+        <Box sx={{ mt: 3, textAlign: "center" }}>
+          <Button
+            variant="outlined"
+            startIcon={<HomeWorkIcon />}
+            onClick={() => navigate("/landlord/tenants")}
+            sx={{
+              borderRadius: 3,
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              color: "#111111",
+              borderColor: "#f8b500",
+              "&:hover": {
+                backgroundColor: "#f8b500",
+                color: "#111111",
+                borderColor: "#111111",
+              },
+            }}
+          >
+            View Tenants
+          </Button>
+        </Box>
       </CardContent>
     </Card>
   );

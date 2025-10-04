@@ -1,6 +1,6 @@
 // src/pages/LandlordPage/LandlordDashboard.jsx
 import React from "react";
-import { Box, Typography, Card, Avatar, Button, Grid } from "@mui/material";
+import { Box, Typography, Card, Avatar, Button } from "@mui/material";
 import { motion } from "framer-motion";
 
 import DashboardStats from "./DashboardStats";
@@ -10,7 +10,7 @@ import TenantSummaryCard from "./TenantSummaryCard";
 import RecentPaymentsCard from "./RecentPaymentsCard";
 import MaintenanceRequestsCard from "./MaintenanceRequestsCard";
 
-// Reusable Section Title
+// Reusable Section Title (centered)
 const SectionTitle = ({ children }) => (
   <Typography
     variant="subtitle2"
@@ -20,6 +20,7 @@ const SectionTitle = ({ children }) => (
       fontWeight: 600,
       mb: 2,
       color: "text.primary",
+      textAlign: "center",
     }}
   >
     {children}
@@ -37,7 +38,6 @@ const LandlordDashboard = () => {
 
   return (
     <Box sx={{ minHeight: "100%" }}>
-
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
@@ -62,7 +62,7 @@ const LandlordDashboard = () => {
             <Avatar
               src="/assets/images/landlord-avatar.png"
               alt="Landlord"
-              sx={{ width: 56, height: 56, bgcolor: "#f8b500", color: "#111111" }}
+              sx={{ width: 56, height: 56, bgcolor: "#f8b500", color: "#111" }}
             />
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 600, color: "text.primary" }}>
@@ -78,7 +78,7 @@ const LandlordDashboard = () => {
             variant="contained"
             sx={{
               bgcolor: "#f8b500",
-              color: "#111111",
+              color: "#111",
               fontWeight: 600,
               textTransform: "none",
               borderRadius: 2,
@@ -102,9 +102,27 @@ const LandlordDashboard = () => {
       </motion.div>
 
       {/* Dashboard Sections */}
-      <Grid container spacing={3} sx={{ mt: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center", // center all cards horizontally
+          gap: 2,
+          mt: 3,
+          px: { xs: 2, md: 0 },
+        }}
+      >
         {sections.map((section, index) => (
-          <Grid item xs={12} sm={6} lg={4} key={section.title}>
+          <Box
+            key={section.title}
+            sx={{
+              flex: "0 0 350px", // fixed width
+              minWidth: 350,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center", // center content inside card
+            }}
+          >
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -113,9 +131,9 @@ const LandlordDashboard = () => {
               <SectionTitle>{section.title}</SectionTitle>
               {section.component}
             </motion.div>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 };

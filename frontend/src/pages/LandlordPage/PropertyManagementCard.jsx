@@ -1,22 +1,18 @@
 // src/components/cards/PropertyManagementCard.jsx
 import React from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  LinearProgress,
-  Stack,
-} from "@mui/material";
+import { Card, CardContent, Typography, Box, LinearProgress, Stack, Button } from "@mui/material";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import { useNavigate } from "react-router-dom";
 
+// Sample properties
 const properties = [
   { name: "Sunrise Apartments", units: 12, occupied: 10 },
   { name: "Pensasha Towers", units: 20, occupied: 18 },
-  { name: "Lakeview Residences", units: 8, occupied: 6 },
 ];
 
 function PropertyManagementCard() {
+  const navigate = useNavigate();
+
   return (
     <Card
       sx={{
@@ -24,28 +20,18 @@ function PropertyManagementCard() {
         boxShadow: 3,
         p: 2,
         background: "linear-gradient(135deg, #ffffff, #fafafa)",
+        width: "100%",
+        maxWidth: 350, // responsive max width
+        mx: "auto",    // center horizontally
       }}
     >
       <CardContent>
-        {/* Title */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            mb: 3,
-            color: "#111",
-            letterSpacing: 0.5,
-          }}
-        >
-          Managed Properties
-        </Typography>
-
         {/* Property List */}
         <Stack spacing={3}>
           {properties.map((property, index) => {
-            const occupancyRate = Math.round(
-              (property.occupied / property.units) * 100
-            );
+            const occupancyRate = Math.round((property.occupied / property.units) * 100);
+            const progressColor =
+              occupancyRate > 80 ? "#4caf50" : occupancyRate > 50 ? "#f8b500" : "#f44336";
 
             return (
               <Box key={index}>
@@ -60,23 +46,16 @@ function PropertyManagementCard() {
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <HomeWorkIcon sx={{ color: "#f8b500" }} />
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: 600, color: "#2a2a2a" }}
-                    >
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#2a2a2a" }}>
                       {property.name}
                     </Typography>
                   </Box>
-
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "#777", fontWeight: 500 }}
-                  >
+                  <Typography variant="body2" sx={{ color: "#777", fontWeight: 500 }}>
                     {occupancyRate}% Occupied
                   </Typography>
                 </Box>
 
-                {/* Occupancy Progress */}
+                {/* Occupancy Progress Bar */}
                 <LinearProgress
                   variant="determinate"
                   value={occupancyRate}
@@ -85,12 +64,7 @@ function PropertyManagementCard() {
                     borderRadius: 5,
                     backgroundColor: "#eee",
                     "& .MuiLinearProgress-bar": {
-                      backgroundColor:
-                        occupancyRate > 80
-                          ? "#4caf50"
-                          : occupancyRate > 50
-                          ? "#f8b500"
-                          : "#f44336",
+                      backgroundColor: progressColor,
                     },
                   }}
                 />
@@ -106,6 +80,31 @@ function PropertyManagementCard() {
             );
           })}
         </Stack>
+
+        {/* View All Button */}
+        <Box sx={{ mt: 4, textAlign: "center" }}>
+          <Button
+            variant="outlined"
+            startIcon={<HomeWorkIcon />}
+            onClick={() => navigate("/landlord/properties")}
+            sx={{
+              borderRadius: 3,
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              color: "#111111",
+              borderColor: "#f8b500",
+              "&:hover": {
+                backgroundColor: "#f8b500",
+                color: "#111111",
+                borderColor: "#111111",
+              },
+            }}
+          >
+            View All Properties
+          </Button>
+        </Box>
       </CardContent>
     </Card>
   );

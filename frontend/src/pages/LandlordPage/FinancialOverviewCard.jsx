@@ -1,13 +1,6 @@
 // src/components/cards/FinancialOverviewCard.jsx
 import React from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Divider,
-  Stack,
-} from "@mui/material";
+import { Card, CardContent, Typography, Box, Divider, Stack } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
@@ -24,37 +17,24 @@ function FinancialOverviewCard() {
       sx={{
         borderRadius: 3,
         boxShadow: 3,
-        p: 2,
+        p: 3,
         background: "linear-gradient(135deg, #ffffff, #f9f9f9)",
+        width: "100%",
+        maxWidth: 300, // responsive width
+        mx: "auto",    // center horizontally
       }}
     >
       <CardContent>
-        {/* Title */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            mb: 3,
-            color: "#111",
-            letterSpacing: 0.5,
-          }}
-        >
-          Financial Overview
-        </Typography>
-
         {/* Stats */}
-        <Stack spacing={2} divider={<Divider flexItem />}>
-          {/* Income */}
+        <Stack spacing={3} divider={<Divider flexItem />}>
+          {/* Total Income */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <AccountBalanceWalletIcon sx={{ color: "#4caf50" }} />
             <Box>
               <Typography variant="body2" sx={{ color: "#777" }}>
                 Total Income
               </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, color: "#111" }}
-              >
+              <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
                 {financials.totalIncome}
               </Typography>
             </Box>
@@ -67,10 +47,7 @@ function FinancialOverviewCard() {
               <Typography variant="body2" sx={{ color: "#777" }}>
                 Expenses
               </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, color: "#111" }}
-              >
+              <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
                 {financials.totalExpenses}
               </Typography>
             </Box>
@@ -83,10 +60,7 @@ function FinancialOverviewCard() {
               <Typography variant="body2" sx={{ color: "#777" }}>
                 Net Profit
               </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 700, color: "#2a2a2a" }}
-              >
+              <Typography variant="h6" sx={{ fontWeight: 700, color: "#2a2a2a" }}>
                 {financials.netProfit}
               </Typography>
             </Box>

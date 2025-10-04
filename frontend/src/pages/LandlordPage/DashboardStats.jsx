@@ -6,6 +6,7 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import PeopleIcon from "@mui/icons-material/People";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
+// Sample dynamic stats
 const stats = [
   { label: "Properties", value: 3, icon: <HomeWorkIcon /> },
   { label: "Units", value: 40, icon: <ApartmentIcon /> },
@@ -24,19 +25,14 @@ function DashboardStats() {
               boxShadow: 2,
               height: "100%",
               bgcolor: "#fff",
-              maxWidth: { xs: 320, sm: "100%" }, // limit width on small screens
-              mx: "auto", // center horizontally
+              maxWidth: 320,
+              mx: "auto",
+              cursor: "pointer",
+              transition: "transform 0.2s",
+              "&:hover": { transform: "translateY(-4px)", boxShadow: 4 },
             }}
           >
-            <CardContent
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                p: { xs: 2, sm: 3 },
-              }}
-            >
-              {/* Icon wrapper */}
+            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2, p: { xs: 2, sm: 3 } }}>
               <Box
                 sx={{
                   display: "flex",
@@ -54,24 +50,16 @@ function DashboardStats() {
                 {stat.icon}
               </Box>
 
-              {/* Text */}
               <Box>
                 <Typography
                   variant="h6"
-                  sx={{
-                    fontWeight: 700,
-                    color: "#111",
-                    fontSize: { xs: "1rem", sm: "1.25rem" },
-                  }}
+                  sx={{ fontWeight: 700, color: "#111", fontSize: { xs: "1rem", sm: "1.25rem" } }}
                 >
                   {stat.value}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{
-                    color: "#555",
-                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                  }}
+                  sx={{ color: "#555", fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
                 >
                   {stat.label}
                 </Typography>
