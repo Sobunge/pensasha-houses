@@ -1,3 +1,4 @@
+// src/data/menuItems.js
 import React from "react";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
@@ -10,7 +11,8 @@ import BuildIcon from "@mui/icons-material/Build";
 import PaymentIcon from "@mui/icons-material/Payment";
 import PersonIcon from "@mui/icons-material/Person";
 
-// Tenant menu
+
+// ======================= TENANT MENU =======================
 export const tenantMenuItems = [
   { label: "Dashboard", link: "/tenant", icon: <DashboardIcon /> },
   { label: "Profile", link: "/tenant/user-profile", icon: <PersonIcon /> },
@@ -25,7 +27,8 @@ export const tenantMenuItems = [
   { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
 ];
 
-// Landlord menu
+
+// ======================= LANDLORD MENU =======================
 export const landlordMenuItems = [
   { label: "Dashboard", link: "/landlord", icon: <DashboardIcon /> },
   { label: "Profile", link: "/landlord/user-profile", icon: <PersonIcon /> },
@@ -42,7 +45,8 @@ export const landlordMenuItems = [
   { label: "Reports", link: "/landlord/reports", icon: <DescriptionIcon /> },
 ];
 
-// Caretaker menu
+
+// ======================= CARETAKER MENU =======================
 export const caretakerMenuItems = [
   { label: "Dashboard", link: "/caretaker", icon: <DashboardIcon /> },
   { label: "Profile", link: "/caretaker/user-profile", icon: <PersonIcon /> },
@@ -50,14 +54,15 @@ export const caretakerMenuItems = [
   { label: "Announcements", link: "/caretaker/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/caretaker/messages", icon: <MailIcon /> },
   { label: "Activity Feeds", link: "/caretaker/activities", icon: <NotificationsIcon /> },
-  { label: "Maintenance Requests", link: "/caretaker/maintenance-requests", icon: <BuildIcon /> },
 
   // Role-specific
-  { label: "Tasks", link: "/caretaker/tasks", icon: <BuildIcon /> },
-  { label: "Maintenance Requests", link: "/caretaker/maintenance", icon: <BuildIcon /> },
+  { label: "Maintenance Requests", link: "/caretaker/maintenance-requests", icon: <BuildIcon /> },
+  { label: "Assigned Tasks", link: "/caretaker/tasks", icon: <BuildIcon /> },
+  { label: "Reports", link: "/caretaker/reports", icon: <DescriptionIcon /> },
 ];
 
-// Admin menu
+
+// ======================= ADMIN MENU =======================
 export const adminMenuItems = [
   { label: "Dashboard", link: "/admin", icon: <DashboardIcon /> },
   { label: "Profile", link: "/admin/user-profile", icon: <PersonIcon /> },
