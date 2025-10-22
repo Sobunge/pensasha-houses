@@ -26,6 +26,8 @@ import MaintenanceRequestsPage from "./pages/MaintenanceRequestPage/MaintenanceR
 import ActivityFeedPage from "./pages/ActivityFeedPage/ActivityFeedPage";
 import RentPaymentsPage from "./pages/RentPaymentPage/RentPaymentsPage";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
+import CaretakerTasksPage from "./pages/CaretakerPage/CaretakerTasksPage";
+import CaretakerReportsPage from "./pages/CaretakerPage/CaretakerReportsPage";
 
 // Landlord
 import LandlordDashboard from "./pages/LandlordPage/LandlordDashboard";
@@ -96,9 +98,9 @@ function App() {
             <Route path="tenants/:id" element={<TenantDetails />} />
             <Route path="caretakers" element={<LandlordCaretakers />} />
             <Route path="caretakers/:id" element={<LandlordCaretakerDetails />} />
-            <Route path="finances" element={<LandlordFinance />} /> 
+            <Route path="finances" element={<LandlordFinance />} />
             <Route path="reports" element={<LandlordReports />} />
-            <Route path="messages" element={<MessagesPage  />} />
+            <Route path="messages" element={<MessagesPage />} />
             <Route path="messages/:id" element={<ConversationPage />} />
             <Route path="announcements" element={<AnnouncementsPage />} />
             <Route path="activities" element={<ActivityFeedPage />} />
@@ -120,6 +122,8 @@ function App() {
             <Route path="user-profile" element={<UserProfilePage />} />
             <Route path="properties/:id" element={<PropertyPage />} />
             <Route path="maintenance-requests" element={<MaintenanceRequestsPage />} />
+            <Route path="tasks" element={<CaretakerTasksPage />} />
+            <Route path="reports" element={<CaretakerReportsPage />} />
             <Route path="*" element={<NotFound />} /> {/* Caretaker catch-all */}
           </Route>
 
