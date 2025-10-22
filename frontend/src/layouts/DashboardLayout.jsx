@@ -8,10 +8,9 @@ import MainFooter from "../components/MainFooter";
 import { useAuth } from "../pages/Auth/AuthContext";
 
 function DashboardLayout() {
-  const { user } = useAuth(); // Get logged-in user
+  const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Prevent rendering if user is not logged in
   if (!user) return null;
 
   return (
@@ -22,10 +21,10 @@ function DashboardLayout() {
         onClose={() => setMobileOpen(false)}
       />
 
-      {/* Main content area */}
+      {/* Main content */}
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         {/* Navbar */}
-        <UsersNavbar user={user} onMenuClick={() => setMobileOpen(!mobileOpen)} />
+        <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
 
         {/* Page content */}
         <Box
@@ -37,8 +36,8 @@ function DashboardLayout() {
             minHeight: "calc(100vh - 64px - 64px)", // Adjust for navbar & footer
           }}
         >
-          <Toolbar /> {/* Push content below navbar */}
-          <Outlet /> {/* Render the current dashboard page */}
+          <Toolbar /> {/* Spacer below fixed navbar */}
+          <Outlet />
         </Box>
 
         {/* Footer */}

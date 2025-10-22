@@ -1,15 +1,24 @@
 // src/data/menuItems.js
 import React from "react";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import HomeWorkIcon from "@mui/icons-material/HomeWork";
+
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import ApartmentIcon from "@mui/icons-material/Apartment";
 import AnnouncementIcon from "@mui/icons-material/Announcement";
-import MessageIcon from "@mui/icons-material/Message";
-import MailIcon from "@mui/icons-material/Mail";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import DescriptionIcon from "@mui/icons-material/Description";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import BuildIcon from "@mui/icons-material/Build";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import DescriptionIcon from "@mui/icons-material/Description";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import MailIcon from "@mui/icons-material/Mail";
+import MessageIcon from "@mui/icons-material/Message";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import PaymentIcon from "@mui/icons-material/Payment";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PersonIcon from "@mui/icons-material/Person";
+import SecurityIcon from "@mui/icons-material/Security";
+import SettingsIcon from "@mui/icons-material/Settings";
+import StorageIcon from "@mui/icons-material/Storage";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
 
 // ======================= TENANT MENU =======================
@@ -64,15 +73,30 @@ export const caretakerMenuItems = [
 
 // ======================= ADMIN MENU =======================
 export const adminMenuItems = [
+  // --- Core Pages ---
   { label: "Dashboard", link: "/admin", icon: <DashboardIcon /> },
   { label: "Profile", link: "/admin/user-profile", icon: <PersonIcon /> },
-  { label: "Properties", link: "/admin/properties", icon: <HomeWorkIcon /> },
+
+  // --- Management ---
+  { label: "Properties", link: "/admin/properties", icon: <ApartmentIcon /> },
+  { label: "Tenants", link: "/admin/tenants", icon: <PeopleAltIcon /> },
+  { label: "Landlords", link: "/admin/landlords", icon: <PersonIcon /> },
+  { label: "Caretakers", link: "/admin/caretakers", icon: <SupportAgentIcon /> },
+
+  // --- Communication & Notifications ---
   { label: "Announcements", link: "/admin/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/admin/messages", icon: <MailIcon /> },
   { label: "Activity Feeds", link: "/admin/activities", icon: <NotificationsIcon /> },
-  { label: "Maintenance Requests", link: "/admin/maintenance-requests", icon: <BuildIcon /> },
 
-  // Role-specific
-  { label: "Users", link: "/admin/users", icon: <PersonIcon /> },
-  { label: "Reports", link: "/admin/reports", icon: <DescriptionIcon /> },
+  // --- Operations ---
+  { label: "Maintenance Requests", link: "/admin/maintenance-requests", icon: <BuildIcon /> },
+  { label: "Payments", link: "/admin/payments", icon: <PaymentIcon /> },
+  { label: "Documents", link: "/admin/documents", icon: <DescriptionIcon /> },
+  { label: "Reports", link: "/admin/reports", icon: <AssessmentIcon /> },
+  { label: "System Logs", link: "/admin/logs", icon: <StorageIcon /> },
+
+  // --- Security & Settings ---
+  { label: "User Management", link: "/admin/users", icon: <AdminPanelSettingsIcon /> },
+  { label: "Roles & Permissions", link: "/admin/roles", icon: <SecurityIcon /> },
+  { label: "System Settings", link: "/admin/settings", icon: <SettingsIcon /> },
 ];
