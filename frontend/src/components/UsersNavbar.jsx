@@ -61,7 +61,7 @@ function UsersNavbar({ onMenuClick }) {
           color="inherit"
           aria-label="menu"
           onClick={onMenuClick}
-          sx={{ mr: 2, display: { md: "none" } }}
+          sx={{display: { md: "none" } }}
         >
           <MenuIcon />
         </IconButton>
@@ -90,7 +90,7 @@ function UsersNavbar({ onMenuClick }) {
             alt="Pensasha Logo"
             sx={{ height: 32 }}
           />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", pl: 26 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", pl: 30 }}>
             {roleLabel} – Dashboard
           </Typography>
         </Box>
