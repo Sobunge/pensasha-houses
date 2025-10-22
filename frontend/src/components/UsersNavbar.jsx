@@ -15,7 +15,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import ProfileMenu from "../layouts/ProfileMenu";
 import ActivityFeedCard from "./cards/ActivityFeedCard";
 import MessagesCard from "./cards/MessagesCard";
-import { useAuth } from "../pages/Auth/AuthContext"; 
+import { useAuth } from "../pages/Auth/AuthContext";
 
 // Sample messages (replace with backend data)
 const sampleMessages = [
