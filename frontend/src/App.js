@@ -120,8 +120,13 @@ function App() {
           >
             <Route index element={<CaretakerDashboard />} />
             <Route path="user-profile" element={<UserProfilePage />} />
+            <Route path="properties" element={<PropertiesPage />} />
             <Route path="properties/:id" element={<PropertyPage />} />
+            <Route path="announcements" element={<AnnouncementsPage />} />
             <Route path="maintenance-requests" element={<MaintenanceRequestsPage />} />
+            <Route path="messages" element={<MessagesPage />} />
+            <Route path="messages/:id" element={<ConversationPage />} />
+            <Route path="activities" element={<ActivityFeedPage />} />
             <Route path="tasks" element={<CaretakerTasksPage />} />
             <Route path="reports" element={<CaretakerReportsPage />} />
             <Route path="*" element={<NotFound />} /> {/* Caretaker catch-all */}
