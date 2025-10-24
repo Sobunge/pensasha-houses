@@ -3,7 +3,7 @@ import { Box, Toolbar } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import UsersNavbar from "../components/UsersNavbar";
 import UserSidebar from "../components/UserSidebar";
-import MainFooter from "../components/MainFooter";
+import UserFooter from "../components/UserFooter";
 import { useAuth } from "../pages/Auth/AuthContext";
 
 function DashboardLayout() {
@@ -54,7 +54,7 @@ function DashboardLayout() {
         </Box>
 
         {/* Sticky Footer */}
-        <MainFooter />
+        <UserFooter />
       </Box>
     </Box>
   );
