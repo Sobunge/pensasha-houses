@@ -143,7 +143,15 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="user-profile" element={<UserProfilePage />} />
+            <Route path="properties" element={<PropertiesPage />} />
             <Route path="properties/:id" element={<PropertyPage />} />
+            <Route path="announcements" element={<AnnouncementsPage />} />
+              <Route path="messages" element={<MessagesPage />} />
+            <Route path="messages/:id" element={<ConversationPage />} />
+            <Route path="activities" element={<ActivityFeedPage />} />
+            <Route path="finances" element={<ActivityFeedPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
+            <Route path="reports" element={<CaretakerReportsPage />} />
             <Route path="maintenance-requests" element={<MaintenanceRequestsPage />} />
             <Route path="*" element={<NotFound />} /> {/* Admin catch-all */}
           </Route>

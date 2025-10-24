@@ -90,7 +90,7 @@ export const adminMenuItems = [
 
   // --- Operations ---
   { label: "Maintenance Requests", link: "/admin/maintenance-requests", icon: <BuildIcon /> },
-  { label: "Payments", link: "/admin/payments", icon: <PaymentIcon /> },
+  { label: "finances", link: "/admin/finances", icon: <PaymentIcon /> },
   { label: "Documents", link: "/admin/documents", icon: <DescriptionIcon /> },
   { label: "Reports", link: "/admin/reports", icon: <AssessmentIcon /> },
   { label: "System Logs", link: "/admin/logs", icon: <StorageIcon /> },
