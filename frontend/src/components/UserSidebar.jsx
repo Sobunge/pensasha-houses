@@ -64,7 +64,7 @@ function UserSidebar({ mobileOpen, onClose }) {
   const drawerContent = (
     <Box
       sx={{
-        minHeight: "100%",
+        minHeight: "80%",
         bgcolor: "#111",
         color: "#fff",
         display: "flex",
