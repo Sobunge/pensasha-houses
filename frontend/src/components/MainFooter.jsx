@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Typography, Stack, Link } from "@mui/material";
+import { Box, Container, Stack, Link } from "@mui/material";
 
 function MainFooter() {
   return (
@@ -8,9 +8,14 @@ function MainFooter() {
       sx={{
         backgroundColor: "#2A2A2A",
         color: "#F7F7F7",
-        py: 2,
+        py: 1,
         px: 2,
-        mt: "auto", // pushes footer to bottom in flex layouts
+        position: "fixed", // make it always visible
+        bottom: 0,
+        left: { xs: 0, md: 280 }, // accounts for sidebar width on desktop
+        right: 0,
+        zIndex: 1200,
+        borderTop: "1px solid rgba(255,255,255,0.1)",
       }}
     >
       <Container>
@@ -20,12 +25,6 @@ function MainFooter() {
           alignItems="center"
           textAlign="center"
         >
-          {/* Copyright */}
-          <Typography variant="body2" sx={{ color: "#BDBDBD" }}>
-            All rights reserved
-          </Typography>
-
-          {/* Quick Links */}
           <Stack direction="row" spacing={2} justifyContent="center">
             <Link
               href="#"

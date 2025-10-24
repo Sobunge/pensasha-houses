@@ -1,4 +1,3 @@
-// src/components/DashboardLayout.jsx
 import React, { useState } from "react";
 import { Box, Toolbar } from "@mui/material";
 import { Outlet } from "react-router-dom";
@@ -21,8 +20,17 @@ function DashboardLayout() {
         onClose={() => setMobileOpen(false)}
       />
 
-      {/* Main content */}
-      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+      {/* Main Content */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          bgcolor: "#f7f7f7",
+          minHeight: "100vh",
+          position: "relative",
+        }}
+      >
         {/* Navbar */}
         <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
 
@@ -32,15 +40,20 @@ function DashboardLayout() {
           sx={{
             flexGrow: 1,
             p: { xs: 2, md: 3 },
-            bgcolor: "#f7f7f7",
-            minHeight: "calc(100vh - 64px - 64px)", // Adjust for navbar & footer
+            pb: "60px", // space for fixed footer
+            overflowY: "auto",
+            scrollbarWidth: "none", // hides scrollbar in Firefox
+            msOverflowStyle: "none", // hides scrollbar in IE/Edge
+            "&::-webkit-scrollbar": {
+              display: "none", // hides scrollbar in Chrome/Safari
+            },
           }}
         >
-          <Toolbar /> {/* Spacer below fixed navbar */}
+          <Toolbar /> {/* Spacer for fixed Navbar */}
           <Outlet />
         </Box>
 
-        {/* Footer */}
+        {/* Sticky Footer */}
         <MainFooter />
       </Box>
     </Box>
