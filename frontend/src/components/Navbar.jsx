@@ -27,7 +27,7 @@ import AuthModal from "../pages/Auth/AuthModal";
 // Navigation items for desktop links
 const navItems = [
   { label: "Home", link: "/", icon: <HomeIcon /> },
-  { label: "Browse Listings", link: "/properties", icon: <SearchIcon /> },
+  { label: "Browse Properties", link: "/properties", icon: <SearchIcon /> },
   // Remove link, handle via modal
   { label: "List a Property", icon: <AddBoxIcon />, requiresAuth: true },
 ];
