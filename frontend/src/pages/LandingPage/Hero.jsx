@@ -75,7 +75,7 @@ function Hero() {
                             },
                         }}
                     >
-                        Browse Listings
+                        Browse Properties
                     </Button>
                 </Stack>
             </Container>
