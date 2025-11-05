@@ -6,6 +6,7 @@ import AppLayout from "./layouts/AppLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 // Pages
+import PropertyDetails from "./pages/ListingsPage/PropertyDetails";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import ListingsPage from "./pages/ListingsPage/ListingsPage";
 import NotFound from "./pages/NotFoundPage/NotFound";
@@ -56,6 +57,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/properties" element={<ListingsPage />} />
+            <Route path="/property/:id" element={<PropertyDetails />} />
             <Route path="*" element={<NotFound />} /> {/* Public catch-all */}
           </Route>
 
