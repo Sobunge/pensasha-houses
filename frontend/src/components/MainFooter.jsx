@@ -10,18 +10,26 @@ function MainFooter() {
         bottom: 0,
         left: 0,
         width: "100%",
-        bgcolor: "rgba(0, 0, 0, 0.6)", // black background with 60% opacity
-        color: "#fff", // solid white text
+        bgcolor: "rgba(0, 0, 0, 0.75)", // darker semi-transparent black
+        color: "#fff",
         textAlign: "center",
-        py: 1,
-        px: 1,
-        boxShadow: "0 -2px 5px rgba(0, 0, 0, 0.3)",
+        py: 1.2,
+        px: 2,
+        boxShadow: "0 -3px 8px rgba(0, 0, 0, 0.4)",
         zIndex: 1200,
-        fontSize: "0.75rem",
+        fontSize: "0.8rem",
+        backdropFilter: "blur(6px)", // subtle glassy effect
       }}
     >
-      <Typography variant="body2" sx={{ fontSize: "inherit" }}>
-        © {new Date().getFullYear()} Pensasha Houses. All rights reserved.
+      <Typography
+        variant="body2"
+        sx={{
+          fontSize: "inherit",
+          letterSpacing: "0.3px",
+          opacity: 0.9,
+        }}
+      >
+        © {new Date().getFullYear()} <strong>Pensasha Houses</strong>. All rights reserved.
       </Typography>
     </Box>
   );
