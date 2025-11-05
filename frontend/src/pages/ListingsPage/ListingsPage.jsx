@@ -9,7 +9,6 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import SidebarFilter from "./SidebarFilter";
