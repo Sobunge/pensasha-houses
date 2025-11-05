@@ -16,8 +16,11 @@ import BedIcon from "@mui/icons-material/Bed";
 import BathtubIcon from "@mui/icons-material/Bathtub";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { useNavigate } from "react-router-dom";
 
 export default function PropertyCard({ property }) {
+  const navigate = useNavigate();
+
   return (
     <Card
       sx={{
@@ -167,6 +170,7 @@ export default function PropertyCard({ property }) {
           fullWidth
           variant="contained"
           startIcon={<VisibilityIcon />}
+          onClick={() => navigate(`/property/${property.id}`)}
           sx={{
             position: "relative",
             overflow: "hidden",
