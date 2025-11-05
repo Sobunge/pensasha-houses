@@ -10,6 +10,7 @@ function AppLayout() {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
+        backgroundColor: "#f5f5f5"
       }}
     >
       {/* Navbar */}
