@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -16,10 +16,20 @@ import BedIcon from "@mui/icons-material/Bed";
 import BathtubIcon from "@mui/icons-material/Bathtub";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useNavigate } from "react-router-dom";
 
 export default function PropertyCard({ property }) {
   const navigate = useNavigate();
+  const [favorited, setFavorited] = useState(false);
+  const [animate, setAnimate] = useState(false);
+
+  const handleFavoriteClick = () => {
+    setFavorited((prev) => !prev);
+    setAnimate(true);
+    setTimeout(() => setAnimate(false), 500); // reset animation after 0.5s
+    // Optional: send favorite state to backend here
+  };
 
   return (
     <Card
@@ -30,13 +40,13 @@ export default function PropertyCard({ property }) {
         borderRadius: 4,
         overflow: "hidden",
         backgroundColor: "#fff",
-        border: "2px solid #e0e0e0", // more pronounced border
-        boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
+        border: "1px solid #e0e0e0",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
         transition: "all 0.35s ease",
         "&:hover": {
           transform: "translateY(-6px)",
-          borderColor: "#f8b500",
-          boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
+          borderColor: "#ffc62c",
+          boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
         },
       }}
     >
@@ -56,6 +66,7 @@ export default function PropertyCard({ property }) {
         {/* Favorite Button */}
         <IconButton
           size="small"
+          onClick={handleFavoriteClick}
           sx={{
             position: "absolute",
             top: 10,
@@ -66,9 +77,21 @@ export default function PropertyCard({ property }) {
               backgroundColor: "#fff",
               boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
             },
+            transform: animate ? "scale(1.4)" : "scale(1)",
+            transition: animate ? "transform 0.3s ease" : "transform 0.2s ease",
           }}
         >
-          <FavoriteBorderIcon fontSize="small" sx={{ color: "#f8b500" }} />
+          {favorited ? (
+            <FavoriteIcon
+              fontSize="small"
+              sx={{
+                color: "#f50057",
+                animation: animate ? "heartbeat 0.5s ease" : "none",
+              }}
+            />
+          ) : (
+            <FavoriteBorderIcon fontSize="small" sx={{ color: "#f8b500" }} />
+          )}
         </IconButton>
 
         {/* Price Tag */}
@@ -89,14 +112,14 @@ export default function PropertyCard({ property }) {
         />
       </Box>
 
-      {/* Details */}
-      <CardContent sx={{ flexGrow: 1, p: 2 }}>
+      {/* Details Section */}
+      <CardContent sx={{ flexGrow: 1, p: 2.2, bgcolor: "#fafafa" }}>
         <Typography
           variant="subtitle1"
           sx={{
             fontWeight: 700,
-            mb: 0.6,
-            fontSize: "0.95rem",
+            mb: 0.8,
+            fontSize: "1rem",
             color: "#222",
             display: "flex",
             alignItems: "center",
@@ -112,15 +135,15 @@ export default function PropertyCard({ property }) {
             display: "flex",
             alignItems: "center",
             color: "#666",
-            mb: 1,
-            gap: 0.5,
+            mb: 1.5,
+            gap: 0.6,
           }}
         >
-          <PlaceIcon fontSize="small" color="action" />
+          <PlaceIcon fontSize="small" sx={{ color: "#777" }} />
           <Typography
             variant="body2"
             sx={{
-              fontSize: "0.8rem",
+              fontSize: "0.85rem",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -131,92 +154,79 @@ export default function PropertyCard({ property }) {
           </Typography>
         </Box>
 
-        {/* Property Info */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            mt: 1,
-            px: 0.3,
             color: "#333",
+            mt: 1,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
-            <BedIcon fontSize="small" color="action" />
-            <Typography variant="body2" sx={{ fontSize: "0.78rem" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <BedIcon fontSize="small" sx={{ color: "#777" }} />
+            <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
               {property.beds} Beds
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
-            <BathtubIcon fontSize="small" color="action" />
-            <Typography variant="body2" sx={{ fontSize: "0.78rem" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <BathtubIcon fontSize="small" sx={{ color: "#777" }} />
+            <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
               {property.baths} Baths
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
-            <HomeIcon fontSize="small" color="action" />
-            <Typography variant="body2" sx={{ fontSize: "0.78rem" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <HomeIcon fontSize="small" sx={{ color: "#777" }} />
+            <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
               {property.type}
             </Typography>
           </Box>
         </Box>
       </CardContent>
 
-      {/* Footer Button */}
-      <CardActions sx={{ p: 2, pt: 0 }}>
+      <CardActions sx={{ p: 2, pt: 0, bgcolor: "#fff" }}>
         <Button
           fullWidth
           variant="contained"
           startIcon={<VisibilityIcon />}
           onClick={() => navigate(`/property/${property.id}`)}
           sx={{
-            position: "relative",
-            overflow: "hidden",
             background: "linear-gradient(45deg, #f8b500, #ffc62c)",
             color: "#111",
             fontWeight: 700,
             textTransform: "none",
-            fontSize: "0.8rem",
+            fontSize: "0.9rem",
             borderRadius: 2,
             py: 1,
             boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
             transition: "all 0.35s ease",
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: "-75%",
-              width: "50%",
-              height: "100%",
-              background:
-                "linear-gradient(120deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 80%)",
-              transform: "skewX(-25deg)",
-              transition: "0.5s",
-            },
             "&:hover": {
+              background: "linear-gradient(45deg, #ffc62c, #f8b500)",
               transform: "translateY(-2px)",
               boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
-              background: "linear-gradient(45deg, #ffc62c, #f8b500)",
-              animation: "pulse 1.5s infinite",
-              "&::before": {
-                left: "125%",
-              },
             },
             "&:active": {
               transform: "scale(0.97)",
-            },
-            "@keyframes pulse": {
-              "0%": { boxShadow: "0 0 0 0 rgba(248,181,0,0.4)" },
-              "70%": { boxShadow: "0 0 0 10px rgba(248,181,0,0)" },
-              "100%": { boxShadow: "0 0 0 0 rgba(248,181,0,0)" },
             },
           }}
         >
           View Details
         </Button>
       </CardActions>
+
+      {/* Keyframes for heartbeat animation */}
+      <style>
+        {`
+          @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+          }
+        `}
+      </style>
     </Card>
   );
 }
