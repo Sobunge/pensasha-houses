@@ -39,7 +39,7 @@ const sampleProperties = [
   {
     id: "1",
     title: "Modern Apartment in Kisumu",
-    image: "../../assets/images/house.jpg",
+    image: "../../assets/images/external.jpg",
     price: 25000,
     location: "Milimani, Kisumu",
     beds: 2,
@@ -49,11 +49,11 @@ const sampleProperties = [
       "This stylish 2-bedroom apartment offers scenic lake views, modern finishes, and convenient access to the city center. Ideal for both professionals and small families.",
     amenities: ["Wi-Fi", "Parking", "24/7 Security", "Balcony", "Water Heater"],
     gallery: [
-      "../../assets/images/house.jpg",
-      "../../assets/images/house.jpg",
-      "../../assets/images/house.jpg",
-      "../../assets/images/house.jpg",
-      "../../assets/images/house.jpg",
+      "../../assets/images/Living_room.webp",
+      "../../assets/images/bathroom.webp",
+      "../../assets/images/hallway.webp",
+      "../../assets/images/kitchen.webp",
+      "../../assets/images/sink.webp",
     ],
   },
 ];
@@ -88,7 +88,7 @@ export default function PropertyDetails() {
           <HomeIcon sx={{ mr: 0.5, fontSize: 18 }} />
           Home
         </Link>
-        <Link component={RouterLink} to="/listings" underline="hover" sx={{ color: "#555" }}>
+        <Link component={RouterLink} to="/properties" underline="hover" sx={{ color: "#555" }}>
           Listings
         </Link>
         <Typography color="text.primary" sx={{ fontWeight: 500 }}>
