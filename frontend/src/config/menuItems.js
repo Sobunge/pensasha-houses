@@ -19,13 +19,15 @@ import SecurityIcon from "@mui/icons-material/Security";
 import SettingsIcon from "@mui/icons-material/Settings";
 import StorageIcon from "@mui/icons-material/Storage";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import SearchIcon from "@mui/icons-material/Search";
 
 
 // ======================= TENANT MENU =======================
 export const tenantMenuItems = [
   { label: "Dashboard", link: "/tenant", icon: <DashboardIcon /> },
   { label: "Profile", link: "/tenant/user-profile", icon: <PersonIcon /> },
-  { label: "Properties", link: "/tenant/properties", icon: <HomeWorkIcon /> },
+  { label: "My Rentals", link: "/tenant/properties", icon: <ApartmentIcon /> },
+  { label: "Browse Properties", link: "/tenant/browse-properties", icon: <SearchIcon /> },
   { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
   { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },

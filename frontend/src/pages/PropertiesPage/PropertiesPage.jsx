@@ -3,6 +3,7 @@ import React from "react";
 import { Box, Typography, Button, Grid } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
 
 function PropertiesPage() {
@@ -14,72 +15,106 @@ function PropertiesPage() {
     { id: 4, name: "Garden Court", unit: "D-301", lease: "Apr 2024 – Mar 2025", rentAmount: "Ksh 14,000", rentStatus: "Paid" },
   ];
 
+  // Function to get status color
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "paid":
+        return "success";
+      case "pending":
+        return "warning";
+      default:
+        return "default";
+    }
+  };
+
   return (
-    <Box sx={{ mb: 3, px: 2 }}>
+    <Box sx={{ mb: 3, px: { xs: 2, md: 4 }, py: { xs: 3, md: 4 } }}>
       {/* Page Title */}
       <Typography
-        variant="h5"
-        sx={{ fontWeight: 600, mb: 3, textAlign: "center", color: "#111111" }}
+        variant="h4"
+        sx={{
+          fontWeight: 800,
+          mb: 2,
+          textAlign: "center",
+          color: "#111111", // black text
+          fontSize: { xs: "2rem", md: "2.5rem" },
+        }}
       >
         Your Properties
       </Typography>
 
-      {/* Empty state */}
+      <Typography
+        variant="body1"
+        sx={{ mb: 4, textAlign: "center", color: "#2a2a2a" }}
+      >
+        Manage your rented units or explore available properties to rent.
+      </Typography>
+
+      {/* Empty State */}
       {sampleProperties.length === 0 ? (
         <Box
           sx={{
             textAlign: "center",
             mt: 6,
-            p: 4,
+            p: 5,
             borderRadius: 3,
-            border: "2px dashed #c59000",
+            border: "2px dashed #f8b500",
             backgroundColor: "#f7f7f7",
           }}
         >
-          <HomeWorkOutlinedIcon sx={{ fontSize: 60, color: "#f8b500", mb: 2 }} />
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: "#111111" }}>
-            No properties found
+          <HomeWorkOutlinedIcon sx={{ fontSize: 80, color: "#f8b500", mb: 2 }} />
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 700, mb: 1, color: "#111111" }}
+          >
+            No Properties Found
           </Typography>
           <Typography sx={{ color: "#2a2a2a", mb: 3 }}>
-            It looks like you don’t have any properties linked to your account yet.
+            You don’t have any properties yet. Start browsing and rent your dream place!
           </Typography>
           <Button
             variant="contained"
+            startIcon={<SearchOutlinedIcon />}
             sx={{
               borderRadius: 3,
-              px: 3,
-              py: 1,
-              fontWeight: 600,
-              backgroundColor: "#f8b500",
-              "&:hover": { backgroundColor: "#ffc62c" },
+              px: 4,
+              py: 1.5,
+              fontWeight: 700,
+              fontSize: "1rem",
+              color: "#111111",          // dark text for contrast
+              backgroundColor: "#f8b500", // solid gold
+              border: "2px solid #c59000", // thin darker gold border
+              transition: "all 0.3s ease",
+              "&:hover": {
+                backgroundColor: "#ffc62c", // lighter gold on hover
+                transform: "scale(1.05)",   // subtle grow effect
+                boxShadow: "0 4px 15px rgba(248, 181, 0, 0.4)", // soft glow
+              },
             }}
           >
-            Add Your First Property
+            Browse Properties
           </Button>
+
         </Box>
       ) : (
-        <Grid
-          container
-          spacing={3}
-          justifyContent="center" // center cards horizontally
-        >
+        <Grid container spacing={3} justifyContent="center">
           {sampleProperties.map((property) => (
             <Grid
               item
-              xs={12}   // full width on mobile
-              sm={6}    // two cards per row on small screens
-              md={4}    // three cards per row on medium screens
-              lg={3}    // four cards per row on large screens
+              xs={12}
+              sm={6}
+              md={4}
+              lg={3}
               key={property.id}
-              sx={{ display: "flex", justifyContent: "center" }} // center each card
+              sx={{ display: "flex", justifyContent: "center" }}
             >
-              <PropertyInfoCard property={property} />
+              <PropertyInfoCard property={property} statusColor={getStatusColor(property.rentStatus)} />
             </Grid>
           ))}
         </Grid>
       )}
 
-      {/* Load more button if needed */}
+      {/* Load more button */}
       {sampleProperties.length > 6 && (
         <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
           <Button
@@ -91,7 +126,10 @@ function PropertiesPage() {
               borderRadius: 3,
               borderColor: "#f8b500",
               color: "#111111",
-              "&:hover": { backgroundColor: "#ffc62c", borderColor: "#c59000" },
+              "&:hover": {
+                backgroundColor: "#ffc62c",
+                borderColor: "#c59000",
+              },
             }}
           >
             Load More Properties

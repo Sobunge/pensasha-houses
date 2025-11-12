@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,6 +10,9 @@ import {
   Box,
   IconButton,
   InputAdornment,
+  CircularProgress,
+  Fade,
+  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
@@ -26,25 +29,56 @@ export default function RequestToRentDialog({ open, onClose, property }) {
     phone: "",
     message: "",
   });
-
   const [submitted, setSubmitted] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    // Reset form and success state whenever dialog opens
+    if (open) {
+      setFormData({ name: "", email: "", phone: "", message: "" });
+      setSuccess(false);
+      setSubmitted(false);
+      setErrors({});
+    }
+  }, [open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Full name is required";
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     setSubmitted(true);
+    setSuccess(false);
 
     // Simulate sending request
     setTimeout(() => {
-      alert("✅ Request sent successfully!");
       setSubmitted(false);
+      setSuccess(true);
       setFormData({ name: "", email: "", phone: "", message: "" });
-      onClose();
-    }, 1000);
+
+      // ✅ Do NOT auto-close dialog. Parent decides when to close.
+      // You can still optionally auto-hide success message:
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2000);
+    }, 1500);
   };
 
   return (
@@ -62,7 +96,6 @@ export default function RequestToRentDialog({ open, onClose, property }) {
         },
       }}
     >
-      {/* Centered Header */}
       <DialogTitle
         sx={{
           fontWeight: 700,
@@ -78,7 +111,7 @@ export default function RequestToRentDialog({ open, onClose, property }) {
           textAlign: "center",
         }}
       >
-        REQUEST TO RENT
+        Request to Rent
         <IconButton
           onClick={onClose}
           size="small"
@@ -92,8 +125,7 @@ export default function RequestToRentDialog({ open, onClose, property }) {
         </IconButton>
       </DialogTitle>
 
-      {/* Property Summary */}
-      <Box sx={{ px: 3, pt: 2, pb: 1 }}>
+      <Box sx={{ px: 3, pt: 1 }}>
         <Typography variant="body1" fontWeight={600}>
           {property?.title}
         </Typography>
@@ -102,22 +134,27 @@ export default function RequestToRentDialog({ open, onClose, property }) {
         </Typography>
       </Box>
 
-      {/* Form */}
       <DialogContent dividers>
+        {success && (
+          <Fade in={success}>
+            <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+              ✅ Your request was sent successfully!
+            </Alert>
+          </Fade>
+        )}
+
         <Box
           component="form"
           onSubmit={handleSubmit}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2.5,
-          }}
+          sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
         >
           <TextField
             label="Full Name"
             name="name"
             value={formData.name}
             onChange={handleChange}
+            error={!!errors.name}
+            helperText={errors.name}
             required
             placeholder="Enter your full name"
             InputProps={{
@@ -129,7 +166,6 @@ export default function RequestToRentDialog({ open, onClose, property }) {
             }}
             fullWidth
           />
-
           <TextField
             label="Email Address"
             name="email"
@@ -146,12 +182,13 @@ export default function RequestToRentDialog({ open, onClose, property }) {
             }}
             fullWidth
           />
-
           <TextField
             label="Phone Number"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
+            error={!!errors.phone}
+            helperText={errors.phone}
             required
             placeholder="+254 700 000 000"
             InputProps={{
@@ -163,7 +200,6 @@ export default function RequestToRentDialog({ open, onClose, property }) {
             }}
             fullWidth
           />
-
           <TextField
             label="Message"
             name="message"
@@ -184,7 +220,6 @@ export default function RequestToRentDialog({ open, onClose, property }) {
         </Box>
       </DialogContent>
 
-      {/* Footer Actions */}
       <DialogActions
         sx={{
           p: 3,
@@ -198,14 +233,12 @@ export default function RequestToRentDialog({ open, onClose, property }) {
           variant="outlined"
           color="error"
           startIcon={<CancelIcon />}
+          disabled={submitted}
           sx={{
             borderRadius: 2,
             fontWeight: 600,
             borderWidth: 2,
-            "&:hover": {
-              borderWidth: 2,
-              backgroundColor: "#ffe5e5",
-            },
+            "&:hover": { borderWidth: 2, backgroundColor: "#ffe5e5" },
           }}
         >
           Cancel
@@ -215,7 +248,9 @@ export default function RequestToRentDialog({ open, onClose, property }) {
           type="submit"
           onClick={handleSubmit}
           variant="contained"
-          startIcon={<SendIcon />}
+          startIcon={
+            submitted ? <CircularProgress size={20} sx={{ color: "#111" }} /> : <SendIcon />
+          }
           disabled={submitted}
           sx={{
             background: "linear-gradient(45deg, #f8b500, #ffc62c)",

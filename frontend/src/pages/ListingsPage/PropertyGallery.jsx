@@ -165,26 +165,25 @@ export default function PropertyGallery({ gallery }) {
           </IconButton>
 
           {/* Previous Button */}
-          {!isMobile && (
-            <IconButton
-              onClick={handlePrev}
-              sx={{
-                position: "absolute",
-                left: 16,
-                color: "white",
-                backgroundColor: "rgba(0,0,0,0.4)",
-                "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
-              }}
-            >
-              <ArrowBackIosNewIcon />
-            </IconButton>
-          )}
+          <IconButton
+            onClick={handlePrev}
+            sx={{
+              position: "absolute",
+              left: { xs: 8, sm: 16 },
+              color: "white",
+              backgroundColor: "rgba(0,0,0,0.4)",
+              "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+              zIndex: 2,
+            }}
+          >
+            <ArrowBackIosNewIcon fontSize={isMobile ? "small" : "medium"} />
+          </IconButton>
 
           {/* Main Image */}
           {openIndex !== null && (
             <img
               src={gallery[openIndex]}
-              alt={`Property photo ${openIndex + 1}`}
+              alt={`Property view ${openIndex + 1}`}
               style={{
                 width: "100%",
                 height: "auto",
@@ -196,20 +195,19 @@ export default function PropertyGallery({ gallery }) {
           )}
 
           {/* Next Button */}
-          {!isMobile && (
-            <IconButton
-              onClick={handleNext}
-              sx={{
-                position: "absolute",
-                right: 16,
-                color: "white",
-                backgroundColor: "rgba(0,0,0,0.4)",
-                "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
-              }}
-            >
-              <ArrowForwardIosIcon />
-            </IconButton>
-          )}
+          <IconButton
+            onClick={handleNext}
+            sx={{
+              position: "absolute",
+              right: { xs: 8, sm: 16 },
+              color: "white",
+              backgroundColor: "rgba(0,0,0,0.4)",
+              "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+              zIndex: 2,
+            }}
+          >
+            <ArrowForwardIosIcon fontSize={isMobile ? "small" : "medium"} />
+          </IconButton>
 
           {/* Bottom Indicator */}
           {openIndex !== null && (
@@ -233,6 +231,7 @@ export default function PropertyGallery({ gallery }) {
           )}
         </Box>
       </Dialog>
+
     </Box>
   );
 }

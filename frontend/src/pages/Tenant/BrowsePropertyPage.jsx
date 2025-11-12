@@ -1,4 +1,4 @@
-// src/pages/ListingsPage/PropertyDetails.jsx
+// src/pages/ListingsPage/BrowserPropertyPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -11,9 +11,9 @@ import {
   Card,
   CardMedia,
   CardContent,
-  Container,
   Breadcrumbs,
   Link,
+  Container,
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -28,9 +28,9 @@ import {
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
 
-import PropertyGallery from "./PropertyGallery";
-import PropertyNotFound from "./PropertyNotFound";
-import RequestToRentDialog from "./RequestToRentDialog";
+import PropertyGallery from "../../pages/ListingsPage/PropertyGallery";
+import PropertyNotFound from "../../pages/ListingsPage/PropertyNotFound";
+import RequestToRentDialog from "../../pages/ListingsPage/RequestToRentDialog";
 import AuthModal from "../Auth/AuthModal";
 import { useAuth } from "../Auth/AuthContext";
 
@@ -58,38 +58,30 @@ const sampleProperties = [
   },
 ];
 
-export default function PropertyDetails() {
+export default function BrowserPropertyPage() {
   const { id } = useParams();
   const property = sampleProperties.find((p) => p.id === id);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Auth context
   const { user, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
-
-  // Local state
   const [openRequestDialog, setOpenRequestDialog] = useState(false);
   const [openAuthModal, setOpenAuthModal] = useState(false);
 
-  // Open request dialog automatically if user logged in after redirect
   useEffect(() => {
     if (user && redirectAfterAuth === "rent-request") {
       setOpenRequestDialog(true);
       setOpenAuthModal(false);
-
-      // Clear redirect intent
       setTimeout(() => setRedirectAfterAuth(null), 100);
     }
   }, [user, redirectAfterAuth, setRedirectAfterAuth]);
 
   const handleRequestClick = () => {
     if (!user) {
-      // User not logged in → show login modal and set redirect
       setRedirectAfterAuth("rent-request");
       setOpenAuthModal(true);
     } else {
-      // Already logged in → open request dialog
       setOpenRequestDialog(true);
     }
   };
@@ -97,18 +89,14 @@ export default function PropertyDetails() {
   if (!property) return <PropertyNotFound />;
 
   return (
-    <Container maxWidth="lg" sx={{ mt: { xs: 8, md: 5 }, py: { xs: 3, md: 6 } }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 1 } }}>
       {/* Breadcrumbs */}
       <Breadcrumbs
         aria-label="breadcrumb"
         separator={<ChevronRightIcon fontSize="small" />}
         sx={{ mb: 3, fontSize: { xs: "0.85rem", md: "1rem" }, color: "text.secondary" }}
       >
-        <Link
-          href="/"
-          underline="hover"
-          sx={{ display: "flex", alignItems: "center", color: "#555" }}
-        >
+        <Link href="/" underline="hover" sx={{ display: "flex", alignItems: "center", color: "#555" }}>
           <HomeIcon sx={{ mr: 0.5, fontSize: 18 }} /> Home
         </Link>
         <Link href="/properties" underline="hover" sx={{ color: "#555" }}>
@@ -240,11 +228,7 @@ export default function PropertyDetails() {
 
       {/* Modals */}
       <AuthModal open={openAuthModal} onClose={() => setOpenAuthModal(false)} />
-      <RequestToRentDialog
-        open={openRequestDialog}
-        onClose={() => setOpenRequestDialog(false)}
-        property={property}
-      />
+      <RequestToRentDialog open={openRequestDialog} onClose={() => setOpenRequestDialog(false)} property={property} />
     </Container>
   );
 }

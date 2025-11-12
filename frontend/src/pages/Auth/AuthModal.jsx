@@ -12,65 +12,87 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+
 import LoginForm from "../Auth/LoginPage/LoginForm";
 import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 import { useNotification } from "../../components/NotificationProvider";
+import { AuthContext } from "../../pages/Auth/AuthContext";
+import { users } from "../../config/users";
 
-// ⬅️ import AuthContext + users
-import { AuthContext } from "./AuthContext"; // ✅ check path
-import { users } from "../../config/users" // ✅ lowercase file name
-
-function AuthModal({ open, onClose }) {
+export default function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
   const { notify } = useNotification();
+  const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useContext(AuthContext);
 
-  // from context
-  const { loginAs } = useContext(AuthContext);
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
+  // -----------------------
+  // Tab switching
+  // -----------------------
+  const handleTabChange = (_, newValue) => setActiveTab(newValue);
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
 
-  // ✅ Updated: check both email + password
-  const handleSuccess = (email, password) => {
-    const user = users.find(
-      (u) => u.email === email && u.password === password
-    );
+  // -----------------------
+  // Login handler
+  // -----------------------
+  const handleLoginSuccess = (email, password) => {
+    const user = users.find(u => u.email === email && u.password === password);
 
-    if (user) {
-      loginAs(user); // store full user object in context
-      notify(`Welcome back, ${user.name}!`, "success");
-      onClose?.(); // Close modal
-
-      // redirect based on role
-      switch (user.role) {
-        case "tenant":
-          navigate("/tenant");
-          break;
-        case "landlord":
-          navigate("/landlord");
-          break;
-        case "caretaker":
-          navigate("/caretaker");
-          break;
-        case "admin":
-          navigate("/admin");
-          break;
-        default:
-          navigate("/");
-      }
-    } else {
+    if (!user) {
       notify("Invalid email or password!", "error");
+      return;
     }
+
+    loginAs(user);
+    notify(`Welcome back, ${user.name}!`, "success");
+    onClose?.();
+
+    // ✅ Redirect if user had an intended page (like property page)
+    if (redirectAfterAuth) {
+      navigate(redirectAfterAuth);
+      setRedirectAfterAuth(null);
+      return;
+    }
+
+    // ✅ Default role-based redirect
+    const roleRedirects = {
+      tenant: "/tenant",
+      landlord: "/landlord",
+      caretaker: "/caretaker",
+      admin: "/admin",
+    };
+    navigate(roleRedirects[user.role] || "/");
+  };
+
+  // -----------------------
+  // Registration handler
+  // -----------------------
+  const handleRegisterSuccess = (newUserData) => {
+    const user = {
+      name: `${newUserData.firstName} ${newUserData.lastName}`,
+      role: newUserData.role,
+      email: newUserData.email || "",
+      phone: newUserData.phone,
+    };
+
+    loginAs(user);
+    notify("Account created successfully!", "success");
+    onClose?.();
+
+    // ✅ Redirect if user had an intended page
+    if (redirectAfterAuth) {
+      navigate(redirectAfterAuth);
+      setRedirectAfterAuth(null);
+      return;
+    }
+
+    // ✅ Default redirect after signup
+    navigate("/");
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      {/* Top Bar with Tabs + Close Button */}
+      {/* Header with Tabs and Close button */}
       <Box
         sx={{
           display: "flex",
@@ -80,32 +102,26 @@ function AuthModal({ open, onClose }) {
           borderColor: "divider",
         }}
       >
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="fullWidth"
-          sx={{ flex: 1 }}
-        >
+        <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{ flex: 1 }}>
           <Tab icon={<LoginIcon />} iconPosition="start" label="Login" />
           <Tab icon={<PersonAddIcon />} iconPosition="start" label="Sign Up" />
         </Tabs>
-
         <IconButton onClick={onClose} sx={{ mr: 1 }}>
           <CloseIcon />
         </IconButton>
       </Box>
 
-      {/* Content */}
+      {/* Dialog content */}
       <DialogContent>
         {activeTab === 0 ? (
           <LoginForm
-            onSuccess={handleSuccess} // expects (email, password)
-            onClose={onClose} // <-- Pass onClose to LoginForm
+            onSuccess={handleLoginSuccess}
+            onClose={onClose}
             switchToSignup={switchToSignup}
           />
         ) : (
           <RegistrationForm
-            onSuccess={handleSuccess}
+            onSuccess={handleRegisterSuccess}
             switchToLogin={switchToLogin}
           />
         )}
@@ -113,5 +129,3 @@ function AuthModal({ open, onClose }) {
     </Dialog>
   );
 }
-
-export default AuthModal;
