@@ -59,7 +59,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/properties" element={<ListingsPage />} />
-            <Route path="/property/:id" element={<PropertyDetails />} />
+            <Route path="/properties/:id" element={<PropertyDetails />} />
             <Route path="*" element={<NotFound />} /> {/* Public catch-all */}
           </Route>
 
