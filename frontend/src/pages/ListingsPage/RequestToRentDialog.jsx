@@ -11,8 +11,6 @@ import {
   IconButton,
   InputAdornment,
   CircularProgress,
-  Fade,
-  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
@@ -21,8 +19,10 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import MessageIcon from "@mui/icons-material/Message";
+import { useNotification } from "../../components/NotificationProvider";
 
 export default function RequestToRentDialog({ open, onClose, property }) {
+  const { notify } = useNotification(); // toast notifier
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,14 +30,11 @@ export default function RequestToRentDialog({ open, onClose, property }) {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Reset form and success state whenever dialog opens
     if (open) {
       setFormData({ name: "", email: "", phone: "", message: "" });
-      setSuccess(false);
       setSubmitted(false);
       setErrors({});
     }
@@ -65,19 +62,17 @@ export default function RequestToRentDialog({ open, onClose, property }) {
     }
 
     setSubmitted(true);
-    setSuccess(false);
 
     // Simulate sending request
     setTimeout(() => {
       setSubmitted(false);
-      setSuccess(true);
       setFormData({ name: "", email: "", phone: "", message: "" });
 
-      // ✅ Do NOT auto-close dialog. Parent decides when to close.
-      // You can still optionally auto-hide success message:
-      setTimeout(() => {
-        setSuccess(false);
-      }, 2000);
+      // Close modal
+      onClose();
+
+      // Show toast notification after modal closes
+      notify(`✅ Your request for "${property.title}" was sent successfully!`, "success");
     }, 1500);
   };
 
@@ -115,11 +110,7 @@ export default function RequestToRentDialog({ open, onClose, property }) {
         <IconButton
           onClick={onClose}
           size="small"
-          sx={{
-            position: "absolute",
-            right: 16,
-            color: "#111",
-          }}
+          sx={{ position: "absolute", right: 16, color: "#111" }}
         >
           <CloseIcon />
         </IconButton>
@@ -135,14 +126,6 @@ export default function RequestToRentDialog({ open, onClose, property }) {
       </Box>
 
       <DialogContent dividers>
-        {success && (
-          <Fade in={success}>
-            <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
-              ✅ Your request was sent successfully!
-            </Alert>
-          </Fade>
-        )}
-
         <Box
           component="form"
           onSubmit={handleSubmit}

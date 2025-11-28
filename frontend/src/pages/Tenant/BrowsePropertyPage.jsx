@@ -65,12 +65,13 @@ export default function BrowserPropertyPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { user, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
+  const { user, role, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
   const [openRequestDialog, setOpenRequestDialog] = useState(false);
   const [openAuthModal, setOpenAuthModal] = useState(false);
 
+  // Auto-open rent request dialog if redirected after login
   useEffect(() => {
-    if (user && redirectAfterAuth === "rent-request") {
+    if (user && redirectAfterAuth?.includes("/tenant/browse-properties/")) {
       setOpenRequestDialog(true);
       setOpenAuthModal(false);
       setTimeout(() => setRedirectAfterAuth(null), 100);
@@ -78,10 +79,13 @@ export default function BrowserPropertyPage() {
   }, [user, redirectAfterAuth, setRedirectAfterAuth]);
 
   const handleRequestClick = () => {
-    if (!user) {
-      setRedirectAfterAuth("rent-request");
+    // Only tenants can request to rent
+    if (!user || role !== "tenant") {
+      // Save redirect path and open auth modal
+      setRedirectAfterAuth("/tenant/browse-properties/" + id);
       setOpenAuthModal(true);
     } else {
+      // Tenant logged in → open request dialog
       setOpenRequestDialog(true);
     }
   };
