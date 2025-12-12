@@ -102,6 +102,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           value={formData.idNumber}
           onChange={handleChange}
           required
+          size="small"
           placeholder="Enter your ID Number"
           slotProps={{
             input: {
@@ -121,6 +122,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           value={formData.password}
           onChange={handleChange}
           required
+          size="small"
           placeholder="Enter your password"
           slotProps={{
             input: {
@@ -145,7 +147,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           fullWidth
           type="submit"
           variant="contained"
-          size="large"
+          size="small"
           startIcon={<LockOutlinedIcon />}
           sx={{
             bgcolor: "#f8b500",
