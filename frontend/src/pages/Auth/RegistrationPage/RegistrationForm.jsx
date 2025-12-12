@@ -33,7 +33,7 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/auth/register", formData);
+      await api.post("/auth/register", formData);
 
       notify("Registration successful! Please login.", "success", 3000);
       onSuccess?.(); // switch to login page/modal
