@@ -52,7 +52,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
       loginAs(user);
       localStorage.setItem("user", JSON.stringify(user));
 
-      console.log("Login successful:", user);
       notify("Login successful!", "success", 3000);
 
       // Redirect based on role

@@ -120,7 +120,6 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           size="small"
           required
           placeholder="+254 712 345 678"
-          helperText="e.g. +254 712 345 678"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
