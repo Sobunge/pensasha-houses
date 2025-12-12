@@ -1,3 +1,4 @@
+// src/components/Auth/RegistrationPage/RegistrationForm.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -7,145 +8,107 @@ import {
   Typography,
   MenuItem,
   Avatar,
-  Link as MuiLink,
   Divider,
   InputAdornment,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import PhoneIcon from "@mui/icons-material/Phone";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import LockIcon from "@mui/icons-material/Lock";
+import api from "../../../api/api"; // Axios instance with interceptors
+import { useNotification } from "../../../components/NotificationProvider";
 
 function RegistrationForm({ onSuccess, switchToLogin }) {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
+    idNumber: "",
     password: "",
     role: "",
   });
+  const { notify } = useNotification();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User Registration Data:", formData);
-    onSuccess?.();
+    try {
+      const response = await api.post("/auth/register", formData);
+
+      notify("Registration successful! Please login.", "success", 3000);
+      onSuccess?.(); // switch to login page/modal
+    } catch (err) {
+      console.error(err);
+      notify(
+        err.response?.data?.error || "Registration failed. Try again.",
+        "error",
+        3500
+      );
+    }
   };
 
   return (
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-
-      }}
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {/* Icon */}
       <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
         <PersonAddIcon />
       </Avatar>
 
-      {/* Heading */}
       <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
         Create Your Account
       </Typography>
 
-      {/* Intro */}
       <Typography
         variant="body2"
-        sx={{
-          color: "text.secondary",
-          textAlign: "center",
-          mb: 3,
-          maxWidth: 360,
-        }}
+        sx={{ color: "text.secondary", textAlign: "center", mb: 3 }}
       >
-        Fill in your details below to join and get started.
+        Enter your ID, choose a password, and select your role.
       </Typography>
 
-      {/* Form Fields */}
       <Stack spacing={2} sx={{ width: "100%" }}>
-        {/* Name Group */}
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <TextField
-            label="First Name"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            required
-            placeholder="John"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircleIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextField
-            label="Last Name"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            required
-            placeholder="Doe"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircleIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Stack>
-
         <TextField
-          label="Phone Number"
-          name="phone"
-          type="tel"
-          value={formData.phone}
-          onChange={handleChange}
           fullWidth
+          label="ID Number"
+          name="idNumber"
+          type="text"
+          value={formData.idNumber}
+          onChange={handleChange}
           size="small"
           required
-          placeholder="+254 712 345 678"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <PhoneIcon color="action" />
-              </InputAdornment>
-            ),
+          placeholder="Enter your ID Number"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <BadgeOutlinedIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
 
         <TextField
+          fullWidth
           label="Password"
           name="password"
           type="password"
           value={formData.password}
           onChange={handleChange}
-          fullWidth
           size="small"
           required
           placeholder="Enter a strong password"
           helperText="At least 8 characters"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
 
@@ -155,16 +118,24 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           name="role"
           value={formData.role}
           onChange={handleChange}
-          fullWidth
           size="small"
           required
-          placeholder="Select Role"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonAddIcon color="action" />
+                </InputAdornment>
+              ),
+            },
+          }}
+
         >
+          <MenuItem value="" disabled>Select Role</MenuItem>
           <MenuItem value="tenant">Tenant</MenuItem>
           <MenuItem value="landlord">Landlord</MenuItem>
         </TextField>
 
-        {/* Sign Up Button */}
         <Button
           type="submit"
           variant="contained"
@@ -174,48 +145,26 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
             mt: 1,
             py: 1.2,
             bgcolor: "#f8b500",
-            color: "#111111",
+            color: "#111",
             fontWeight: 600,
             textTransform: "none",
-            transition: "all 0.3s ease",
-            "&:hover": {
-              bgcolor: "#c59000",
-              transform: "scale(1.03)",
-              boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
-            },
+            "&:hover": { bgcolor: "#c59000" },
           }}
         >
-          Sign Up
+          Register
         </Button>
 
-        {/* Divider */}
         <Divider sx={{ my: 1 }} />
 
-        {/* Switch to Login */}
         <Typography
           variant="body2"
           align="center"
           sx={{ mt: 1, color: "text.secondary" }}
         >
           Already have an account?{" "}
-          <MuiLink
-            component="button"
-            onClick={switchToLogin}
-            sx={{
-              color: "#115293",
-              fontWeight: 600,
-              textDecoration: "none",
-              position: "relative",
-              transition: "color 0.3s ease, transform 0.2s ease",
-              "&:hover": {
-                color: "#ffc62c",
-                transform: "scale(1.05)",
-                textShadow: "0 0 6px rgba(248, 181, 0, 0.6)",
-              },
-            }}
-          >
+          <Button onClick={switchToLogin} sx={{ textTransform: "none", p: 0 }}>
             Sign In
-          </MuiLink>
+          </Button>
         </Typography>
       </Stack>
     </Box>
