@@ -139,6 +139,7 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
         <Button
           type="submit"
           variant="contained"
+          size="small"
           fullWidth
           startIcon={<PersonAddIcon />}
           sx={{

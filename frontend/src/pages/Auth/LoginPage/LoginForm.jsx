@@ -150,6 +150,8 @@ export default function LoginForm({ switchToSignup, onClose }) {
           size="small"
           startIcon={<LockOutlinedIcon />}
           sx={{
+            mt: 1,
+            py: 1.2,
             bgcolor: "#f8b500",
             color: "#111",
             fontWeight: 600,
