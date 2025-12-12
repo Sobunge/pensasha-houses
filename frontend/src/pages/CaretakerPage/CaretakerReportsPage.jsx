@@ -1,7 +1,7 @@
 // src/pages/Caretaker/CaretakerReportsPage.jsx
 import React from "react";
 import { Box, Typography, Grid, Card, CardContent, Divider } from "@mui/material";
-import { Description, Build, Assessment } from "@mui/icons-material";
+import { Description } from "@mui/icons-material";
 
 const reports = [
   { id: 1, title: "Weekly Maintenance Summary", date: "2025-10-12", description: "3 repairs completed, 1 pending." },

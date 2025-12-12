@@ -12,15 +12,15 @@ import {
   InputAdornment,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import EmailIcon from "@mui/icons-material/Email";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import LockIcon from "@mui/icons-material/Lock";
 import { useNotification } from "../../../components/NotificationProvider";
 import { useAuth } from "../AuthContext";
-import { users } from "../../../config/users";
 import { useNavigate } from "react-router-dom";
+import api, { setAccessToken } from "../../../api/api";
 
 export default function LoginForm({ switchToSignup, onClose }) {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ idNumber: "", password: "" });
   const { notify } = useNotification();
   const { loginAs } = useAuth();
   const navigate = useNavigate();
@@ -30,22 +30,32 @@ export default function LoginForm({ switchToSignup, onClose }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const user = users.find(
-      (u) =>
-        u.email.toLowerCase() === formData.email.toLowerCase() &&
-        u.password === formData.password
-    );
+    try {
+      // Send login request to backend
+      const response = await api.post("/auth/login", {
+        idNumber: formData.idNumber,
+        password: formData.password,
+      });
 
-    if (user) {
-      loginAs({ email: user.email, role: user.role, name: user.name });
+      const { accessToken, roles, username } = response.data;
+
+      // Store access token in memory
+      setAccessToken(accessToken);
+
+      // convert role to lowercase
+      const normalizedRole = roles[0].toLowerCase();
+      // Save user info in context and optionally localStorage
+      const user = { idNumber: username, role: normalizedRole };
+      loginAs(user);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // ✅ success notification with longer duration (3s)
+      console.log("Login successful:", user);
       notify("Login successful!", "success", 3000);
 
+      // Redirect based on role
       const roleRedirects = {
         tenant: "/tenant",
         landlord: "/landlord",
@@ -53,16 +63,17 @@ export default function LoginForm({ switchToSignup, onClose }) {
         admin: "/admin",
       };
 
-      // ✅ close modal first
       if (onClose) onClose();
-
-      // ✅ then navigate after short delay
       setTimeout(() => {
         navigate(roleRedirects[user.role] || "/");
       }, 200);
-    } else {
-      // ❌ error notification with slightly shorter duration (3.5s)
-      notify("Invalid email or password!", "error", 3500);
+    } catch (err) {
+      console.error(err);
+      notify(
+        err.response?.data?.error || "Invalid credentials or server error",
+        "error",
+        3500
+      );
     }
   };
 
@@ -86,19 +97,21 @@ export default function LoginForm({ switchToSignup, onClose }) {
       <Stack spacing={2} sx={{ width: "100%" }}>
         <TextField
           fullWidth
-          label="Email Address"
-          name="email"
-          type="email"
-          value={formData.email}
+          label="ID Number"
+          name="idNumber"
+          type="text"
+          value={formData.idNumber}
           onChange={handleChange}
           required
-          placeholder="Enter your email"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <EmailIcon color="action" />
-              </InputAdornment>
-            ),
+          placeholder="Enter your ID Number"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <BadgeOutlinedIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
         <TextField
@@ -110,12 +123,14 @@ export default function LoginForm({ switchToSignup, onClose }) {
           onChange={handleChange}
           required
           placeholder="Enter your password"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Stack>

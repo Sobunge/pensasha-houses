@@ -1,7 +1,7 @@
 // src/pages/Caretaker/CaretakerTasksPage.jsx
 import React from "react";
 import { Grid, Card, CardContent, Typography, Button, Box } from "@mui/material";
-import { CheckCircle, Pending, Build } from "@mui/icons-material";
+import {  Build } from "@mui/icons-material";
 
 const tasks = [
   { id: 1, title: "Fix leaking pipe - Room 204", status: "Pending", date: "2025-10-14" },
