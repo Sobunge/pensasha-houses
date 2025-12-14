@@ -11,9 +11,11 @@ import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
 @Mapper(componentModel = "spring")
 public interface CaretakerMapper {
 
+    // Map entity -> DTO
     @Mapping(source = "assignedProperty.id", target = "propertyId")
     CaretakerDTO toDTO(Caretaker caretaker);
 
+    // Map DTO -> entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "locked", ignore = true)
@@ -22,6 +24,7 @@ public interface CaretakerMapper {
     @Mapping(source = "propertyId", target = "assignedProperty", qualifiedByName = "mapPropertyIdToProperty")
     Caretaker toEntity(CaretakerDTO caretakerDTO);
 
+    // Helper to convert propertyId to Property entity
     @Named("mapPropertyIdToProperty")
     default Property mapPropertyIdToProperty(Long propertyId) {
         if (propertyId == null) {
@@ -31,5 +34,4 @@ public interface CaretakerMapper {
         property.setId(propertyId);
         return property;
     }
-
 }

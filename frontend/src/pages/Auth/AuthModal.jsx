@@ -23,20 +23,26 @@ export default function AuthModal({ open, onClose }) {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
   const { notify } = useNotification();
-  const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useContext(AuthContext);
+  const {
+    loginAs,
+    redirectAfterAuth,
+    setRedirectAfterAuth,
+  } = useContext(AuthContext);
 
   // -----------------------
-  // Tab switching
+  // Tab control
   // -----------------------
   const handleTabChange = (_, newValue) => setActiveTab(newValue);
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
 
   // -----------------------
-  // Login handler
+  // Login handler (unchanged)
   // -----------------------
   const handleLoginSuccess = (email, password) => {
-    const user = users.find(u => u.email === email && u.password === password);
+    const user = users.find(
+      (u) => u.email === email && u.password === password
+    );
 
     if (!user) {
       notify("Invalid email or password!", "error");
@@ -47,52 +53,32 @@ export default function AuthModal({ open, onClose }) {
     notify(`Welcome back, ${user.name}!`, "success");
     onClose?.();
 
-    // ✅ Redirect if user had an intended page (like property page)
     if (redirectAfterAuth) {
       navigate(redirectAfterAuth);
       setRedirectAfterAuth(null);
       return;
     }
 
-    // ✅ Default role-based redirect
     const roleRedirects = {
       tenant: "/tenant",
       landlord: "/landlord",
       caretaker: "/caretaker",
       admin: "/admin",
     };
+
     navigate(roleRedirects[user.role] || "/");
   };
 
   // -----------------------
-  // Registration handler
+  // Registration handler (FIXED)
   // -----------------------
-  const handleRegisterSuccess = (newUserData) => {
-    const user = {
-      name: `${newUserData.firstName} ${newUserData.lastName}`,
-      role: newUserData.role,
-      email: newUserData.email || "",
-      phone: newUserData.phone,
-    };
-
-    loginAs(user);
-    notify("Account created successfully!", "success");
-    onClose?.();
-
-    // ✅ Redirect if user had an intended page
-    if (redirectAfterAuth) {
-      navigate(redirectAfterAuth);
-      setRedirectAfterAuth(null);
-      return;
-    }
-
-    // ✅ Default redirect after signup
-    navigate("/");
+  const handleRegisterSuccess = () => {
+    notify("Account created successfully. Please login.", "success");
+    switchToLogin();
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      {/* Header with Tabs and Close button */}
       <Box
         sx={{
           display: "flex",
@@ -102,16 +88,21 @@ export default function AuthModal({ open, onClose }) {
           borderColor: "divider",
         }}
       >
-        <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{ flex: 1 }}>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          variant="fullWidth"
+          sx={{ flex: 1 }}
+        >
           <Tab icon={<LoginIcon />} iconPosition="start" label="Login" />
           <Tab icon={<PersonAddIcon />} iconPosition="start" label="Sign Up" />
         </Tabs>
+
         <IconButton onClick={onClose} sx={{ mr: 1 }}>
           <CloseIcon />
         </IconButton>
       </Box>
 
-      {/* Dialog content */}
       <DialogContent>
         {activeTab === 0 ? (
           <LoginForm

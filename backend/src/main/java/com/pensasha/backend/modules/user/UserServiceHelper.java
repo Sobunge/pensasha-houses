@@ -47,20 +47,12 @@ public class UserServiceHelper {
      * @param userDTO Source DTO with user-provided input data.
      */
     public void copyCommonUserAttributes(User user, CreateUserDTO userDTO) {
-        user.setFirstName(userDTO.getFirstName());
-        user.setSecondName(userDTO.getSecondName());
-        user.setThirdName(userDTO.getThirdName());
         user.setIdNumber(userDTO.getIdNumber());
 
         // Encode and set password
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setRole(userDTO.getRole());
 
-        // Only set profile picture if present and not empty
-        if (userDTO.getProfilePicture() != null && !userDTO.getProfilePicture().isEmpty()) {
-            user.setProfilePicture(userDTO.getProfilePicture());
-        }
     }
 
     /**

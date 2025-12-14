@@ -14,7 +14,7 @@ import {
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import LockIcon from "@mui/icons-material/Lock";
-import api from "../../../api/api"; // Axios instance with interceptors
+import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
 function RegistrationForm({ onSuccess, switchToLogin }) {
@@ -23,6 +23,7 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
     password: "",
     role: "",
   });
+
   const { notify } = useNotification();
 
   const handleChange = (e) => {
@@ -32,15 +33,16 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await api.post("/auth/register", formData);
 
-      notify("Registration successful! Please login.", "success", 3000);
-      onSuccess?.(); // switch to login page/modal
+      onSuccess?.();
     } catch (err) {
       console.error(err);
       notify(
-        err.response?.data?.error || "Registration failed. Try again.",
+        err.response?.data?.error ||
+          "Registration failed. Try again.",
         "error",
         3500
       );
@@ -73,17 +75,16 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           fullWidth
           label="ID Number"
           name="idNumber"
-          type="text"
           value={formData.idNumber}
           onChange={handleChange}
           size="small"
           required
-          placeholder="Enter your ID Number"
+          placeholder="Enter your Id Number"
           slotProps={{
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <BadgeOutlinedIcon color="action" />
+                  <BadgeOutlinedIcon />
                 </InputAdornment>
               ),
             },
@@ -99,13 +100,13 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           onChange={handleChange}
           size="small"
           required
-          placeholder="Enter a strong password"
+          placeholder="Enter your password"
           helperText="At least 8 characters"
           slotProps={{
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <LockIcon color="action" />
+                  <LockIcon />
                 </InputAdornment>
               ),
             },
@@ -120,28 +121,18 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           onChange={handleChange}
           size="small"
           required
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PersonAddIcon color="action" />
-                </InputAdornment>
-              ),
-            },
-          }}
-
         >
-          <MenuItem value="" disabled>Select Role</MenuItem>
-          <MenuItem value="tenant">Tenant</MenuItem>
-          <MenuItem value="landlord">Landlord</MenuItem>
+          <MenuItem value="" disabled>
+            Select Role
+          </MenuItem>
+          <MenuItem value="TENANT">Tenant</MenuItem>
+          <MenuItem value="LANDLORD">Landlord</MenuItem>
         </TextField>
 
         <Button
           type="submit"
           variant="contained"
-          size="small"
           fullWidth
-          startIcon={<PersonAddIcon />}
           sx={{
             mt: 1,
             py: 1.2,
@@ -157,13 +148,9 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
 
         <Divider sx={{ my: 1 }} />
 
-        <Typography
-          variant="body2"
-          align="center"
-          sx={{ mt: 1, color: "text.secondary" }}
-        >
+        <Typography variant="body2" align="center">
           Already have an account?{" "}
-          <Button onClick={switchToLogin} sx={{ textTransform: "none", p: 0 }}>
+          <Button onClick={switchToLogin} sx={{ p: 0, textTransform: "none" }}>
             Sign In
           </Button>
         </Typography>

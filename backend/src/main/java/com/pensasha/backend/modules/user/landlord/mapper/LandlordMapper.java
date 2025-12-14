@@ -16,10 +16,12 @@ import com.pensasha.backend.modules.user.landlord.dto.LandLordDTO;
 @Mapper(componentModel = "spring")
 public interface LandlordMapper {
 
+    // Entity -> DTO
     @Mapping(target = "propertyIds", source = "properties", qualifiedByName = "propertySetToIds")
     @Mapping(target = "bankDetailsId", source = "bankDetails.id")
     LandLordDTO toDTO(LandLord landLord);
 
+    // DTO -> Entity
     @Mapping(target = "properties", source = "propertyIds", qualifiedByName = "idsToPropertySet")
     @Mapping(target = "accountExpirationDate", ignore = true)
     @Mapping(target = "enabled", ignore = true)
@@ -27,35 +29,38 @@ public interface LandlordMapper {
     @Mapping(target = "locked", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "passwordExpirationDate", ignore = true)
-     @Mapping(target = "bankDetails", source = "bankDetailsId")
+    @Mapping(target = "bankDetails", source = "bankDetailsId", qualifiedByName = "mapBankDetails")
     LandLord toEntity(LandLordDTO landlordDTO);
 
-    // Helper method for converting Set<Property> to Set<Long>
+    // Helper: Set<Property> -> Set<Long>
     @Named("propertySetToIds")
-    default Set<Long> mapPropertiesToIds(Set<Property> properties) {
+    default Set<Long> propertySetToIds(Set<Property> properties) {
+        if (properties == null) return new HashSet<>();
         return properties.stream()
                 .map(Property::getId)
                 .collect(Collectors.toSet());
     }
 
-    // Helper method for converting Set<Long> to Set<Property>
+    // Helper: Set<Long> -> Set<Property>
     @Named("idsToPropertySet")
     default Set<Property> idsToPropertySet(Set<Long> propertyIds) {
         Set<Property> properties = new HashSet<>();
-
-        for (Long propertyId : propertyIds) {
-            Property property = new Property();
-            property.setId(propertyId); // Simulating the setting of the ID
-            properties.add(property);
+        if (propertyIds != null) {
+            for (Long propertyId : propertyIds) {
+                if (propertyId != null) {
+                    Property property = new Property();
+                    property.setId(propertyId);
+                    properties.add(property);
+                }
+            }
         }
-
         return properties;
     }
 
-     // Map the BankDetails by ID (you may need to modify this depending on how you're fetching BankDetails)
+    // Helper: bankDetailsId -> BankDetails entity
+    @Named("mapBankDetails")
     default BankDetails mapBankDetails(Long bankDetailsId) {
-        // Here, you could fetch the actual BankDetails from the database using the ID.
-        // For now, let's assume we're creating a dummy BankDetails instance with the given ID.
+        if (bankDetailsId == null) return null;
         BankDetails bankDetails = new BankDetails();
         bankDetails.setId(bankDetailsId);
         return bankDetails;
