@@ -30,12 +30,18 @@ public interface LandlordMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "passwordExpirationDate", ignore = true)
     @Mapping(target = "bankDetails", source = "bankDetailsId", qualifiedByName = "mapBankDetails")
+    @Mapping(target = "firstName", ignore = true)
+    @Mapping(target = "secondName", ignore = true)
+    @Mapping(target = "thirdName", ignore = true)
+    @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "profilePicture", ignore = true)
     LandLord toEntity(LandLordDTO landlordDTO);
 
     // Helper: Set<Property> -> Set<Long>
     @Named("propertySetToIds")
     default Set<Long> propertySetToIds(Set<Property> properties) {
-        if (properties == null) return new HashSet<>();
+        if (properties == null)
+            return new HashSet<>();
         return properties.stream()
                 .map(Property::getId)
                 .collect(Collectors.toSet());
@@ -60,7 +66,8 @@ public interface LandlordMapper {
     // Helper: bankDetailsId -> BankDetails entity
     @Named("mapBankDetails")
     default BankDetails mapBankDetails(Long bankDetailsId) {
-        if (bankDetailsId == null) return null;
+        if (bankDetailsId == null)
+            return null;
         BankDetails bankDetails = new BankDetails();
         bankDetails.setId(bankDetailsId);
         return bankDetails;

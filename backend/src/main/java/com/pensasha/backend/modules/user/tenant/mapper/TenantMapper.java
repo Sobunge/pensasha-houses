@@ -22,6 +22,11 @@ public interface TenantMapper {
     @Mapping(target = "passwordExpirationDate", ignore = true)
     @Mapping(target = "leases", ignore = true)
     @Mapping(target = "rentalUnits", ignore = true)
+    @Mapping(target = "firstName", ignore = true)
+    @Mapping(target = "secondName", ignore = true)
+    @Mapping(target = "thirdName", ignore = true)
+    @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "profilePicture", ignore = true)
     Tenant toEntity(TenantDTO tenantDTO);
 
     // Map Tenant -> TenantDTO, safely converting lists to IDs

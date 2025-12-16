@@ -17,10 +17,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.pensasha.backend.modules.user.dto.LoginRequestDTO;
+import com.pensasha.backend.modules.user.dto.LoginResponseDTO;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.security.CustomUserDetailsService;
 import com.pensasha.backend.security.JWTUtils;
+import com.pensasha.backend.modules.user.dto.AuthPrincipalDTO;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,24 +68,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequestDTO request,
-                                                     BindingResult result,
-                                                     HttpServletResponse response) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request,
+                                                  BindingResult result,
+                                                  HttpServletResponse response) {
 
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid input data"));
+            return ResponseEntity.badRequest().body(null);
         }
 
+        // Authenticate user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getIdNumber(), request.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // Cast to CustomUserDetails
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         // Generate tokens
-        Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
+        Map<String, String> tokens = jwtUtils.generateTokens(customUserDetails);
         String accessToken = tokens.get("accessToken");
         String refreshToken = tokens.get("refreshToken");
 
@@ -97,20 +101,26 @@ public class AuthController {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-        // Prepare login response with access token
-        Map<String, Object> respBody = new HashMap<>();
-        respBody.put("accessToken", accessToken);
-        respBody.put("roles", userDetails.getAuthorities().stream()
-                .map(auth -> auth.getAuthority()).collect(Collectors.toList()));
-        respBody.put("username", userDetails.getUsername());
+        // Map role → default route
+        Role role = customUserDetails.getPrimaryRole();
+        String defaultRoute = resolveDefaultRoute(role.name());
 
-        return ResponseEntity.ok(respBody);
+        // Build response
+        AuthPrincipalDTO principal = new AuthPrincipalDTO(
+                customUserDetails.getUser().getId(),
+                customUserDetails.getUsername(),
+                role.name().toLowerCase(),
+                defaultRoute
+        );
+
+        LoginResponseDTO responseBody = new LoginResponseDTO(accessToken, principal);
+
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, Object>> refreshToken(HttpServletRequest request,
                                                             HttpServletResponse response) {
-        // Extract refresh token from HttpOnly cookie
         String refreshToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
                 .filter(c -> "refreshToken".equals(c.getName()))
                 .map(Cookie::getValue)
@@ -129,7 +139,6 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid refresh token"));
             }
 
-            // Generate new access token
             String newAccessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
 
             Map<String, Object> resp = new HashMap<>();
@@ -146,7 +155,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletResponse response) {
-        // Clear refresh token cookie
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(true)
@@ -157,5 +165,16 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
+    // Private helper to map roles → default routes
+    private String resolveDefaultRoute(String roleName) {
+        return switch (roleName) {
+            case "TENANT" -> "/tenant";
+            case "LANDLORD" -> "/landlord";
+            case "CARETAKER" -> "/caretaker";
+            case "ADMIN" -> "/admin";
+            default -> "/";
+        };
     }
 }

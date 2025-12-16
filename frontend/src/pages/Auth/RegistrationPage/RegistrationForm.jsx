@@ -10,6 +10,7 @@ import {
   Avatar,
   Divider,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
@@ -23,6 +24,7 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
     password: "",
     role: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const { notify } = useNotification();
 
@@ -33,19 +35,21 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       await api.post("/auth/register", formData);
-
+      notify("Registration successful!", "success", 3000);
       onSuccess?.();
     } catch (err) {
       console.error(err);
       notify(
-        err.response?.data?.error ||
-          "Registration failed. Try again.",
+        err.response?.data?.error || "Registration failed. Try again.",
         "error",
         3500
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,14 +84,12 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           size="small"
           required
           placeholder="Enter your Id Number"
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <BadgeOutlinedIcon />
-                </InputAdornment>
-              ),
-            },
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <BadgeOutlinedIcon />
+              </InputAdornment>
+            ),
           }}
         />
 
@@ -102,14 +104,12 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           placeholder="Enter your password"
           helperText="At least 8 characters"
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon />
-                </InputAdornment>
-              ),
-            },
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockIcon />
+              </InputAdornment>
+            ),
           }}
         />
 
@@ -132,6 +132,7 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
         <Button
           type="submit"
           variant="contained"
+          size="small"
           fullWidth
           sx={{
             mt: 1,
@@ -142,8 +143,12 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
             textTransform: "none",
             "&:hover": { bgcolor: "#c59000" },
           }}
+          disabled={loading}
+          startIcon={loading ? <CircularProgress size={20} /> : (
+            <PersonAddIcon />
+          )}
         >
-          Register
+          {loading ? "Registering..." : "Register"}
         </Button>
 
         <Divider sx={{ my: 1 }} />

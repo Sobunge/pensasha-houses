@@ -22,6 +22,11 @@ public interface CaretakerMapper {
     @Mapping(target = "accountExpirationDate", ignore = true)
     @Mapping(target = "passwordExpirationDate", ignore = true)
     @Mapping(source = "propertyId", target = "assignedProperty", qualifiedByName = "mapPropertyIdToProperty")
+    @Mapping(target = "firstName", ignore = true)
+    @Mapping(target = "secondName", ignore = true)
+    @Mapping(target = "thirdName", ignore = true)
+    @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "profilePicture", ignore = true)
     Caretaker toEntity(CaretakerDTO caretakerDTO);
 
     // Helper to convert propertyId to Property entity

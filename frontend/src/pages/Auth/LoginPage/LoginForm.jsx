@@ -10,6 +10,7 @@ import {
   Stack,
   Link as MuiLink,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
@@ -21,6 +22,7 @@ import api, { setAccessToken } from "../../../api/api";
 
 export default function LoginForm({ switchToSignup, onClose }) {
   const [formData, setFormData] = useState({ idNumber: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const { notify } = useNotification();
   const { loginAs } = useAuth();
   const navigate = useNavigate();
@@ -32,47 +34,37 @@ export default function LoginForm({ switchToSignup, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      // Send login request to backend
-      const response = await api.post("/auth/login", {
-        idNumber: formData.idNumber,
-        password: formData.password,
-      });
+      const response = await api.post("/auth/login", formData);
+      const { accessToken, principal } = response.data;
 
-      const { accessToken, roles, username } = response.data;
-
-      // Store access token in memory
+      // Store access token
       setAccessToken(accessToken);
 
-      // convert role to lowercase
-      const normalizedRole = roles[0].toLowerCase();
-      // Save user info in context and optionally localStorage
-      const user = { idNumber: username, role: normalizedRole };
+      // Save user info
+      const user = {
+        idNumber: principal.username,
+        role: principal.role,
+        defaultRoute: principal.defaultRoute,
+      };
       loginAs(user);
       localStorage.setItem("user", JSON.stringify(user));
 
       notify("Login successful!", "success", 3000);
 
-      // Redirect based on role
-      const roleRedirects = {
-        tenant: "/tenant",
-        landlord: "/landlord",
-        caretaker: "/caretaker",
-        admin: "/admin",
-      };
-
       if (onClose) onClose();
-      setTimeout(() => {
-        navigate(roleRedirects[user.role] || "/");
-      }, 200);
+      navigate(principal.defaultRoute || "/");
     } catch (err) {
-      console.error(err);
-      notify(
-        err.response?.data?.error || "Invalid credentials or server error",
-        "error",
-        3500
-      );
+      // Internal log for troubleshooting
+      console.error("Login error:", err.response?.data || err.message);
+
+      // Generic error for the end user
+      const errorMessage = "Invalid credentials";
+      notify(errorMessage, "error", 3500);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,20 +90,17 @@ export default function LoginForm({ switchToSignup, onClose }) {
           fullWidth
           label="ID Number"
           name="idNumber"
-          type="text"
           value={formData.idNumber}
           onChange={handleChange}
           required
           size="small"
           placeholder="Enter your ID Number"
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <BadgeOutlinedIcon color="action" />
-                </InputAdornment>
-              ),
-            },
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <BadgeOutlinedIcon color="action" />
+              </InputAdornment>
+            ),
           }}
         />
         <TextField
@@ -124,14 +113,12 @@ export default function LoginForm({ switchToSignup, onClose }) {
           required
           size="small"
           placeholder="Enter your password"
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon color="action" />
-                </InputAdornment>
-              ),
-            },
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockIcon color="action" />
+              </InputAdornment>
+            ),
           }}
         />
       </Stack>
@@ -148,7 +135,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           type="submit"
           variant="contained"
           size="small"
-          startIcon={<LockOutlinedIcon />}
+          startIcon={loading ? <CircularProgress size={20} /> : <LockOutlinedIcon />}
           sx={{
             mt: 1,
             py: 1.2,
@@ -158,8 +145,9 @@ export default function LoginForm({ switchToSignup, onClose }) {
             textTransform: "none",
             "&:hover": { bgcolor: "#c59000" },
           }}
+          disabled={loading}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </Button>
 
         <Divider sx={{ my: 1 }} />
