@@ -91,7 +91,7 @@ function TenantDashboard() {
               Role: {user.role}
             </Typography>
             <Typography variant="body2" sx={{ color: "#555" }}>
-              You have {tenantProperties.length} properties
+              You have {tenantProperties.length} rental units
             </Typography>
           </Box>
         </Box>
@@ -113,13 +113,13 @@ function TenantDashboard() {
         </Button>
       </Card>
 
-      {/* Properties & Rent */}
-      <SectionTitle title="Your Properties & Rent" />
+      {/* Units & Rent */}
+      <SectionTitle title="Your Rental Units & Rent" />
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 4 }}>
         {tenantProperties.length === 0 ? (
           <Box sx={{ width: "100%", textAlign: "center", mt: 2 }}>
             <Typography variant="body2" sx={{ color: "#555", mb: 2 }}>
-              You currently have no properties assigned.
+              You currently have no rental unit assigned.
             </Typography>
             <Button
               variant="outlined"
