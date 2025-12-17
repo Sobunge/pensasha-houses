@@ -18,23 +18,87 @@ import LockIcon from "@mui/icons-material/Lock";
 import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
-function RegistrationForm({ onSuccess, switchToLogin }) {
+/* ---------------- Validation ---------------- */
+
+const validateIdNumber = (value) => {
+  if (!value) return "ID Number is required";
+  if (value.length < 7 || value.length > 8) {
+    return "ID Number must be 7 or 8 digits";
+  }
+  return null;
+};
+
+const validatePassword = (value) => {
+  if (!value) return "Password is required";
+  if (value.length < 5) {
+    return "Password must be at least 5 characters";
+  }
+  return null;
+};
+
+const validateRole = (value) => {
+  if (!value) return "Role is required";
+  return null;
+};
+
+export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const [formData, setFormData] = useState({
     idNumber: "",
     password: "",
     role: "",
   });
-  const [loading, setLoading] = useState(false);
 
+  const [touched, setTouched] = useState({
+    idNumber: false,
+    password: false,
+    role: false,
+  });
+
+  const [loading, setLoading] = useState(false);
   const { notify } = useNotification();
+
+  /* ---------------- Derived validation ---------------- */
+
+  const idError = validateIdNumber(formData.idNumber);
+  const passwordError = validatePassword(formData.password);
+  const roleError = validateRole(formData.role);
+
+  const showIdError = touched.idNumber && Boolean(idError);
+  const showPasswordError = touched.password && Boolean(passwordError);
+  const showRoleError = touched.role && Boolean(roleError);
+
+  /* ---------------- Handlers ---------------- */
+
+  const handleIdChange = (e) => {
+    const digitsOnly = e.target.value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      idNumber: digitsOnly.slice(0, 8),
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleBlur = (field) => () => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // final guard
+    if (idError || passwordError || roleError) {
+      setTouched({
+        idNumber: true,
+        password: true,
+        role: true,
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -42,7 +106,7 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
       notify("Registration successful!", "success", 3000);
       onSuccess?.();
     } catch (err) {
-      console.error(err);
+      console.error("Registration error:", err.response?.data || err.message);
       notify(
         err.response?.data?.error || "Registration failed. Try again.",
         "error",
@@ -52,6 +116,8 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
       setLoading(false);
     }
   };
+
+  /* ---------------- UI ---------------- */
 
   return (
     <Box
@@ -80,16 +146,23 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           label="ID Number"
           name="idNumber"
           value={formData.idNumber}
-          onChange={handleChange}
+          onChange={handleIdChange}
+          onBlur={handleBlur("idNumber")}
           size="small"
           required
-          placeholder="Enter your Id Number"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <BadgeOutlinedIcon />
-              </InputAdornment>
-            ),
+          placeholder="Enter your ID Number"
+          error={showIdError}
+          helperText={showIdError ? idError : ""}
+          slotProps={{
+            input: {
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+              startAdornment: (
+                <InputAdornment position="start">
+                  <BadgeOutlinedIcon />
+                </InputAdornment>
+              ),
+            },
           }}
         />
 
@@ -100,16 +173,20 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           type="password"
           value={formData.password}
           onChange={handleChange}
+          onBlur={handleBlur("password")}
           size="small"
           required
           placeholder="Enter your password"
-          helperText="At least 8 characters"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon />
-              </InputAdornment>
-            ),
+          error={showPasswordError}
+          helperText={showPasswordError ? passwordError : ""}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon />
+                </InputAdornment>
+              ),
+            },
           }}
         />
 
@@ -119,8 +196,11 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           name="role"
           value={formData.role}
           onChange={handleChange}
+          onBlur={handleBlur("role")}
           size="small"
           required
+          error={showRoleError}
+          helperText={showRoleError ? roleError : ""}
         >
           <MenuItem value="" disabled>
             Select Role
@@ -134,6 +214,10 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
           variant="contained"
           size="small"
           fullWidth
+          disabled={loading}
+          startIcon={
+            loading ? <CircularProgress size={20} /> : <PersonAddIcon />
+          }
           sx={{
             mt: 1,
             py: 1.2,
@@ -143,10 +227,6 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
             textTransform: "none",
             "&:hover": { bgcolor: "#c59000" },
           }}
-          disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} /> : (
-            <PersonAddIcon />
-          )}
         >
           {loading ? "Registering..." : "Register"}
         </Button>
@@ -163,5 +243,3 @@ function RegistrationForm({ onSuccess, switchToLogin }) {
     </Box>
   );
 }
-
-export default RegistrationForm;
