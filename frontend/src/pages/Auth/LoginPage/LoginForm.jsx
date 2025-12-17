@@ -30,6 +30,14 @@ const validateIdNumber = (value) => {
   return null;
 };
 
+const validatePassword = (value) => {
+  if (!value) return "Password is required";
+  if (value.length < 5) {
+    return "Password must be at least 5 characters";
+  }
+  return null;
+};
+
 export default function LoginForm({ switchToSignup, onClose }) {
   const [formData, setFormData] = useState({
     idNumber: "",
@@ -38,6 +46,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
 
   const [touched, setTouched] = useState({
     idNumber: false,
+    password: false,
   });
 
   const [loading, setLoading] = useState(false);
@@ -46,10 +55,13 @@ export default function LoginForm({ switchToSignup, onClose }) {
   const { loginAs } = useAuth();
   const navigate = useNavigate();
 
-  /* ---------------- Derived validation state ---------------- */
+  /* ---------------- Derived validation ---------------- */
 
   const idError = validateIdNumber(formData.idNumber);
+  const passwordError = validatePassword(formData.password);
+
   const showIdError = touched.idNumber && Boolean(idError);
+  const showPasswordError = touched.password && Boolean(passwordError);
 
   /* ---------------- Handlers ---------------- */
 
@@ -61,21 +73,24 @@ export default function LoginForm({ switchToSignup, onClose }) {
     }));
   };
 
-  const handleBlur = () => {
-    setTouched((prev) => ({ ...prev, idNumber: true }));
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleBlur = (field) => () => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // final guard before submit
-    if (idError) {
-      setTouched({ idNumber: true });
+    // Final guard before submit
+    if (idError || passwordError) {
+      setTouched({
+        idNumber: true,
+        password: true,
+      });
       return;
     }
 
@@ -134,7 +149,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           name="idNumber"
           value={formData.idNumber}
           onChange={handleIdChange}
-          onBlur={handleBlur}
+          onBlur={handleBlur("idNumber")}
           required
           size="small"
           placeholder="Enter your ID Number"
@@ -160,9 +175,12 @@ export default function LoginForm({ switchToSignup, onClose }) {
           type="password"
           value={formData.password}
           onChange={handleChange}
+          onBlur={handleBlur("password")}
           required
           size="small"
           placeholder="Enter your password"
+          error={showPasswordError}
+          helperText={showPasswordError ? passwordError : ""}
           slotProps={{
             input: {
               startAdornment: (
