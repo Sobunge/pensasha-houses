@@ -27,7 +27,7 @@ export const tenantMenuItems = [
   { label: "Dashboard", link: "/tenant", icon: <DashboardIcon /> },
   { label: "Profile", link: "/tenant/user-profile", icon: <PersonIcon /> },
   { label: "My Rentals", link: "/tenant/properties", icon: <ApartmentIcon /> },
-  { label: "Browse Properties", link: "/tenant/browse-properties", icon: <SearchIcon /> },
+  { label: "Browse Units", link: "/tenant/browse-properties", icon: <SearchIcon /> },
   { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
   { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
   { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
