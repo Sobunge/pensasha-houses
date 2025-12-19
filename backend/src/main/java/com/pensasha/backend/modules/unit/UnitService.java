@@ -2,6 +2,7 @@ package com.pensasha.backend.modules.unit;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -119,7 +120,7 @@ public class UnitService {
      * @return The rent amount due for the unit.
      * @throws ResourceNotFoundException if no unit is found with the given ID.
      */
-    public double calculateRentDue(Long id) {
+    public BigDecimal calculateRentDue(Long id) {
         Unit unit = getUnitById(id); // Retrieve the unit to calculate rent for (throws exception if not found).
         return unit.getRentAmount(); // Return the rent amount of the unit.
     }

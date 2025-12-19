@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.unit;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -88,9 +89,9 @@ public class UnitController {
      * Calculates the rent due for a unit.
      */
     @GetMapping("/{id}/rent-due")
-    public ResponseEntity<Double> calculateRentDue(@PathVariable Long id) {
+    public ResponseEntity<BigDecimal> calculateRentDue(@PathVariable Long id) {
         log.info("Calculating rent due for unit with ID: {}", id);
-        double rentDue = unitService.calculateRentDue(id);
+        BigDecimal rentDue = unitService.calculateRentDue(id);
         return ResponseEntity.ok(rentDue);
     }
 
