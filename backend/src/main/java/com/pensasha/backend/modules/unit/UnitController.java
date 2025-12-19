@@ -1,5 +1,7 @@
 package com.pensasha.backend.modules.unit;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,5 +92,16 @@ public class UnitController {
         log.info("Calculating rent due for unit with ID: {}", id);
         double rentDue = unitService.calculateRentDue(id);
         return ResponseEntity.ok(rentDue);
+    }
+
+
+    /**
+     * Retrieves all units associated with a specific tenant ID.
+     */
+    @GetMapping("/tenant/{tenantId}")
+    public ResponseEntity<java.util.List<Unit>> getUnitsByTenantId(@PathVariable Long tenantId) {
+        log.info("Fetching units for tenant with ID: {}", tenantId);
+        List<Unit> units = unitService.getUnitsByTenantId(tenantId);
+        return ResponseEntity.ok(units);
     }
 }

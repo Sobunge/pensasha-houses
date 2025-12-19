@@ -1,6 +1,9 @@
 package com.pensasha.backend.modules.unit;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -119,5 +122,15 @@ public class UnitService {
     public double calculateRentDue(Long id) {
         Unit unit = getUnitById(id); // Retrieve the unit to calculate rent for (throws exception if not found).
         return unit.getRentAmount(); // Return the rent amount of the unit.
+    }
+
+    /**
+     * Retrieves all units associated with a specific tenant ID.
+     * 
+     * @param id The ID of the tenant.
+     * @return A list of Unit entities associated with the given tenant ID.
+     */
+    public List<Unit> getUnitsByTenantId(Long id) {
+        return unitRepository.findByTenantId(id);
     }
 }

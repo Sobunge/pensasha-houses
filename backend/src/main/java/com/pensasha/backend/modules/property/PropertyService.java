@@ -227,14 +227,4 @@ public class PropertyService {
         return propertyRepository.findByLandLordIdNumber(idNumber, pageable);
     }
 
-    /**
-     * Fetches all properties associated with a tenant identified by their ID number.
-     * 
-     * @param idNumber The ID number of the tenant.
-     * @return A list of properties associated with the specified tenant.
-     */
-    public Page<Property> gettingPropertiesForTenant(String idNumber, Pageable pageable){
-        log.info("Fetching properties for tenant with ID number {}", idNumber);
-        return propertyRepository.findByTenantIdNumber(idNumber, pageable);
-    }
 }

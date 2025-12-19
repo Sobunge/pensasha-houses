@@ -94,4 +94,5 @@ public class TenantController {
             return ResponseEntity.notFound().build();
         }
     }
+
 }

@@ -21,8 +21,8 @@ import api from "../../api/api";
 
 function TenantDashboard() {
   const [user, setUser] = useState(null);
-  const [tenantProperties, setTenantProperties] = useState([]);
-  const [loadingProperties, setLoadingProperties] = useState(true);
+  const [tenantUnits, setTenantUnits] = useState([]);
+  const [loadingUnits, setLoadingUnits] = useState(true);
   const navigate = useNavigate();
 
   // Load user from localStorage
@@ -36,24 +36,24 @@ function TenantDashboard() {
   useEffect(() => {
     if (!user) return;
 
-    const fetchTenantProperties = async () => {
-      setLoadingProperties(true);
+    const fetchTenantUnits = async () => {
+      setLoadingUnits(true);
       try {
-        const response = await api.get("/tenant/properties");
-        setTenantProperties(response.data || []);
+        const response = await api.get("/units/tenant/" + user.id);
+        setTenantUnits(response.data || []);
       } catch (err) {
-        console.error("Failed to fetch tenant properties:", err);
+        console.error("Failed to fetch tenant units:", err);
       } finally {
-        setLoadingProperties(false);
+        setLoadingUnits(false);
       }
     };
 
-    fetchTenantProperties();
+    fetchTenantUnits();
   }, [user]);
 
-  const visibleDesktop = tenantProperties.slice(0, 2);
+  const visibleDesktop = tenantUnits.slice(0, 2);
 
-  if (!user || loadingProperties) {
+  if (!user || loadingUnits) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
         <CircularProgress />
@@ -91,7 +91,7 @@ function TenantDashboard() {
               Role: {user.role}
             </Typography>
             <Typography variant="body2" sx={{ color: "#555" }}>
-              You have {tenantProperties.length} rental units
+              You have {tenantUnits.length} rental units
             </Typography>
           </Box>
         </Box>
@@ -116,7 +116,7 @@ function TenantDashboard() {
       {/* Units & Rent */}
       <SectionTitle title="Your Rental Units & Rent" />
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 4 }}>
-        {tenantProperties.length === 0 ? (
+        {tenantUnits.length === 0 ? (
           <Box sx={{ width: "100%", textAlign: "center", mt: 2 }}>
             <Typography variant="body2" sx={{ color: "#555", mb: 2 }}>
               You currently have no rental unit assigned.
@@ -132,7 +132,7 @@ function TenantDashboard() {
                 "&:hover": { backgroundColor: "#fef2b2", borderColor: "#f8b500" },
               }}
             >
-              Browse Available Properties
+              Browse Available Units
             </Button>
           </Box>
         ) : (
@@ -145,7 +145,7 @@ function TenantDashboard() {
                 <PropertyInfoCard property={property} />
               </Box>
             ))}
-            {tenantProperties.length > visibleDesktop.length && (
+            {tenantUnits.length > visibleDesktop.length && (
               <Box sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}>
                 <Button
                   variant="outlined"
