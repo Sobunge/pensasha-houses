@@ -1,12 +1,9 @@
 package com.pensasha.backend.modules.payment;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
-
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.*;
@@ -15,12 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
-/**
- * REST controller for managing payments.
- * Provides endpoints to create, update, delete, and retrieve payment resources.
- * Includes HATEOAS links for discoverability.
- */
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
@@ -29,12 +22,6 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    /**
-     * Adds a new payment.
-     *
-     * @param payment The payment to be added.
-     * @return ResponseEntity containing the saved Payment and HATEOAS links.
-     */
     @PostMapping
     public ResponseEntity<EntityModel<Payment>> createPayment(@Valid @RequestBody Payment payment) {
         log.info("Creating new payment: {}", payment);
@@ -42,13 +29,6 @@ public class PaymentController {
         return ResponseEntity.ok(toModel(createdPayment));
     }
 
-    /**
-     * Updates an existing payment by its ID.
-     *
-     * @param paymentId      The ID of the payment to update.
-     * @param paymentDetails The updated payment information.
-     * @return ResponseEntity containing the updated Payment and HATEOAS links.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<Payment>> updatePayment(
             @PathVariable("id") Long paymentId,
@@ -58,12 +38,6 @@ public class PaymentController {
         return ResponseEntity.ok(toModel(updatedPayment));
     }
 
-    /**
-     * Retrieves a payment by its ID.
-     *
-     * @param id The payment ID.
-     * @return ResponseEntity containing the Payment and HATEOAS links.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Payment>> getPaymentById(@PathVariable Long id) {
         log.info("Fetching payment with ID: {}", id);
@@ -72,12 +46,6 @@ public class PaymentController {
                 .orElseThrow(() -> new ResourceNotFoundException("Payment with id: " + id + " not found"));
     }
 
-    /**
-     * Retrieves all payments with pagination.
-     *
-     * @param pageable Pagination parameters.
-     * @return PagedModel containing a list of Payment resources with HATEOAS links.
-     */
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Payment>>> getAllPayments(Pageable pageable) {
         log.info("Fetching all payments with pagination: {}", pageable);
@@ -94,12 +62,6 @@ public class PaymentController {
         return ResponseEntity.ok(pagedModel);
     }
 
-    /**
-     * Deletes a payment by its ID.
-     *
-     * @param id The payment ID.
-     * @return ResponseEntity with HTTP 204 status.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
         log.info("Deleting payment with ID: {}", id);
@@ -107,29 +69,17 @@ public class PaymentController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Assigns an invoice to a payment.
-     *
-     * @param invoiceId The invoice ID.
-     * @param paymentId The payment ID.
-     * @return ResponseEntity containing the updated Payment and HATEOAS links.
-     */
     @PostMapping("/{paymentId}/assign-invoice/{invoiceId}")
     public ResponseEntity<EntityModel<Payment>> assignInvoiceToPayment(
-            @PathVariable String invoiceId,
-            @PathVariable Long paymentId) {
+            @PathVariable Long paymentId,
+            @PathVariable UUID invoiceId) {
         log.info("Assigning invoice {} to payment {}", invoiceId, paymentId);
         Payment updatedPayment = paymentService.assignPaymentToInvoice(invoiceId, paymentId);
         return ResponseEntity.ok(toModel(updatedPayment));
     }
 
-    /**
-     * Converts a Payment entity into an EntityModel (HATEOAS resource) with links.
-     *
-     * @param payment The Payment entity.
-     * @return EntityModel containing the payment and related links.
-     */
     private EntityModel<Payment> toModel(Payment payment) {
+        String invoiceId = payment.getInvoice() != null ? payment.getInvoice().getInvoiceNumber().toString() : "null";
         return EntityModel.of(payment,
                 WebMvcLinkBuilder
                         .linkTo(WebMvcLinkBuilder.methodOn(PaymentController.class).getPaymentById(payment.getId()))
@@ -140,7 +90,9 @@ public class PaymentController {
                 WebMvcLinkBuilder
                         .linkTo(WebMvcLinkBuilder.methodOn(PaymentController.class).deletePayment(payment.getId()))
                         .withRel("delete"),
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PaymentController.class)
-                        .assignInvoiceToPayment("INVOICE_ID", payment.getId())).withRel("assign-invoice"));
+                WebMvcLinkBuilder
+                        .linkTo(WebMvcLinkBuilder.methodOn(PaymentController.class)
+                                .assignInvoiceToPayment(payment.getId(), UUID.fromString(invoiceId)))
+                        .withRel("assign-invoice"));
     }
 }

@@ -1,8 +1,14 @@
 package com.pensasha.backend.modules.payment.dto;
 
 import java.time.LocalDate;
+import java.util.UUID;
+
 import lombok.*;
 
+/**
+ * Data Transfer Object for Payment.
+ * Represents the minimal information required to create or view a Payment.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,9 +22,9 @@ public class PaymentDTO {
 
     private LocalDate paymentDate;
 
-    private String method; // Could be enum name or string representation
+    private String method; // Could be enum name or string
 
     private Long tenantId;
 
-    private Long invoiceNumber; // nullable, since invoice is optional
+    private UUID invoiceNumber; // Match Invoice entity type
 }
