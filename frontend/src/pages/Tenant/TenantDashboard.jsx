@@ -39,7 +39,7 @@ function TenantDashboard() {
     const fetchTenantUnits = async () => {
       setLoadingUnits(true);
       try {
-        const response = await api.get("/units/tenant/" + user.id);
+        const response = await api.get(`/units/tenant/${user.idNumber}`);
         setTenantUnits(response.data || []);
       } catch (err) {
         console.error("Failed to fetch tenant units:", err);
