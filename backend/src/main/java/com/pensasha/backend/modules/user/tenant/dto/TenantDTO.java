@@ -3,25 +3,31 @@ package com.pensasha.backend.modules.user.tenant.dto;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
  * DTO for transferring tenant-specific data.
- * Extends UserDTO and adds fields for rental units, leases, and emergency contact.
+ * A tenant does NOT directly own units; units are derived from leases.
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class TenantDTO extends CreateUserDTO {
 
     /**
+     * Database ID of the tenant (needed for mapping and API responses)
+     */
+    private Long id;
+
+    /**
      * Emergency contact phone number for the tenant.
-     * Optional but if present, must match phone number pattern.
      */
     @Pattern(
         regexp = "^(?:\\+254|0)[17][0-9]{8}$",
@@ -30,12 +36,12 @@ public class TenantDTO extends CreateUserDTO {
     private String emergencyContact;
 
     /**
-     * List of rental unit IDs assigned to this tenant.
-     */
-    private List<Long> rentalUnitIds;
-
-    /**
-     * List of lease IDs assigned to this tenant.
+     * Lease IDs associated with this tenant.
      */
     private List<Long> leaseIds;
+
+    /**
+     * Unit IDs derived from the tenant's leases (read-only, derived field).
+     */
+    private List<Long> unitIds;
 }

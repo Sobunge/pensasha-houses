@@ -1,7 +1,6 @@
 package com.pensasha.backend.modules.user.tenant;
 
 import com.pensasha.backend.modules.lease.Lease;
-import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,18 +53,6 @@ public class TenantController {
             @RequestParam String emergencyContact) {
         log.info("PATCH /api/tenants/{}/emergency-contact", idNumber);
         TenantDTO updatedTenant = tenantService.updateEmergencyContact(idNumber, emergencyContact);
-        return ResponseEntity.ok(updatedTenant);
-    }
-
-    /**
-     * Update rental units for a tenant.
-     */
-    @PutMapping("/{idNumber}/rental-units")
-    public ResponseEntity<TenantDTO> updateRentalUnits(
-            @PathVariable String idNumber,
-            @RequestBody List<Unit> units) {
-        log.info("PUT /api/tenants/{}/rental-units", idNumber);
-        TenantDTO updatedTenant = tenantService.updateRentalUnits(idNumber, units);
         return ResponseEntity.ok(updatedTenant);
     }
 

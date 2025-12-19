@@ -2,7 +2,6 @@ package com.pensasha.backend.modules.user.tenant;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.lease.Lease;
-import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 import com.pensasha.backend.modules.user.tenant.mapper.TenantMapper;
 import lombok.AllArgsConstructor;
@@ -61,20 +60,6 @@ public class TenantService {
         tenant.setEmergencyContact(emergencyContact);
         Tenant updatedTenant = tenantRepository.save(tenant);
         log.info("Successfully updated emergency contact for tenant with ID number: {}", idNumber);
-        return tenantMapper.toDTO(updatedTenant);
-    }
-
-    /**
-     * Update rental units for a tenant
-     */
-    public TenantDTO updateRentalUnits(String idNumber, List<Unit> units) {
-        log.info("Updating rental units for tenant with ID number: {}", idNumber);
-        Tenant tenant = tenantRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Tenant with ID number " + idNumber + " not found."));
-
-        tenant.setRentalUnits(units);
-        Tenant updatedTenant = tenantRepository.save(tenant);
-        log.info("Successfully updated rental units for tenant with ID number: {}", idNumber);
         return tenantMapper.toDTO(updatedTenant);
     }
 

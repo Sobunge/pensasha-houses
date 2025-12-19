@@ -7,13 +7,14 @@ import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.user.tenant.Tenant;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 
 @Mapper(componentModel = "spring")
 public interface TenantMapper {
 
-    // Map TenantDTO -> Tenant entity
+    // TenantDTO -> Tenant
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "enabled", ignore = true)
@@ -21,7 +22,6 @@ public interface TenantMapper {
     @Mapping(target = "accountExpirationDate", ignore = true)
     @Mapping(target = "passwordExpirationDate", ignore = true)
     @Mapping(target = "leases", ignore = true)
-    @Mapping(target = "rentalUnits", ignore = true)
     @Mapping(target = "firstName", ignore = true)
     @Mapping(target = "secondName", ignore = true)
     @Mapping(target = "thirdName", ignore = true)
@@ -29,28 +29,33 @@ public interface TenantMapper {
     @Mapping(target = "profilePicture", ignore = true)
     Tenant toEntity(TenantDTO tenantDTO);
 
-    // Map Tenant -> TenantDTO, safely converting lists to IDs
-    @Mapping(target = "rentalUnitIds", expression = "java(getUnitIds(tenant))")
+    // Tenant -> TenantDTO
     @Mapping(target = "leaseIds", expression = "java(getLeaseIds(tenant))")
+    @Mapping(target = "unitIds", expression = "java(getUnitIdsFromLeases(tenant))")
     TenantDTO toDTO(Tenant tenant);
 
-    // Helper method to safely extract rental unit IDs
-    default List<Long> getUnitIds(Tenant tenant) {
-        if (tenant.getRentalUnits() == null || tenant.getRentalUnits().isEmpty()) {
-            return Collections.emptyList();
-        }
-        return tenant.getRentalUnits().stream()
-                     .map(unit -> unit.getId())
-                     .collect(Collectors.toList());
-    }
-
-    // Helper method to safely extract lease IDs
+    // Extract lease IDs
     default List<Long> getLeaseIds(Tenant tenant) {
         if (tenant.getLeases() == null || tenant.getLeases().isEmpty()) {
             return Collections.emptyList();
         }
-        return tenant.getLeases().stream()
-                     .map(lease -> lease.getId())
+        return tenant.getLeases()
+                     .stream()
+                     .map(Lease::getId)
+                     .collect(Collectors.toList());
+    }
+
+    // Derive unit IDs via leases (single source of truth)
+    default List<Long> getUnitIdsFromLeases(Tenant tenant) {
+        if (tenant.getLeases() == null || tenant.getLeases().isEmpty()) {
+            return Collections.emptyList();
+        }
+        return tenant.getLeases()
+                     .stream()
+                     .map(Lease::getUnit)
+                     .filter(unit -> unit != null)
+                     .map(unit -> unit.getId())
+                     .distinct()
                      .collect(Collectors.toList());
     }
 }
