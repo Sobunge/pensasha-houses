@@ -124,7 +124,7 @@ function TenantDashboard() {
             <Button
               variant="outlined"
               size="small"
-              onClick={() => navigate("/tenant/browse-properties")}
+              onClick={() => navigate("/tenant/browse-units")}
               sx={{
                 borderRadius: 3,
                 textTransform: "none",

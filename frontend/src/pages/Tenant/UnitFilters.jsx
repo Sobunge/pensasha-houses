@@ -44,7 +44,7 @@ export default function PropertyFilters({ filters, onChange, onApply, onReset })
     >
       {/* Title */}
       <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
-        Filter Properties
+        Filter Units
       </Typography>
 
       {/* Search */}

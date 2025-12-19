@@ -15,7 +15,6 @@ import MailIcon from "@mui/icons-material/Mail";
 import ProfileMenu from "../layouts/ProfileMenu";
 import ActivityFeedCard from "./cards/ActivityFeedCard";
 import MessagesCard from "./cards/MessagesCard";
-import { useAuth } from "../pages/Auth/AuthContext";
 
 // Sample messages (replace with backend data)
 const sampleMessages = [
@@ -29,8 +28,6 @@ function UsersNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
   const [anchorElMessages, setAnchorElMessages] = useState(null);
 
-  const { user } = useAuth();
-
   // Notifications popover
   const handleOpenNotifications = (event) => setAnchorElNotifications(event.currentTarget);
   const handleCloseNotifications = () => setAnchorElNotifications(null);
@@ -38,11 +35,6 @@ function UsersNavbar({ onMenuClick }) {
   // Messages popover
   const handleOpenMessages = (event) => setAnchorElMessages(event.currentTarget);
   const handleCloseMessages = () => setAnchorElMessages(null);
-
-  // Capitalize role for display
-  const roleLabel = user?.role
-    ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
-    : "User";
 
   return (
     <AppBar
@@ -61,7 +53,7 @@ function UsersNavbar({ onMenuClick }) {
           color="inherit"
           aria-label="menu"
           onClick={onMenuClick}
-          sx={{display: { md: "none" } }}
+          sx={{ display: { md: "none" } }}
         >
           <MenuIcon />
         </IconButton>
@@ -91,7 +83,7 @@ function UsersNavbar({ onMenuClick }) {
             sx={{ height: 32 }}
           />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", pl: 30 }}>
-            {roleLabel} – Dashboard
+            My Dashboard
           </Typography>
         </Box>
 

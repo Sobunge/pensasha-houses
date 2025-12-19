@@ -17,8 +17,8 @@ import LandlordReports from "./pages/LandlordPage/LandlordReports";
 
 // Tenant
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
-import BrowsePropertiesPage from "./pages/Tenant/BrowsePropertiesPage";
-import BrowsePropertyPage from "./pages/Tenant/BrowsePropertyPage";
+import BrowseUnitsPage from "./pages/Tenant/BrowseUnitsPage";
+import BrowseUnitPage from "./pages/Tenant/BrowseUnitPage";
 import PropertiesPage from "./pages/PropertiesPage/PropertiesPage";
 import PropertyPage from "./pages/PropertiesPage/PropertyPage";
 import AnnouncementsPage from "./pages/AnnouncementPage/AnnouncementsPage";
@@ -73,8 +73,8 @@ function App() {
             }
           >
             <Route index element={<TenantDashboard />} />
-            <Route path="browse-properties" element={<BrowsePropertiesPage />} />
-            <Route path="browse-properties/:id" element={<BrowsePropertyPage />} />
+            <Route path="browse-units" element={<BrowseUnitsPage />} />
+            <Route path="browse-units/:id" element={<BrowseUnitPage />} />
             <Route path="properties" element={<PropertiesPage />} />
             <Route path="properties/:id" element={<PropertyPage />} />
             <Route path="announcements" element={<AnnouncementsPage />} />

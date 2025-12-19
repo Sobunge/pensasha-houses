@@ -4,7 +4,7 @@ import { Box, Typography, Button, Pagination } from "@mui/material";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PropertyGrid from "../ListingsPage/PropertyGrid";
-import PropertyFilters from "./PropertyFilters";
+import PropertyFilters from "./UnitFilters";
 
 function BrowsePropertiesPage() {
   const [page, setPage] = useState(1);
@@ -82,10 +82,10 @@ function BrowsePropertiesPage() {
       {/* Page Header */}
       <Box sx={{ textAlign: "center", mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: "#111" }}>
-          Browse Properties
+          Browse Units
         </Typography>
         <Typography variant="body1" sx={{ color: "#2a2a2a" }}>
-          Explore available properties and find your dream home.
+          Explore available units and find your dream home.
         </Typography>
         <Box
           sx={{
@@ -120,10 +120,10 @@ function BrowsePropertiesPage() {
         >
           <HomeWorkOutlinedIcon sx={{ fontSize: 80, color: "#f8b500", mb: 2 }} />
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: "#111" }}>
-            No Properties Found
+            No units Found
           </Typography>
           <Typography sx={{ color: "#2a2a2a", mb: 3 }}>
-            We couldn’t find any properties matching your filters.
+            We couldn’t find any unit matching your filters.
           </Typography>
           <Button
             variant="contained"

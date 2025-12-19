@@ -28,9 +28,9 @@ import {
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
 
-import PropertyGallery from "../../pages/ListingsPage/PropertyGallery";
-import PropertyNotFound from "../../pages/ListingsPage/PropertyNotFound";
-import RequestToRentDialog from "../../pages/ListingsPage/RequestToRentDialog";
+import PropertyGallery from "../ListingsPage/PropertyGallery";
+import PropertyNotFound from "../ListingsPage/PropertyNotFound";
+import RequestToRentDialog from "../ListingsPage/RequestToRentDialog";
 import AuthModal from "../Auth/AuthModal";
 import { useAuth } from "../Auth/AuthContext";
 
