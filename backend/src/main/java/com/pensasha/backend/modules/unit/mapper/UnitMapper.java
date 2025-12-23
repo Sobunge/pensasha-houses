@@ -38,7 +38,9 @@ public interface UnitMapper {
      * @param dto the UnitDTO containing data to be converted.
      * @return a Unit entity object.
      */
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "tenant", source = "tenantId", qualifiedByName = "tenantIdToTenant")
     @Mapping(target = "property", source = "propertyId", qualifiedByName = "propertyIdToProperty")
+    @Mapping(target = "maintenanceRequests", ignore = true)
     Unit toEntity(UnitDTO dto);
 }
