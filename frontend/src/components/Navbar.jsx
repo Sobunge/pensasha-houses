@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -10,6 +10,7 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
+  ListItemButton,
   Container,
   Typography,
   useTheme,
@@ -24,11 +25,10 @@ import LoginIcon from "@mui/icons-material/Login";
 import { useLocation } from "react-router-dom";
 import AuthModal from "../pages/Auth/AuthModal";
 
-// Navigation items for desktop links
+// Navigation items
 const navItems = [
   { label: "Home", link: "/", icon: <HomeIcon /> },
   { label: "Browse Properties", link: "/properties", icon: <SearchIcon /> },
-  // Remove link, handle via modal
   { label: "List a Property", icon: <AddBoxIcon />, requiresAuth: true },
 ];
 
@@ -42,6 +42,13 @@ function Navbar() {
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const handleAuthOpen = () => setAuthOpen(true);
   const handleAuthClose = () => setAuthOpen(false);
+
+  // Auto-close drawer on desktop
+  useEffect(() => {
+    if (!isMobile && mobileOpen) {
+      setMobileOpen(false);
+    }
+  }, [isMobile, mobileOpen]);
 
   const drawer = (
     <Box
@@ -71,35 +78,42 @@ function Navbar() {
 
       <List sx={{ flexGrow: 1 }}>
         {navItems.map((item) => (
-          <ListItem
-            key={item.label}
-            button
-            onClick={item.requiresAuth ? handleAuthOpen : undefined}
-            component={item.requiresAuth ? "div" : "a"}
-            href={!item.requiresAuth ? item.link : undefined}
-            sx={{
-              px: 3,
-              py: 1.5,
-              borderRadius: 1,
-              textDecoration: "none",
-              color: location.pathname === item.link ? "#f8b500" : "#111111",
-              fontWeight: location.pathname === item.link ? 600 : 400,
-              "&:hover": { backgroundColor: "#FFF6E0" },
-            }}
-          >
-            <ListItemIcon
-              sx={{ minWidth: 40, color: location.pathname === item.link ? "#f8b500" : "#111111" }}
+          <ListItem key={item.label} disablePadding>
+            <ListItemButton
+              onClick={item.requiresAuth ? handleAuthOpen : undefined}
+              component={item.requiresAuth ? "div" : "a"}
+              href={!item.requiresAuth ? item.link : undefined}
+              sx={{
+                px: 3,
+                py: 1.5,
+                borderRadius: 1,
+                textDecoration: "none",
+                color: location.pathname === item.link ? "#f8b500" : "#111111",
+                fontWeight: location.pathname === item.link ? 600 : 400,
+                "&:hover": { backgroundColor: "#FFF6E0" },
+              }}
             >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.label} />
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: location.pathname === item.link ? "#f8b500" : "#111111",
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
           </ListItem>
         ))}
 
-        {/* Always show Login / Sign Up */}
-        <ListItem button onClick={handleAuthOpen}>
-          <ListItemIcon><LoginIcon /></ListItemIcon>
-          <ListItemText primary="Login / Sign Up" />
+        {/* Login / Sign Up */}
+        <ListItem disablePadding>
+          <ListItemButton onClick={handleAuthOpen}>
+            <ListItemIcon>
+              <LoginIcon />
+            </ListItemIcon>
+            <ListItemText primary="Login / Sign Up" />
+          </ListItemButton>
         </ListItem>
       </List>
 
