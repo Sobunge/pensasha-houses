@@ -39,7 +39,6 @@ function TenantDashboard() {
     const fetchTenantUnits = async () => {
       setLoadingUnits(true);
       try {
-        console.log("Fetching units for tenant:", user);
         const response = await api.get(`/units/tenant/${user.id}`);
         setTenantUnits(response.data || []);
       } catch (err) {
@@ -172,10 +171,20 @@ function TenantDashboard() {
 
       {/* Requests & Updates */}
       <SectionTitle title="Requests & Updates" />
-      <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap", mb: 4 }}>
-        <CardWrapper><MaintenanceCard tenantId={user.id} /></CardWrapper>
-        <CardWrapper><AnnouncementsCard /></CardWrapper>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 3,
+          flexWrap: "wrap",
+          mb: 4,
+          justifyContent: "center",
+          alignItems: "stretch", 
+        }}
+      >
+        <MaintenanceCard tenantId={user.id} />
+        <AnnouncementsCard userId={user.id} />
       </Box>
+
 
       {/* Documents */}
       <SectionTitle title="Your Documents" />
@@ -188,7 +197,7 @@ function TenantDashboard() {
       <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
         <PaymentsSection />
       </Box>
-    </Box>
+    </Box >
   );
 }
 

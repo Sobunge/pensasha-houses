@@ -15,8 +15,8 @@ function MaintenanceCard({ tenantId }) {
 
   if (loading) {
     return (
-      <Card sx={{ borderRadius: 3, boxShadow: 2, bgcolor: "#fff", minWidth: 250, textAlign: "center" }}>
-        <CardContent>
+      <Card sx={cardStyle}>
+        <CardContent sx={cardContentStyle}>
           <CircularProgress />
           <Typography variant="body2" sx={{ mt: 1 }}>
             Loading maintenance requests...
@@ -28,8 +28,8 @@ function MaintenanceCard({ tenantId }) {
 
   if (error) {
     return (
-      <Card sx={{ borderRadius: 3, boxShadow: 2, bgcolor: "#fff", minWidth: 250, textAlign: "center" }}>
-        <CardContent>
+      <Card sx={cardStyle}>
+        <CardContent sx={cardContentStyle}>
           <Typography color="error">Failed to load requests</Typography>
         </CardContent>
       </Card>
@@ -39,47 +39,75 @@ function MaintenanceCard({ tenantId }) {
   const totalOpen = counts.PENDING + counts.IN_PROGRESS;
 
   return (
-    <Card sx={{ borderRadius: 3, boxShadow: 2, bgcolor: "#fff", minWidth: 250 }}>
-      <CardContent>
+    <Card sx={cardStyle}>
+      <CardContent
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          gap: 1.5, // spacing between items
+        }}
+      >
         {/* Title with Icon */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <BuildIcon sx={{ color: "#f8b500" }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111" }}>
             Maintenance Requests
           </Typography>
         </Box>
 
-        {/* Status Summary */}
-        <Typography variant="body2" sx={{ color: "#555", mb: 1 }}>
+        {/* Summary */}
+        <Typography variant="body2" sx={{ color: "#555" }}>
           You currently have <strong>{totalOpen}</strong> open request{totalOpen !== 1 && "s"}.
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+        {/* Status Chips */}
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: "center" }}>
           <Chip label={`Pending: ${counts.PENDING}`} color="warning" size="small" />
           <Chip label={`In Progress: ${counts.IN_PROGRESS}`} color="info" size="small" />
           <Chip label={`Completed: ${counts.COMPLETED}`} color="success" size="small" />
         </Box>
 
-        {/* Action Button */}
+        {/* View Requests Button */}
         <Button
           variant="contained"
           size="small"
           startIcon={<VisibilityIcon />}
           onClick={handleNavigate}
-          sx={{
-            bgcolor: "#f8b500",
-            color: "#111",
-            fontWeight: 600,
-            textTransform: "none",
-            borderRadius: 2,
-            "&:hover": { bgcolor: "#c59000" },
-          }}
+          sx={buttonStyle}
         >
           View Requests
         </Button>
       </CardContent>
+
     </Card>
   );
 }
+
+// Common styles
+const cardStyle = {
+  borderRadius: 3,
+  boxShadow: 2,
+  bgcolor: "#fff",
+  width: 400,
+  minHeight: 100,
+  display: "flex",
+  flexDirection: "column",
+};
+
+const cardContentStyle = {
+  flexGrow: 1,
+};
+
+const buttonStyle = {
+  bgcolor: "#f8b500",
+  color: "#111",
+  fontWeight: 600,
+  textTransform: "none",
+  borderRadius: 2,
+  "&:hover": { bgcolor: "#c59000" },
+};
 
 export default MaintenanceCard;
