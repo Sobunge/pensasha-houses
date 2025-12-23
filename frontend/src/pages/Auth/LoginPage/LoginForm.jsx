@@ -103,6 +103,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
       setAccessToken(accessToken);
 
       const user = {
+        id: principal.id,
         idNumber: principal.username,
         role: principal.role,
         defaultRoute: principal.defaultRoute,
