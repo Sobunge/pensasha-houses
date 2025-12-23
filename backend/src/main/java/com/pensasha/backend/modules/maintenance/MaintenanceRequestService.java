@@ -1,9 +1,12 @@
 package com.pensasha.backend.modules.maintenance;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.pensasha.backend.modules.maintenance.dto.CreateMaintenanceRequestDTO;
+import com.pensasha.backend.modules.maintenance.dto.MaintenanceRequestResponseDTO;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.unit.UnitRepository;
 import com.pensasha.backend.modules.user.tenant.Tenant;
@@ -22,62 +25,83 @@ public class MaintenanceRequestService {
     private final UnitRepository unitRepository;
     private final TenantRepository tenantRepository;
 
-    // CREATE
-    public MaintenanceRequest createRequest(
+    /**
+     * CREATE a new maintenance request
+     */
+    public MaintenanceRequestResponseDTO createRequest(
             Long tenantId,
-            Long unitId,
-            MaintenanceType type,
-            MaintenancePriority priority,
-            String description) {
+            CreateMaintenanceRequestDTO dto) {
 
         Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("Tenant not found"));
 
-        Unit unit = unitRepository.findById(unitId)
+        Unit unit = unitRepository.findById(dto.getUnitId())
                 .orElseThrow(() -> new EntityNotFoundException("Unit not found"));
 
         MaintenanceRequest request = new MaintenanceRequest(
-                type,
-                priority,
-                description,
+                dto.getType(),
+                dto.getPriority(),
+                dto.getDescription(),
                 unit,
                 tenant
         );
 
-        return maintenanceRequestRepository.save(request);
+        MaintenanceRequest saved = maintenanceRequestRepository.save(request);
+
+        return MaintenanceRequestResponseDTO.fromEntity(saved);
     }
 
-    // READ
-    public MaintenanceRequest getRequest(Long id) {
-        return maintenanceRequestRepository.findById(id)
+    /**
+     * READ a single maintenance request by ID
+     */
+    public MaintenanceRequestResponseDTO getRequest(Long id) {
+        MaintenanceRequest request = maintenanceRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Maintenance request not found: " + id));
+
+        return MaintenanceRequestResponseDTO.fromEntity(request);
     }
 
-    // UPDATE (controlled)
-    public MaintenanceRequest updateRequest(
+    /**
+     * UPDATE maintenance request details (type, priority, description)
+     */
+    public MaintenanceRequestResponseDTO updateRequest(
             Long requestId,
             MaintenanceType type,
             MaintenancePriority priority,
             String description) {
 
-        MaintenanceRequest request = getRequest(requestId);
+        MaintenanceRequest request = maintenanceRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Maintenance request not found: " + requestId));
 
         request.updateDetails(type, priority, description);
 
-        return request; // managed entity — auto flushed
+        return MaintenanceRequestResponseDTO.fromEntity(request);
     }
 
-    // STATUS CHANGE
-    public MaintenanceRequest updateStatus(Long requestId, MaintenanceStatus status) {
-        MaintenanceRequest request = getRequest(requestId);
+    /**
+     * UPDATE maintenance request status
+     */
+    public MaintenanceRequestResponseDTO updateStatus(Long requestId, MaintenanceStatus status) {
+
+        MaintenanceRequest request = maintenanceRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Maintenance request not found: " + requestId));
+
         request.updateStatus(status);
-        return request;
+
+        return MaintenanceRequestResponseDTO.fromEntity(request);
     }
 
-    // DELETE
+    /**
+     * DELETE a maintenance request
+     */
     public void deleteRequest(Long requestId) {
-        MaintenanceRequest request = getRequest(requestId);
+
+        MaintenanceRequest request = maintenanceRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Maintenance request not found: " + requestId));
 
         if (request.getStatus() == MaintenanceStatus.COMPLETED) {
             throw new IllegalStateException("Completed requests cannot be deleted");
@@ -86,8 +110,12 @@ public class MaintenanceRequestService {
         maintenanceRequestRepository.delete(request);
     }
 
-    // QUERY
-    public List<MaintenanceRequest> getRequestsByTenant(Long tenantId) {
-        return maintenanceRequestRepository.findByTenantId(tenantId);
+    /**
+     * GET all maintenance requests for a tenant
+     */
+    public List<MaintenanceRequestResponseDTO> getRequestsByTenant(Long tenantId) {
+        return maintenanceRequestRepository.findByTenantId(tenantId).stream()
+                .map(MaintenanceRequestResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }
