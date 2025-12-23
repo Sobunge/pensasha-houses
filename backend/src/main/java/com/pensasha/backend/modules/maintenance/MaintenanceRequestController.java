@@ -1,6 +1,7 @@
 package com.pensasha.backend.modules.maintenance;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +54,7 @@ public class MaintenanceRequestController {
                 id,
                 dto.getType(),
                 dto.getPriority(),
-                dto.getDescription()
-        );
+                dto.getDescription());
 
         return ResponseEntity.ok(response);
     }
@@ -88,4 +88,18 @@ public class MaintenanceRequestController {
         List<MaintenanceRequestResponseDTO> requests = maintenanceRequestService.getRequestsByTenant(tenantId);
         return ResponseEntity.ok(requests);
     }
+
+    @GetMapping("/tenant/{tenantId}/counts")
+    public ResponseEntity<Map<String, Integer>> getRequestCounts(@PathVariable Long tenantId) {
+        List<MaintenanceRequestResponseDTO> requests = maintenanceRequestService.getRequestsByTenant(tenantId);
+
+        Map<String, Integer> counts = Map.of(
+                "PENDING", (int) requests.stream().filter(r -> r.status() == MaintenanceStatus.PENDING).count(),
+                "IN_PROGRESS",
+                (int) requests.stream().filter(r -> r.status() == MaintenanceStatus.IN_PROGRESS).count(),
+                "COMPLETED", (int) requests.stream().filter(r -> r.status() == MaintenanceStatus.COMPLETED).count());
+
+        return ResponseEntity.ok(counts);
+    }
+
 }
