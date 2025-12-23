@@ -39,7 +39,8 @@ function TenantDashboard() {
     const fetchTenantUnits = async () => {
       setLoadingUnits(true);
       try {
-        const response = await api.get(`/units/tenant/${user.idNumber}`);
+        console.log("Fetching units for tenant:", user);
+        const response = await api.get(`/units/tenant/${user.id}`);
         setTenantUnits(response.data || []);
       } catch (err) {
         console.error("Failed to fetch tenant units:", err);
@@ -172,7 +173,7 @@ function TenantDashboard() {
       {/* Requests & Updates */}
       <SectionTitle title="Requests & Updates" />
       <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap", mb: 4 }}>
-        <CardWrapper><MaintenanceCard /></CardWrapper>
+        <CardWrapper><MaintenanceCard tenantId={user.id} /></CardWrapper>
         <CardWrapper><AnnouncementsCard /></CardWrapper>
       </Box>
 
