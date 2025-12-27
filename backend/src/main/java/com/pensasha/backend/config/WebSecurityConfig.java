@@ -16,11 +16,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.pensasha.backend.security.JWTAuthenticationFilter;
-
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.pensasha.backend.security.CustomUserDetailsService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -40,19 +38,32 @@ public class WebSecurityConfig {
             .cors(cors -> {}) // uses corsConfigurationSource bean
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // ensure preflight OPTIONS doesn't require auth
+            // Exception handling: explicit 401 and 403 for frontend
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"UNAUTHORIZED\"}");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"FORBIDDEN\"}");
+                })
+            )
+
+            // Authorization rules
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-                // static/public resources you may want public:
                 .requestMatchers("/public/**", "/static/**").permitAll()
                 .anyRequest().authenticated()
             )
 
-            // add JWT filter before UsernamePasswordAuthenticationFilter
+            // JWT filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
-            // optional logout handler (keeps your existing behavior)
+            // Optional logout handler
             .logout(logout -> logout
                 .logoutUrl("/user/logout")
                 .logoutSuccessHandler((request, response, auth) -> {
@@ -66,10 +77,6 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-    /**
-     * Build an AuthenticationManager wired with your UserDetailsService and password encoder.
-     * This ensures the AuthenticationManager can be used elsewhere (e.g. login endpoint).
-     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -82,22 +89,17 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * CORS configuration:
-     * - For dev: allow localhost patterns.
-     * - For production: replace with concrete origins (do NOT use wildcard with credentials).
-     */
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
 
-        // DEV: allow any localhost origin (useful for browsers using 127.0.0.1 or different ports)
+        // DEV: allow any localhost origin
         cfg.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
-        // PROD (example): cfg.setAllowedOrigins(List.of("https://yourdomain.com"));
+        // PROD: replace with concrete origins, e.g., cfg.setAllowedOrigins(List.of("https://yourdomain.com"));
 
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         cfg.setAllowedHeaders(List.of("*"));
-        cfg.setAllowCredentials(true); // if true, do not use addAllowedOrigin("*") — use patterns or explicit origins
+        cfg.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);

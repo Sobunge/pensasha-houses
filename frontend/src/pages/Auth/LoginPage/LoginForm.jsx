@@ -21,41 +21,26 @@ import { useNavigate } from "react-router-dom";
 import api, { setAccessToken } from "../../../api/api";
 
 /* ---------------- Validation ---------------- */
-
 const validateIdNumber = (value) => {
   if (!value) return null;
-  if (value.length < 7 || value.length > 8) {
-    return "ID Number must be 7 or 8 digits";
-  }
+  if (value.length < 7 || value.length > 8) return "ID Number must be 7 or 8 digits";
   return null;
 };
 
 const validatePassword = (value) => {
   if (!value) return "Password is required";
-  if (value.length < 5) {
-    return "Password must be at least 5 characters";
-  }
+  if (value.length < 5) return "Password must be at least 5 characters";
   return null;
 };
 
 export default function LoginForm({ switchToSignup, onClose }) {
-  const [formData, setFormData] = useState({
-    idNumber: "",
-    password: "",
-  });
-
-  const [touched, setTouched] = useState({
-    idNumber: false,
-    password: false,
-  });
-
+  const [formData, setFormData] = useState({ idNumber: "", password: "" });
+  const [touched, setTouched] = useState({ idNumber: false, password: false });
   const [loading, setLoading] = useState(false);
 
   const { notify } = useNotification();
-  const { loginAs } = useAuth();
+  const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
   const navigate = useNavigate();
-
-  /* ---------------- Derived validation ---------------- */
 
   const idError = validateIdNumber(formData.idNumber);
   const passwordError = validatePassword(formData.password);
@@ -63,14 +48,9 @@ export default function LoginForm({ switchToSignup, onClose }) {
   const showIdError = touched.idNumber && Boolean(idError);
   const showPasswordError = touched.password && Boolean(passwordError);
 
-  /* ---------------- Handlers ---------------- */
-
   const handleIdChange = (e) => {
     const digitsOnly = e.target.value.replace(/\D/g, "");
-    setFormData((prev) => ({
-      ...prev,
-      idNumber: digitsOnly.slice(0, 8),
-    }));
+    setFormData((prev) => ({ ...prev, idNumber: digitsOnly.slice(0, 8) }));
   };
 
   const handleChange = (e) => {
@@ -85,12 +65,8 @@ export default function LoginForm({ switchToSignup, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Final guard before submit
     if (idError || passwordError) {
-      setTouched({
-        idNumber: true,
-        password: true,
-      });
+      setTouched({ idNumber: true, password: true });
       return;
     }
 
@@ -100,6 +76,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
       const response = await api.post("/auth/login", formData);
       const { accessToken, principal } = response.data;
 
+      // Set token for API calls
       setAccessToken(accessToken);
 
       const user = {
@@ -109,13 +86,16 @@ export default function LoginForm({ switchToSignup, onClose }) {
         defaultRoute: principal.defaultRoute,
       };
 
+      // Update AuthContext
       loginAs(user);
-      localStorage.setItem("user", JSON.stringify(user));
 
       notify("Login successful!", "success", 3000);
 
       if (onClose) onClose();
-      navigate(principal.defaultRoute || "/");
+
+      // Navigate to redirect path if set, otherwise default
+      navigate(redirectAfterAuth || principal.defaultRoute || "/");
+      setRedirectAfterAuth(null);
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message);
       notify("Invalid credentials", "error", 3500);
@@ -123,8 +103,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
       setLoading(false);
     }
   };
-
-  /* ---------------- UI ---------------- */
 
   return (
     <Box
@@ -156,16 +134,13 @@ export default function LoginForm({ switchToSignup, onClose }) {
           placeholder="Enter your ID Number"
           error={showIdError}
           helperText={showIdError ? idError : ""}
-          slotProps={{
-            input: {
-              inputMode: "numeric",
-              pattern: "[0-9]*",
-              startAdornment: (
-                <InputAdornment position="start">
-                  <BadgeOutlinedIcon color="action" />
-                </InputAdornment>
-              ),
-            },
+          InputProps={{
+            inputMode: "numeric",
+            startAdornment: (
+              <InputAdornment position="start">
+                <BadgeOutlinedIcon color="action" />
+              </InputAdornment>
+            ),
           }}
         />
 
@@ -182,14 +157,12 @@ export default function LoginForm({ switchToSignup, onClose }) {
           placeholder="Enter your password"
           error={showPasswordError}
           helperText={showPasswordError ? passwordError : ""}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon color="action" />
-                </InputAdornment>
-              ),
-            },
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockIcon color="action" />
+              </InputAdornment>
+            ),
           }}
         />
       </Stack>
@@ -206,9 +179,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           type="submit"
           variant="contained"
           size="small"
-          startIcon={
-            loading ? <CircularProgress size={20} /> : <LockOutlinedIcon />
-          }
+          startIcon={loading ? <CircularProgress size={20} /> : <LockOutlinedIcon />}
           sx={{
             mt: 1,
             py: 1.2,

@@ -1,56 +1,112 @@
 // api.js
 import axios from "axios";
 
-let accessToken = null; // In-memory storage
+/**
+ * In-memory access token (cleared on reload by design)
+ */
+let accessToken = null;
 
-// Function to set the access token after login or refresh
+/**
+ * Refresh control
+ */
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+/**
+ * Token setters/getters
+ */
 export const setAccessToken = (token) => {
   accessToken = token;
 };
 
-// Create Axios instance
+export const clearAccessToken = () => {
+  accessToken = null;
+};
+
+/**
+ * Notify queued requests once refresh completes
+ */
+const onRefreshed = (token) => {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+};
+
+const subscribeToRefresh = (callback) => {
+  refreshSubscribers.push(callback);
+};
+
+/**
+ * Axios instance for normal API calls
+ */
 const api = axios.create({
   baseURL: "http://localhost:8080/api",
-  withCredentials: true, // Important to send HttpOnly refresh token cookies
+  withCredentials: true, // sends HttpOnly refresh cookies
 });
 
-// Request interceptor: attach access token to headers
-api.interceptors.request.use((config) => {
-  if (accessToken) {
-    config.headers["Authorization"] = `Bearer ${accessToken}`;
-  }
-  return config;
+/**
+ * Axios instance ONLY for refresh (no interceptors, no Authorization)
+ */
+const refreshClient = axios.create({
+  baseURL: "http://localhost:8080/api",
+  withCredentials: true,
 });
 
-// Response interceptor: handle 401 Unauthorized (access token expired)
+/**
+ * Attach access token to outgoing requests
+ */
+api.interceptors.request.use(
+  (config) => {
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+/**
+ * Handle 401 responses and refresh tokens
+ */
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Prevent infinite loop
+    // Only retry once
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      try {
-        // Attempt to refresh token using HttpOnly cookie
-        const refreshResponse = await axios.post(
-          "/api/auth/refresh",
-          {},
-          { baseURL: "http://localhost:8080/api", withCredentials: true }
-        );
+      if (!isRefreshing) {
+        isRefreshing = true;
 
-        const newAccessToken = refreshResponse.data.accessToken;
-        setAccessToken(newAccessToken);
+        try {
+          const refreshResponse = await refreshClient.post("/auth/refresh");
+          const newAccessToken = refreshResponse.data.accessToken;
 
-        // Retry the original request with new token
-        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed: redirect to login
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
+          if (!newAccessToken) throw new Error("Refresh failed: no access token");
+
+          setAccessToken(newAccessToken);
+          onRefreshed(newAccessToken);
+
+        } catch (refreshError) {
+          onRefreshed(null);
+          clearAccessToken();
+          window.location.href = "/login";
+          return Promise.reject(refreshError);
+
+        } finally {
+          isRefreshing = false;
+        }
       }
+
+      // Queue the request until refresh completes
+      return new Promise((resolve, reject) => {
+        subscribeToRefresh((token) => {
+          if (!token) return reject(error);
+          originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          resolve(api(originalRequest));
+        });
+      });
     }
 
     return Promise.reject(error);

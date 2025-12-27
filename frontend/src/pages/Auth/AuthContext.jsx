@@ -1,25 +1,30 @@
 // src/pages/Auth/AuthContext.jsx
 import React, { createContext, useContext, useState } from "react";
 
-export const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  // In-memory user state only; no localStorage
+  const [user, setUser] = useState(null);
 
-  // ✅ new: store redirect path (e.g. "/request-to-rent")
+  // Store redirect path after login
   const [redirectAfterAuth, setRedirectAfterAuth] = useState(null);
 
+  // Set user after login or refresh
   const loginAs = (userObj) => {
     setUser(userObj);
-    localStorage.setItem("user", JSON.stringify(userObj));
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+  // Logout: clear user state and optionally notify backend
+  const logout = async () => {
+    try {
+      // Optional: call backend to invalidate refresh token
+      await fetch("/api/auth/logout", { credentials: "include" });
+    } catch {
+      // Ignore network errors
+    } finally {
+      setUser(null);
+    }
   };
 
   return (

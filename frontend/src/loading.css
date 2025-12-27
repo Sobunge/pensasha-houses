@@ -1,0 +1,31 @@
+/* src/loading.css */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f7f7f7; /* light neutral background */
+}
+
+.spinner {
+  border: 6px solid #f7f7f7; /* lightest shade */
+  border-top: 6px solid #f8b500; /* brand yellow */
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  font-size: 1.3rem;
+  color: #2a2a2a; /* dark neutral */
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

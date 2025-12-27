@@ -28,187 +28,165 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JWTUtils jwtUtils;
-    private final UserService userService;
-    private final CustomUserDetailsService customUserDetailsService;
+        private final AuthenticationManager authenticationManager;
+        private final JWTUtils jwtUtils;
+        private final UserService userService;
+        private final CustomUserDetailsService customUserDetailsService;
 
-    private static final long REFRESH_TOKEN_EXPIRATION_MS =
-            7 * 24 * 60 * 60 * 1000;
+        private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000;
 
-    // ========================= REGISTER =========================
+        // ========================= REGISTER =========================
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(
-            @Valid @RequestBody CreateUserDTO dto,
-            BindingResult result) {
+        @PostMapping("/register")
+        public ResponseEntity<?> register(@Valid @RequestBody CreateUserDTO dto,
+                        BindingResult result) {
 
-        if (result.hasErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> err.getDefaultMessage())
-                    .toList();
+                if (result.hasErrors()) {
+                        List<String> errors = result.getFieldErrors()
+                                        .stream()
+                                        .map(err -> err.getDefaultMessage())
+                                        .toList();
 
-            return ResponseEntity.badRequest()
-                    .body(Map.of("errors", errors));
+                        return ResponseEntity.badRequest().body(Map.of("errors", errors));
+                }
+
+                if (userService.gettingUser(dto.getIdNumber()).isPresent()) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                        .body(Map.of("error", "User already exists"));
+                }
+
+                GetUserDTO savedUser = userService.addUser(dto);
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
         }
 
-        if (userService.gettingUser(dto.getIdNumber()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "User already exists"));
+        // ========================= LOGIN =========================
+
+        @PostMapping("/login")
+        public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request,
+                        BindingResult result,
+                        HttpServletResponse response) {
+
+                if (result.hasErrors()) {
+                        String message = result.getFieldErrors().get(0).getDefaultMessage();
+                        return ResponseEntity.badRequest()
+                                        .body(new LoginResponseDTO(null,
+                                                        new AuthPrincipalDTO(null, null, null, message)));
+                }
+
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(request.getIdNumber(), request.getPassword()));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+                Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
+                String accessToken = tokens.get("accessToken");
+                String refreshToken = tokens.get("refreshToken");
+
+                // DEV: secure=false, PROD: secure=true
+                ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                                .httpOnly(true)
+                                .secure(false) // switch to true in production
+                                .sameSite("Lax") // dev-safe; use "Strict" in production
+                                .path("/api/auth/refresh")
+                                .maxAge(REFRESH_TOKEN_EXPIRATION_MS / 1000)
+                                .build();
+
+                response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+                Role role = userDetails.getPrimaryRole();
+                AuthPrincipalDTO principal = new AuthPrincipalDTO(
+                                userDetails.getUser().getId(),
+                                userDetails.getUsername(),
+                                role.name().toLowerCase(),
+                                resolveDefaultRoute(role.name()));
+
+                return ResponseEntity.ok(new LoginResponseDTO(accessToken, principal));
         }
 
-        GetUserDTO savedUser = userService.addUser(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
+        // ========================= REFRESH =========================
 
-    // ========================= LOGIN =========================
+        @PostMapping("/refresh")
+        public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request, HttpServletResponse response) {
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(
-            @Valid @RequestBody LoginRequestDTO request,
-            BindingResult result,
-            HttpServletResponse response) {
+                try {
+                        String oldRefreshToken = Arrays
+                                        .stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
+                                        .filter(c -> "refreshToken".equals(c.getName()))
+                                        .map(Cookie::getValue)
+                                        .findFirst()
+                                        .orElse(null);
 
-        if (result.hasErrors()) {
-            String message = result.getFieldErrors()
-                    .get(0)
-                    .getDefaultMessage();
+                        if (oldRefreshToken == null) {
+                                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                        }
 
-            return ResponseEntity.badRequest()
-                    .body(new LoginResponseDTO(
-                            null,
-                            new AuthPrincipalDTO(null, null, null, message)
-                    ));
+                        String username = jwtUtils.extractUsername(oldRefreshToken);
+                        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService
+                                        .loadUserByUsername(username);
+
+                        if (!jwtUtils.validateToken(oldRefreshToken, userDetails)) {
+                                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                        }
+
+                        // Generate new tokens
+                        Map<String, String> newTokens = jwtUtils.generateTokens(userDetails);
+                        String newAccessToken = newTokens.get("accessToken");
+                        String newRefreshToken = newTokens.get("refreshToken");
+
+                        // Rotate refresh token cookie
+                        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
+                                        .httpOnly(true)
+                                        .secure(true) // production
+                                        .sameSite("Strict") // production
+                                        .path("/api/auth/refresh")
+                                        .maxAge(REFRESH_TOKEN_EXPIRATION_MS / 1000)
+                                        .build();
+
+                        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+                        Role role = userDetails.getPrimaryRole();
+                        AuthPrincipalDTO principal = new AuthPrincipalDTO(
+                                        userDetails.getUser().getId(),
+                                        userDetails.getUsername(),
+                                        role.name().toLowerCase(),
+                                        resolveDefaultRoute(role.name()));
+
+                        return ResponseEntity.ok(new LoginResponseDTO(newAccessToken, principal));
+
+                } catch (io.jsonwebtoken.ExpiredJwtException e) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getIdNumber(),
-                        request.getPassword()
-                )
-        );
+        // ========================= LOGOUT =========================
 
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
+        @PostMapping("/logout")
+        public ResponseEntity<?> logout(HttpServletResponse response) {
 
-        CustomUserDetails userDetails =
-                (CustomUserDetails) authentication.getPrincipal();
+                ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                                .httpOnly(true)
+                                .secure(false) // DEV: true in production
+                                .sameSite("Lax") // DEV: "Strict" in production
+                                .path("/api/auth/refresh")
+                                .maxAge(0)
+                                .build();
 
-        Map<String, String> tokens =
-                jwtUtils.generateTokens(userDetails);
+                response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
-        String accessToken = tokens.get("accessToken");
-        String refreshToken = tokens.get("refreshToken");
-
-        ResponseCookie refreshCookie = ResponseCookie
-                .from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/api/auth/refresh")
-                .maxAge(REFRESH_TOKEN_EXPIRATION_MS / 1000)
-                .build();
-
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                refreshCookie.toString()
-        );
-
-        Role role = userDetails.getPrimaryRole();
-
-        AuthPrincipalDTO principal = new AuthPrincipalDTO(
-                userDetails.getUser().getId(),
-                userDetails.getUsername(),
-                role.name().toLowerCase(),
-                resolveDefaultRoute(role.name())
-        );
-
-        return ResponseEntity.ok(
-                new LoginResponseDTO(accessToken, principal)
-        );
-    }
-
-    // ========================= REFRESH =========================
-
-    @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDTO> refresh(
-            HttpServletRequest request) {
-
-        String refreshToken = Arrays.stream(
-                        Optional.ofNullable(request.getCookies())
-                                .orElse(new Cookie[0])
-                )
-                .filter(c -> "refreshToken".equals(c.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
-
-        if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
         }
 
-        String username = jwtUtils.extractUsername(refreshToken);
-        CustomUserDetails userDetails =
-                (CustomUserDetails)
-                        customUserDetailsService
-                                .loadUserByUsername(username);
+        // ========================= HELPERS =========================
 
-        if (!jwtUtils.validateToken(refreshToken, userDetails)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        private String resolveDefaultRoute(String role) {
+                return switch (role) {
+                        case "TENANT" -> "/tenant";
+                        case "LANDLORD" -> "/landlord";
+                        case "CARETAKER" -> "/caretaker";
+                        case "ADMIN" -> "/admin";
+                        default -> "/";
+                };
         }
-
-        String newAccessToken =
-                jwtUtils.generateTokens(userDetails)
-                        .get("accessToken");
-
-        Role role = userDetails.getPrimaryRole();
-
-        AuthPrincipalDTO principal = new AuthPrincipalDTO(
-                userDetails.getUser().getId(),
-                userDetails.getUsername(),
-                role.name().toLowerCase(),
-                resolveDefaultRoute(role.name())
-        );
-
-        return ResponseEntity.ok(
-                new LoginResponseDTO(newAccessToken, principal)
-        );
-    }
-
-    // ========================= LOGOUT =========================
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-
-        ResponseCookie deleteCookie = ResponseCookie
-                .from("refreshToken", "")
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/api/auth/refresh")
-                .maxAge(0)
-                .build();
-
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                deleteCookie.toString()
-        );
-
-        return ResponseEntity.ok(
-                Map.of("message", "Logged out successfully")
-        );
-    }
-
-    // ========================= HELPERS =========================
-
-    private String resolveDefaultRoute(String role) {
-        return switch (role) {
-            case "TENANT" -> "/tenant";
-            case "LANDLORD" -> "/landlord";
-            case "CARETAKER" -> "/caretaker";
-            case "ADMIN" -> "/admin";
-            default -> "/";
-        };
-    }
 }
