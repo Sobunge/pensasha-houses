@@ -4,22 +4,23 @@ import React, { createContext, useContext, useState } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  // Initialize from sessionStorage instead of localStorage
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  // ✅ new: store redirect path (e.g. "/request-to-rent")
+  // Store redirect path (optional)
   const [redirectAfterAuth, setRedirectAfterAuth] = useState(null);
 
   const loginAs = (userObj) => {
     setUser(userObj);
-    localStorage.setItem("user", JSON.stringify(userObj));
+    sessionStorage.setItem("user", JSON.stringify(userObj));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
   };
 
   return (

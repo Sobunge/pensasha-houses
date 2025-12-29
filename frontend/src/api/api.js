@@ -1,17 +1,18 @@
-// api.js
 import axios from "axios";
 
-let accessToken = null; // In-memory storage
+// Initialize token from sessionStorage
+let accessToken = sessionStorage.getItem("accessToken") || null;
 
 // Function to set the access token after login or refresh
 export const setAccessToken = (token) => {
   accessToken = token;
+  sessionStorage.setItem("accessToken", token);
 };
 
 // Create Axios instance
 const api = axios.create({
   baseURL: "http://localhost:8080/api",
-  withCredentials: true, // Important to send HttpOnly refresh token cookies
+  withCredentials: true, // Send HttpOnly refresh token cookies
 });
 
 // Request interceptor: attach access token to headers
@@ -28,12 +29,10 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Prevent infinite loop
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Attempt to refresh token using HttpOnly cookie
         const refreshResponse = await axios.post(
           "/api/auth/refresh",
           {},
@@ -43,11 +42,9 @@ api.interceptors.response.use(
         const newAccessToken = refreshResponse.data.accessToken;
         setAccessToken(newAccessToken);
 
-        // Retry the original request with new token
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed: redirect to login
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }

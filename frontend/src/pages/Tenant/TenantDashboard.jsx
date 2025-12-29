@@ -18,19 +18,22 @@ import AnnouncementsCard from "../../components/cards/AnnouncementsCard";
 import DocumentsCard from "../../components/cards/DocumentsCard";
 import PaymentsCard from "../../components/cards/PaymentsCard";
 import api from "../../api/api";
+import { useAuth } from "../Auth/AuthContext";
 
 function TenantDashboard() {
-  const [user, setUser] = useState(null);
+  const { user, loginAs } = useAuth();
   const [tenantUnits, setTenantUnits] = useState([]);
   const [loadingUnits, setLoadingUnits] = useState(true);
   const navigate = useNavigate();
 
-  // Load user from localStorage
+  // Restore user from sessionStorage if context is empty
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) navigate("/");
-    else setUser(storedUser);
-  }, [navigate]);
+    if (!user) {
+      const storedUser = JSON.parse(sessionStorage.getItem("user"));
+      if (storedUser) loginAs(storedUser);
+      else navigate("/login");
+    }
+  }, [user, loginAs, navigate]);
 
   // Fetch tenant properties
   useEffect(() => {
@@ -80,12 +83,12 @@ function TenantDashboard() {
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Avatar
             src="/assets/images/tenant-avatar.png"
-            alt={user.name}
+            alt={user.name || user.idNumber}
             sx={{ width: 56, height: 56, bgcolor: "#f8b500", color: "#111" }}
           />
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
-              Welcome back, {user.name} 👋
+              Welcome back, {user.name || user.idNumber} 👋
             </Typography>
             <Typography variant="body2" sx={{ color: "#555" }}>
               Role: {user.role}
@@ -178,13 +181,12 @@ function TenantDashboard() {
           flexWrap: "wrap",
           mb: 4,
           justifyContent: "center",
-          alignItems: "stretch", 
+          alignItems: "stretch",
         }}
       >
         <MaintenanceCard tenantId={user.id} />
         <AnnouncementsCard userId={user.id} />
       </Box>
-
 
       {/* Documents */}
       <SectionTitle title="Your Documents" />
@@ -197,11 +199,11 @@ function TenantDashboard() {
       <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
         <PaymentsSection />
       </Box>
-    </Box >
+    </Box>
   );
 }
 
-// Section Title
+/* ---------------- Helper Components ---------------- */
 const SectionTitle = ({ title }) => (
   <Typography
     variant="subtitle2"
@@ -217,7 +219,6 @@ const SectionTitle = ({ title }) => (
   </Typography>
 );
 
-// Card Wrapper
 const CardWrapper = ({ children }) => (
   <Box
     sx={{
@@ -234,7 +235,6 @@ const CardWrapper = ({ children }) => (
   </Box>
 );
 
-// Documents Section
 const DocumentsSection = () => (
   <CardWrapper>
     <DocumentsCard />
@@ -247,7 +247,6 @@ const DocumentsSection = () => (
   </CardWrapper>
 );
 
-// Payments Section
 const PaymentsSection = () => (
   <CardWrapper>
     <PaymentsCard />
