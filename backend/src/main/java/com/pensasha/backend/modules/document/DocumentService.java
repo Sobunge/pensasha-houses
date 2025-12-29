@@ -18,8 +18,7 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
 
-    private static final Path STORAGE_ROOT =
-            Paths.get("uploads").toAbsolutePath().normalize();
+    private static final Path STORAGE_ROOT = Paths.get("uploads").toAbsolutePath().normalize();
 
     /**
      * Store a file for a given user
@@ -34,27 +33,23 @@ public class DocumentService {
 
         String originalFilename = file.getOriginalFilename();
         String cleanFilename = StringUtils.cleanPath(
-                originalFilename != null ? originalFilename : "file"
-        );
+                originalFilename != null ? originalFilename : "file");
 
-        String storedFilename =
-                UUID.randomUUID() + "_" + cleanFilename;
+        String storedFilename = UUID.randomUUID() + "_" + cleanFilename;
 
         Path targetPath = STORAGE_ROOT.resolve(storedFilename);
 
         Files.copy(
                 file.getInputStream(),
                 targetPath,
-                StandardCopyOption.REPLACE_EXISTING
-        );
+                StandardCopyOption.REPLACE_EXISTING);
 
         Document document = new Document();
         document.setFileName(cleanFilename);
         document.setFileType(
                 file.getContentType() != null
                         ? file.getContentType()
-                        : "application/octet-stream"
-        );
+                        : "application/octet-stream");
         document.setFileUrl(targetPath.toString());
         document.setUploadedAt(LocalDateTime.now());
         document.setUser(user);
@@ -89,4 +84,12 @@ public class DocumentService {
 
         documentRepository.delete(document);
     }
+
+    /**
+     * Count documents for a specific user
+     */
+    public long countDocumentsForUser(Long userId) {
+        return documentRepository.countByUserId(userId);
+    }
+
 }

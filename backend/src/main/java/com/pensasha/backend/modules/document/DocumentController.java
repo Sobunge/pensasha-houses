@@ -26,8 +26,7 @@ public class DocumentController {
     @PostMapping("/upload")
     public ResponseEntity<Document> uploadDocument(
             @RequestParam("file") MultipartFile file,
-            Authentication authentication
-    ) throws IOException {
+            Authentication authentication) throws IOException {
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -65,8 +64,7 @@ public class DocumentController {
     @DeleteMapping("/{documentId}")
     public ResponseEntity<Void> deleteDocument(
             @PathVariable Long documentId,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
 
         String idNumber = authentication.getName();
 
@@ -76,5 +74,14 @@ public class DocumentController {
         documentService.deleteDocument(documentId, user);
 
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get document count for a specific user
+     */
+    @GetMapping("/count/{userId}")
+    public ResponseEntity<Long> getDocumentCount(@PathVariable Long userId) {
+        long count = documentService.countDocumentsForUser(userId);
+        return ResponseEntity.ok(count);
     }
 }
