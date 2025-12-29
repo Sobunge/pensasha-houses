@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, Typography, Button, Box, CircularProgress } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { useNavigate } from "react-router-dom";
-import { useDocumentCount } from "../../hooks/useDocumentCount";
+import { useDocumentCount } from "../../components/hooks/useDocumentCount";
 
 function DocumentsCard({ userId }) {
   const navigate = useNavigate();

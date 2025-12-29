@@ -1,14 +1,6 @@
-// src/pages/TenantPage/TenantDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Card,
-  Button,
-  Avatar,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Typography, Card, Button, Avatar, CircularProgress } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PaymentIcon from "@mui/icons-material/Payment";
@@ -16,8 +8,8 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
 import MaintenanceCard from "../../components/cards/MaintenanceCard";
 import AnnouncementsCard from "../../components/cards/AnnouncementsCard";
-import DocumentsCard from "../../components/cards/DocumentsCard";
 import PaymentsCard from "../../components/cards/PaymentsCard";
+import DocumentsCard from "../../components/cards/DocumentsCard";
 import api from "../../api/api";
 import { useAuth } from "../Auth/AuthContext";
 
@@ -27,11 +19,7 @@ function TenantDashboard() {
   const [loadingUnits, setLoadingUnits] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("accessToken");
-    console.log("Access Stored Token:", token);
-  }, []);
-
+  /* ------------------ Handle user from sessionStorage ------------------ */
   useEffect(() => {
     if (!user) {
       try {
@@ -44,6 +32,7 @@ function TenantDashboard() {
     }
   }, [user, loginAs, navigate]);
 
+  /* ------------------ Fetch tenant units ------------------ */
   useEffect(() => {
     if (!user) return;
 
@@ -88,14 +77,7 @@ function TenantDashboard() {
             textAlign: { xs: "center", md: "left" },
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: "center", gap: 2 }}>
             <Avatar
               src="/assets/images/avatar.png"
               alt={user.name || user.idNumber}
@@ -111,10 +93,7 @@ function TenantDashboard() {
               <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
                 Welcome back, {user.name || user.idNumber} 👋
               </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: hasUnits ? "#555" : "#888", mt: 0.5 }}
-              >
+              <Typography variant="body2" sx={{ color: hasUnits ? "#555" : "#888", mt: 0.5 }}>
                 {hasUnits
                   ? `You have ${tenantUnits.length} rental unit${tenantUnits.length > 1 ? "s" : ""}`
                   : "You don’t have any rental units yet"}
@@ -204,12 +183,12 @@ function TenantDashboard() {
 
       {/* Documents */}
       <Section title="Your Documents">
-        <DocumentsSection />
+        <DocumentsCard userId={user.id} />
       </Section>
 
       {/* Payments */}
       <Section title="Recent Payments">
-        <PaymentsSection />
+        <PaymentsCard />
       </Section>
     </Box>
   );
@@ -220,41 +199,18 @@ const Section = ({ title, children }) => (
   <Box sx={{ mb: 4, textAlign: { xs: "center", md: "center", lg: "left" } }}>
     <Typography
       variant="subtitle2"
-      sx={{
-        textTransform: "uppercase",
-        letterSpacing: 1,
-        fontWeight: 600,
-        mb: 2,
-        color: "#2a2a2a",
-      }}
+      sx={{ textTransform: "uppercase", letterSpacing: 1, fontWeight: 600, mb: 2, color: "#2a2a2a" }}
     >
       {title}
     </Typography>
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 3,
-        justifyContent: { xs: "center", md: "center", lg: "flex-start" },
-      }}
-    >
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: { xs: "center", md: "center", lg: "flex-start" } }}>
       {children}
     </Box>
   </Box>
 );
 
 const EmptyState = ({ message, ctaText, ctaIcon, onClick }) => (
-  <Box
-    sx={{
-      width: "100%",
-      textAlign: "center",
-      mt: 1,
-      p: 3,
-      borderRadius: 3,
-      bgcolor: "#ffffff",
-      border: "1px dashed #ffc62c",
-    }}
-  >
+  <Box sx={{ width: "100%", textAlign: "center", mt: 1, p: 3, borderRadius: 3, bgcolor: "#ffffff", border: "1px dashed #ffc62c" }}>
     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#2a2a2a", mb: 1 }}>
       No Rental Unit Assigned
     </Typography>
@@ -266,54 +222,11 @@ const EmptyState = ({ message, ctaText, ctaIcon, onClick }) => (
       size="medium"
       startIcon={ctaIcon}
       onClick={onClick}
-      sx={{
-        bgcolor: "#f8b500",
-        color: "#111",
-        fontWeight: 600,
-        textTransform: "none",
-        borderRadius: 3,
-        px: 4,
-        "&:hover": { bgcolor: "#ffc62c" },
-        mx: { xs: "auto", md: "auto", lg: 0 },
-      }}
+      sx={{ bgcolor: "#f8b500", color: "#111", fontWeight: 600, textTransform: "none", borderRadius: 3, px: 4, "&:hover": { bgcolor: "#ffc62c" }, mx: { xs: "auto", md: "auto", lg: 0 } }}
     >
       {ctaText}
     </Button>
   </Box>
-);
-
-const CardWrapper = ({ children }) => (
-  <Box
-    sx={{
-      height: "100%",
-      "& .MuiCard-root": {
-        height: "100%",
-        borderRadius: 3,
-        transition: "all 0.2s ease-in-out",
-        "&:hover": { transform: "translateY(-4px)", boxShadow: 4 },
-      },
-    }}
-  >
-    {children}
-  </Box>
-);
-
-const DocumentsSection = () => (
-  <CardWrapper>
-    <DocumentsCard />
-    <Typography variant="body2" sx={{ width: "100%", textAlign: "center", color: "#555", mt: 1 }}>
-      No documents available.
-    </Typography>
-  </CardWrapper>
-);
-
-const PaymentsSection = () => (
-  <CardWrapper>
-    <PaymentsCard />
-    <Typography variant="body2" sx={{ width: "100%", textAlign: "center", color: "#555", mt: 1 }}>
-      No recent payments.
-    </Typography>
-  </CardWrapper>
 );
 
 export default TenantDashboard;
