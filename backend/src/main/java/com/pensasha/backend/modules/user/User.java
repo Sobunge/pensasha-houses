@@ -63,4 +63,5 @@ public class User {
     private LocalDateTime accountExpirationDate;
 
     private LocalDateTime passwordExpirationDate;
+
 }
