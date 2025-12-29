@@ -1,31 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, CardContent, Typography, Button, Box, CircularProgress } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { useNavigate } from "react-router-dom";
-import api from "../../api/api";
+import { useDocumentCount } from "../../hooks/useDocumentCount";
 
 function DocumentsCard({ userId }) {
   const navigate = useNavigate();
-
-  const [docCount, setDocCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    const fetchDocumentCount = async () => {
-      try {
-        const response = await api.get("/documents/count/${user.id}");
-        setDocCount(response.data);
-      } catch (err) {
-        console.error("Failed to fetch document count", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDocumentCount();
-  }, []);
+  const { count: docCount, loading, error } = useDocumentCount(userId);
 
   const handleNavigate = () => {
     navigate("/tenant/documents");
@@ -51,7 +32,7 @@ function DocumentsCard({ userId }) {
           </Typography>
         ) : (
           <Typography variant="body2" sx={{ color: "#555", mb: 2 }}>
-            You have <strong>{docCount}</strong> documents available.
+            You have <strong>{docCount}</strong> document{docCount !== 1 ? "s" : ""} available.
           </Typography>
         )}
 
