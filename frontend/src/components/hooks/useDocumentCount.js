@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
-import { useAuth } from "../pages/Auth/AuthContext";
 
-export const useDocumentCount = () => {
-  const { user } = useAuth();
-
+export const useDocumentCount = (userId) => {
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!user?.id) {
+    if (!userId) {
       setLoading(false);
       return;
     }
@@ -20,7 +17,7 @@ export const useDocumentCount = () => {
       setError(false);
 
       try {
-        const res = await api.get(`/documents/count/${user.id}`);
+        const res = await api.get(`/documents/count/${userId}`);
         setCount(res.data);
       } catch (err) {
         console.error("Failed to fetch document count:", err);
@@ -31,7 +28,7 @@ export const useDocumentCount = () => {
     };
 
     fetchCount();
-  }, [user?.id]);
+  }, [userId]);
 
   return { count, loading, error };
 };
