@@ -109,6 +109,7 @@ function TenantDashboard() {
             fontWeight: 600,
             textTransform: "none",
             borderRadius: 2,
+            size: "small",
             px: 3,
             mt: { xs: 2, md: 0 },
           }}
@@ -125,7 +126,7 @@ function TenantDashboard() {
             sx={{
               width: "100%",
               textAlign: "center",
-              mt: 4,
+              mt: 1,
               p: 3,
               borderRadius: 3,
               bgcolor: "#ffffff",
@@ -166,6 +167,7 @@ function TenantDashboard() {
                 fontWeight: 600,
                 textTransform: "none",
                 borderRadius: 3,
+                size: "small",
                 px: 4,
                 "&:hover": {
                   bgcolor: "#ffc62c",
