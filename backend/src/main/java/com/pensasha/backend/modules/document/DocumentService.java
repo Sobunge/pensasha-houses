@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,42 +18,46 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
 
-    // Base folder to store uploaded files
-    private final Path fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
+    private static final Path STORAGE_ROOT =
+            Paths.get("uploads").toAbsolutePath().normalize();
 
     /**
      * Store a file for a given user
      */
     public Document storeFile(MultipartFile file, User user) throws IOException {
+
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Cannot store empty file");
+            throw new IllegalArgumentException("File must not be empty");
         }
 
-        // Ensure upload directory exists
-        if (!Files.exists(fileStorageLocation)) {
-            Files.createDirectories(fileStorageLocation);
-        }
+        Files.createDirectories(STORAGE_ROOT);
 
-        // Clean and resolve filename
-        String fileName = file.getOriginalFilename();
-        String originalFileName = (fileName != null) ? StringUtils.cleanPath(fileName) : null;
-        if (originalFileName == null || originalFileName.isBlank()) {
-            originalFileName = "unnamed_file_" + System.currentTimeMillis();
-        }
-
-        Path targetLocation = fileStorageLocation.resolve(originalFileName);
-
-        // Copy file to target location (replace if exists)
-        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-        // Create and save document entity
-        Document document = new Document(
-                originalFileName,
-                file.getContentType() != null ? file.getContentType() : "application/octet-stream",
-                targetLocation.toString(),
-                user
+        String originalFilename = file.getOriginalFilename();
+        String cleanFilename = StringUtils.cleanPath(
+                originalFilename != null ? originalFilename : "file"
         );
+
+        String storedFilename =
+                UUID.randomUUID() + "_" + cleanFilename;
+
+        Path targetPath = STORAGE_ROOT.resolve(storedFilename);
+
+        Files.copy(
+                file.getInputStream(),
+                targetPath,
+                StandardCopyOption.REPLACE_EXISTING
+        );
+
+        Document document = new Document();
+        document.setFileName(cleanFilename);
+        document.setFileType(
+                file.getContentType() != null
+                        ? file.getContentType()
+                        : "application/octet-stream"
+        );
+        document.setFileUrl(targetPath.toString());
         document.setUploadedAt(LocalDateTime.now());
+        document.setUser(user);
 
         return documentRepository.save(document);
     }
@@ -65,9 +70,23 @@ public class DocumentService {
     }
 
     /**
-     * Delete a document by its ID
+     * Delete a document owned by the given user
      */
-    public void deleteDocument(Long documentId) {
-        documentRepository.deleteById(documentId);
+    public void deleteDocument(Long documentId, User user) {
+
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+
+        if (!document.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Not authorized to delete this document");
+        }
+
+        try {
+            Files.deleteIfExists(Paths.get(document.getFileUrl()));
+        } catch (IOException ignored) {
+            // File deletion failure should not block DB cleanup
+        }
+
+        documentRepository.delete(document);
     }
 }
