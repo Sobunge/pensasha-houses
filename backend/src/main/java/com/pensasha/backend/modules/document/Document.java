@@ -4,6 +4,7 @@ import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,13 +25,22 @@ public class Document {
     private String fileType;
 
     @Column(nullable = false)
-    private String fileUrl; // Could be path on server or cloud storage link
+    private String fileUrl; // Can be a server path or cloud storage link
 
     @Column(nullable = false)
-    private LocalDateTime uploadedAt = LocalDateTime.now();
+    private LocalDateTime uploadedAt;
 
     // Many documents can belong to one user
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    // Convenient constructor for creating a new document
+    public Document(String fileName, String fileType, String fileUrl, User user) {
+        this.fileName = fileName != null ? fileName : "unknown";
+        this.fileType = fileType != null ? fileType : "application/octet-stream";
+        this.fileUrl = fileUrl != null ? fileUrl : "";
+        this.user = user;
+        this.uploadedAt = LocalDateTime.now();
+    }
 }
