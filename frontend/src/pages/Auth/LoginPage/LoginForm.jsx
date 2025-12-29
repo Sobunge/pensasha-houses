@@ -18,7 +18,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import { useNotification } from "../../../components/NotificationProvider";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
-import api, { setAccessToken } from "../../../api/api";
+import api from "../../../api/api";
 
 /* ---------------- Validation ---------------- */
 const validateIdNumber = (value) => {
@@ -75,17 +75,19 @@ export default function LoginForm({ switchToSignup, onClose }) {
       const response = await api.post("/auth/login", formData);
       const { accessToken, principal } = response.data;
 
-      // Store token in sessionStorage + memory
-      setAccessToken(accessToken);
+      // Store token in sessionStorage
+      sessionStorage.setItem("accessToken", accessToken);
 
+      // Store user in sessionStorage for refresh
       const user = {
         id: principal.id,
         idNumber: principal.username,
         role: principal.role,
         defaultRoute: principal.defaultRoute,
       };
+      sessionStorage.setItem("user", JSON.stringify(user));
 
-      // AuthContext now handles sessionStorage internally
+      // Update AuthContext
       loginAs(user);
 
       notify("Login successful!", "success", 3000);

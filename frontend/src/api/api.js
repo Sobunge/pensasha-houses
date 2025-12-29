@@ -1,21 +1,25 @@
 import axios from "axios";
 
-// Initialize token from sessionStorage
+// Memory + sessionStorage token management
 let accessToken = sessionStorage.getItem("accessToken") || null;
 
-// Function to set the access token after login or refresh
+/**
+ * Set access token in memory and sessionStorage
+ * @param {string|null} token
+ */
 export const setAccessToken = (token) => {
   accessToken = token;
-  sessionStorage.setItem("accessToken", token);
+  if (token) sessionStorage.setItem("accessToken", token);
+  else sessionStorage.removeItem("accessToken");
 };
 
-// Create Axios instance
+// Axios instance
 const api = axios.create({
   baseURL: "http://localhost:8080/api",
-  withCredentials: true, // Send HttpOnly refresh token cookies
+  withCredentials: true, // include HttpOnly refresh token cookies
 });
 
-// Request interceptor: attach access token to headers
+// Request interceptor: attach access token
 api.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -23,29 +27,35 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor: handle 401 Unauthorized (access token expired)
+// Response interceptor: handle 401 and refresh token
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // Only retry once
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const refreshResponse = await axios.post(
-          "/api/auth/refresh",
+        // Refresh token request
+        const refreshRes = await axios.post(
+          "/auth/refresh",
           {},
-          { baseURL: "http://localhost:8080/api", withCredentials: true }
+          { baseURL: api.defaults.baseURL, withCredentials: true }
         );
 
-        const newAccessToken = refreshResponse.data.accessToken;
-        setAccessToken(newAccessToken);
+        const newToken = refreshRes.data.accessToken;
+        setAccessToken(newToken);
 
-        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        // Retry original request with new token
+        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
+        // Failed to refresh, clear token
         setAccessToken(null);
+        sessionStorage.removeItem("user"); // optional: clear user
+        window.location.href = "/login"; // force login
         return Promise.reject(refreshError);
       }
     }

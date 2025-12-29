@@ -27,24 +27,31 @@ function TenantDashboard() {
   const [loadingUnits, setLoadingUnits] = useState(true);
   const navigate = useNavigate();
 
-  // Restore user from sessionStorage if context is empty
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken");
+    console.log("Access Stored Token:", token);
+  }, []);
+
   useEffect(() => {
     if (!user) {
-      const storedUser = JSON.parse(sessionStorage.getItem("user"));
-      if (storedUser) loginAs(storedUser);
-      else navigate("/");
+      try {
+        const storedUser = JSON.parse(sessionStorage.getItem("user"));
+        if (storedUser) loginAs(storedUser);
+        else navigate("/");
+      } catch {
+        navigate("/");
+      }
     }
   }, [user, loginAs, navigate]);
 
-  // Fetch tenant properties
   useEffect(() => {
     if (!user) return;
 
-    const fetchTenantUnits = async () => {
+    const fetchUnits = async () => {
       setLoadingUnits(true);
       try {
-        const response = await api.get(`/units/tenant/${user.id}`);
-        setTenantUnits(response.data || []);
+        const res = await api.get(`/units/tenant/${user.id}`);
+        setTenantUnits(res.data || []);
       } catch (err) {
         console.error("Failed to fetch tenant units:", err);
       } finally {
@@ -52,10 +59,8 @@ function TenantDashboard() {
       }
     };
 
-    fetchTenantUnits();
+    fetchUnits();
   }, [user]);
-
-  const visibleDesktop = tenantUnits.slice(0, 2);
 
   if (!user || loadingUnits) {
     return (
@@ -65,131 +70,103 @@ function TenantDashboard() {
     );
   }
 
-  return (
-    <Box sx={{ flexGrow: 1, bgcolor: "#f7f7f7", minHeight: "100vh" }}>
-      {/* Hero Card */}
-      <Card
-        sx={{
-          mb: 4,
-          p: 3,
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-          borderRadius: 3,
-          boxShadow: 2,
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Avatar
-            src="/assets/images/tenant-avatar.png"
-            alt={user.name || user.idNumber}
-            sx={{ width: 56, height: 56, bgcolor: "#f8b500", color: "#111" }}
-          />
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
-              Welcome back, {user.name || user.idNumber} 👋
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#555" }}>
-              Role: {user.role}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#555" }}>
-              You have {tenantUnits.length} rental units
-            </Typography>
-          </Box>
-        </Box>
+  const hasUnits = tenantUnits.length > 0;
+  const visibleUnits = tenantUnits.slice(0, 2);
 
-        <Button
-          variant="contained"
-          startIcon={<PaymentIcon />}
+  return (
+    <Box sx={{ flexGrow: 1, bgcolor: "#f7f7f7", minHeight: "100vh", p: 3 }}>
+      {/* Hero Card */}
+      <Card sx={{ mb: 4, p: 3, borderRadius: 3, boxShadow: 2 }}>
+        <Box
           sx={{
-            bgcolor: "#f8b500",
-            color: "#111",
-            fontWeight: 600,
-            textTransform: "none",
-            borderRadius: 2,
-            size: "small",
-            px: 3,
-            mt: { xs: 2, md: 0 },
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: "center",
+            justifyContent: { xs: "center", md: "space-between" },
+            gap: 2,
+            width: "100%",
+            textAlign: { xs: "center", md: "left" },
           }}
         >
-          Pay Rent Now
-        </Button>
-      </Card>
-
-      {/* Units & Rent */}
-      <SectionTitle title="Your Rental Units & Rent" />
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 4 }}>
-        {tenantUnits.length === 0 ? (
           <Box
             sx={{
-              width: "100%",
-              textAlign: "center",
-              mt: 1,
-              p: 3,
-              borderRadius: 3,
-              bgcolor: "#ffffff",
-              border: "1px dashed #ffc62c",
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: "center",
+              gap: 2,
             }}
           >
-            <Typography
-              variant="subtitle1"
+            <Avatar
+              src="/assets/images/avatar.png"
+              alt={user.name || user.idNumber}
               sx={{
-                fontWeight: 600,
-                color: "#2a2a2a",
-                mb: 0.5,
-              }}
-            >
-              No Rental Unit Assigned
-            </Typography>
-
-            <Typography
-              variant="body2"
-              sx={{
-                color: "#555",
-                mb: 3,
-                maxWidth: 360,
-                mx: "auto",
-              }}
-            >
-              You are not currently linked to any rental unit. Browse available properties to get started.
-            </Typography>
-
-            <Button
-              variant="contained"
-              size="medium"
-              startIcon={<SearchOutlinedIcon />}
-              onClick={() => navigate("/tenant/browse-units")}
-              sx={{
+                width: hasUnits ? 56 : 72,
+                height: hasUnits ? 56 : 72,
                 bgcolor: "#f8b500",
-                color: "#111111",
-                fontWeight: 600,
-                textTransform: "none",
-                borderRadius: 3,
-                size: "small",
-                px: 4,
-                "&:hover": {
-                  bgcolor: "#ffc62c",
-                },
+                color: "#111",
+                boxShadow: 2,
               }}
-            >
-              Browse Available Units
-            </Button>
+            />
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
+                Welcome back, {user.name || user.idNumber} 👋
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: hasUnits ? "#555" : "#888", mt: 0.5 }}
+              >
+                {hasUnits
+                  ? `You have ${tenantUnits.length} rental unit${tenantUnits.length > 1 ? "s" : ""}`
+                  : "You don’t have any rental units yet"}
+              </Typography>
+            </Box>
           </Box>
 
-        ) : (
+          {hasUnits && (
+            <Button
+              variant="contained"
+              startIcon={<PaymentIcon />}
+              sx={{
+                bgcolor: "#f8b500",
+                color: "#111",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: 2,
+                px: 3,
+                mt: { xs: 2, md: 0 },
+                alignSelf: { xs: "center", md: "auto" },
+              }}
+            >
+              Pay Rent Now
+            </Button>
+          )}
+        </Box>
+      </Card>
+
+      {/* Rental Units Section */}
+      <Section title="Your Rental Units & Rent">
+        {hasUnits ? (
           <>
-            {visibleDesktop.map((property) => (
+            {visibleUnits.map((unit) => (
               <Box
-                key={property.id}
-                sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}
+                key={unit.id}
+                sx={{
+                  flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" },
+                  display: "flex",
+                  justifyContent: { xs: "center", md: "flex-start" },
+                }}
               >
-                <PropertyInfoCard property={property} />
+                <PropertyInfoCard property={unit} />
               </Box>
             ))}
-            {tenantUnits.length > visibleDesktop.length && (
-              <Box sx={{ flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" } }}>
+            {tenantUnits.length > visibleUnits.length && (
+              <Box
+                sx={{
+                  flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" },
+                  display: "flex",
+                  justifyContent: { xs: "center", md: "flex-start" },
+                }}
+              >
                 <Button
                   variant="outlined"
                   size="small"
@@ -209,54 +186,100 @@ function TenantDashboard() {
               </Box>
             )}
           </>
+        ) : (
+          <EmptyState
+            message="You are not currently linked to any rental unit. Browse available properties to get started."
+            ctaText="Browse Available Units"
+            ctaIcon={<SearchOutlinedIcon />}
+            onClick={() => navigate("/tenant/browse-units")}
+          />
         )}
-      </Box>
+      </Section>
 
       {/* Requests & Updates */}
-      <SectionTitle title="Requests & Updates" />
-      <Box
-        sx={{
-          display: "flex",
-          gap: 3,
-          flexWrap: "wrap",
-          mb: 4,
-          justifyContent: "center",
-          alignItems: "stretch",
-        }}
-      >
+      <Section title="Requests & Updates">
         <MaintenanceCard tenantId={user.id} />
         <AnnouncementsCard userId={user.id} />
-      </Box>
+      </Section>
 
       {/* Documents */}
-      <SectionTitle title="Your Documents" />
-      <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap", mb: 4 }}>
+      <Section title="Your Documents">
         <DocumentsSection />
-      </Box>
+      </Section>
 
       {/* Payments */}
-      <SectionTitle title="Recent Payments" />
-      <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+      <Section title="Recent Payments">
         <PaymentsSection />
-      </Box>
+      </Section>
     </Box>
   );
 }
 
 /* ---------------- Helper Components ---------------- */
-const SectionTitle = ({ title }) => (
-  <Typography
-    variant="subtitle2"
+const Section = ({ title, children }) => (
+  <Box sx={{ mb: 4, textAlign: { xs: "center", md: "center", lg: "left" } }}>
+    <Typography
+      variant="subtitle2"
+      sx={{
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        fontWeight: 600,
+        mb: 2,
+        color: "#2a2a2a",
+      }}
+    >
+      {title}
+    </Typography>
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 3,
+        justifyContent: { xs: "center", md: "center", lg: "flex-start" },
+      }}
+    >
+      {children}
+    </Box>
+  </Box>
+);
+
+const EmptyState = ({ message, ctaText, ctaIcon, onClick }) => (
+  <Box
     sx={{
-      textTransform: "uppercase",
-      letterSpacing: 1,
-      fontWeight: 600,
-      mb: 2,
-      color: "#2a2a2a",
+      width: "100%",
+      textAlign: "center",
+      mt: 1,
+      p: 3,
+      borderRadius: 3,
+      bgcolor: "#ffffff",
+      border: "1px dashed #ffc62c",
     }}
   >
-    {title}
-  </Typography>
+    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#2a2a2a", mb: 1 }}>
+      No Rental Unit Assigned
+    </Typography>
+    <Typography variant="body2" sx={{ color: "#555", mb: 3, maxWidth: 360, mx: "auto" }}>
+      {message}
+    </Typography>
+    <Button
+      variant="contained"
+      size="medium"
+      startIcon={ctaIcon}
+      onClick={onClick}
+      sx={{
+        bgcolor: "#f8b500",
+        color: "#111",
+        fontWeight: 600,
+        textTransform: "none",
+        borderRadius: 3,
+        px: 4,
+        "&:hover": { bgcolor: "#ffc62c" },
+        mx: { xs: "auto", md: "auto", lg: 0 },
+      }}
+    >
+      {ctaText}
+    </Button>
+  </Box>
 );
 
 const CardWrapper = ({ children }) => (
@@ -278,10 +301,7 @@ const CardWrapper = ({ children }) => (
 const DocumentsSection = () => (
   <CardWrapper>
     <DocumentsCard />
-    <Typography
-      variant="body2"
-      sx={{ width: "100%", textAlign: "center", color: "#555", mt: 1 }}
-    >
+    <Typography variant="body2" sx={{ width: "100%", textAlign: "center", color: "#555", mt: 1 }}>
       No documents available.
     </Typography>
   </CardWrapper>
@@ -290,10 +310,7 @@ const DocumentsSection = () => (
 const PaymentsSection = () => (
   <CardWrapper>
     <PaymentsCard />
-    <Typography
-      variant="body2"
-      sx={{ width: "100%", textAlign: "center", color: "#555", mt: 1 }}
-    >
+    <Typography variant="body2" sx={{ width: "100%", textAlign: "center", color: "#555", mt: 1 }}>
       No recent payments.
     </Typography>
   </CardWrapper>
