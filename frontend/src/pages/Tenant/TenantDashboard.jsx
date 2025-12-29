@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PaymentIcon from "@mui/icons-material/Payment";
 
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
@@ -31,7 +32,7 @@ function TenantDashboard() {
     if (!user) {
       const storedUser = JSON.parse(sessionStorage.getItem("user"));
       if (storedUser) loginAs(storedUser);
-      else navigate("/login");
+      else navigate("/");
     }
   }, [user, loginAs, navigate]);
 
@@ -120,24 +121,61 @@ function TenantDashboard() {
       <SectionTitle title="Your Rental Units & Rent" />
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 4 }}>
         {tenantUnits.length === 0 ? (
-          <Box sx={{ width: "100%", textAlign: "center", mt: 2 }}>
-            <Typography variant="body2" sx={{ color: "#555", mb: 2 }}>
-              You currently have no rental unit assigned.
+          <Box
+            sx={{
+              width: "100%",
+              textAlign: "center",
+              mt: 4,
+              p: 3,
+              borderRadius: 3,
+              bgcolor: "#ffffff",
+              border: "1px dashed #ffc62c",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 600,
+                color: "#2a2a2a",
+                mb: 0.5,
+              }}
+            >
+              No Rental Unit Assigned
             </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#555",
+                mb: 3,
+                maxWidth: 360,
+                mx: "auto",
+              }}
+            >
+              You are not currently linked to any rental unit. Browse available properties to get started.
+            </Typography>
+
             <Button
-              variant="outlined"
-              size="small"
+              variant="contained"
+              size="medium"
+              startIcon={<SearchOutlinedIcon />}
               onClick={() => navigate("/tenant/browse-units")}
               sx={{
-                borderRadius: 3,
-                textTransform: "none",
+                bgcolor: "#f8b500",
+                color: "#111111",
                 fontWeight: 600,
-                "&:hover": { backgroundColor: "#fef2b2", borderColor: "#f8b500" },
+                textTransform: "none",
+                borderRadius: 3,
+                px: 4,
+                "&:hover": {
+                  bgcolor: "#ffc62c",
+                },
               }}
             >
               Browse Available Units
             </Button>
           </Box>
+
         ) : (
           <>
             {visibleDesktop.map((property) => (
