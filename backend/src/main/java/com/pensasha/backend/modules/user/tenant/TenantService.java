@@ -24,14 +24,17 @@ public class TenantService {
     private final TenantMapper tenantMapper;
 
     /**
-     * Get tenant details by idNumber
+     * Get tenant details by database ID
      */
-    public TenantDTO getTenantByIdNumber(String idNumber) {
-        log.info("Fetching tenant with ID number: {}", idNumber);
-        Tenant tenant = tenantRepository.findByIdNumber(idNumber)
+    public TenantDTO getTenantById(Long id) {
+        log.info("Fetching tenant with ID: {}", id);
+
+        Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Tenant with ID number {} not found", idNumber);
-                    return new ResourceNotFoundException("Tenant with ID number " + idNumber + " not found.");
+                    log.error("Tenant with ID {} not found", id);
+                    return new ResourceNotFoundException(
+                            "Tenant with ID " + id + " not found."
+                    );
                 });
 
         return tenantMapper.toDTO(tenant);
@@ -41,39 +44,61 @@ public class TenantService {
      * Get paginated list of tenants
      */
     public Page<TenantDTO> getAllTenants(Pageable pageable) {
-        log.info("Fetching tenants page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        log.info(
+            "Fetching tenants page: {}, size: {}",
+            pageable.getPageNumber(),
+            pageable.getPageSize()
+        );
+
         Page<Tenant> tenantsPage = tenantRepository.findAll(pageable);
-        List<TenantDTO> tenantDTOs = tenantsPage.stream()
+
+        List<TenantDTO> tenantDTOs = tenantsPage.getContent()
+                .stream()
                 .map(tenantMapper::toDTO)
                 .collect(Collectors.toList());
-        return new PageImpl<>(tenantDTOs, pageable, tenantsPage.getTotalElements());
+
+        return new PageImpl<>(
+                tenantDTOs,
+                pageable,
+                tenantsPage.getTotalElements()
+        );
     }
 
     /**
-     * Update emergency contact for a tenant
+     * Update emergency contact for a tenant by ID
      */
-    public TenantDTO updateEmergencyContact(String idNumber, String emergencyContact) {
-        log.info("Updating emergency contact for tenant with ID number: {}", idNumber);
-        Tenant tenant = tenantRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Tenant with ID number " + idNumber + " not found."));
+    public TenantDTO updateEmergencyContact(Long id, String emergencyContact) {
+        log.info("Updating emergency contact for tenant with ID: {}", id);
+
+        Tenant tenant = tenantRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Tenant with ID " + id + " not found."
+                ));
 
         tenant.setEmergencyContact(emergencyContact);
+
         Tenant updatedTenant = tenantRepository.save(tenant);
-        log.info("Successfully updated emergency contact for tenant with ID number: {}", idNumber);
+
+        log.info("Emergency contact updated successfully for tenant ID: {}", id);
         return tenantMapper.toDTO(updatedTenant);
     }
 
     /**
-     * Update leases for a tenant
+     * Update leases for a tenant by ID
      */
-    public TenantDTO updateLeases(String idNumber, List<Lease> leases) {
-        log.info("Updating leases for tenant with ID number: {}", idNumber);
-        Tenant tenant = tenantRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Tenant with ID number " + idNumber + " not found."));
+    public TenantDTO updateLeases(Long id, List<Lease> leases) {
+        log.info("Updating leases for tenant with ID: {}", id);
+
+        Tenant tenant = tenantRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Tenant with ID " + id + " not found."
+                ));
 
         tenant.setLeases(leases);
+
         Tenant updatedTenant = tenantRepository.save(tenant);
-        log.info("Successfully updated leases for tenant with ID number: {}", idNumber);
+
+        log.info("Leases updated successfully for tenant ID: {}", id);
         return tenantMapper.toDTO(updatedTenant);
     }
 
@@ -82,13 +107,14 @@ public class TenantService {
      */
     public boolean deleteTenant(Long id) {
         log.info("Deleting tenant with ID: {}", id);
-        if (tenantRepository.existsById(id)) {
-            tenantRepository.deleteById(id);
-            log.info("Successfully deleted tenant with ID: {}", id);
-            return true;
-        }
-        log.warn("Tenant with ID: {} not found for deletion", id);
-        return false;
-    }
 
+        if (!tenantRepository.existsById(id)) {
+            log.warn("Tenant with ID {} not found for deletion", id);
+            return false;
+        }
+
+        tenantRepository.deleteById(id);
+        log.info("Tenant with ID {} deleted successfully", id);
+        return true;
+    }
 }

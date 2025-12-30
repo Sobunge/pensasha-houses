@@ -11,13 +11,14 @@ import {
 import BadgeIcon from "@mui/icons-material/Badge";
 import { useAuth } from "../Auth/AuthContext";
 
-// Role-specific imports
+// Role-specific components
 import TenantProfile from "./TenantProfile";
 import LandlordProfile from "./LandlordProfile";
 import CaretakerProfile from "./CaretakerProfile";
 import AdminProfile from "./AdminProfile";
-import EditProfileDialog from "./EditProfileDialog"; // optional: for profile editing
-import ChangeProfilePicDialog from "./ChangeProfilePicDialog"; // new dialog
+
+import EditProfileDialog from "./EditProfileDialog";
+import ChangeProfilePicDialog from "./ChangeProfilePicDialog";
 
 export default function UserProfilePage() {
   const { user } = useAuth();
@@ -38,13 +39,13 @@ export default function UserProfilePage() {
   const renderRoleProfile = (role) => {
     switch (role) {
       case "tenant":
-        return <TenantProfile user={user} onUpdate={() => {}} />;
+        return <TenantProfile user={user} />;
       case "landlord":
-        return <LandlordProfile user={user} onUpdate={() => {}} />;
+        return <LandlordProfile user={user} />;
       case "caretaker":
-        return <CaretakerProfile user={user} onUpdate={() => {}} />;
+        return <CaretakerProfile user={user} />;
       case "admin":
-        return <AdminProfile user={user} onUpdate={() => {}} />;
+        return <AdminProfile user={user} />;
       default:
         return null;
     }
@@ -55,7 +56,7 @@ export default function UserProfilePage() {
       sx={{
         display: "flex",
         justifyContent: "center",
-        py: 2,
+        py: 3,
         px: 2,
         bgcolor: "#f5f5f5",
       }}
@@ -69,53 +70,90 @@ export default function UserProfilePage() {
           width: "100%",
         }}
       >
-        {/* Header: Avatar + Name */}
+        {/* ================= HEADER ================= */}
         <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={3}
+          direction={{ xs: "column", md: "row" }}
+          spacing={4}
           alignItems="center"
-          mb={2}
+          justifyContent="center"
+          mb={4}
         >
-          <Box textAlign="center">
+          {/* Avatar */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             <Avatar
               sx={{
-                width: { xs: 80, sm: 100 },
-                height: { xs: 80, sm: 100 },
+                width: { xs: 90, sm: 110 },
+                height: { xs: 90, sm: 110 },
+                fontSize: { xs: 36, sm: 44 },
                 bgcolor: "#f8b500",
-                fontSize: { xs: 32, sm: 40 },
-                mx: "auto",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                border: "4px solid #fff",
+                transition: "transform 0.3s ease",
+                "&:hover": { transform: "scale(1.05)" },
               }}
             >
               {user.name?.charAt(0) || "U"}
             </Avatar>
-            {/* Change Profile Picture Link */}
+
             <Link
               component="button"
-              variant="body2"
+              variant="caption"
               onClick={() => setOpenChangePic(true)}
-              sx={{ mt: 1, display: "block", color: "#1976d2" }}
+              sx={{
+                mt: 3,
+                fontWeight: 600,
+                letterSpacing: 0.6,
+                textTransform: "uppercase",
+              }}
             >
-              Change Profile Picture
+              Change Photo
             </Link>
           </Box>
-          <Box textAlign={{ xs: "center", sm: "left" }}>
+
+          {/* Name + Role */}
+          <Box
+            textAlign={{ xs: "center", md: "left" }}
+            display="flex"
+            flexDirection="column"
+            alignItems={{ xs: "center", md: "flex-start" }}
+          >
             <Typography
               variant="h4"
-              sx={{ fontWeight: 700, wordBreak: "break-word" }}
+              sx={{
+                fontWeight: 800,
+                lineHeight: 1.2,
+                letterSpacing: -0.5,
+              }}
             >
               {user.name}
             </Typography>
+
             <Stack
               direction="row"
               alignItems="center"
-              justifyContent={{ xs: "center", sm: "flex-start" }}
               spacing={1}
-              mt={1}
+              mt={1.5}
+              sx={{
+                bgcolor: "rgba(248,181,0,0.12)",
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 2,
+              }}
             >
-              <BadgeIcon sx={{ color: "#f8b500" }} />
+              <BadgeIcon sx={{ color: "#f8b500", fontSize: 20 }} />
               <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 600, color: "text.secondary" }}
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  color: "text.secondary",
+                }}
               >
                 {user.role?.toUpperCase()}
               </Typography>
@@ -125,26 +163,23 @@ export default function UserProfilePage() {
 
         <Divider sx={{ mb: 3 }} />
 
-        {/* Role-specific content */}
+        {/* ================= ROLE CONTENT ================= */}
         {renderRoleProfile(user.role)}
 
-        {/* Edit Profile Dialog */}
+        {/* ================= DIALOGS ================= */}
         {openEditProfile && (
           <EditProfileDialog
             open={openEditProfile}
             handleClose={() => setOpenEditProfile(false)}
             user={user}
-            onSave={(data) => console.log("Save profile:", data)}
           />
         )}
 
-        {/* Change Profile Picture Dialog */}
         {openChangePic && (
           <ChangeProfilePicDialog
             open={openChangePic}
             handleClose={() => setOpenChangePic(false)}
             user={user}
-            onSave={(newPic) => console.log("Profile pic updated:", newPic)}
           />
         )}
       </Paper>

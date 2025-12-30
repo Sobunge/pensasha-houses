@@ -22,12 +22,12 @@ public class TenantController {
     private final TenantService tenantService;
 
     /**
-     * Get tenant details by ID number.
+     * Get tenant details by database ID.
      */
-    @GetMapping("/{idNumber}")
-    public ResponseEntity<TenantDTO> getTenantByIdNumber(@PathVariable String idNumber) {
-        log.info("GET /api/tenants/{}", idNumber);
-        TenantDTO tenantDTO = tenantService.getTenantByIdNumber(idNumber);
+    @GetMapping("/{id}")
+    public ResponseEntity<TenantDTO> getTenantById(@PathVariable Long id) {
+        log.info("GET /api/tenants/{}", id);
+        TenantDTO tenantDTO = tenantService.getTenantById(id);
         return ResponseEntity.ok(tenantDTO);
     }
 
@@ -37,34 +37,49 @@ public class TenantController {
     @GetMapping
     public ResponseEntity<Page<TenantDTO>> getAllTenants(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         log.info("GET /api/tenants?page={}&size={}", page, size);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
         Page<TenantDTO> tenants = tenantService.getAllTenants(pageable);
         return ResponseEntity.ok(tenants);
     }
 
     /**
-     * Update emergency contact for a tenant.
+     * Update emergency contact for a tenant by ID.
      */
-    @PatchMapping("/{idNumber}/emergency-contact")
+    @PatchMapping("/{id}/emergency-contact")
     public ResponseEntity<TenantDTO> updateEmergencyContact(
-            @PathVariable String idNumber,
-            @RequestParam String emergencyContact) {
-        log.info("PATCH /api/tenants/{}/emergency-contact", idNumber);
-        TenantDTO updatedTenant = tenantService.updateEmergencyContact(idNumber, emergencyContact);
+            @PathVariable Long id,
+            @RequestParam String emergencyContact
+    ) {
+        log.info("PATCH /api/tenants/{}/emergency-contact", id);
+
+        TenantDTO updatedTenant =
+                tenantService.updateEmergencyContact(id, emergencyContact);
+
         return ResponseEntity.ok(updatedTenant);
     }
 
     /**
-     * Update leases for a tenant.
+     * Update leases for a tenant by ID.
      */
-    @PutMapping("/{idNumber}/leases")
+    @PutMapping("/{id}/leases")
     public ResponseEntity<TenantDTO> updateLeases(
-            @PathVariable String idNumber,
-            @RequestBody List<Lease> leases) {
-        log.info("PUT /api/tenants/{}/leases", idNumber);
-        TenantDTO updatedTenant = tenantService.updateLeases(idNumber, leases);
+            @PathVariable Long id,
+            @RequestBody List<Lease> leases
+    ) {
+        log.info("PUT /api/tenants/{}/leases", id);
+
+        TenantDTO updatedTenant =
+                tenantService.updateLeases(id, leases);
+
         return ResponseEntity.ok(updatedTenant);
     }
 
@@ -72,14 +87,12 @@ public class TenantController {
      * Delete tenant by database ID.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTenant(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTenant(@PathVariable Long id) {
         log.info("DELETE /api/tenants/{}", id);
-        boolean deleted = tenantService.deleteTenant(id);
-        if (deleted) {
-            return ResponseEntity.ok("Tenant deleted successfully.");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
+        boolean deleted = tenantService.deleteTenant(id);
+        return deleted
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
 }
