@@ -1,8 +1,9 @@
 import React from "react";
-import { Grid, Paper, Typography, Box } from "@mui/material";
+import { Grid, Paper, Typography, Box, CircularProgress } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import useTenantProfile from "../../components/hooks/useTenantProfile";
 
 const cardStyle = {
   p: 2,
@@ -12,14 +13,29 @@ const cardStyle = {
   display: "flex",
   alignItems: "center",
   gap: 1.5,
+  transition: "transform 0.2s, box-shadow 0.2s",
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: 3,
+  },
 };
 
-export default function TenantProfile({ user }) {
+const iconStyle = {
+  color: "#f8b500",
+  fontSize: 32,
+};
+
+export default function TenantProfile(idNumber) {
+  const { user, loading, error } = useTenantProfile(idNumber);
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} sm={6}>
         <Paper sx={cardStyle}>
-          <EmailIcon sx={{ color: "#f8b500" }} />
+          <EmailIcon sx={iconStyle} />
           <Box>
             <Typography variant="subtitle2" color="text.secondary">
               Email
@@ -33,7 +49,7 @@ export default function TenantProfile({ user }) {
 
       <Grid item xs={12} sm={6}>
         <Paper sx={cardStyle}>
-          <PhoneIcon sx={{ color: "#f8b500" }} />
+          <PhoneIcon sx={iconStyle} />
           <Box>
             <Typography variant="subtitle2" color="text.secondary">
               Phone
@@ -47,7 +63,7 @@ export default function TenantProfile({ user }) {
 
       <Grid item xs={12} sm={6}>
         <Paper sx={cardStyle}>
-          <HomeWorkIcon sx={{ color: "#f8b500" }} />
+          <HomeWorkIcon sx={iconStyle} />
           <Box>
             <Typography variant="subtitle2" color="text.secondary">
               Assigned Property
