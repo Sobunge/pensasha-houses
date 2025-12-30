@@ -18,12 +18,14 @@ import LockIcon from "@mui/icons-material/Lock";
 import { useNotification } from "../../../components/NotificationProvider";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
-import api from "../../../api/api";
+import api, { setAccessToken } from "../../../api/api";
 
 /* ---------------- Validation ---------------- */
 const validateIdNumber = (value) => {
   if (!value) return null;
-  if (value.length < 7 || value.length > 8) return "ID Number must be 7 or 8 digits";
+  if (value.length < 7 || value.length > 8) {
+    return "ID Number must be 7 or 8 digits";
+  }
   return null;
 };
 
@@ -51,7 +53,10 @@ export default function LoginForm({ switchToSignup, onClose }) {
   /* ---------------- Handlers ---------------- */
   const handleIdChange = (e) => {
     const digitsOnly = e.target.value.replace(/\D/g, "");
-    setFormData((prev) => ({ ...prev, idNumber: digitsOnly.slice(0, 8) }));
+    setFormData((prev) => ({
+      ...prev,
+      idNumber: digitsOnly.slice(0, 8),
+    }));
   };
 
   const handleChange = (e) => {
@@ -59,7 +64,8 @@ export default function LoginForm({ switchToSignup, onClose }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleBlur = (field) => () => setTouched((prev) => ({ ...prev, [field]: true }));
+  const handleBlur = (field) => () =>
+    setTouched((prev) => ({ ...prev, [field]: true }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,22 +78,19 @@ export default function LoginForm({ switchToSignup, onClose }) {
     setLoading(true);
 
     try {
-      const response = await api.post("/auth/login", formData);
-      const { accessToken, principal } = response.data;
+      const { data } = await api.post("/auth/login", formData);
+      const { accessToken, principal } = data;
 
-      // Store token in sessionStorage
-      sessionStorage.setItem("accessToken", accessToken);
+      setAccessToken(accessToken);
 
-      // Store user in sessionStorage for refresh
       const user = {
         id: principal.id,
         idNumber: principal.username,
         role: principal.role,
         defaultRoute: principal.defaultRoute,
       };
-      sessionStorage.setItem("user", JSON.stringify(user));
 
-      // Update AuthContext
+      sessionStorage.setItem("user", JSON.stringify(user));
       loginAs(user);
 
       notify("Login successful!", "success", 3000);
@@ -96,7 +99,13 @@ export default function LoginForm({ switchToSignup, onClose }) {
       navigate(principal.defaultRoute || "/");
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message);
-      notify("Invalid credentials", "error", 3500);
+
+      const message =
+        err.response?.status === 403
+          ? "Invalid ID Number or Password"
+          : "Unable to connect. Please try again.";
+
+      notify(message, "error", 3500);
     } finally {
       setLoading(false);
     }
@@ -129,18 +138,18 @@ export default function LoginForm({ switchToSignup, onClose }) {
           onChange={handleIdChange}
           onBlur={handleBlur("idNumber")}
           required
-          size="small"
           placeholder="Enter your ID Number"
+          size="small"
           error={showIdError}
           helperText={showIdError ? idError : ""}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <BadgeOutlinedIcon color="action" />
-              </InputAdornment>
-            ),
-            inputMode: "numeric",
-            pattern: "[0-9]*",
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <BadgeOutlinedIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
 
@@ -153,25 +162,42 @@ export default function LoginForm({ switchToSignup, onClose }) {
           onChange={handleChange}
           onBlur={handleBlur("password")}
           required
+          placeholder="Enter your Password"
           size="small"
-          placeholder="Enter your password"
           error={showPasswordError}
           helperText={showPasswordError ? passwordError : ""}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Stack>
 
       <Box sx={{ width: "100%", textAlign: "right", mt: 1 }}>
-        <MuiLink href="/forgot-password" fontSize="0.85rem">
+        <MuiLink
+          href="/forgot-password"
+          sx={{
+            fontSize: "0.85rem",
+            cursor: "pointer",
+            textDecoration: "none",
+            color: "primary.main",
+            textTransform: "none",
+            verticalAlign: "baseline",
+            "&:hover": {
+              textDecoration: "underline",
+              color: "primary.dark",
+            },
+          }}
+        >
           Forgot password?
         </MuiLink>
       </Box>
+
 
       <Stack spacing={1.5} sx={{ width: "100%", mt: 2 }}>
         <Button
@@ -179,16 +205,16 @@ export default function LoginForm({ switchToSignup, onClose }) {
           type="submit"
           variant="contained"
           size="small"
-          startIcon={loading ? <CircularProgress size={20} /> : <LockOutlinedIcon />}
           sx={{
             mt: 1,
             py: 1.2,
-            bgcolor: "#f8b500",
-            color: "#111",
             fontWeight: 600,
             textTransform: "none",
-            "&:hover": { bgcolor: "#c59000" },
+            "&:hover": { bgcolor: "#f8b500", color: "#000" },
           }}
+          startIcon={
+            loading ? <CircularProgress size={20} /> : <LockOutlinedIcon />
+          }
           disabled={loading}
         >
           {loading ? "Logging in..." : "Login"}
@@ -198,10 +224,26 @@ export default function LoginForm({ switchToSignup, onClose }) {
 
         <Typography variant="body2" textAlign="center">
           Don’t have an account?{" "}
-          <MuiLink component="button" onClick={switchToSignup}>
+          <MuiLink
+            component="button"
+            onClick={switchToSignup}
+            sx={{
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: 500,
+              color: "primary.main",
+              textTransform: "none",
+              verticalAlign: "baseline", // ensures perfect alignment with text
+              "&:hover": {
+                textDecoration: "underline",
+                color: "primary.dark",
+              },
+            }}
+          >
             Sign Up
           </MuiLink>
         </Typography>
+
       </Stack>
     </Box>
   );

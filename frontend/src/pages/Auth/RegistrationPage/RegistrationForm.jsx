@@ -6,6 +6,7 @@ import {
   TextField,
   Button,
   Typography,
+  Link as MuiLink,
   MenuItem,
   Avatar,
   Divider,
@@ -221,11 +222,9 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           sx={{
             mt: 1,
             py: 1.2,
-            bgcolor: "#f8b500",
-            color: "#111",
             fontWeight: 600,
             textTransform: "none",
-            "&:hover": { bgcolor: "#c59000" },
+            "&:hover": { bgcolor: "#f8b500", color: "#000" },
           }}
         >
           {loading ? "Registering..." : "Register"}
@@ -235,10 +234,26 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
 
         <Typography variant="body2" align="center">
           Already have an account?{" "}
-          <Button onClick={switchToLogin} sx={{ p: 0, textTransform: "none" }}>
+          <MuiLink
+            component="button"
+            onClick={switchToLogin}
+            sx={{
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: 500,
+              color: "primary.main",
+              textTransform: "none",
+              verticalAlign: "baseline", // aligns with text
+              "&:hover": {
+                textDecoration: "underline",
+                color: "primary.dark",
+              },
+            }}
+          >
             Sign In
-          </Button>
+          </MuiLink>
         </Typography>
+
       </Stack>
     </Box>
   );
