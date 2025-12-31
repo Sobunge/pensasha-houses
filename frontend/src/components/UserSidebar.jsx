@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+// src/components/UserSidebar.jsx
+import React from "react";
 import {
   Box,
   Drawer,
@@ -19,36 +20,11 @@ import {
 } from "../config/menuItems";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
-
-const drawerWidth = 280;
-
-// Inject global SimpleBar scrollbar color
-const injectScrollbarStyle = () => {
-  const style = document.createElement("style");
-  style.innerHTML = `
-    .simplebar-scrollbar::before {
-      background-color: #f8b500 !important;
-    }
-    .simplebar-track.simplebar-vertical {
-      background: rgba(255, 255, 255, 0.08) !important;
-      width: 8px !important;
-      border-radius: 4px;
-    }
-    .simplebar-scrollbar {
-      border-radius: 4px !important;
-    }
-  `;
-  document.head.appendChild(style);
-};
+import { DRAWER_WIDTH } from "../layouts/constants";
 
 function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    injectScrollbarStyle();
-  }, []);
 
   const menuItems =
     user?.role === "tenant"
@@ -64,14 +40,14 @@ function UserSidebar({ mobileOpen, onClose }) {
   const drawerContent = (
     <Box
       sx={{
-        minHeight: "80%",
+        height: "100%",
         bgcolor: "#111",
         color: "#fff",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* Logo */}
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -79,6 +55,7 @@ function UserSidebar({ mobileOpen, onClose }) {
           justifyContent: "center",
           gap: 1,
           p: 2,
+          flexShrink: 0,
         }}
       >
         <Box
@@ -87,74 +64,74 @@ function UserSidebar({ mobileOpen, onClose }) {
           alt="Pensasha Logo"
           sx={{ height: 30 }}
         />
-        <Typography variant="h6" sx={{ fontWeight: 600, color: "#fff" }}>
+        <Typography variant="h6" fontWeight={600}>
           Pensasha Houses
         </Typography>
       </Box>
 
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
-      {/* Scrollable Menu */}
-      <SimpleBar
-        scrollableNodeProps={{ ref: scrollRef }}
-        style={{ maxHeight: "calc(100vh - 130px)" }}
-        autoHide={true}
-      >
-        <List sx={{ flexGrow: 1, p: 1 }}>
-          {menuItems.map((item) => {
-            const basePath = `/${user?.role}`;
-            const isActive =
-              location.pathname === item.link ||
-              (location.pathname.startsWith(item.link + "/") &&
-                item.link !== basePath);
+      {/* Scrollable Menu (flex-based, no magic numbers) */}
+      <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+        <SimpleBar style={{ height: "100%" }} autoHide>
+          <List sx={{ p: 1 }}>
+            {menuItems.map((item) => {
+              const basePath = `/${user?.role}`;
+              const isActive =
+                location.pathname === item.link ||
+                (location.pathname.startsWith(item.link + "/") &&
+                  item.link !== basePath);
 
-            return (
-              <ListItemButton
-                key={item.label}
-                component={Link}
-                to={item.link}
-                onClick={onClose}
-                sx={{
-                  borderRadius: 1,
-                  color: isActive ? "#f8b500" : "#ddd",
-                  backgroundColor: isActive ? "#222" : "transparent",
-                  transition: "all 0.2s ease-in-out",
-                  "&:hover": {
-                    backgroundColor: "#222",
-                    color: "#f8b500",
-                    "& .MuiListItemIcon-root": { color: "#f8b500" },
-                  },
-                }}
-              >
-                <ListItemIcon
+              return (
+                <ListItemButton
+                  key={item.label}
+                  component={Link}
+                  to={item.link}
+                  onClick={onClose}
                   sx={{
-                    minWidth: 40,
-                    color: isActive ? "#f8b500" : "#aaa",
+                    borderRadius: 1,
+                    color: isActive ? "#f8b500" : "#ddd",
+                    backgroundColor: isActive ? "#222" : "transparent",
+                    transition: "all 0.2s ease-in-out",
+                    "&:hover": {
+                      backgroundColor: "#222",
+                      color: "#f8b500",
+                      "& .MuiListItemIcon-root": {
+                        color: "#f8b500",
+                      },
+                    },
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    fontWeight: isActive ? 600 : 500,
-                    fontSize: "0.875rem",
-                  }}
-                />
-              </ListItemButton>
-            );
-          })}
-        </List>
-      </SimpleBar>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 40,
+                      color: isActive ? "#f8b500" : "#aaa",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontWeight: isActive ? 600 : 500,
+                      fontSize: "0.875rem",
+                    }}
+                  />
+                </ListItemButton>
+              );
+            })}
+          </List>
+        </SimpleBar>
+      </Box>
 
       {/* Footer */}
       <Box
         sx={{
-          mt: "auto",
           p: 2,
           textAlign: "center",
           fontSize: "0.8rem",
           color: "rgba(255,255,255,0.6)",
+          flexShrink: 0,
         }}
       >
         © {new Date().getFullYear()} Pensasha Houses
@@ -165,7 +142,10 @@ function UserSidebar({ mobileOpen, onClose }) {
   return (
     <Box
       component="nav"
-      sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+      sx={{
+        width: { md: DRAWER_WIDTH },
+        flexShrink: { md: 0 },
+      }}
     >
       {/* Mobile Drawer */}
       <Drawer
@@ -176,8 +156,7 @@ function UserSidebar({ mobileOpen, onClose }) {
         sx={{
           display: { xs: "block", md: "none" },
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
+            width: DRAWER_WIDTH,
             bgcolor: "#111",
             borderRight: "1px solid rgba(255,255,255,0.1)",
           },
@@ -193,8 +172,7 @@ function UserSidebar({ mobileOpen, onClose }) {
         sx={{
           display: { xs: "none", md: "block" },
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
+            width: DRAWER_WIDTH,
             bgcolor: "#111",
             borderRight: "1px solid rgba(255,255,255,0.1)",
           },

@@ -1,3 +1,4 @@
+// src/pages/Tenant/TenantDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Card, Button, Avatar, CircularProgress } from "@mui/material";
@@ -63,7 +64,7 @@ function TenantDashboard() {
   const visibleUnits = tenantUnits.slice(0, 2);
 
   return (
-    <Box sx={{ flexGrow: 1, bgcolor: "#f7f7f7", minHeight: "100vh", p: 3 }}>
+    <Box sx={{ flexGrow: 1, width: "100%", bgcolor: "#f7f7f7", p: { xs: 2, md: 3 } }}>
       {/* Hero Card */}
       <Card sx={{ mb: 4, p: 3, borderRadius: 3, boxShadow: 2 }}>
         <Box
@@ -203,14 +204,31 @@ const Section = ({ title, children }) => (
     >
       {title}
     </Typography>
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: { xs: "center", md: "center", lg: "flex-start" } }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 3,
+        justifyContent: { xs: "center", md: "center", lg: "flex-start" },
+      }}
+    >
       {children}
     </Box>
   </Box>
 );
 
 const EmptyState = ({ message, ctaText, ctaIcon, onClick }) => (
-  <Box sx={{ width: "100%", textAlign: "center", mt: 1, p: 3, borderRadius: 3, bgcolor: "#ffffff", border: "1px dashed #ffc62c" }}>
+  <Box
+    sx={{
+      width: "100%",
+      textAlign: "center",
+      mt: 1,
+      p: 3,
+      borderRadius: 3,
+      bgcolor: "#ffffff",
+      border: "1px dashed #ffc62c",
+    }}
+  >
     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#2a2a2a", mb: 1 }}>
       No Rental Unit Assigned
     </Typography>
@@ -222,7 +240,16 @@ const EmptyState = ({ message, ctaText, ctaIcon, onClick }) => (
       size="medium"
       startIcon={ctaIcon}
       onClick={onClick}
-      sx={{ bgcolor: "#f8b500", color: "#111", fontWeight: 600, textTransform: "none", borderRadius: 3, px: 4, "&:hover": { bgcolor: "#ffc62c" }, mx: { xs: "auto", md: "auto", lg: 0 } }}
+      sx={{
+        bgcolor: "#f8b500",
+        color: "#111",
+        fontWeight: 600,
+        textTransform: "none",
+        borderRadius: 3,
+        px: 4,
+        "&:hover": { bgcolor: "#ffc62c" },
+        mx: { xs: "auto", md: "auto", lg: 0 },
+      }}
     >
       {ctaText}
     </Button>

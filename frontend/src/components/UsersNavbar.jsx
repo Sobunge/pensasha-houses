@@ -15,103 +15,86 @@ import MailIcon from "@mui/icons-material/Mail";
 import ProfileMenu from "../layouts/ProfileMenu";
 import ActivityFeedCard from "./cards/ActivityFeedCard";
 import MessagesCard from "./cards/MessagesCard";
+import { DRAWER_WIDTH, NAVBAR_HEIGHT } from "../layouts/constants";
 
-// Sample messages (replace with backend data)
 const sampleMessages = [
   { id: 1, sender: "Alice", lastMessage: "Hi there!", unread: true },
   { id: 2, sender: "Bob", lastMessage: "Please review the payment.", unread: false },
   { id: 3, sender: "Charlie", lastMessage: "Maintenance request approved.", unread: true },
-  { id: 4, sender: "David", lastMessage: "Can we schedule a visit?", unread: false },
 ];
 
 function UsersNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
   const [anchorElMessages, setAnchorElMessages] = useState(null);
 
-  // Notifications popover
-  const handleOpenNotifications = (event) => setAnchorElNotifications(event.currentTarget);
-  const handleCloseNotifications = () => setAnchorElNotifications(null);
-
-  // Messages popover
-  const handleOpenMessages = (event) => setAnchorElMessages(event.currentTarget);
-  const handleCloseMessages = () => setAnchorElMessages(null);
-
   return (
     <AppBar
       position="fixed"
       sx={{
+        height: NAVBAR_HEIGHT,
+        ml: { md: `${DRAWER_WIDTH}px` },
+        width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
         backgroundColor: "#fff",
         color: "#111",
-        boxShadow: 2,
         borderBottom: "1px solid #eee",
+        justifyContent: "center",
       }}
     >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Sidebar Menu (mobile) */}
+      <Toolbar sx={{ minHeight: NAVBAR_HEIGHT, px: { xs: 1, md: 3 } }}>
+        {/* Mobile logo */}
+        <Box
+          component="img"
+          src="/assets/images/logo.svg"
+          alt="Pensasha Logo"
+          sx={{
+            display: { xs: "block", md: "none" }, // only on mobile
+            height: 32,
+            mr: 2, // spacing to menu button
+          }}
+        />
+
+        {/* Mobile menu button */}
         <IconButton
           edge="start"
-          color="inherit"
-          aria-label="menu"
           onClick={onMenuClick}
           sx={{ display: { md: "none" } }}
         >
           <MenuIcon />
         </IconButton>
 
-        {/* Logo (mobile centered) */}
+        {/* Desktop text only */}
         <Box
           sx={{
-            display: { xs: "flex", md: "none" },
-            flexGrow: 1,
-            justifyContent: "center",
+            display: { xs: "none", md: "flex" },
+            alignItems: "center",
+            gap: 1,
           }}
         >
-          <Box
-            component="img"
-            src="/assets/images/logo.svg"
-            alt="Pensasha Logo"
-            sx={{ height: 32 }}
-          />
-        </Box>
-
-        {/* Logo + Dashboard Title (desktop) */}
-        <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
-          <Box
-            component="img"
-            src="/assets/images/logo.svg"
-            alt="Pensasha Logo"
-            sx={{ height: 32 }}
-          />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111", pl: 30 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
             My Dashboard
           </Typography>
         </Box>
 
-        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "block" } }} />
+        <Box sx={{ flexGrow: 1 }} />
 
-        {/* ===== Messages Dropdown ===== */}
-        <IconButton color="inherit" onClick={handleOpenMessages}>
-          <Badge
-            badgeContent={sampleMessages.filter((m) => m.unread).length}
-            color="warning"
-          >
+        {/* Messages */}
+        <IconButton onClick={(e) => setAnchorElMessages(e.currentTarget)}>
+          <Badge badgeContent={2} color="warning">
             <MailIcon />
           </Badge>
         </IconButton>
         <Popover
           open={Boolean(anchorElMessages)}
           anchorEl={anchorElMessages}
-          onClose={handleCloseMessages}
+          onClose={() => setAnchorElMessages(null)}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
-          PaperProps={{ sx: { mt: 1.5, borderRadius: 3, boxShadow: 4, width: 320 } }}
         >
-          {/* ✅ Pass onClose so MessagesCard can close popover */}
-          <MessagesCard messages={sampleMessages} compact onClose={handleCloseMessages} />
+          <MessagesCard messages={sampleMessages} compact />
         </Popover>
 
-        {/* ===== Notifications Dropdown ===== */}
-        <IconButton color="inherit" onClick={handleOpenNotifications}>
+        {/* Notifications */}
+        <IconButton onClick={(e) => setAnchorElNotifications(e.currentTarget)}>
           <Badge badgeContent={3} color="error">
             <NotificationsIcon />
           </Badge>
@@ -119,13 +102,11 @@ function UsersNavbar({ onMenuClick }) {
         <Popover
           open={Boolean(anchorElNotifications)}
           anchorEl={anchorElNotifications}
-          onClose={handleCloseNotifications}
+          onClose={() => setAnchorElNotifications(null)}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
-          PaperProps={{ sx: { mt: 1.5, borderRadius: 3, boxShadow: 4, width: 320 } }}
         >
-          {/* ✅ Pass onClose so ActivityFeedCard can close popover */}
-          <ActivityFeedCard compact onClose={handleCloseNotifications} />
+          <ActivityFeedCard compact />
         </Popover>
 
         {/* Profile Menu */}

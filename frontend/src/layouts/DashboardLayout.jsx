@@ -1,10 +1,12 @@
+// src/layouts/DashboardLayout.jsx
 import React, { useState } from "react";
-import { Box, Toolbar } from "@mui/material";
+import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import UsersNavbar from "../components/UsersNavbar";
 import UserSidebar from "../components/UserSidebar";
 import UserFooter from "../components/UserFooter";
 import { useAuth } from "../pages/Auth/AuthContext";
+import { NAVBAR_HEIGHT } from "../layouts/constants";
 
 function DashboardLayout() {
   const { user } = useAuth();
@@ -15,45 +17,38 @@ function DashboardLayout() {
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* Sidebar */}
-      <UserSidebar
-        mobileOpen={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-      />
+      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-      {/* Main Content */}
+      {/* Main Column */}
       <Box
         sx={{
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
+          minHeight: 0, // needed for flex overflow
           bgcolor: "#f7f7f7",
-          minHeight: "100vh",
-          position: "relative",
         }}
       >
         {/* Navbar */}
         <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
 
-        {/* Page content */}
+        {/* Scrollable main content */}
         <Box
           component="main"
           sx={{
             flexGrow: 1,
-            p: { xs: 2, md: 3 },
-            pb: "60px", // space for fixed footer
+            mt: `${NAVBAR_HEIGHT}px`,
             overflowY: "auto",
-            scrollbarWidth: "none", // hides scrollbar in Firefox
-            msOverflowStyle: "none", // hides scrollbar in IE/Edge
-            "&::-webkit-scrollbar": {
-              display: "none", // hides scrollbar in Chrome/Safari
-            },
+            minHeight: 0,
+            p: { xs: 2, md: 3 },
           }}
         >
-          <Toolbar /> {/* Spacer for fixed Navbar */}
-          <Outlet />
+          <Box sx={{ maxWidth: 1200, mx: "auto", width: "100%" }}>
+            <Outlet />
+          </Box>
         </Box>
 
-        {/* Sticky Footer */}
+        {/* Footer */}
         <UserFooter />
       </Box>
     </Box>
