@@ -14,15 +14,27 @@ import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import SidebarFilter from "./SidebarFilter";
 import PropertyGrid from "./PropertyGrid";
 
+/**
+ * Layout constants
+ * Keep these aligned with your Navbar and Hero
+ */
+const NAVBAR_HEIGHT = {
+  mobile: 56,
+  desktop: 64,
+};
+
 const ListingsPage = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({});
 
   const isTabletOrMobile = useMediaQuery("(max-width:1224px)");
+
   const toggleDrawer = (open) => () => setDrawerOpen(open);
 
-  // Example properties
+  /**
+   * Mock properties (replace with API later)
+   */
   const properties = Array.from({ length: 20 }, (_, i) => ({
     id: i + 1,
     title: `Property ${i + 1}`,
@@ -32,62 +44,86 @@ const ListingsPage = () => {
     beds: (i % 4) + 1,
     baths: (i % 3) + 1,
     size: 50 + i * 10,
-    image: `/assets/images/house.jpg`,
+    image: "/assets/images/house.jpg",
     category: "Residential",
   }));
 
-  // Filtered properties
+  /**
+   * Filtering logic
+   */
   const filteredProperties = useMemo(() => {
     return properties.filter((property) => {
       if (filters.category && property.category !== filters.category) return false;
       if (filters.type && property.type !== filters.type) return false;
-      if (filters.location && !property.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+      if (
+        filters.location &&
+        !property.location.toLowerCase().includes(filters.location.toLowerCase())
+      )
+        return false;
       if (filters.bedrooms && property.beds < filters.bedrooms) return false;
       if (filters.bathrooms && property.baths < filters.bathrooms) return false;
+
       if (filters.priceRange) {
         const [min, max] = filters.priceRange;
         if (property.price < min || property.price > max) return false;
       }
+
       if (filters.sizeRange) {
         const [min, max] = filters.sizeRange;
         if (property.size < min || property.size > max) return false;
       }
+
       return true;
     });
   }, [filters, properties]);
 
-  // Pagination
+  /**
+   * Pagination
+   */
   const propertiesPerPage = 12;
   const totalPages = Math.ceil(filteredProperties.length / propertiesPerPage);
+
   const displayedProperties = filteredProperties.slice(
     (page - 1) * propertiesPerPage,
     page * propertiesPerPage
   );
 
-  const handlePageChange = (event, value) => setPage(value);
+  const handlePageChange = (_, value) => setPage(value);
 
-  // Handle filter change and reset to page 1
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     setPage(1);
   };
 
   return (
-    <Box sx={{ mt: { xs: 9, md: 10 }, px: { xs: 2, md: 4 }, pb: 4, bgcolor: "#f5f5f5", minHeight: "100vh" }}>
-      {/* Header */}
+    <Box
+      sx={{
+        mt: {
+          xs: `${NAVBAR_HEIGHT.mobile}px`,
+          md: `${NAVBAR_HEIGHT.desktop}px`,
+        },
+        px: { xs: 2, md: 4 },
+        p: 4,
+        bgcolor: "#f5f5f5",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Page header */}
       <Box sx={{ textAlign: "center", mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: "#333" }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
           Explore Available Listings
         </Typography>
-        <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Find your next home — browse apartments, villas, and studios across Kenya.
         </Typography>
-        <Divider sx={{ width: 80, mx: "auto", mb: 2, borderColor: "#ffc62c" }} />
+        <Divider
+          sx={{ width: 80, mx: "auto", borderColor: "#ffc62c" }}
+        />
       </Box>
 
-      {/* Drawer button (mobile/tablet) */}
+      {/* Mobile filter button */}
       {isTabletOrMobile && (
-        <Box sx={{ mb: 2, textAlign: "center" }}>
+        <Box sx={{ textAlign: "center", mb: 2 }}>
           <Button
             variant="contained"
             startIcon={<FilterAltOutlinedIcon />}
@@ -100,7 +136,9 @@ const ListingsPage = () => {
               textTransform: "none",
               px: 2,
               py: 0.8,
-              "&:hover": { background: "linear-gradient(45deg, #ffc62c, #f8b500)", transform: "scale(1.05)" },
+              "&:hover": {
+                background: "linear-gradient(45deg, #ffc62c, #f8b500)",
+              },
             }}
           >
             Show Filters
@@ -108,33 +146,52 @@ const ListingsPage = () => {
         </Box>
       )}
 
-      {/* Main layout */}
-      <Box sx={{ display: { xs: "block", md: "flex" }, alignItems: "flex-start", gap: 3 }}>
-        {/* Desktop sidebar */}
+      {/* Main content */}
+      <Box
+        sx={{
+          display: { xs: "block", md: "flex" },
+          alignItems: "flex-start",
+          gap: 3,
+        }}
+      >
+        {/* Sidebar (desktop) */}
         {!isTabletOrMobile && (
-          <Box sx={{ flex: "0 0 300px", position: "sticky", top: 120 }}>
+          <Box
+            sx={{
+              flex: "0 0 300px",
+              position: "sticky",
+              top: {
+                xs: NAVBAR_HEIGHT.mobile + 16,
+                md: NAVBAR_HEIGHT.desktop + 16,
+              },
+            }}
+          >
             <SidebarFilter onFilter={handleFilterChange} />
           </Box>
         )}
 
-        {/* Property grid */}
+        {/* Listings */}
         <Box sx={{ flex: 1 }}>
           <PropertyGrid properties={displayedProperties} />
 
-          {/* Pagination */}
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <Pagination
               count={totalPages}
               page={page}
               onChange={handlePageChange}
               color="primary"
-              sx={{ "& .MuiPaginationItem-root": { fontWeight: 600, borderRadius: "50%" } }}
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  fontWeight: 600,
+                  borderRadius: "50%",
+                },
+              }}
             />
           </Box>
         </Box>
       </Box>
 
-      {/* Drawer for mobile/tablet */}
+      {/* Filter drawer (mobile) */}
       {isTabletOrMobile && (
         <Drawer
           anchor="left"
@@ -142,16 +199,27 @@ const ListingsPage = () => {
           onClose={toggleDrawer(false)}
           ModalProps={{ keepMounted: true }}
           PaperProps={{
-            sx: { width: "80vw", maxWidth: 350, bgcolor: "#fff", height: "100vh", boxShadow: "0 2px 10px rgba(0,0,0,0.2)" },
+            sx: {
+              width: "80vw",
+              maxWidth: 350,
+              height: "100vh",
+            },
           }}
         >
           <Box sx={{ position: "relative", height: "100%" }}>
-            <IconButton onClick={toggleDrawer(false)} sx={{ position: "absolute", top: 8, right: 8 }} size="small">
+            <IconButton
+              onClick={toggleDrawer(false)}
+              sx={{ position: "absolute", top: 8, right: 8 }}
+              size="small"
+            >
               <CloseIcon />
             </IconButton>
-            <Box sx={{ mt: 6, pl: 3, pr: 2 }}>
-              {/* Pass onCloseDrawer so SidebarFilter can close drawer on Apply */}
-              <SidebarFilter onFilter={handleFilterChange} onCloseDrawer={() => setDrawerOpen(false)} />
+
+            <Box sx={{ mt: 6, px: 2 }}>
+              <SidebarFilter
+                onFilter={handleFilterChange}
+                onCloseDrawer={() => setDrawerOpen(false)}
+              />
             </Box>
           </Box>
         </Drawer>
