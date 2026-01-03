@@ -72,7 +72,7 @@ function UserSidebar({ mobileOpen, onClose }) {
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
       {/* Scrollable Menu (flex-based, no magic numbers) */}
-      <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+      <Box sx={{ flexGrow: 1, pt: 2, overflow: "hidden" }}>
         <SimpleBar style={{ height: "100%" }} autoHide>
           <List sx={{ p: 1 }}>
             {menuItems.map((item) => {
