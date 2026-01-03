@@ -10,57 +10,65 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
+    private final UserCredentials credentials;
 
-    public CustomUserDetails(User user) {
-        this.user = user;
+    public CustomUserDetails(UserCredentials credentials) {
+        this.credentials = credentials;
     }
 
-    // Domain-specific method
-    public Role getPrimaryRole() {
-        return user.getRole();
+    /* ===================== DOMAIN ACCESS ===================== */
+
+    public User getUser() {
+        return credentials.getUser();
     }
 
-    // UserDetails methods
+    /* ===================== AUTHORITIES ===================== */
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        // Role inferred by inheritance, not enums
+        String role = credentials.getUser()
+                                 .getClass()
+                                 .getSimpleName()
+                                 .toUpperCase();
+
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+    }
+
+    /* ===================== AUTH ===================== */
+
+    @Override
+    public String getUsername() {
+        // Login identifier
+        return credentials.getUser().getIdNumber();
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return credentials.getPassword();
     }
 
-    @Override
-    public String getUsername() {
-        return user.getIdNumber();  // login identifier
-    }
+    /* ===================== ACCOUNT STATE ===================== */
 
     @Override
     public boolean isAccountNonExpired() {
-        return user.getAccountExpirationDate() == null ||
-               user.getAccountExpirationDate().isAfter(LocalDateTime.now());
+        return credentials.getAccountExpirationDate() == null ||
+               credentials.getAccountExpirationDate().isAfter(LocalDateTime.now());
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return !user.isLocked();
+        return !credentials.isLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return user.getPasswordExpirationDate() == null ||
-               user.getPasswordExpirationDate().isAfter(LocalDateTime.now());
+        return credentials.getPasswordExpirationDate() == null ||
+               credentials.getPasswordExpirationDate().isAfter(LocalDateTime.now());
     }
 
     @Override
     public boolean isEnabled() {
-        return user.isEnabled();
-    }
-
-    // Optional getter for User entity
-    public User getUser() {
-        return user;
+        return credentials.isEnabled();
     }
 }
