@@ -1,67 +1,59 @@
 package com.pensasha.backend.modules.user;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * Base entity representing a User.
- * Subclasses include Tenant, LandLord, and Caretaker.
- * Inheritance strategy is JOINED: each subclass has its own table.
+ * Base entity representing a system user.
+ * This class holds identity and profile-related data only.
+ *
+ * Authentication, authorization, and credentials should be handled
+ * in a separate entity (e.g. UserCredentials).
+ *
+ * Subclasses include Tenant, Landlord, and Caretaker.
  */
 @Entity
-@Table(name = "users",
-       uniqueConstraints = {
-           @UniqueConstraint(columnNames = "idNumber"),
-           @UniqueConstraint(columnNames = "phoneNumber") // optional, can allow null
-       })
-@Data
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "id_number"),
+        @UniqueConstraint(columnNames = "phone_number")
+    }
+)
+@Inheritance(strategy = InheritanceType.JOINED)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-public class User {
+public abstract class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Required for registration
-    @Column(nullable = false)
-    private String firstName = "";
+    /* ===================== IDENTITY ===================== */
 
-    private String secondName = "";
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
 
-    @Column(nullable = false)
-    private String thirdName = "";
+    @Column(name = "middle_name", length = 50)
+    private String middleName;
 
-    @Column(unique = true, nullable = false)
-    private String idNumber = "";
+    @Column(name = "last_name", nullable = false, length = 50)
+    private String lastName;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private String password;
+    @Column(name = "id_number", nullable = false, unique = true, length = 30)
+    private String idNumber;
 
-    @Column(unique = true, nullable = true)
+    @Column(name = "phone_number", unique = true, length = 20)
     private String phoneNumber;
 
-    private String profilePicture = "";
+    /* ===================== PROFILE ===================== */
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.TENANT;
-
-    @Column(nullable = false)
-    private boolean enabled = true;
-
-    private boolean locked = false;
-
-    private LocalDateTime accountExpirationDate;
-
-    private LocalDateTime passwordExpirationDate;
+    @Column(name = "profile_picture")
+    private String profilePicture;
 
 }
