@@ -30,12 +30,12 @@ function UserSidebar({ mobileOpen, onClose }) {
     user?.role === "tenant"
       ? tenantMenuItems
       : user?.role === "landlord"
-      ? landlordMenuItems
-      : user?.role === "caretaker"
-      ? caretakerMenuItems
-      : user?.role === "admin"
-      ? adminMenuItems
-      : [];
+        ? landlordMenuItems
+        : user?.role === "caretaker"
+          ? caretakerMenuItems
+          : user?.role === "admin"
+            ? adminMenuItems
+            : [];
 
   const drawerContent = (
     <Box
@@ -123,6 +123,8 @@ function UserSidebar({ mobileOpen, onClose }) {
           </List>
         </SimpleBar>
       </Box>
+
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
       {/* Footer */}
       <Box
