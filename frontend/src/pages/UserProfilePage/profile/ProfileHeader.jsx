@@ -7,12 +7,17 @@ export default function ProfileHeader({ user, onChangePic }) {
     <Stack
       direction={{ xs: "column", md: "row" }}
       spacing={4}
-      alignItems="center"
-      justifyContent="center"
-      mb={4}
+      alignItems={{ xs: "center", md: "flex-start" }}
+      justifyContent={{ xs: "center", md: "flex-start" }}
     >
       {/* Avatar */}
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <Avatar
           sx={{
             width: { xs: 90, sm: 110 },
@@ -32,7 +37,12 @@ export default function ProfileHeader({ user, onChangePic }) {
           component="button"
           variant="caption"
           onClick={onChangePic}
-          sx={{ mt: 3, fontWeight: 600, letterSpacing: 0.6, textTransform: "uppercase" }}
+          sx={{
+            mt: 2,
+            fontWeight: 600,
+            letterSpacing: 0.6,
+            textTransform: "uppercase",
+          }}
         >
           Change Photo
         </Link>
@@ -40,12 +50,17 @@ export default function ProfileHeader({ user, onChangePic }) {
 
       {/* Name + Role */}
       <Box
-        textAlign={{ xs: "center", md: "left" }}
-        display="flex"
-        flexDirection="column"
-        alignItems={{ xs: "center", md: "flex-start" }}
+        sx={{
+          textAlign: { xs: "center", md: "left" },
+          display: "flex",
+          flexDirection: "column",
+          alignItems: { xs: "center", md: "flex-start" },
+        }}
       >
-        <Typography variant="h4" sx={{ fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.5 }}>
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.5 }}
+        >
           {user.name}
         </Typography>
 
@@ -54,10 +69,22 @@ export default function ProfileHeader({ user, onChangePic }) {
           alignItems="center"
           spacing={1}
           mt={1.5}
-          sx={{ bgcolor: "rgba(248,181,0,0.12)", px: 1.5, py: 0.5, borderRadius: 2 }}
+          sx={{
+            bgcolor: "rgba(248,181,0,0.12)",
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 2,
+          }}
         >
           <BadgeIcon sx={{ color: "#f8b500", fontSize: 20 }} />
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, letterSpacing: 0.8, color: "text.secondary" }}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: 700,
+              letterSpacing: 0.8,
+              color: "text.secondary",
+            }}
+          >
             {user.role?.toUpperCase()}
           </Typography>
         </Stack>
