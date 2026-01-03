@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Divider, Grid } from "@mui/material";
+import { Box, Typography, Stack } from "@mui/material";
 
 export default function ProfileInfo({ user }) {
   const infoData = [
@@ -9,23 +9,21 @@ export default function ProfileInfo({ user }) {
   ];
 
   return (
-    <Box>
-      <Typography variant="h6" fontWeight={600} mb={2}>
-        Personal Information
-      </Typography>
-      <Divider sx={{ mb: 2 }} />
-      <Grid container spacing={2}>
-        {infoData.map((item) => (
-          <Grid item xs={12} sm={6} key={item.label}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {item.label}
-            </Typography>
-            <Typography variant="body1" fontWeight={500}>
-              {item.value}
-            </Typography>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+    <Stack spacing={3}>
+      {infoData.map((item) => (
+        <Box key={item.label}>
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ mb: 0.5 }}
+          >
+            {item.label}
+          </Typography>
+          <Typography variant="body1" fontWeight={500}>
+            {item.value}
+          </Typography>
+        </Box>
+      ))}
+    </Stack>
   );
 }
