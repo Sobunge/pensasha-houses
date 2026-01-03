@@ -16,17 +16,7 @@ public interface TenantMapper {
 
     // TenantDTO -> Tenant
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "enabled", ignore = true)
-    @Mapping(target = "locked", ignore = true)
-    @Mapping(target = "accountExpirationDate", ignore = true)
-    @Mapping(target = "passwordExpirationDate", ignore = true)
     @Mapping(target = "leases", ignore = true)
-    @Mapping(target = "firstName", ignore = true)
-    @Mapping(target = "secondName", ignore = true)
-    @Mapping(target = "thirdName", ignore = true)
-    @Mapping(target = "phoneNumber", ignore = true)
-    @Mapping(target = "profilePicture", ignore = true)
     Tenant toEntity(TenantDTO tenantDTO);
 
     // Tenant -> TenantDTO

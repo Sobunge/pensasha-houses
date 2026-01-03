@@ -1,42 +1,45 @@
 package com.pensasha.backend.modules.user.dto;
 
-import org.springframework.validation.annotation.Validated;  // Importing annotation for validation support in Spring
+import org.springframework.validation.annotation.Validated;
 
-import jakarta.persistence.Column;  // Importing column annotation from Jakarta Persistence
-import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;  // Importing Lombok annotations for generating boilerplate code
+import lombok.NoArgsConstructor;
 
-// DTO class for updating user details, with validation constraints
-@Data  // Lombok annotation to generate getters, setters, toString, equals, and hashCode methods
-@NoArgsConstructor  // Lombok annotation to generate a no-argument constructor
-@AllArgsConstructor  // Lombok annotation to generate an all-arguments constructor
-@Validated  // Spring annotation to trigger validation during method execution
+/**
+ * DTO for updating user profile information.
+ * Includes validation rules for each field to ensure data integrity.
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Validated
 public class UpdateUserDTO {
 
-    // First name field: must not be blank and must be between 3 and 20 characters
-    @NotBlank(message = "First name is required")  // Ensures that the first name is not blank
-    @Size(min = 3, max = 20, message = "First name must be between 3 and 20 characters")  // Ensures the first name is between 3 and 20 characters
+    /** First name: required, 3-20 characters */
+    @NotBlank(message = "First name is required")
+    @Size(min = 3, max = 20, message = "First name must be between 3 and 20 characters")
     private String firstName;
 
-    // Second name field: optional, no validation required
-    private String secondName;
+    /** Middle name: optional */
+    private String middleName;
 
-    // Third name field: must not be blank and must be between 3 and 20 characters
-    @NotBlank(message = "Third name is required")  // Ensures that the third name is not blank
-    @Size(min = 3, max = 20, message = "Third name must be between 3 and 20 characters")  // Ensures the third name is between 3 and 20 characters
-    private String thirdName;
+    /** Last name: required, 3-20 characters */
+    @NotBlank(message = "Last name is required")
+    @Size(min = 3, max = 20, message = "Last name must be between 3 and 20 characters")
+    private String lastName;
 
-    // National ID field: must not be blank and must match the pattern for 7-8 digit numbers
-    @NotBlank(message = "National ID is required")  // Ensures that the national ID is not blank
-    @Pattern(regexp = "^[0-9]{7,8}$", message = "National ID must be 7-8 digits")  // Ensures the national ID is a 7-8 digit number
+    /** National ID: required, 7-8 digits */
+    @NotBlank(message = "National ID is required")
+    @Pattern(regexp = "^[0-9]{7,8}$", message = "National ID must be 7-8 digits")
     private String idNumber;
 
-    // Phone number field: must not be blank, must match the pattern for Kenyan phone numbers
-    @NotBlank(message = "Phone number is required")  // Ensures that the phone number is not blank
-    @Pattern(regexp = "^(?:\\+254|0)[17][0-9]{8}$", message = "Phone number must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)")  // Ensures the phone number matches the Kenyan phone number format
-    @Column(unique = true, nullable = false)  // Ensures that the phone number is unique and cannot be null in the database
+    /** Phone number: required, Kenyan format */
+    @NotBlank(message = "Phone number is required")
+    @Pattern(
+        regexp = "^(?:\\+254|0)[17][0-9]{8}$",
+        message = "Phone number must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)"
+    )
     private String phoneNumber;
-
 }

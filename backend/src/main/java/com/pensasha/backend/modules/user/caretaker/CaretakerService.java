@@ -3,7 +3,8 @@ package com.pensasha.backend.modules.user.caretaker;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.property.PropertyRepository;
-import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
+import com.pensasha.backend.modules.user.caretaker.dto.CreateCaretakerDTO;
+import com.pensasha.backend.modules.user.caretaker.dto.GetCaretakerDTO;
 import com.pensasha.backend.modules.user.caretaker.mapper.CaretakerMapper;
 
 import lombok.AllArgsConstructor;
@@ -14,99 +15,95 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j // Lombok annotation for logging
+@Slf4j
 @AllArgsConstructor
 @Service
 public class CaretakerService {
 
     private final CaretakerRepository caretakerRepository;
     private final PropertyRepository propertyRepository;
-    private final CaretakerMapper careTakerMapper;
+    private final CaretakerMapper caretakerMapper;
 
     /**
-     * Update a caretaker's assigned property.
-     * This method fetches a caretaker and a property by their IDs,
-     * assigns the property to the caretaker, and saves the caretaker.
-     * 
-     * @param caretakerId The ID of the caretaker to update.
-     * @param propertyId  The ID of the property to assign.
-     * @return The updated CareTakerDTO.
+     * Create a new caretaker from a CreateCaretakerDTO.
+     *
+     * @param dto The DTO containing caretaker info
+     * @return The saved caretaker as GetCaretakerDTO
      */
-    public CaretakerDTO updateAssignedProperty(Long caretakerId, Long propertyId) {
-        // Fetch the caretaker by ID
+    public GetCaretakerDTO createCaretaker(CreateCaretakerDTO dto) {
+        Caretaker caretaker = caretakerMapper.toEntity(dto);
+
+        // Save caretaker
+        caretakerRepository.save(caretaker);
+        log.info("Created new caretaker with ID {}", caretaker.getId());
+
+        return caretakerMapper.toGetDTO(caretaker);
+    }
+
+    /**
+     * Assign or update a caretaker's property.
+     *
+     * @param caretakerId The caretaker's ID
+     * @param propertyId  The property ID to assign
+     * @return Updated GetCaretakerDTO
+     */
+    public GetCaretakerDTO updateAssignedProperty(Long caretakerId, Long propertyId) {
         Caretaker caretaker = caretakerRepository.findById(caretakerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Caretaker not found with id: " + caretakerId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Caretaker not found with ID: " + caretakerId));
 
-        // Fetch the property by ID
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + propertyId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Property not found with ID: " + propertyId));
 
-        // Assign the property to the caretaker
         caretaker.setAssignedProperty(property);
-
-        // Save the updated caretaker
         caretakerRepository.save(caretaker);
 
-        // Log the update action
-        log.info("Assigned property with ID {} to caretaker with ID {}", propertyId, caretakerId);
-
-        // Return the updated caretaker as DTO
-        return careTakerMapper.toDTO(caretaker);
+        log.info("Assigned property ID {} to caretaker ID {}", propertyId, caretakerId);
+        return caretakerMapper.toGetDTO(caretaker);
     }
 
     /**
-     * Get a single caretaker's details by ID.
-     * 
-     * @param caretakerId The ID of the caretaker to fetch.
-     * @return The CareTakerDTO for the given caretaker.
+     * Retrieve a single caretaker by ID.
+     *
+     * @param caretakerId The caretaker ID
+     * @return GetCaretakerDTO for the caretaker
      */
-    public CaretakerDTO getCaretaker(Long caretakerId) {
-        // Fetch the caretaker from the repository
+    public GetCaretakerDTO getCaretaker(Long caretakerId) {
         Caretaker caretaker = caretakerRepository.findById(caretakerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Caretaker not found with id: " + caretakerId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Caretaker not found with ID: " + caretakerId));
 
-        // Log the retrieval action
-        log.info("Fetched caretaker details with ID {}", caretakerId);
-
-        // Return the caretaker's details as DTO
-        return careTakerMapper.toDTO(caretaker);
+        log.info("Retrieved caretaker with ID {}", caretakerId);
+        return caretakerMapper.toGetDTO(caretaker);
     }
 
     /**
-     * Get a list of all caretakers' details.
-     * 
-     * @return A list of CareTakerDTOs for all caretakers.
+     * Retrieve all caretakers.
+     *
+     * @return List of GetCaretakerDTO
      */
-    public List<CaretakerDTO> getAllCaretakers() {
-        // Fetch all caretakers from the repository
+    public List<GetCaretakerDTO> getAllCaretakers() {
         List<Caretaker> caretakers = caretakerRepository.findAll();
+        log.info("Retrieved {} caretakers", caretakers.size());
 
-        // Log the fetch action
-        log.info("Fetched details for {} caretakers", caretakers.size());
-
-        // Map all caretakers to DTOs and return
         return caretakers.stream()
-                .map(careTakerMapper::toDTO)
+                .map(caretakerMapper::toGetDTO)
                 .collect(Collectors.toList());
     }
 
     /**
      * Delete a caretaker by ID.
-     * This method deletes the caretaker after verifying the ID exists in the
-     * repository.
-     * 
-     * @param caretakerId The ID of the caretaker to delete.
+     *
+     * @param caretakerId The caretaker ID
      */
     public void deleteCaretaker(Long caretakerId) {
-        // Check if the caretaker exists in the repository
         if (!caretakerRepository.existsById(caretakerId)) {
-            throw new ResourceNotFoundException("Caretaker not found with id: " + caretakerId);
+            throw new ResourceNotFoundException(
+                    "Caretaker not found with ID: " + caretakerId);
         }
 
-        // Log the deletion action
-        log.info("Deleting caretaker with ID {}", caretakerId);
-
-        // Delete the caretaker by ID
         caretakerRepository.deleteById(caretakerId);
+        log.info("Deleted caretaker with ID {}", caretakerId);
     }
 }

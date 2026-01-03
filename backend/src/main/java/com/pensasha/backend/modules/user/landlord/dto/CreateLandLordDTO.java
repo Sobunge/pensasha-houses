@@ -1,4 +1,6 @@
-package com.pensasha.backend.modules.user.caretaker.dto;
+package com.pensasha.backend.modules.user.landlord.dto;
+
+import java.util.Set;
 
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 
@@ -9,15 +11,18 @@ import lombok.Setter;
 
 // Lombok annotation to generate getter methods automatically for all fields in the class
 @Getter
-// Lombok annotation to generate setter methods automatically for all fields in
-// the class
+// Lombok annotation to generate setter methods automatically for all fields in the class
 @Setter
 // Lombok annotation to generate a no-argument constructor automatically
 @NoArgsConstructor
 // Lombok annotation to generate an all-arguments constructor automatically
 @AllArgsConstructor
-public class CaretakerDTO extends CreateUserDTO {
+public class CreateLandLordDTO extends CreateUserDTO {
 
-    // A reference to the Property object that is assigned to the caretaker
-    private Long propertyId;
+     // IDs of the properties owned by this landlord
+    private Set<Long> propertyIds;
+
+    // ID of the associated bank details
+    private Long bankDetailsId;
+
 }

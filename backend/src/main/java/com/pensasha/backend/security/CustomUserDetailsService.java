@@ -1,38 +1,45 @@
 package com.pensasha.backend.security;
 
-import com.pensasha.backend.modules.user.User;
-import com.pensasha.backend.modules.user.UserRepository;
-import com.pensasha.backend.modules.user.CustomUserDetails;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.pensasha.backend.modules.user.CustomUserDetails;
+import com.pensasha.backend.modules.user.UserCredentials;
+import com.pensasha.backend.modules.user.UserCredentialsRepository;
+
+import lombok.RequiredArgsConstructor;
+
 /**
- * Service class responsible for loading user-specific data for Spring Security.
+ * Loads user authentication data based on ID number.
+ * Authentication is credential-driven, not user-driven.
  */
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserCredentialsRepository userCredentialsRepository;
 
     /**
-     * Load a user by idNumber (username) and wrap it in CustomUserDetails.
+     * Load user credentials by ID number and wrap in CustomUserDetails.
      *
-     * @param idNumber the user idNumber
-     * @return CustomUserDetails instance
-     * @throws UsernameNotFoundException if user is not found
+     * @param idNumber national ID number (used as username)
+     * @return UserDetails implementation
+     * @throws UsernameNotFoundException if credentials are not found
      */
     @Override
-    public UserDetails loadUserByUsername(String idNumber) throws UsernameNotFoundException {
-        // Fetch the user from the database
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public UserDetails loadUserByUsername(String idNumber)
+            throws UsernameNotFoundException {
 
-        // Wrap and return as CustomUserDetails
-        return new CustomUserDetails(user);
+        UserCredentials credentials = userCredentialsRepository
+                .findByUser_IdNumber(idNumber)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "Authentication failed: user not found with ID " + idNumber
+                        )
+                );
+
+        return new CustomUserDetails(credentials);
     }
 }

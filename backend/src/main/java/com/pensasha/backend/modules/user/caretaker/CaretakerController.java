@@ -1,72 +1,80 @@
 package com.pensasha.backend.modules.user.caretaker;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
+import com.pensasha.backend.modules.user.caretaker.dto.CreateCaretakerDTO;
+import com.pensasha.backend.modules.user.caretaker.dto.GetCaretakerDTO;
 
 import java.util.List;
 
 /**
- * REST Controller for managing caretaker operations.
- * Handles HTTP requests related to caretaker creation, retrieval, update, and
- * deletion.
+ * REST Controller for managing caretakers.
  */
-@Slf4j // Lombok annotation for logging
+@Slf4j
 @RestController
 @RequestMapping("/api/caretakers")
+@RequiredArgsConstructor
 public class CaretakerController {
 
-    @Autowired
-    private CaretakerService caretakerService;
+    private final CaretakerService caretakerService;
 
     /**
-     * Update the assigned property of a caretaker.
-     *
-     * @param caretakerId ID of the caretaker to update.
-     * @param propertyId  ID of the property to assign.
-     * @return Updated CareTakerDTO.
+     * Create a new caretaker.
+     */
+    @PostMapping
+    public ResponseEntity<GetCaretakerDTO> createCaretaker(
+            @RequestBody CreateCaretakerDTO dto) {
+
+        log.info("API call: Create caretaker");
+        GetCaretakerDTO created = caretakerService.createCaretaker(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    /**
+     * Assign or update a caretaker's property.
      */
     @PutMapping("/{caretakerId}/assign-property/{propertyId}")
-    public CaretakerDTO assignProperty(
+    public ResponseEntity<GetCaretakerDTO> assignProperty(
             @PathVariable Long caretakerId,
             @PathVariable Long propertyId) {
-        log.info("Received request to assign property {} to caretaker {}", propertyId, caretakerId);
-        return caretakerService.updateAssignedProperty(caretakerId, propertyId);
+
+        log.info("API call: Assign property {} to caretaker {}", propertyId, caretakerId);
+        return ResponseEntity.ok(
+                caretakerService.updateAssignedProperty(caretakerId, propertyId));
     }
 
     /**
-     * Get the details of a specific caretaker.
-     *
-     * @param caretakerId ID of the caretaker to fetch.
-     * @return CareTakerDTO containing caretaker details.
+     * Retrieve a caretaker by ID.
      */
     @GetMapping("/{caretakerId}")
-    public CaretakerDTO getCaretaker(@PathVariable Long caretakerId) {
-        log.info("Fetching caretaker with ID {}", caretakerId);
-        return caretakerService.getCaretaker(caretakerId);
+    public ResponseEntity<GetCaretakerDTO> getCaretaker(
+            @PathVariable Long caretakerId) {
+
+        log.info("API call: Get caretaker {}", caretakerId);
+        return ResponseEntity.ok(caretakerService.getCaretaker(caretakerId));
     }
 
     /**
-     * Get a list of all caretakers.
-     *
-     * @return List of CareTakerDTO objects.
+     * Retrieve all caretakers.
      */
     @GetMapping
-    public List<CaretakerDTO> getAllCaretakers() {
-        log.info("Fetching all caretakers");
-        return caretakerService.getAllCaretakers();
+    public ResponseEntity<List<GetCaretakerDTO>> getAllCaretakers() {
+        log.info("API call: Get all caretakers");
+        return ResponseEntity.ok(caretakerService.getAllCaretakers());
     }
 
     /**
-     * Delete a caretaker by ID.
-     *
-     * @param caretakerId ID of the caretaker to delete.
+     * Delete a caretaker.
      */
     @DeleteMapping("/{caretakerId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCaretaker(@PathVariable Long caretakerId) {
-        log.info("Deleting caretaker with ID {}", caretakerId);
+        log.info("API call: Delete caretaker {}", caretakerId);
         caretakerService.deleteCaretaker(caretakerId);
     }
 }

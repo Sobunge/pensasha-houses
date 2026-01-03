@@ -22,15 +22,19 @@ public class CustomUserDetails implements UserDetails {
         return credentials.getUser();
     }
 
+    public Role getPrimaryRole() {
+        return credentials.getUser().getRole();
+    }
+
     /* ===================== AUTHORITIES ===================== */
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Role inferred by inheritance, not enums
         String role = credentials.getUser()
-                                 .getClass()
-                                 .getSimpleName()
-                                 .toUpperCase();
+                .getClass()
+                .getSimpleName()
+                .toUpperCase();
 
         return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
@@ -53,7 +57,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isAccountNonExpired() {
         return credentials.getAccountExpirationDate() == null ||
-               credentials.getAccountExpirationDate().isAfter(LocalDateTime.now());
+                credentials.getAccountExpirationDate().isAfter(LocalDateTime.now());
     }
 
     @Override
@@ -64,7 +68,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return credentials.getPasswordExpirationDate() == null ||
-               credentials.getPasswordExpirationDate().isAfter(LocalDateTime.now());
+                credentials.getPasswordExpirationDate().isAfter(LocalDateTime.now());
     }
 
     @Override

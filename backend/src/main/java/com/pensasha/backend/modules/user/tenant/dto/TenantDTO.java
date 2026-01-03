@@ -2,11 +2,7 @@ package com.pensasha.backend.modules.user.tenant.dto;
 
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -22,7 +18,7 @@ import java.util.List;
 public class TenantDTO extends GetUserDTO {
 
     /**
-     * Database ID of the tenant (needed for mapping and API responses)
+     * Optional database ID of the tenant (for internal use / mapping).
      */
     private Long id;
 
@@ -37,11 +33,13 @@ public class TenantDTO extends GetUserDTO {
 
     /**
      * Lease IDs associated with this tenant.
+     * Provided by the client when creating/updating a tenant.
      */
     private List<Long> leaseIds;
 
     /**
      * Unit IDs derived from the tenant's leases (read-only, derived field).
+     * This field is calculated automatically and should not be set by the client.
      */
     private List<Long> unitIds;
 }

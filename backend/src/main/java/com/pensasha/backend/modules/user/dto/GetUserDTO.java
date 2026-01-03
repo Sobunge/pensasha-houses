@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 public class GetUserDTO {
 
     private String firstName;
-    private String secondName;
-    private String thirdName;
+    private String middleName;
+    private String lastName;
     private String idNumber;
     private String phoneNumber;
     private String profilePicture;

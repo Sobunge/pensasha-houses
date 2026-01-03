@@ -6,30 +6,27 @@ import org.mapstruct.Named;
 
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.caretaker.Caretaker;
-import com.pensasha.backend.modules.user.caretaker.dto.CaretakerDTO;
+import com.pensasha.backend.modules.user.caretaker.dto.CreateCaretakerDTO;
+import com.pensasha.backend.modules.user.caretaker.dto.GetCaretakerDTO;
 
 @Mapper(componentModel = "spring")
 public interface CaretakerMapper {
 
-    // Map entity -> DTO
+    // ---------------------- Entity -> Get DTO ----------------------
     @Mapping(source = "assignedProperty.id", target = "propertyId")
-    CaretakerDTO toDTO(Caretaker caretaker);
+    GetCaretakerDTO toGetDTO(Caretaker caretaker);
 
-    // Map DTO -> entity
+    // ---------------------- Create DTO -> Entity ----------------------
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "enabled", ignore = true)
-    @Mapping(target = "locked", ignore = true)
-    @Mapping(target = "accountExpirationDate", ignore = true)
-    @Mapping(target = "passwordExpirationDate", ignore = true)
     @Mapping(source = "propertyId", target = "assignedProperty", qualifiedByName = "mapPropertyIdToProperty")
     @Mapping(target = "firstName", ignore = true)
-    @Mapping(target = "secondName", ignore = true)
-    @Mapping(target = "thirdName", ignore = true)
+    @Mapping(target = "middleName", ignore = true)
+    @Mapping(target = "lastName", ignore = true)
     @Mapping(target = "phoneNumber", ignore = true)
     @Mapping(target = "profilePicture", ignore = true)
-    Caretaker toEntity(CaretakerDTO caretakerDTO);
+    Caretaker toEntity(CreateCaretakerDTO caretakerDTO);
 
-    // Helper to convert propertyId to Property entity
+    // ---------------------- Helper Methods ----------------------
     @Named("mapPropertyIdToProperty")
     default Property mapPropertyIdToProperty(Long propertyId) {
         if (propertyId == null) {

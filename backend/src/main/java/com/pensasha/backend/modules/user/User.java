@@ -56,4 +56,8 @@ public abstract class User {
     @Column(name = "profile_picture")
     private String profilePicture;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, updatable = false)
+    private Role role;
+
 }
