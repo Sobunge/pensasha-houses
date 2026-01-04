@@ -38,5 +38,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     Boolean existsByIdNumber(String idNumber);
 
-    Optional<User> findByRole(Role role, Pageable pageable);
 }

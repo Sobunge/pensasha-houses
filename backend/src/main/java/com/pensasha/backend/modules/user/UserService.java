@@ -98,6 +98,11 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + idNumber));
     }
 
+    public User getUserEntity(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
+    }
+
     public GetUserDTO getUserById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::toDTO)
@@ -135,5 +140,9 @@ public class UserService {
     public boolean userExists(String idNumber) {
         return userRepository.existsByIdNumber(idNumber);
     }
+
+    public boolean userExistsById(Long id) {
+    return userRepository.existsById(id);
+}
 
 }
