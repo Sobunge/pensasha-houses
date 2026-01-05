@@ -1,5 +1,13 @@
 import React from "react";
-import { Card, CardContent, Typography, Box, Button, Divider, CircularProgress } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Button,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { Link } from "react-router-dom";
@@ -7,100 +15,124 @@ import { useTenantAnnouncements } from "../hooks/useTenantAnnouncements";
 
 function AnnouncementsCard({ userId }) {
   const { announcements, loading, error } = useTenantAnnouncements(userId);
-
-  const latestAnnouncement = announcements[0];
-
-  if (loading) {
-    return (
-      <Card sx={cardStyle}>
-        <CardContent sx={cardContentStyle}>
-          <CircularProgress sx={{ color: "#f8b500" }} />
-          <Typography variant="body2" sx={{ mt: 2, color: "#555" }}>
-            Loading announcements...
-          </Typography>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error || !latestAnnouncement) {
-    return (
-      <Card sx={cardStyle}>
-        <CardContent sx={{ ...cardContentStyle, justifyContent: "center", alignItems: "center", display: "flex", flexDirection: "column" }}>
-          <InfoOutlinedIcon sx={{ fontSize: 50, color: "#f8b500", mb: 1 }} />
-          <Typography variant="body1" sx={{ color: "#777", textAlign: "center", mb: 2 }}>
-            No announcements yet. Stay tuned!
-          </Typography>
-          <Button
-            component={Link}
-            to="/tenant/announcements"
-            size="small"
-            variant="outlined"
-            sx={{ color: "#f8b500", borderColor: "#f8b500", fontWeight: 600, textTransform: "none", "&:hover": { bgcolor: "#fef2b2", borderColor: "#c59000" } }}
-          >
-            View All →
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const latestAnnouncement = announcements?.[0];
 
   return (
-    <Card sx={cardStyle}>
-      <CardContent sx={cardContentStyle}>
-        {/* Header */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-          <CampaignIcon sx={{ color: "#f8b500", fontSize: 28 }} />
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111" }}>
-            Latest Announcement
-          </Typography>
-        </Box>
+    <Card
+      elevation={2}
+      sx={{
+        width: { xs: "100%", sm: "100%", md: "100%", lg: "auto" },
+        minWidth: 400, // minimum width applied
+        borderRadius: 3,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* Card Header */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          p: { xs: 1.5, sm: 2 },
+          borderBottom: 1,
+          borderColor: "divider",
+          bgcolor: "background.paper",
+        }}
+      >
+        <CampaignIcon color="warning" />
+        <Typography variant="subtitle1" fontWeight={600}>
+          Announcements
+        </Typography>
+      </Box>
 
-        {/* Announcement Bubble */}
-        <Box sx={{ p: 2, bgcolor: "#fff7e6", borderRadius: 2, boxShadow: 1, mb: 2 }}>
-          <Typography variant="body2" sx={{ color: "#555", lineHeight: 1.6 }}>
-            {latestAnnouncement.message}
-          </Typography>
-        </Box>
+      {/* Card Content */}
+      <CardContent
+        sx={{
+          p: { xs: 1.5, sm: 2 },
+          display: "flex",
+          flexDirection: "column",
+          gap: 1.5,
+          flexGrow: 1,
+        }}
+      >
+        {loading ? (
+          <Box
+            sx={{
+              minHeight: 64,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 1,
+            }}
+          >
+            <CircularProgress size={20} />
+            <Typography variant="body2" color="text.secondary">
+              Loading announcements…
+            </Typography>
+          </Box>
+        ) : error || !latestAnnouncement ? (
+          <Box
+            sx={{
+              minHeight: 80,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              gap: 1,
+            }}
+          >
+            <InfoOutlinedIcon color="warning" sx={{ fontSize: 40 }} />
+            <Typography variant="body2" color="text.secondary">
+              No announcements yet. Stay tuned.
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              p: 2,
+              bgcolor: "warning.light",
+              borderRadius: 2,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                lineHeight: 1.6,
+                color: "text.primary",
+              }}
+            >
+              {latestAnnouncement.message}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
 
+      {/* Footer */}
       <Divider />
-      <Box sx={{ p: 2, textAlign: "right" }}>
+      <Box
+        sx={{
+          p: { xs: 1.5, sm: 2 },
+          display: "flex",
+          justifyContent: { xs: "center", sm: "flex-end" },
+        }}
+      >
         <Button
           component={Link}
           to="/tenant/announcements"
           size="small"
-          sx={buttonStyle}
+          sx={{
+            textTransform: "none",
+            fontWeight: 600,
+          }}
         >
-          View All →
+          View All
         </Button>
       </Box>
     </Card>
   );
 }
-
-// Card Styles
-const cardStyle = {
-  borderRadius: 3,
-  boxShadow: 3,
-  bgcolor: "#fff",
-  width: 400,
-  minHeight: 100,
-  display: "flex",
-  flexDirection: "column",
-};
-
-const cardContentStyle = {
-  flexGrow: 1,
-  display: "flex",
-  flexDirection: "column",
-};
-
-const buttonStyle = {
-  color: "#f8b500",
-  fontWeight: 600,
-  textTransform: "none",
-  "&:hover": { color: "#c59000", bgcolor: "transparent" },
-};
 
 export default AnnouncementsCard;
