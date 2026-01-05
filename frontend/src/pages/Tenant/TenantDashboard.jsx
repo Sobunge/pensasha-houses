@@ -11,6 +11,7 @@ import MaintenanceCard from "../../components/cards/MaintenanceCard";
 import AnnouncementsCard from "../../components/cards/AnnouncementsCard";
 import PaymentsCard from "../../components/cards/PaymentsCard";
 import DocumentsCard from "../../components/cards/DocumentsCard";
+import DashboardHeader from "../../components/DashboardHeader";
 import api from "../../api/api";
 import { useAuth } from "../Auth/AuthContext";
 
@@ -64,7 +65,15 @@ function TenantDashboard() {
   const visibleUnits = tenantUnits.slice(0, 2);
 
   return (
-    <Box sx={{ flexGrow: 1, width: "100%", bgcolor: "#f7f7f7", p: { xs: 2, md: 3 } }}>
+    <Box sx={{ flexGrow: 1, width: "100%", bgcolor: "#f7f7f7", pb: { xs: 2, md: 3 }, px: { xs:2, md: 3 } }}>
+
+      {/* My Dashboard Header */}
+      <DashboardHeader
+        title="My Dashboard"
+        breadcrumbs={[]}
+      />
+
+
       {/* Hero Card */}
       <Card sx={{ mb: 4, p: 3, borderRadius: 3, boxShadow: 2 }}>
         <Box
