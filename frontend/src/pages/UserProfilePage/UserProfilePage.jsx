@@ -5,10 +5,7 @@ import {
   Typography,
   Divider,
   Button,
-  Breadcrumbs,
-  Link as MuiLink,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
 
 import EditIcon from "@mui/icons-material/Edit";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -16,6 +13,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ProfileHeader from "../UserProfilePage/profile/ProfileHeader";
 import ProfileInfo from "../UserProfilePage/profile/ProfileInfo";
 import ProfileDocuments from "../UserProfilePage/profile/ProfileDocuments";
+import DashboardHeader from "../../components/DashboardHeader";
 
 import EditProfileDialog from "./EditProfileDialog";
 import ChangeProfilePicDialog from "./ChangeProfilePicDialog";
@@ -50,8 +48,7 @@ export default function UserProfilePage() {
   return (
     <Box
       sx={{
-        py: 2,
-        px: 2,
+        pb: { xs: 2, md: 3 }, px: { xs:2, md: 3 },
         bgcolor: "#f5f5f5",
         display: "flex",
         flexDirection: "column",
@@ -59,23 +56,11 @@ export default function UserProfilePage() {
       }}
     >
       {/* ===== TITLE + BREADCRUMBS ===== */}
-      <Box>
-        <Breadcrumbs sx={{ mb: 1 }}>
-          <MuiLink
-            component={RouterLink}
-            to={`/${user.role}`}
-            underline="hover"
-            color="inherit"
-          >
-            Home
-          </MuiLink>
-          <Typography color="text.primary">Profile</Typography>
-        </Breadcrumbs>
-
-        <Typography variant="h5" fontWeight={700} textAlign="center">
-          My Profile
-        </Typography>
-      </Box>
+      {/* My Dashboard Header */}
+      <DashboardHeader
+        title="My Profile"
+        breadcrumbs={[{ label: "My Profile"}]}
+      />
 
       {/* ===== PROFILE HEADER ===== */}
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
