@@ -36,13 +36,13 @@ public abstract class User {
 
     /* ===================== IDENTITY ===================== */
 
-    @Column(name = "first_name", nullable = false, length = 50)
+    @Column(name = "first_name", length = 50)
     private String firstName;
 
     @Column(name = "middle_name", length = 50)
     private String middleName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
+    @Column(name = "last_name", length = 50)
     private String lastName;
 
     @Column(name = "id_number", nullable = false, unique = true, length = 30)
