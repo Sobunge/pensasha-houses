@@ -4,7 +4,6 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Typography,
   Box,
   Badge,
   Popover,
@@ -61,19 +60,6 @@ function UsersNavbar({ onMenuClick }) {
         >
           <MenuIcon />
         </IconButton>
-
-        {/* Desktop text only */}
-        <Box
-          sx={{
-            display: { xs: "none", md: "flex" },
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            My Dashboard
-          </Typography>
-        </Box>
 
         <Box sx={{ flexGrow: 1 }} />
 
