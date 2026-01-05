@@ -19,58 +19,33 @@ import ActivityModal from "../../pages/ActivityFeedPage/ActivityModal";
 function ActivityFeedCard({ activities = [], compact = false, onClose }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  // Default to tenant role
   const role = user?.role || "tenant";
 
-  // Fallback activities
+  // Fallback activities if none provided
   const defaultActivities = [
-    {
-      id: 1,
-      type: "Payment Received",
-      message: "Rent payment for Sept.",
-      date: "10:00 AM",
-      status: "Unread",
-    },
-    {
-      id: 2,
-      type: "Maintenance Update",
-      message: "Plumbing request approved.",
-      date: "11:30 AM",
-      status: "Read",
-    },
-    {
-      id: 3,
-      type: "New Announcement",
-      message: "Community meeting scheduled.",
-      date: "1:00 PM",
-      status: "Unread",
-    },
+    { id: 1, type: "Payment Received", message: "Rent payment for Sept.", date: "10:00 AM", status: "Unread" },
+    { id: 2, type: "Maintenance Update", message: "Plumbing request approved.", date: "11:30 AM", status: "Read" },
+    { id: 3, type: "New Announcement", message: "Community meeting scheduled.", date: "1:00 PM", status: "Unread" },
   ];
 
-  const [activityList, setActivityList] = useState(
-    activities.length ? activities : defaultActivities
-  );
+  const [activityList, setActivityList] = useState(activities.length ? activities : defaultActivities);
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  // Show fewer in compact mode
   const itemsToShow = compact ? activityList.slice(0, 3) : activityList;
 
-  // Open activity (auto-mark read if unread)
+  // Open activity and mark as read if unread
   const handleOpenActivity = (activity) => {
     let updated = activity;
     if (activity.status === "Unread") {
       setActivityList((prev) =>
-        prev.map((a) =>
-          a.id === activity.id ? { ...a, status: "Read" } : a
-        )
+        prev.map((a) => (a.id === activity.id ? { ...a, status: "Read" } : a))
       );
       updated = { ...activity, status: "Read" };
     }
     setSelectedActivity(updated);
   };
 
-  // Mark as read explicitly (from modal)
+  // Mark an activity as read from modal
   const handleMarkRead = (id) => {
     let updated;
     setActivityList((prev) =>
@@ -82,22 +57,19 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
         return a;
       })
     );
-    if (selectedActivity?.id === id) {
-      setSelectedActivity(updated);
-    }
-    setSelectedActivity(null); // ✅ close modal after marking
+    if (selectedActivity?.id === id) setSelectedActivity(updated);
+    setSelectedActivity(null);
   };
 
-  // Navigate to full activity feed
   const handleViewAll = () => {
     navigate(`/${role}/activities`);
-    if (onClose) onClose(); // ✅ close drawer/popover when navigating
+    if (onClose) onClose();
   };
 
   return (
     <Box sx={{ p: 2 }}>
       {/* Header with Close Button */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         <NotificationsIcon sx={{ color: "#1976d2", mr: 1 }} />
         <Typography variant="subtitle1" sx={{ fontWeight: 600, flexGrow: 1 }}>
           Activity Feed
@@ -108,6 +80,9 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
           </IconButton>
         )}
       </Box>
+
+      {/* Divider after header */}
+      <Divider sx={{ my: 2 }} />
 
       {/* Activity List */}
       <Stack spacing={compact ? 1.5 : 2}>
@@ -133,9 +108,7 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
             <Box sx={{ flexGrow: 1 }}>
               <Typography
                 variant="subtitle2"
-                sx={{
-                  fontWeight: activity.status === "Unread" ? 700 : 600,
-                }}
+                sx={{ fontWeight: activity.status === "Unread" ? 700 : 600 }}
                 noWrap
               >
                 {activity.type}
@@ -175,8 +148,8 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
       <ActivityModal
         open={!!selectedActivity}
         activity={selectedActivity}
-        onClose={() => setSelectedActivity(null)} // ✅ only closes modal
-        onMarkRead={handleMarkRead} // ✅ mark & close
+        onClose={() => setSelectedActivity(null)}
+        onMarkRead={handleMarkRead}
       />
     </Box>
   );
