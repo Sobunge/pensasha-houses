@@ -18,14 +18,11 @@ import { useAuth } from "../../pages/Auth/AuthContext";
 function MessagesCard({ messages = [], compact = false, onClose }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  // Default to tenant if no user is logged in
   const role = user?.role || "tenant";
 
   // Limit messages if compact mode
   const displayMessages = compact ? messages.slice(0, 3) : messages;
 
-  // Navigate helper
   const handleNavigate = (path) => {
     navigate(path);
     if (onClose) onClose(); // Close modal/popover if handler is passed
@@ -34,7 +31,7 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
   return (
     <Box sx={{ p: 2 }}>
       {/* Header with Close Button */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         <MailOutlineIcon sx={{ color: "#f8b500", mr: 1 }} />
         <Typography variant="subtitle1" sx={{ fontWeight: 600, flexGrow: 1 }}>
           Messages
@@ -45,6 +42,9 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
           </IconButton>
         )}
       </Box>
+
+      {/* Divider after header */}
+      <Divider sx={{ my: 2 }} />
 
       {/* Message List */}
       <Stack spacing={compact ? 1.5 : 2}>
