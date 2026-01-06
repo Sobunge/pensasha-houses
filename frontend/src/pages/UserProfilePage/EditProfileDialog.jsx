@@ -1,5 +1,4 @@
-// src/components/Profile/EditProfileDialog.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,36 +11,53 @@ import {
   Avatar,
   Typography,
 } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
-import EmailIcon from "@mui/icons-material/Email";
-import PhoneIcon from "@mui/icons-material/Phone";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-function EditProfileDialog({ open, handleClose, user, onSave }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
+import useProfileForm from "../../components/hooks/useProfileForm";
 
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-      });
-    }
-  }, [user]);
+export default function EditProfileDialog({ open, handleClose, profile, onSave }) {
+  const { formData, errors, handleChange, handleSubmit, fields } = useProfileForm(profile);
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const renderFields = (fields, parentKey = null) =>
+    fields.map((field) => {
+      if (field.nested) {
+        return (
+          <Box key={field.key} sx={{ pl: parentKey ? 3 : 0 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 1, fontWeight: 600, color: "text.secondary" }}
+            >
+              {field.label}
+            </Typography>
+            <Stack spacing={2}>{renderFields(field.nested, field.key)}</Stack>
+          </Box>
+        );
+      }
 
-  const handleSubmit = () => {
-    onSave(formData);
+      return (
+        <TextField
+          key={field.key}
+          label={field.label}
+          placeholder={field.placeholder || ""}
+          value={parentKey ? formData[parentKey][field.key] : formData[field.key]}
+          onChange={(e) => handleChange(field.key, e.target.value, parentKey, field)}
+          fullWidth
+          error={Boolean(parentKey ? errors[parentKey]?.[field.key] : errors[field.key])}
+          helperText={parentKey ? errors[parentKey]?.[field.key] : errors[field.key]}
+          InputProps={{
+            startAdornment: parentKey ? null : (
+              <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>{field.icon}</Box>
+            ),
+          }}
+        />
+      );
+    });
+
+  const handleSave = () => {
+    const result = handleSubmit();
+    if (result) onSave(result);
   };
 
   return (
@@ -52,7 +68,6 @@ function EditProfileDialog({ open, handleClose, user, onSave }) {
       maxWidth="sm"
       PaperProps={{ sx: { borderRadius: 3, p: 1.5 } }}
     >
-      {/* Header */}
       <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <Avatar sx={{ bgcolor: "#f8b500", width: 40, height: 40 }}>
           <AccountCircleIcon />
@@ -62,56 +77,12 @@ function EditProfileDialog({ open, handleClose, user, onSave }) {
         </Typography>
       </DialogTitle>
 
-      {/* Content */}
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 1.5 }}>
-          <TextField
-            label="Full Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>
-                  <PersonIcon sx={{ color: "action.active" }} />
-                </Box>
-              ),
-            }}
-          />
-          <TextField
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>
-                  <EmailIcon sx={{ color: "action.active" }} />
-                </Box>
-              ),
-            }}
-          />
-          <TextField
-            label="Phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>
-                  <PhoneIcon sx={{ color: "action.active" }} />
-                </Box>
-              ),
-            }}
-          />
+          {renderFields(fields)}
         </Stack>
       </DialogContent>
 
-      {/* Actions */}
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button
           startIcon={<CloseIcon />}
@@ -131,7 +102,7 @@ function EditProfileDialog({ open, handleClose, user, onSave }) {
         <Button
           startIcon={<SaveIcon />}
           variant="contained"
-          onClick={handleSubmit}
+          onClick={handleSave}
           sx={{
             bgcolor: "#f8b500",
             color: "#111",
@@ -148,5 +119,3 @@ function EditProfileDialog({ open, handleClose, user, onSave }) {
     </Dialog>
   );
 }
-
-export default EditProfileDialog;
