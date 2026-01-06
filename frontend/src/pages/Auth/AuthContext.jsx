@@ -1,16 +1,14 @@
-// src/pages/Auth/AuthContext.jsx
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { setLogoutHandler } from "../../api/api"; // <-- import api logout handler
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Initialize from sessionStorage instead of localStorage
   const [user, setUser] = useState(() => {
     const savedUser = sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  // Store redirect path (optional)
   const [redirectAfterAuth, setRedirectAfterAuth] = useState(null);
 
   const loginAs = (userObj) => {
@@ -23,6 +21,11 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("accessToken");
   };
+
+  // ✅ Register logout handler with API on mount
+  useEffect(() => {
+    setLogoutHandler(logout);
+  }, []);
 
   return (
     <AuthContext.Provider
