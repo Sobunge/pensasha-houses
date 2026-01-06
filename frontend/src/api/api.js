@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// Memory + sessionStorage token management
+// ================= TOKEN MANAGEMENT =================
 let accessToken = sessionStorage.getItem("accessToken") || null;
 
 /**
@@ -13,32 +13,34 @@ export const setAccessToken = (token) => {
   else sessionStorage.removeItem("accessToken");
 };
 
-// Axios instance
+// ================= LOGOUT HANDLER =================
+let logoutHandler = null;
+export const setLogoutHandler = (fn) => {
+  logoutHandler = fn;
+};
+
+// ================= AXIOS INSTANCE =================
 const api = axios.create({
   baseURL: "http://localhost:8080/api",
-  withCredentials: true, // include HttpOnly refresh token cookies
+  withCredentials: true,
 });
 
-// Request interceptor: attach access token
+// Attach access token
 api.interceptors.request.use((config) => {
-  if (accessToken) {
-    config.headers["Authorization"] = `Bearer ${accessToken}`;
-  }
+  if (accessToken) config.headers["Authorization"] = `Bearer ${accessToken}`;
   return config;
 });
 
-// Response interceptor: handle 401 and refresh token
+// Response interceptor: refresh token + auto logout
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Only retry once
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Refresh token request
         const refreshRes = await axios.post(
           "/auth/refresh",
           {},
@@ -47,15 +49,12 @@ api.interceptors.response.use(
 
         const newToken = refreshRes.data.accessToken;
         setAccessToken(newToken);
-
-        // Retry original request with new token
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // Failed to refresh, clear token
+        // Failed to refresh → call AuthContext logout
         setAccessToken(null);
-        sessionStorage.removeItem("user"); // optional: clear user
-        window.location.href = "/login"; // force login
+        if (logoutHandler) logoutHandler();
         return Promise.reject(refreshError);
       }
     }
