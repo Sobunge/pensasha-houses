@@ -140,7 +140,6 @@ export default function useProfileForm(profile) {
     if (!validation.valid) return null;
 
     const processed = { ...formData };
-    if (processed.leases) processed.leases = processed.leases.split(",").map((l) => l.trim());
     if (processed.properties) processed.properties = processed.properties.split(",").map((p) => p.trim());
 
     return processed;
