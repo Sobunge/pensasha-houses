@@ -15,10 +15,11 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 
+import api from "../../api/api";
 import useProfileForm from "../../components/hooks/useProfileForm";
 
-export default function EditProfileDialog({ open, handleClose, profile, onSave }) {
-  const { formData, errors, handleChange, handleSubmit, fields } = useProfileForm(profile);
+export default function EditProfileDialog({ open, handleClose, profile, refreshProfile }) {
+  const { formData, errors, handleChange, handleSubmit, fields } = useProfileForm(profile || {});
 
   const renderFields = (fields, parentKey = null) =>
     fields.map((field) => {
@@ -41,23 +42,46 @@ export default function EditProfileDialog({ open, handleClose, profile, onSave }
           key={field.key}
           label={field.label}
           placeholder={field.placeholder || ""}
-          value={parentKey ? formData[parentKey][field.key] : formData[field.key]}
+          value={parentKey ? formData[parentKey]?.[field.key] ?? "" : formData[field.key] ?? ""}
           onChange={(e) => handleChange(field.key, e.target.value, parentKey, field)}
           fullWidth
           error={Boolean(parentKey ? errors[parentKey]?.[field.key] : errors[field.key])}
           helperText={parentKey ? errors[parentKey]?.[field.key] : errors[field.key]}
-          InputProps={{
-            startAdornment: parentKey ? null : (
-              <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>{field.icon}</Box>
-            ),
-          }}
         />
       );
     });
 
-  const handleSave = () => {
-    const result = handleSubmit();
-    if (result) onSave(result);
+  const handleSave = async () => {
+    if (!profile?.id) return; // make sure we have an ID
+
+    const payload = handleSubmit();
+    if (!payload) return;
+
+    try {
+      let endpoint;
+      switch (profile.role) {
+        case "TENANT":
+          endpoint = `/tenants/${profile.id}`;
+          break;
+        case "LANDLORD":
+          endpoint = `/landlords/${profile.id}`;
+          break;
+        case "CARETAKER":
+          endpoint = `/caretakers/${profile.id}`;
+          break;
+        case "ADMIN":
+          endpoint = `/admins/${profile.id}`;
+          break;
+        default:
+          throw new Error("Unknown role");
+      }
+
+      await api.put(endpoint, payload);
+      await refreshProfile(); // update parent profile
+      handleClose();
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+    }
   };
 
   return (
@@ -72,7 +96,7 @@ export default function EditProfileDialog({ open, handleClose, profile, onSave }
         <Avatar sx={{ bgcolor: "#f8b500", width: 40, height: 40 }}>
           <AccountCircleIcon />
         </Avatar>
-        <Typography variant="h6" fontWeight={600}>
+        <Typography variant="subtitle1" fontWeight={600} component="span">
           Edit Profile
         </Typography>
       </DialogTitle>
