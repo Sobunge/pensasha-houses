@@ -15,7 +15,7 @@ import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 public interface TenantMapper {
 
     // TenantDTO -> Tenant
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target= "email", ignore = true)
     @Mapping(target = "leases", ignore = true)
     Tenant toEntity(TenantDTO tenantDTO);
 
