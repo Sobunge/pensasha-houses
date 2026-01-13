@@ -13,6 +13,11 @@ import com.pensasha.backend.modules.user.caretaker.dto.GetCaretakerDTO;
 public interface CaretakerMapper {
 
     // ---------------------- Entity -> Get DTO ----------------------
+    @Mapping(target = "firstName", ignore = true)
+    @Mapping(target = "middleName", ignore = true)
+    @Mapping(target = "lastName", ignore = true)
+    @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "profilePicture", ignore = true)
     @Mapping(source = "assignedProperty.id", target = "propertyId")
     GetCaretakerDTO toGetDTO(Caretaker caretaker);
 
@@ -23,6 +28,7 @@ public interface CaretakerMapper {
     @Mapping(target = "middleName", ignore = true)
     @Mapping(target = "lastName", ignore = true)
     @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "email", ignore = true)
     @Mapping(target = "profilePicture", ignore = true)
     Caretaker toEntity(CreateCaretakerDTO caretakerDTO);
 
