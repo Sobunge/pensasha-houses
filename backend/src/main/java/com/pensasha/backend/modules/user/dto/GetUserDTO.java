@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetUserDTO {
 
+    private Long id;
     private String firstName;
     private String middleName;
     private String lastName;
