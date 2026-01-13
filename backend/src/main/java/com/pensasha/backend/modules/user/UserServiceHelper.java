@@ -26,7 +26,6 @@ public class UserServiceHelper {
         user.setFirstName(dto.getFirstName());
         user.setMiddleName(dto.getMiddleName());
         user.setLastName(dto.getLastName());
-        user.setIdNumber(dto.getIdNumber());
         user.setPhoneNumber(dto.getPhoneNumber());
 
     }
