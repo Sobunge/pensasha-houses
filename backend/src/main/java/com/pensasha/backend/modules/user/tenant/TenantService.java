@@ -3,6 +3,7 @@ package com.pensasha.backend.modules.user.tenant;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
+import com.pensasha.backend.modules.user.tenant.dto.UpdateTenantDTO;
 import com.pensasha.backend.modules.user.tenant.mapper.TenantMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,4 +118,29 @@ public class TenantService {
         log.info("Tenant with ID {} deleted successfully", id);
         return true;
     }
+
+    /**
+    * Updating tenant information 
+    */
+   public TenantDTO updateTenantDetails(Long id, UpdateTenantDTO updateTenantDTO) {
+       log.info("Updating tenant details for ID: {}", id);
+
+       Tenant tenant = tenantRepository.findById(id)
+               .orElseThrow(() -> new ResourceNotFoundException(
+                       "Tenant with ID " + id + " not found."
+               ));
+
+       tenant.setFirstName(updateTenantDTO.getFirstName());
+       tenant.setMiddleName(updateTenantDTO.getMiddleName());
+       tenant.setLastName(updateTenantDTO.getLastName());
+       tenant.setPhoneNumber(updateTenantDTO.getPhoneNumber());
+       tenant.setEmail(updateTenantDTO.getEmail());
+       tenant.setEmergencyContact(updateTenantDTO.getEmergencyContact());
+
+       Tenant updatedTenant = tenantRepository.save(tenant);
+
+       log.info("Tenant details updated successfully for ID: {}", id);
+       return tenantMapper.toDTO(updatedTenant);
+   }
+
 }
