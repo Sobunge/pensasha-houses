@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Validated
 public class UpdateUserDTO {
 
-    /** First name: required, 3-20 characters */
+    /** First name: required, 3–20 characters */
     @NotBlank(message = "First name is required")
     @Size(min = 3, max = 20, message = "First name must be between 3 and 20 characters")
     private String firstName;
@@ -25,15 +25,10 @@ public class UpdateUserDTO {
     /** Middle name: optional */
     private String middleName;
 
-    /** Last name: required, 3-20 characters */
+    /** Last name: required, 3–20 characters */
     @NotBlank(message = "Last name is required")
     @Size(min = 3, max = 20, message = "Last name must be between 3 and 20 characters")
     private String lastName;
-
-    /** National ID: required, 7-8 digits */
-    @NotBlank(message = "National ID is required")
-    @Pattern(regexp = "^[0-9]{7,8}$", message = "National ID must be 7-8 digits")
-    private String idNumber;
 
     /** Phone number: required, Kenyan format */
     @NotBlank(message = "Phone number is required")
@@ -42,4 +37,10 @@ public class UpdateUserDTO {
         message = "Phone number must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)"
     )
     private String phoneNumber;
+
+    /** Email address: required, RFC-compliant */
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be a valid email address")
+    @Size(max = 100, message = "Email must not exceed 100 characters")
+    private String email;
 }
