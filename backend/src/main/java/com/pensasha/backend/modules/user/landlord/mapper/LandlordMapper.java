@@ -18,6 +18,12 @@ import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 public interface LandlordMapper {
 
     // ---------------------- Entity -> Get DTO ----------------------
+    @Mapping(target = "firstName", ignore = true)
+    @Mapping(target = "middleName", ignore = true)
+    @Mapping(target = "lastName", ignore = true)
+    @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "profilePicture", ignore = true)
+    @Mapping(target = "role", ignore = true)
     @Mapping(target = "propertyIds", source = "properties", qualifiedByName = "propertySetToIds")
     @Mapping(target = "bankDetailsId", source = "bankDetails.id")
     GetLandLordDTO toGetDTO(LandLord landLord);
@@ -28,6 +34,7 @@ public interface LandlordMapper {
     @Mapping(target = "middleName", ignore = true)
     @Mapping(target = "lastName", ignore = true)
     @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "email", ignore = true)
     @Mapping(target = "profilePicture", ignore = true)
     @Mapping(target = "properties", source = "propertyIds", qualifiedByName = "idsToPropertySet")
     @Mapping(target = "bankDetails", source = "bankDetailsId", qualifiedByName = "mapBankDetails")
@@ -36,7 +43,8 @@ public interface LandlordMapper {
     // ---------------------- Helper Methods ----------------------
     @Named("propertySetToIds")
     default Set<Long> propertySetToIds(Set<Property> properties) {
-        if (properties == null || properties.isEmpty()) return new HashSet<>();
+        if (properties == null || properties.isEmpty())
+            return new HashSet<>();
         return properties.stream()
                 .map(Property::getId)
                 .collect(Collectors.toSet());
@@ -59,7 +67,8 @@ public interface LandlordMapper {
 
     @Named("mapBankDetails")
     default BankDetails mapBankDetails(Long bankDetailsId) {
-        if (bankDetailsId == null) return null;
+        if (bankDetailsId == null)
+            return null;
         BankDetails bankDetails = new BankDetails();
         bankDetails.setId(bankDetailsId);
         return bankDetails;
