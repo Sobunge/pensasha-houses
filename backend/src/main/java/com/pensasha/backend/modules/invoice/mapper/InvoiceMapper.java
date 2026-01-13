@@ -12,7 +12,6 @@ public interface InvoiceMapper {
 
     // Mapping from the Invoice entity to the InvoiceDTO
     // This method maps the relevant fields between the entity and the DTO
-
     @Mapping(source = "tenant.id", target = "tenantId") // Maps tenant's id field to tenantId in DTO
     @Mapping(source = "lease.id", target = "leaseId") // Maps lease's id field to leaseId in DTO
     @Mapping(source = "payments", target = "paymentIds") // Maps list of Payment entities to list of payment IDs in DTO
