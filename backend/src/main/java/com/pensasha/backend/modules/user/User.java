@@ -20,7 +20,8 @@ import lombok.Setter;
     name = "users",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = "id_number"),
-        @UniqueConstraint(columnNames = "phone_number")
+        @UniqueConstraint(columnNames = "phone_number"),
+        @UniqueConstraint(columnNames = "email")
     }
 )
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -51,6 +52,9 @@ public abstract class User {
     @Column(name = "phone_number", unique = true, length = 20)
     private String phoneNumber;
 
+    @Column(name = "email", unique = true, length = 100)
+    private String email;
+
     /* ===================== PROFILE ===================== */
 
     @Column(name = "profile_picture")
@@ -59,5 +63,4 @@ public abstract class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, updatable = false)
     private Role role;
-
 }
