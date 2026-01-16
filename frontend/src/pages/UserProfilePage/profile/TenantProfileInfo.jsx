@@ -37,7 +37,7 @@ export default function TenantProfileInfo({ profile }) {
               variant="body1"
               sx={{ fontWeight: 500, color: "text.primary" }}
             >
-              {profile.emergencyContact || "-s"}
+              {profile.emergencyContact || "-"}
             </Typography>
           </Stack>
         </Box>
