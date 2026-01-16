@@ -17,7 +17,7 @@ export const useDocumentCount = (userId) => {
       setError(false);
 
       try {
-        const res = await api.get(`/documents/count/${userId}`);
+        const res = await api.get(`/documents/count/me`);
         setCount(res.data);
       } catch (err) {
         console.error("Failed to fetch document count:", err);
