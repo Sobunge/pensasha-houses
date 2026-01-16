@@ -43,7 +43,7 @@ export default function ProfileDocuments({ openDialog, setOpenDialog }) {
     downloadDocument,
   } = useDocuments();
 
-  /* ===================== FETCH ON OPEN ===================== */
+  // Fetch documents when dialog opens
   useEffect(() => {
     if (openDialog) fetchDocuments();
   }, [openDialog, fetchDocuments]);
@@ -90,10 +90,18 @@ export default function ProfileDocuments({ openDialog, setOpenDialog }) {
               }}
               secondaryAction={
                 <Stack direction="row" spacing={0.5}>
-                  <IconButton aria-label="download" sx={{ color: "#f8b500" }} onClick={() => downloadDocument(doc)}>
+                  <IconButton
+                    aria-label="download"
+                    sx={{ color: "#f8b500" }}
+                    onClick={() => downloadDocument(doc)}
+                  >
                     <DownloadIcon />
                   </IconButton>
-                  <IconButton aria-label="delete" sx={{ color: "error.main" }} onClick={() => deleteDocument(doc.id)}>
+                  <IconButton
+                    aria-label="delete"
+                    sx={{ color: "error.main" }}
+                    onClick={() => deleteDocument(doc.id)}
+                  >
                     <DeleteOutlineIcon />
                   </IconButton>
                 </Stack>
@@ -102,7 +110,12 @@ export default function ProfileDocuments({ openDialog, setOpenDialog }) {
               <ListItemIcon>
                 <PictureAsPdfIcon sx={{ color: "#f8b500" }} />
               </ListItemIcon>
-              <ListItemText primary={doc.documentType} secondary={doc.fileName} primaryTypographyProps={{ fontWeight: 600 }} />
+
+              <ListItemText
+                primary={doc.documentType} // friendly type
+                secondary={"Uploaded file"} // show original filename
+                primaryTypographyProps={{ fontWeight: 600 }}
+              />
             </ListItem>
           ))}
         </List>
