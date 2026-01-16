@@ -2,44 +2,69 @@ package com.pensasha.backend.modules.document;
 
 import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "documents")
-@Data
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "user")
 public class Document {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    @EqualsAndHashCode.Include
+    private UUID id;
 
-    // File metadata
-    @Column(nullable = false)
+    /* ===================== BUSINESS ===================== */
+    @Column(name = "document_type", nullable = false)
+    private String documentType;
+
+    /* ===================== FILE METADATA ===================== */
+    @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    @Column(nullable = false)
-    private String fileType;
+    @Column(name = "content_type", nullable = false)
+    private String contentType;
 
-    @Column(nullable = false)
-    private String fileUrl; // Can be a server path or cloud storage link
+    @Column(name = "file_size", nullable = false)
+    private long fileSize;
 
-    @Column(nullable = false)
+    /* ===================== STORAGE ===================== */
+    @Column(name = "storage_key", nullable = false, unique = true)
+    private String storageKey;
+
+    /* ===================== AUDIT ===================== */
+    @Column(name = "uploaded_at", nullable = false, updatable = false)
     private LocalDateTime uploadedAt;
 
-    // Many documents can belong to one user
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    /* ===================== RELATIONSHIP ===================== */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    // Convenient constructor for creating a new document
-    public Document(String fileName, String fileType, String fileUrl, User user) {
-        this.fileName = fileName != null ? fileName : "unknown";
-        this.fileType = fileType != null ? fileType : "application/octet-stream";
-        this.fileUrl = fileUrl != null ? fileUrl : "";
+    /* ===================== CONSTRUCTOR ===================== */
+    public Document(
+            String documentType,
+            String fileName,
+            String contentType,
+            long fileSize,
+            String storageKey,
+            User user) {
+
+        if (documentType == null || fileName == null || contentType == null || storageKey == null || user == null) {
+            throw new IllegalArgumentException("Document fields must not be null");
+        }
+
+        this.documentType = documentType;
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.fileSize = fileSize;
+        this.storageKey = storageKey;
         this.user = user;
         this.uploadedAt = LocalDateTime.now();
     }
