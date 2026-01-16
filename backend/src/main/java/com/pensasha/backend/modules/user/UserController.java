@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import com.pensasha.backend.dto.ApiResponse;
 import com.pensasha.backend.modules.user.dto.GetAllUsersDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
-import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
+import com.pensasha.backend.modules.user.dto.ResetPasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.helper.ParseRoleHelper;
 
@@ -61,7 +61,7 @@ public class UserController {
         @PutMapping("/{idNumber}/changePassword")
         public ResponseEntity<EntityModel<ApiResponse>> changePassword(
                         @PathVariable String idNumber,
-                        @RequestBody UpdatePasswordDTO dto) {
+                        @RequestBody ResetPasswordDTO dto) {
 
                 userService.updatePassword(idNumber, dto);
 
