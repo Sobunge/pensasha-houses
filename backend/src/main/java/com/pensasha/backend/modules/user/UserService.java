@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
-import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
+import com.pensasha.backend.modules.user.dto.ResetPasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.mapper.UserMapper;
 
@@ -71,7 +71,7 @@ public class UserService {
     /* ===================== UPDATE PASSWORD ===================== */
 
     @Transactional
-    public void updatePassword(String idNumber, UpdatePasswordDTO dto) {
+    public void updatePassword(String idNumber, ResetPasswordDTO dto) {
         UserCredentials credentials = credentialsRepository
                 .findByUser_IdNumber(idNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user: " + idNumber));
