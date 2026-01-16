@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -17,95 +17,83 @@ import {
   FormControl,
   Stack,
   Divider,
+  Skeleton,
 } from "@mui/material";
 
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 
+import useDocuments from "../../../components/hooks/useDocuments";
+
 export default function ProfileDocuments({ openDialog, setOpenDialog }) {
-  const documentTypes = [
-    "ID Copy",
-    "Lease Agreement",
-    "Passport",
-    "Utility Bill",
-  ];
-
-  const [documents, setDocuments] = useState([
-    {
-      type: "ID Copy",
-      file: new File([""], "id-copy.pdf", { type: "application/pdf" }),
-    },
-  ]);
-
+  const documentTypes = ["ID Copy", "Lease Agreement", "Passport", "Utility Bill"];
   const [selectedDocType, setSelectedDocType] = useState("");
 
-  const handleUpload = (e) => {
+  const {
+    documents,
+    loading,
+    uploading,
+    fetchDocuments,
+    uploadDocument,
+    deleteDocument,
+    downloadDocument,
+  } = useDocuments();
+
+  /* ===================== FETCH ON OPEN ===================== */
+  useEffect(() => {
+    if (openDialog) fetchDocuments();
+  }, [openDialog, fetchDocuments]);
+
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !selectedDocType) return;
-    if (file.type !== "application/pdf") return;
 
-    setDocuments((prev) => [...prev, { type: selectedDocType, file }]);
-    setSelectedDocType("");
-    e.target.value = "";
-  };
-
-  const handleDelete = (type) => {
-    setDocuments((prev) => prev.filter((doc) => doc.type !== type));
+    try {
+      await uploadDocument(file, selectedDocType);
+      setSelectedDocType("");
+      e.target.value = "";
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <Box>
-      {/* ===== DOCUMENT LIST / EMPTY STATE ===== */}
-      {documents.length === 0 ? (
+      {/* DOCUMENT LIST OR SKELETON */}
+      {loading ? (
+        <Stack spacing={1}>
+          <Skeleton width="100%" height={40} />
+          <Skeleton width="100%" height={40} />
+        </Stack>
+      ) : documents.length === 0 ? (
         <Box sx={{ py: 4, textAlign: "center" }}>
-          <DescriptionOutlinedIcon sx={{ fontSize: 42, color: "#c59000", mb: 1 }} />
+          <PictureAsPdfIcon sx={{ fontSize: 42, color: "#c59000", mb: 1 }} />
           <Typography fontWeight={600} color="#111111">
             No documents uploaded
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Upload required documents to complete your profile.
           </Typography>
         </Box>
       ) : (
         <List sx={{ mb: 2 }}>
           {documents.map((doc) => (
             <ListItem
-              key={doc.type}
+              key={doc.id}
               sx={{
                 mb: 1,
                 borderRadius: 2,
                 bgcolor: "#f7f7f7",
                 border: "1px solid #eee",
-                "&:hover": {
-                  bgcolor: "#fff8e1",
-                },
+                "&:hover": { bgcolor: "#fff8e1" },
               }}
               secondaryAction={
                 <Stack direction="row" spacing={0.5}>
-                  <IconButton
-                    aria-label="download"
-                    sx={{ color: "#f8b500" }}
-                    onClick={() => {
-                      const url = URL.createObjectURL(doc.file);
-                      const link = document.createElement("a");
-                      link.href = url;
-                      link.download = doc.file.name;
-                      link.click();
-                    }}
-                  >
+                  <IconButton aria-label="download" sx={{ color: "#f8b500" }} onClick={() => downloadDocument(doc)}>
                     <DownloadIcon />
                   </IconButton>
-
-                  <IconButton
-                    aria-label="delete"
-                    onClick={() => handleDelete(doc.type)}
-                    sx={{ color: "error.main" }}
-                  >
+                  <IconButton aria-label="delete" sx={{ color: "error.main" }} onClick={() => deleteDocument(doc.id)}>
                     <DeleteOutlineIcon />
                   </IconButton>
                 </Stack>
@@ -114,48 +102,20 @@ export default function ProfileDocuments({ openDialog, setOpenDialog }) {
               <ListItemIcon>
                 <PictureAsPdfIcon sx={{ color: "#f8b500" }} />
               </ListItemIcon>
-
-              <ListItemText
-                primary={doc.type}
-                secondary={doc.file.name}
-                primaryTypographyProps={{
-                  fontWeight: 600,
-                  color: "#111111",
-                }}
-              />
+              <ListItemText primary={doc.documentType} secondary={doc.fileName} primaryTypographyProps={{ fontWeight: 600 }} />
             </ListItem>
           ))}
         </List>
       )}
 
-      {/* ===== MANAGE DOCUMENTS DIALOG ===== */}
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        {/* ===== TITLE WITH CLOSE BUTTON ===== */}
-        <DialogTitle
-          sx={{
-            fontWeight: 700,
-            pr: 5,
-          }}
-        >
+      {/* DIALOG FOR UPLOAD */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700, pr: 5 }}>
           Upload Document
-
           <IconButton
             aria-label="close"
             onClick={() => setOpenDialog(false)}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: "text.secondary",
-              "&:hover": {
-                bgcolor: "action.hover",
-              },
-            }}
+            sx={{ position: "absolute", right: 8, top: 8, color: "text.secondary" }}
           >
             <CloseIcon />
           </IconButton>
@@ -163,26 +123,11 @@ export default function ProfileDocuments({ openDialog, setOpenDialog }) {
 
         <DialogContent>
           <Stack spacing={3} mt={1}>
-            <Typography variant="body2" color="text.secondary">
-              Choose a document type and upload a PDF file.
-            </Typography>
-
             <FormControl fullWidth>
-              <Select
-                value={selectedDocType}
-                onChange={(e) => setSelectedDocType(e.target.value)}
-                displayEmpty
-              >
-                <MenuItem value="" disabled>
-                  Select document type
-                </MenuItem>
-
+              <Select value={selectedDocType} onChange={(e) => setSelectedDocType(e.target.value)} displayEmpty>
+                <MenuItem value="" disabled>Select document type</MenuItem>
                 {documentTypes.map((type) => (
-                  <MenuItem
-                    key={type}
-                    value={type}
-                    disabled={documents.some((d) => d.type === type)}
-                  >
+                  <MenuItem key={type} value={type} disabled={documents.some((d) => d.documentType === type)}>
                     {type}
                   </MenuItem>
                 ))}
@@ -193,23 +138,11 @@ export default function ProfileDocuments({ openDialog, setOpenDialog }) {
               variant="contained"
               component="label"
               startIcon={<UploadFileIcon />}
-              disabled={!selectedDocType}
-              sx={{
-                bgcolor: "#f8b500",
-                color: "#111",
-                fontWeight: 600,
-                "&:hover": {
-                  bgcolor: "warning.dark",
-                },
-              }}
+              disabled={!selectedDocType || uploading}
+              sx={{ bgcolor: "#f8b500", color: "#111", fontWeight: 600 }}
             >
-              Select a PDF to upload
-              <input
-                type="file"
-                accept="application/pdf"
-                hidden
-                onChange={handleUpload}
-              />
+              {uploading ? "Uploading..." : "Select a PDF to upload"}
+              <input type="file" hidden accept="application/pdf" onChange={handleFileUpload} />
             </Button>
           </Stack>
         </DialogContent>
@@ -221,14 +154,7 @@ export default function ProfileDocuments({ openDialog, setOpenDialog }) {
             onClick={() => setOpenDialog(false)}
             variant="contained"
             startIcon={<CheckCircleOutlineIcon />}
-            sx={{
-              bgcolor: "success.main",
-              fontWeight: 600,
-              px: 3,
-              "&:hover": {
-                bgcolor: "success.dark",
-              },
-            }}
+            sx={{ bgcolor: "success.main", fontWeight: 600 }}
           >
             Done
           </Button>
