@@ -10,8 +10,9 @@ import {
 import BadgeIcon from "@mui/icons-material/Badge";
 import PhoneIcon from "@mui/icons-material/Phone";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined"; // new
 import LockResetIcon from "@mui/icons-material/LockReset";
-import ChangePasswordDialog from "../ChangePasswordDialog"; // import the dialog
+import ChangePasswordDialog from "../ChangePasswordDialog";
 
 export default function BaseProfileInfo({ profile }) {
   const [openReset, setOpenReset] = useState(false);
@@ -30,6 +31,11 @@ export default function BaseProfileInfo({ profile }) {
       label: "ID Number",
       value: profile?.idNumber || "-",
       icon: <BadgeIcon fontSize="small" sx={{ color: "#f8b500" }} />,
+    },
+    {
+      label: "Email",
+      value: profile?.email || "-",
+      icon: <EmailOutlinedIcon fontSize="small" sx={{ color: "#9c27b0" }} />,
     },
     {
       label: "Phone Number",
@@ -67,11 +73,16 @@ export default function BaseProfileInfo({ profile }) {
               >
                 {item.label}
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500, color: "text.primary" }}>
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: 500, color: "text.primary" }}
+              >
                 {item.value}
               </Typography>
             </Stack>
-            {index < infoData.length - 1 && <Divider sx={{ my: 1.5, borderColor: "divider" }} />}
+            {index < infoData.length - 1 && (
+              <Divider sx={{ my: 1.5, borderColor: "divider" }} />
+            )}
           </Box>
         ))}
 
@@ -88,8 +99,10 @@ export default function BaseProfileInfo({ profile }) {
         </Button>
       </Stack>
 
-      {/* Open the centralized ChangePasswordDialog */}
-      <ChangePasswordDialog open={openReset} handleClose={() => setOpenReset(false)} />
+      <ChangePasswordDialog
+        open={openReset}
+        handleClose={() => setOpenReset(false)}
+      />
     </Box>
   );
 }
