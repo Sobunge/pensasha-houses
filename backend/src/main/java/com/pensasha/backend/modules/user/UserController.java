@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -58,16 +59,36 @@ public class UserController {
 
         /* ===================== CHANGE PASSWORD ===================== */
 
-        @PutMapping("/{idNumber}/changePassword")
+        @PutMapping("/{id}/changePassword")
         public ResponseEntity<EntityModel<ApiResponse>> changePassword(
-                        @PathVariable String idNumber,
+                        @PathVariable Long id,
                         @RequestBody ResetPasswordDTO dto) {
 
-                userService.updatePassword(idNumber, dto);
+                userService.updatePassword(id, dto);
 
                 EntityModel<ApiResponse> response = EntityModel.of(
                                 new ApiResponse("Password updated successfully"),
-                                linkTo(methodOn(UserController.class).getUser(idNumber)).withSelfRel(),
+                                linkTo(methodOn(UserController.class).getUserById(id)).withSelfRel(),
+                                linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
+
+                return ResponseEntity.ok(response);
+        }
+
+        /*
+         * ===================== CHANGE PASSWORD FOR CURRENT USER =====================
+         */
+        @PreAuthorize("isAuthenticated()")
+        @PutMapping("/me/changePassword")
+        public ResponseEntity<EntityModel<ApiResponse>> changePasswordForCurrentUser(
+                        @AuthenticationPrincipal CustomUserDetails authUser,
+                        @RequestBody ResetPasswordDTO dto) {
+
+                // Use the authenticated user's ID
+                userService.updatePassword(authUser.getUser().getId(), dto);
+
+                EntityModel<ApiResponse> response = EntityModel.of(
+                                new ApiResponse("Password updated successfully"),
+                                linkTo(methodOn(UserController.class).getUser(authUser.getUsername())).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
 
                 return ResponseEntity.ok(response);
@@ -101,6 +122,17 @@ public class UserController {
                 return ResponseEntity.ok(model);
         }
 
+        /* ===================== GET CURRENT USER WITH ID ===================== */
+        @GetMapping("/{id}")
+        public ResponseEntity<EntityModel<GetUserDTO>> getUserById(@PathVariable Long id) {
+                GetUserDTO user = userService.getUserById(id);
+                EntityModel<GetUserDTO> model = EntityModel.of(user,
+                                linkTo(methodOn(UserController.class).getUserById(id)).withSelfRel(),
+                                linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
+                return ResponseEntity.ok(model);
+        }
+
+        /* ===================== GET CURRENT LOGGED IN USER */
         @GetMapping("/me")
         public ResponseEntity<EntityModel<GetUserDTO>> getCurrentUser(
                         @AuthenticationPrincipal CustomUserDetails authUser) {
