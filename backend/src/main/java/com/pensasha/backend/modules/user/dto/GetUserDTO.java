@@ -14,6 +14,7 @@ public class GetUserDTO {
     private String firstName;
     private String middleName;
     private String lastName;
+    private String email;
     private String idNumber;
     private String phoneNumber;
     private String profilePicture;
