@@ -71,10 +71,10 @@ public class UserService {
     /* ===================== UPDATE PASSWORD ===================== */
 
     @Transactional
-    public void updatePassword(String idNumber, ResetPasswordDTO dto) {
+    public void updatePassword(Long id, ResetPasswordDTO dto) {
         UserCredentials credentials = credentialsRepository
-                .findByUser_IdNumber(idNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user: " + idNumber));
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user ID: " + id));
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), credentials.getPassword())) {
             throw new IllegalArgumentException("Current password is incorrect");
@@ -87,7 +87,7 @@ public class UserService {
         credentials.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         credentialsRepository.save(credentials);
 
-        log.info("Password updated for user: {}", idNumber);
+        log.info("Password updated for user: {}", id);
     }
 
     /* ===================== READ USER ===================== */
