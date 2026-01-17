@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,6 +11,7 @@ import {
   Avatar,
   Typography,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SaveIcon from "@mui/icons-material/Save";
@@ -28,6 +29,7 @@ export default function EditProfileDialog({
 }) {
   const { formData, errors, handleChange, handleSubmit, fields } =
     useProfileForm(profile || {});
+  const [loading, setLoading] = useState(false);
 
   const renderFields = (fields, parentKey = null) =>
     fields.map((field) => {
@@ -36,17 +38,11 @@ export default function EditProfileDialog({
           <Box key={field.key} sx={{ pl: parentKey ? 3 : 0 }}>
             <Typography
               variant="subtitle2"
-              sx={{
-                mb: 1,
-                fontWeight: 600,
-                color: "text.secondary",
-              }}
+              sx={{ mb: 1, fontWeight: 600, color: "text.secondary" }}
             >
               {field.label}
             </Typography>
-            <Stack spacing={2}>
-              {renderFields(field.nested, field.key)}
-            </Stack>
+            <Stack spacing={2}>{renderFields(field.nested, field.key)}</Stack>
           </Box>
         );
       }
@@ -54,10 +50,7 @@ export default function EditProfileDialog({
       const value = parentKey
         ? formData[parentKey]?.[field.key] ?? ""
         : formData[field.key] ?? "";
-
-      const error = parentKey
-        ? errors[parentKey]?.[field.key]
-        : errors[field.key];
+      const error = parentKey ? errors[parentKey]?.[field.key] : errors[field.key];
 
       return (
         <TextField
@@ -65,9 +58,7 @@ export default function EditProfileDialog({
           label={field.label}
           placeholder={field.placeholder || ""}
           value={value}
-          onChange={(e) =>
-            handleChange(field.key, e.target.value, parentKey, field)
-          }
+          onChange={(e) => handleChange(field.key, e.target.value, parentKey, field)}
           error={Boolean(error)}
           helperText={error}
           fullWidth
@@ -84,17 +75,13 @@ export default function EditProfileDialog({
               borderRadius: 2,
               backgroundColor: "rgba(0,0,0,0.02)",
               transition: "all 0.2s ease",
-              "&:hover": {
-                backgroundColor: "rgba(0,0,0,0.04)",
-              },
+              "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
               "&.Mui-focused": {
                 backgroundColor: "#fff",
                 boxShadow: "0 0 0 2px rgba(248,181,0,0.25)",
               },
             },
-            "& .MuiInputLabel-root": {
-              fontWeight: 500,
-            },
+            "& .MuiInputLabel-root": { fontWeight: 500 },
           }}
         />
       );
@@ -106,6 +93,7 @@ export default function EditProfileDialog({
     const payload = handleSubmit();
     if (!payload) return;
 
+    setLoading(true);
     try {
       let endpoint;
       switch (profile.role) {
@@ -130,6 +118,8 @@ export default function EditProfileDialog({
       handleClose();
     } catch (err) {
       console.error("Failed to update profile:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -184,12 +174,13 @@ export default function EditProfileDialog({
             textTransform: "none",
             "&:hover": { bgcolor: "#d32f2f" },
           }}
+          disabled={loading}
         >
           Cancel
         </Button>
 
         <Button
-          startIcon={<SaveIcon />}
+          startIcon={loading ? <CircularProgress size={18} /> : <SaveIcon />}
           variant="contained"
           onClick={handleSave}
           sx={{
@@ -201,8 +192,9 @@ export default function EditProfileDialog({
             textTransform: "none",
             "&:hover": { bgcolor: "#c59000" },
           }}
+          disabled={loading}
         >
-          Save
+          {loading ? "Saving..." : "Save"}
         </Button>
       </DialogActions>
     </Dialog>
