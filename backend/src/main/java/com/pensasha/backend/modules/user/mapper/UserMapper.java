@@ -40,5 +40,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)  // Role is managed separately
     @Mapping(target = "profilePicture", ignore = true)
+    @Mapping(target = "idNumber", ignore = true)
     void updateEntity(@MappingTarget User user, UpdateUserDTO dto);
 }

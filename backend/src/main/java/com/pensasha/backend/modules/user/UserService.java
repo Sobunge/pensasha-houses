@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
-import com.pensasha.backend.modules.user.dto.UpdatePasswordDTO;
+import com.pensasha.backend.modules.user.dto.ResetPasswordDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import com.pensasha.backend.modules.user.mapper.UserMapper;
 
@@ -71,10 +71,10 @@ public class UserService {
     /* ===================== UPDATE PASSWORD ===================== */
 
     @Transactional
-    public void updatePassword(String idNumber, UpdatePasswordDTO dto) {
+    public void updatePassword(Long id, ResetPasswordDTO dto) {
         UserCredentials credentials = credentialsRepository
-                .findByUser_IdNumber(idNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user: " + idNumber));
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user ID: " + id));
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), credentials.getPassword())) {
             throw new IllegalArgumentException("Current password is incorrect");
@@ -87,7 +87,7 @@ public class UserService {
         credentials.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         credentialsRepository.save(credentials);
 
-        log.info("Password updated for user: {}", idNumber);
+        log.info("Password updated for user: {}", id);
     }
 
     /* ===================== READ USER ===================== */

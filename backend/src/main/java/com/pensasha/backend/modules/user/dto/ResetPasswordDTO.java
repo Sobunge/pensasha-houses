@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor; // Importing Lombok annotations for generating 
       // hashCode methods
 @NoArgsConstructor // Lombok annotation to generate a no-argument constructor
 @AllArgsConstructor // Lombok annotation to generate an all-arguments constructor
-public class UpdatePasswordDTO {
+public class ResetPasswordDTO {
 
     // The current password, required to be non-blank and at least 8 characters
     @NotBlank(message = "Password is required") // Ensures that the current password is not blank
