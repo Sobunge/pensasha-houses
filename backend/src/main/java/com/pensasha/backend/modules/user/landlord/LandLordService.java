@@ -26,7 +26,7 @@ public class LandLordService {
     private final LandlordMapper landLordMapper;
 
     // ---------------------- Fetch by ID Number ----------------------
-    public GetLandLordDTO getLandlordById(String idNumber) {
+    public GetLandLordDTO getLandlordByIdNumber(String idNumber) {
         log.info("Fetching landlord with National ID: {}", idNumber);
         LandLord landLord = landLordRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> {
@@ -36,6 +36,18 @@ public class LandLordService {
 
         return landLordMapper.toGetDTO(landLord); // use GetLandLordDTO
     }
+
+    // --------------------- Fetch by ID ----------------------
+    public GetLandLordDTO getLandLordById(Long id) {
+        log.info("Fetching landlord with ID: {}", id);
+        LandLord landLord = landLordRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("LandLord with ID: {} not found.", id);
+                    return new ResourceNotFoundException("LandLord with ID: " + id + " not found.");
+                });
+
+        return landLordMapper.toGetDTO(landLord); // use GetLandLordDTO
+    }   
 
     // ---------------------- Fetch all with pagination ----------------------
     public Page<GetLandLordDTO> getAllLandlords(Pageable pageable) {
