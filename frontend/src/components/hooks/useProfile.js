@@ -36,7 +36,7 @@ export default function useProfile() {
 
         case "LANDLORD":
           if (baseProfile.id) {
-            const landlordRes = await api.get(`/landlords/${baseProfile.id}`);
+            const landlordRes = await api.get(`/landlords/by-id/${baseProfile.id}`);
             fullProfile = { ...baseProfile, ...landlordRes.data };
           }
           break;
