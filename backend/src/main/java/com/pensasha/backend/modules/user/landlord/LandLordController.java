@@ -54,14 +54,29 @@ public class LandLordController {
     }
 
     // ---------------------- Get Landlord by National ID ----------------------
-    @GetMapping("/{idNumber}")
+    @GetMapping("/by-national-id/{idNumber}")
     public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable String idNumber) {
         log.info("API call: Get landlord with ID: {}", idNumber);
 
-        GetLandLordDTO landlordDTO = landLordService.getLandlordById(idNumber);
+        GetLandLordDTO landlordDTO = landLordService.getLandlordByIdNumber(idNumber);
 
         EntityModel<GetLandLordDTO> resource = EntityModel.of(landlordDTO,
                 linkTo(methodOn(LandLordController.class).getLandlordById(idNumber)).withSelfRel(),
+                linkTo(methodOn(LandLordController.class).getAllLandlords(0, 10)).withRel("all-landlords")
+        );
+
+        return ResponseEntity.ok(resource);
+    }
+
+    // ---------------------- Get landlord by ID ---------------------- //
+    @GetMapping("/by-id/{id}")
+    public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable Long id) {
+        log.info("API call: Get landlord with DB ID: {}", id);
+
+        GetLandLordDTO landlordDTO = landLordService.getLandLordById(id);
+
+        EntityModel<GetLandLordDTO> resource = EntityModel.of(landlordDTO,
+                linkTo(methodOn(LandLordController.class).getLandlordById(id)).withSelfRel(),
                 linkTo(methodOn(LandLordController.class).getAllLandlords(0, 10)).withRel("all-landlords")
         );
 
