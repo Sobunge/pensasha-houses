@@ -23,11 +23,6 @@ import lombok.NoArgsConstructor;
 public class UpdateLandlordDTO extends UpdateUserDTO {
 
     /**
-     * Set of property IDs owned by this landlord.
-     */
-    private Set<Long> propertyIds;
-
-    /**
      * Bank details associated with this landlord.
      */
     private BankDetails bankDetails;
