@@ -1,7 +1,5 @@
 package com.pensasha.backend.modules.user.landlord.dto;
 
-import java.util.Set;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
