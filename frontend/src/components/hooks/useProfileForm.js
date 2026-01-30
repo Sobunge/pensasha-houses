@@ -26,7 +26,6 @@ export default function useProfileForm(profile) {
       case "LANDLORD":
         return [
           ...baseFields,
-          { key: "properties", label: "Properties Owned (comma-separated)", placeholder: "e.g. Property 1, Property 2" },
           {
             key: "bankDetails",
             label: "Bank Details",
