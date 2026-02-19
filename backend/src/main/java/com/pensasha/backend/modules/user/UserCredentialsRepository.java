@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserCredentialsRepository extends JpaRepository<UserCredentials, Long> {
     
-    Optional<UserCredentials> findByUser_IdNumber(String idNumber);
+    Optional<UserCredentials> findByUser_PhoneNumber(String phoneNumber);
     
     void deleteByUser(User user);
     

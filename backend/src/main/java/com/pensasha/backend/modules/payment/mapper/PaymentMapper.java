@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.modules.payment.Payment;
 import com.pensasha.backend.modules.payment.dto.PaymentDTO;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
@@ -23,9 +23,9 @@ public interface PaymentMapper {
     PaymentDTO toDTO(Payment payment);
 
     // Convert tenantId to Tenant entity
-    default Tenant mapTenant(Long tenantId) {
+    default TenantProfile mapTenant(Long tenantId) {
         if (tenantId == null) return null;
-        Tenant tenant = new Tenant();
+        TenantProfile tenant = new TenantProfile();
         tenant.setId(tenantId);
         return tenant;
     }

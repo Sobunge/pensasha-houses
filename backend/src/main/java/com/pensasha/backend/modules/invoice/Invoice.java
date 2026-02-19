@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.payment.Payment;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 import jakarta.persistence.*;
 
@@ -41,7 +41,7 @@ public class Invoice {
     /** The tenant to whom this invoice belongs. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id", nullable = false)
-    private Tenant tenant;
+    private TenantProfile tenant;
 
     /** Total amount that the tenant is required to pay for this invoice. */
     private BigDecimal amountDue;

@@ -12,7 +12,7 @@ import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.lease.dto.LeaseDTO;
 import com.pensasha.backend.modules.unit.Unit;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 @Mapper(componentModel = "spring")
 public interface LeaseMapper {
@@ -30,9 +30,9 @@ public interface LeaseMapper {
     LeaseDTO toDTO(Lease lease);
 
     // Convert tenantId to Tenant entity
-    default Tenant mapTenant(Long tenantId) {
+    default TenantProfile mapTenant(Long tenantId) {
         if (tenantId == null) return null;
-        Tenant tenant = new Tenant();
+        TenantProfile tenant = new TenantProfile();
         tenant.setId(tenantId);
         return tenant;
     }

@@ -11,35 +11,46 @@ import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 
 /**
  * Mapper for converting between User entity and DTOs.
- * Supports partial updates via UpdateUserDTO and full conversion to GetUserDTO.
+ * Supports:
+ * - Full conversion to GetUserDTO
+ * - Partial updates via UpdateUserDTO (ignores system-managed fields)
  */
-@Mapper(
-    componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
 
     /* ===================== READ ===================== */
 
     /**
      * Converts a User entity to a GetUserDTO.
-     * @param user The User entity.
-     * @return The DTO representation.
+     * Maps all relevant fields including optional ones.
+     *
+     * @param user the User entity
+     * @return the DTO representation
      */
+    @Mapping(target = "profilePicture", source = "profilePictureUrl") // map correctly
     GetUserDTO toDTO(User user);
 
     /* ===================== UPDATE ===================== */
 
     /**
      * Updates an existing User entity from UpdateUserDTO.
-     * Ignores read-only or system-managed fields such as id and role.
+     * Ignores read-only or system-managed fields:
+     * - id
+     * - role
+     * - idNumber (cannot change once set)
+     * - profilePictureUrl (updated separately if needed)
      *
-     * @param user The existing User entity to update.
-     * @param dto  The DTO containing updated values.
+     * @param user the existing User entity to update
+     * @param dto  the DTO containing updated values
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "role", ignore = true)  // Role is managed separately
-    @Mapping(target = "profilePicture", ignore = true)
+    @Mapping(target = "role", ignore = true)
     @Mapping(target = "idNumber", ignore = true)
+    @Mapping(target = "profilePictureUrl", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "profileCompletionStatus", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     void updateEntity(@MappingTarget User user, UpdateUserDTO dto);
+
 }

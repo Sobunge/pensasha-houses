@@ -152,11 +152,11 @@ public class PropertyController {
         }
 
         // Gettting all properties of a landlord
-        @GetMapping("/landlord/{idNumber}")
+        @GetMapping("/landlord/{id}")
         public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getPropertiesByLandlord(
-                        @PathVariable String idNumber, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                        @PathVariable Long id, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
 
-                Page<Property> properties = propertyService.gettingPropertiesForLandlord(idNumber, pageable);
+                Page<Property> properties = propertyService.getPropertiesForLandlord(id, pageable);
 
                 if (properties.isEmpty()) {
                         return ResponseEntity.noContent().build();
@@ -171,20 +171,20 @@ public class PropertyController {
                                 .collect(Collectors.toList());
 
                 CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
-                                linkTo(methodOn(PropertyController.class).getPropertiesByLandlord(idNumber, pageable))
+                                linkTo(methodOn(PropertyController.class).getPropertiesByLandlord(id, pageable))
                                                 .withSelfRel());
 
                 // Add pagination links for next and previous pages if applicable
                 if (properties.hasNext()) {
                         Pageable nextPageable = properties.nextPageable();
                         responseDTO.add(linkTo(methodOn(PropertyController.class)
-                                        .getPropertiesByLandlord(idNumber, nextPageable)).withRel("next"));
+                                        .getPropertiesByLandlord(id, nextPageable)).withRel("next"));
                 }
 
                 if (properties.hasPrevious()) {
                         Pageable prevPageable = properties.previousPageable();
                         responseDTO.add(linkTo(methodOn(PropertyController.class)
-                                        .getPropertiesByLandlord(idNumber, prevPageable)).withRel("previous"));
+                                        .getPropertiesByLandlord(id, prevPageable)).withRel("previous"));
                 }
 
                 return ResponseEntity.ok(responseDTO);

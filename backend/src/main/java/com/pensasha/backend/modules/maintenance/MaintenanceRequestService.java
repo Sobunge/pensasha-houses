@@ -9,8 +9,8 @@ import com.pensasha.backend.modules.maintenance.dto.CreateMaintenanceRequestDTO;
 import com.pensasha.backend.modules.maintenance.dto.MaintenanceRequestResponseDTO;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.unit.UnitRepository;
-import com.pensasha.backend.modules.user.tenant.Tenant;
-import com.pensasha.backend.modules.user.tenant.TenantRepository;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
+import com.pensasha.backend.modules.user.tenant.TenantProfileRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -23,7 +23,7 @@ public class MaintenanceRequestService {
 
     private final MaintenanceRequestRepository maintenanceRequestRepository;
     private final UnitRepository unitRepository;
-    private final TenantRepository tenantRepository;
+    private final TenantProfileRepository tenantRepository;
 
     /**
      * CREATE a new maintenance request
@@ -32,7 +32,7 @@ public class MaintenanceRequestService {
             Long tenantId,
             CreateMaintenanceRequestDTO dto) {
 
-        Tenant tenant = tenantRepository.findById(tenantId)
+        TenantProfile tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("Tenant not found"));
 
         Unit unit = unitRepository.findById(dto.getUnitId())

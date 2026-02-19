@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pensasha.backend.modules.user.tenant.TenantRepository;
+import com.pensasha.backend.modules.user.tenant.TenantProfileRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
-    private final TenantRepository tenantRepository;
+    private final TenantProfileRepository tenantRepository;
     private final InvoiceSequenceRepository invoiceSequenceRepository;
 
     @Transactional
@@ -119,7 +119,7 @@ public class InvoiceService {
 
     public Page<Invoice> getInvoicesByTenant(String idNumber, Pageable pageable) {
         log.info("Fetching invoices for tenant with ID number: {}", idNumber);
-        return invoiceRepository.findByTenantIdNumber(idNumber, pageable);
+        return invoiceRepository.findByTenantUserIdNumber(idNumber, pageable);
     }
 
     public Page<Invoice> getInvoicesByProperty(Long propertyId, Pageable pageable) {

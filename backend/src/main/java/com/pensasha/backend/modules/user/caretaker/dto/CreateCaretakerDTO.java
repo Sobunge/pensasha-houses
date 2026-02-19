@@ -1,23 +1,24 @@
 package com.pensasha.backend.modules.user.caretaker.dto;
 
-import com.pensasha.backend.modules.user.dto.CreateUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO for creating a Caretaker.
- * Inherits common user creation fields from CreateUserDTO.
+ * DTO for creating a CaretakerProfile.
+ * 
+ * Includes a reference to an existing User and profile-specific fields.
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCaretakerDTO extends CreateUserDTO {
+public class CreateCaretakerDTO {
 
     /**
-     * ID of the property assigned to the caretaker.
+     * The ID of the existing User to link to this profile.
      */
-    private Long propertyId;
+    private Long userId;
+
 }

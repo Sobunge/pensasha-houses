@@ -1,35 +1,20 @@
 package com.pensasha.backend.modules.user;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-/**
- * Base entity representing a system user.
- * This class holds identity and profile-related data only.
- *
- * Authentication, authorization, and credentials should be handled
- * in a separate entity (e.g. UserCredentials).
- *
- * Subclasses include Tenant, Landlord, and Caretaker.
- */
 @Entity
-@Table(
-    name = "users",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = "id_number"),
-        @UniqueConstraint(columnNames = "phone_number"),
-        @UniqueConstraint(columnNames = "email")
-    }
-)
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public abstract class User {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,30 +22,67 @@ public abstract class User {
 
     /* ===================== IDENTITY ===================== */
 
-    @Column(name = "first_name", length = 50)
+    @Column(length = 50)
     private String firstName;
 
-    @Column(name = "middle_name", length = 50)
+    @Column(length = 50)
     private String middleName;
 
-    @Column(name = "last_name", length = 50)
+    @Column(length = 50)
     private String lastName;
 
-    @Column(name = "id_number", nullable = false, unique = true, length = 30)
+    // Optional — collected later during verification
+    @Column(unique = true, length = 30)
     private String idNumber;
 
-    @Column(name = "phone_number", unique = true, length = 20)
+    // REQUIRED — primary login identity (E.164 format)
+    @Column(unique = true, nullable = false, length = 15)
     private String phoneNumber;
 
-    @Column(name = "email", unique = true, length = 100)
+    // Optional email
+    @Column(unique = true, length = 100)
     private String email;
 
     /* ===================== PROFILE ===================== */
 
-    @Column(name = "profile_picture")
-    private String profilePicture;
+    @Column(name = "profile_picture_url", length = 255)
+    private String profilePictureUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProfileCompletionStatus profileCompletionStatus =
+            ProfileCompletionStatus.BASIC;
+
+    /* ===================== AUDIT ===================== */
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    /* ===================== FACTORY ===================== */
+
+    /**
+     * Minimal registration entry.
+     * Used at first signup (phone + role only).
+     */
+    public static User minimal(
+            String phoneNumber,
+            Role role
+    ) {
+        User user = new User();
+        user.setPhoneNumber(phoneNumber);
+        user.setRole(role);
+        return user;
+    }
 }

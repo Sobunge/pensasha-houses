@@ -1,5 +1,8 @@
 package com.pensasha.backend.modules.invoice.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -7,41 +10,36 @@ import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.modules.invoice.dto.InvoiceDTO;
 import com.pensasha.backend.modules.payment.Payment;
 
-@Mapper(componentModel = "spring") // Specifies that MapStruct will generate a Spring bean of this mapper
+@Mapper(componentModel = "spring")
 public interface InvoiceMapper {
 
-    // Mapping from the Invoice entity to the InvoiceDTO
-    // This method maps the relevant fields between the entity and the DTO
-    @Mapping(source = "tenant.id", target = "tenantId") // Maps tenant's id field to tenantId in DTO
-    @Mapping(source = "lease.id", target = "leaseId") // Maps lease's id field to leaseId in DTO
-    @Mapping(source = "payments", target = "paymentIds") // Maps list of Payment entities to list of payment IDs in DTO
-    InvoiceDTO toDTO(Invoice invoice); // Converts Invoice entity to InvoiceDTO
+    /* =========================
+       ENTITY → DTO
+       ========================= */
 
-    // Mapping from the InvoiceDTO to the Invoice entity
-    // This method converts the DTO back to an entity, populating the corresponding
-    // fields
+    @Mapping(source = "invoiceNumber", target = "invoiceNumber")
+    @Mapping(source = "tenant.id", target = "tenantId")
+    @Mapping(source = "lease.id", target = "leaseId")
+    @Mapping(target = "paymentIds", expression = "java(mapPaymentsToIds(invoice.getPayments()))")
+    InvoiceDTO toDTO(Invoice invoice);
 
-    @Mapping(target = "tenant.id", source = "tenantId") // Maps tenantId from DTO to tenant's id field in the entity
-    @Mapping(target = "lease.id", source = "leaseId") // Maps leaseId from DTO to lease's id field in the entity
-    @Mapping(source = "paymentIds", target = "payments") // Maps list of payment IDs in DTO to list of Payment entities
-    Invoice toEntity(InvoiceDTO invoiceDTO); // Converts InvoiceDTO back to Invoice entity
+    /* =========================
+       DTO → ENTITY
+       ========================= */
 
-    // Helper method to convert a Payment object to its ID (used for mapping Payment
-    // list to paymentIds)
-    // This is used when mapping from Invoice entity to InvoiceDTO
+    @Mapping(target = "tenant", ignore = true)
+    @Mapping(target = "lease", ignore = true)
+    @Mapping(target = "payments", ignore = true)
+    Invoice toEntity(InvoiceDTO dto);
 
-    default Long paymentToId(Payment payment) {
-        return payment.getId(); // Returns the ID of the Payment
+    /* =========================
+       HELPERS
+       ========================= */
+
+    default List<Long> mapPaymentsToIds(List<Payment> payments) {
+        if (payments == null) return List.of();
+        return payments.stream()
+                .map(Payment::getId)
+                .collect(Collectors.toList());
     }
-
-    // Helper method to convert a Long (payment ID) back to a Payment object (used
-    // for mapping paymentIds to Payments)
-    // This is used when mapping from InvoiceDTO to Invoice entity
-
-    default Payment idToPayment(Long id) {
-        Payment payment = new Payment(); // Creates a new Payment object
-        payment.setId(id); // Sets the ID of the new Payment object
-        return payment; // Returns the Payment object
-    }
-
 }

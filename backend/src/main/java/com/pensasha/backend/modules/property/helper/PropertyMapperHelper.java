@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.unit.UnitRepository;
-import com.pensasha.backend.modules.user.caretaker.Caretaker;
-import com.pensasha.backend.modules.user.caretaker.CaretakerRepository;
-import com.pensasha.backend.modules.user.landlord.LandLord;
-import com.pensasha.backend.modules.user.landlord.LandLordRepository;
+import com.pensasha.backend.modules.user.caretaker.CaretakerProfile;
+import com.pensasha.backend.modules.user.caretaker.CaretakerProfileRepository;
+import com.pensasha.backend.modules.user.landlord.LandlordProfile;
+import com.pensasha.backend.modules.user.landlord.LandlordProfileRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -26,8 +26,8 @@ import lombok.AllArgsConstructor;
 public class PropertyMapperHelper {
 
     // Repositories for accessing LandLord, Caretaker, and Unit entities
-    private final LandLordRepository landLordRepository;
-    private final CaretakerRepository caretakerRepository;
+    private final LandlordProfileRepository landLordRepository;
+    private final CaretakerProfileRepository caretakerRepository;
     private final UnitRepository unitRepository;
 
     /**
@@ -38,7 +38,7 @@ public class PropertyMapperHelper {
      * @throws ResourceNotFoundException if no landlord is found with the given ID
      */
     @Named("landlordIdToLandlord") // Exposes this method to MapStruct with a specific name
-    public LandLord getLandlordbyId(Long landlordId) {
+    public LandlordProfile getLandlordbyId(Long landlordId) {
         return landLordRepository.findById(landlordId)
                 .orElseThrow(() -> new ResourceNotFoundException("LandLord not found with id: " + landlordId));
     }
@@ -51,7 +51,7 @@ public class PropertyMapperHelper {
      * @throws ResourceNotFoundException if no caretaker is found with the given ID
      */
     @Named("caretakerIdToCaretaker")
-    public Caretaker getCaretakerById(Long caretakerId) {
+    public CaretakerProfile getCaretakerById(Long caretakerId) {
         return caretakerRepository.findById(caretakerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Caretaker not found with id: " + caretakerId));
     }

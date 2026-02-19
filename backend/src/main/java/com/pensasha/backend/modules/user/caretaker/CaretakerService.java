@@ -3,13 +3,12 @@ package com.pensasha.backend.modules.user.caretaker;
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.property.PropertyRepository;
+import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.caretaker.dto.CreateCaretakerDTO;
 import com.pensasha.backend.modules.user.caretaker.dto.GetCaretakerDTO;
 import com.pensasha.backend.modules.user.caretaker.mapper.CaretakerMapper;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,90 +19,79 @@ import java.util.stream.Collectors;
 @Service
 public class CaretakerService {
 
-    private final CaretakerRepository caretakerRepository;
+    private final CaretakerProfileRepository caretakerRepository;
     private final PropertyRepository propertyRepository;
     private final CaretakerMapper caretakerMapper;
 
     /**
-     * Create a new caretaker from a CreateCaretakerDTO.
-     *
-     * @param dto The DTO containing caretaker info
-     * @return The saved caretaker as GetCaretakerDTO
+     * Create a new caretaker profile linked to a User.
      */
-    public GetCaretakerDTO createCaretaker(CreateCaretakerDTO dto) {
-        Caretaker caretaker = caretakerMapper.toEntity(dto);
+    public GetCaretakerDTO createCaretaker(CreateCaretakerDTO dto, User user) {
+        // Map DTO to entity
+        CaretakerProfile profile = caretakerMapper.toEntity(dto);
 
-        // Save caretaker
-        caretakerRepository.save(caretaker);
-        log.info("Created new caretaker with ID {}", caretaker.getId());
+        // Link the profile to the user
+        profile.setUser(user);
 
-        return caretakerMapper.toGetDTO(caretaker);
+        caretakerRepository.save(profile);
+        log.info("Created new caretaker profile with ID {}", profile.getId());
+
+        return caretakerMapper.toGetDTO(profile);
     }
 
     /**
      * Assign or update a caretaker's property.
-     *
-     * @param caretakerId The caretaker's ID
-     * @param propertyId  The property ID to assign
-     * @return Updated GetCaretakerDTO
      */
-    public GetCaretakerDTO updateAssignedProperty(Long caretakerId, Long propertyId) {
-        Caretaker caretaker = caretakerRepository.findById(caretakerId)
+    public GetCaretakerDTO updateAssignedProperty(Long caretakerProfileId, Long propertyId) {
+        CaretakerProfile profile = caretakerRepository.findById(caretakerProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Caretaker not found with ID: " + caretakerId));
+                        "Caretaker profile not found with ID: " + caretakerProfileId));
 
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Property not found with ID: " + propertyId));
 
-        caretaker.setAssignedProperty(property);
-        caretakerRepository.save(caretaker);
+        profile.setAssignedProperty(property);
+        caretakerRepository.save(profile);
 
-        log.info("Assigned property ID {} to caretaker ID {}", propertyId, caretakerId);
-        return caretakerMapper.toGetDTO(caretaker);
+        log.info("Assigned property ID {} to caretaker profile ID {}", propertyId, caretakerProfileId);
+        return caretakerMapper.toGetDTO(profile);
     }
 
     /**
-     * Retrieve a single caretaker by ID.
-     *
-     * @param caretakerId The caretaker ID
-     * @return GetCaretakerDTO for the caretaker
+     * Retrieve a single caretaker profile by ID.
      */
-    public GetCaretakerDTO getCaretaker(Long caretakerId) {
-        Caretaker caretaker = caretakerRepository.findById(caretakerId)
+    public GetCaretakerDTO getCaretaker(Long caretakerProfileId) {
+        CaretakerProfile profile = caretakerRepository.findById(caretakerProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Caretaker not found with ID: " + caretakerId));
+                        "Caretaker profile not found with ID: " + caretakerProfileId));
 
-        log.info("Retrieved caretaker with ID {}", caretakerId);
-        return caretakerMapper.toGetDTO(caretaker);
+        log.info("Retrieved caretaker profile with ID {}", caretakerProfileId);
+        return caretakerMapper.toGetDTO(profile);
     }
 
     /**
-     * Retrieve all caretakers.
-     *
-     * @return List of GetCaretakerDTO
+     * Retrieve all caretaker profiles.
      */
     public List<GetCaretakerDTO> getAllCaretakers() {
-        List<Caretaker> caretakers = caretakerRepository.findAll();
-        log.info("Retrieved {} caretakers", caretakers.size());
+        List<CaretakerProfile> profiles = caretakerRepository.findAll();
+        log.info("Retrieved {} caretaker profiles", profiles.size());
 
-        return caretakers.stream()
+        return profiles.stream()
                 .map(caretakerMapper::toGetDTO)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Delete a caretaker by ID.
-     *
-     * @param caretakerId The caretaker ID
+     * Delete a caretaker profile by ID.
      */
-    public void deleteCaretaker(Long caretakerId) {
-        if (!caretakerRepository.existsById(caretakerId)) {
+    public void deleteCaretaker(Long caretakerProfileId) {
+        if (!caretakerRepository.existsById(caretakerProfileId)) {
             throw new ResourceNotFoundException(
-                    "Caretaker not found with ID: " + caretakerId);
+                    "Caretaker profile not found with ID: " + caretakerProfileId);
         }
 
-        caretakerRepository.deleteById(caretakerId);
-        log.info("Deleted caretaker with ID {}", caretakerId);
+        caretakerRepository.deleteById(caretakerProfileId);
+        log.info("Deleted caretaker profile with ID {}", caretakerProfileId);
     }
 }

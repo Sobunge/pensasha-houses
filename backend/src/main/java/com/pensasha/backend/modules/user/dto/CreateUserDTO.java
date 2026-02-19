@@ -2,10 +2,7 @@ package com.pensasha.backend.modules.user.dto;
 
 import com.pensasha.backend.modules.user.Role;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -15,14 +12,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CreateUserDTO {
 
-    @NotBlank
-    @Pattern(regexp = "^[0-9]{7,8}$")
-    private String idNumber;
+    @NotBlank(message = "Phone number is required")
+    @Pattern(
+        regexp = "^\\+?[1-9]\\d{7,14}$",
+        message = "Invalid phone number format"
+    )
+    private String phoneNumber;
 
-    @NotBlank
-    @Size(min = 8)
+    @NotBlank(message = "Password is required")
+    @Size(min = 5, message = "Password must be at least 5 characters")
     private String password;
 
-    @NotNull
+    @NotNull(message = "Role is required")
     private Role role;
 }

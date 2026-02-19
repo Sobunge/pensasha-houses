@@ -49,7 +49,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("errors", errors));
         }
 
-        if (userService.userExists(dto.getIdNumber())) {
+        if (userService.userExists(dto.getPhoneNumber())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("error", "User already exists"));
         }
@@ -73,10 +73,12 @@ public class AuthController {
         }
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getIdNumber(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(
+                        request.getPhoneNumber(), 
+                        request.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
         Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
@@ -94,14 +96,15 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         Role role = userDetails.getPrimaryRole();
+
         AuthPrincipalDTO principal = new AuthPrincipalDTO(
                 userDetails.getUser().getId(),
-                userDetails.getUsername(),
+                userDetails.getUser().getPhoneNumber(), // ✅ return phone
                 role.name().toLowerCase(),
-                resolveDefaultRoute(role)
-        );
+                resolveDefaultRoute(role));
 
-        return ResponseEntity.ok(new LoginResponseDTO(accessToken, principal));
+        return ResponseEntity.ok(
+                new LoginResponseDTO(accessToken, principal));
     }
 
     // ========================= REFRESH TOKEN =========================
@@ -109,13 +112,14 @@ public class AuthController {
     public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request) {
 
         String refreshToken = Arrays.stream(Optional.ofNullable(request.getCookies())
-                        .orElse(new Cookie[0]))
+                .orElse(new Cookie[0]))
                 .filter(c -> "refreshToken".equals(c.getName()))
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);
 
-        if (refreshToken == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (refreshToken == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         String username = jwtUtils.extractUsername(refreshToken);
         CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(username);
@@ -130,8 +134,7 @@ public class AuthController {
                 userDetails.getUser().getId(),
                 userDetails.getUsername(),
                 role.name().toLowerCase(),
-                resolveDefaultRoute(role)
-        );
+                resolveDefaultRoute(role));
 
         return ResponseEntity.ok(new LoginResponseDTO(newAccessToken, principal));
     }

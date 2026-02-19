@@ -3,24 +3,25 @@ package com.pensasha.backend.modules.maintenance.mapper;
 import com.pensasha.backend.modules.maintenance.MaintenanceRequest;
 import com.pensasha.backend.modules.maintenance.dto.CreateMaintenanceRequestDTO;
 import com.pensasha.backend.modules.maintenance.dto.MaintenanceRequestResponseDTO;
+import com.pensasha.backend.modules.unit.Unit;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 public class MaintenanceRequestMapper {
 
     /**
-     * Maps a CreateMaintenanceRequestDTO + resolved tenant/unit to a MaintenanceRequest entity
+     * Maps a CreateMaintenanceRequestDTO + resolved tenant/unit to a
+     * MaintenanceRequest entity
      */
     public static MaintenanceRequest toEntity(
             CreateMaintenanceRequestDTO dto,
-            com.pensasha.backend.modules.unit.Unit unit,
-            com.pensasha.backend.modules.user.tenant.Tenant tenant) {
+            Unit unit, TenantProfile tenant) {
 
         return new MaintenanceRequest(
                 dto.getType(),
                 dto.getPriority(),
                 dto.getDescription(),
                 unit,
-                tenant
-        );
+                tenant);
     }
 
     /**
@@ -35,7 +36,6 @@ public class MaintenanceRequestMapper {
                 request.getRequestDate(),
                 request.getDescription(),
                 request.getUnit().getId(),
-                request.getTenant().getId()
-        );
+                request.getTenant().getId());
     }
 }

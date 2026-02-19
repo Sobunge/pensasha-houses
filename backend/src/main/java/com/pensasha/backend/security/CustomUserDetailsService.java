@@ -12,7 +12,7 @@ import com.pensasha.backend.modules.user.UserCredentialsRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Loads user authentication data based on ID number.
+ * Loads user authentication data based on phone number.
  * Authentication is credential-driven, not user-driven.
  */
 @Service
@@ -22,21 +22,21 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserCredentialsRepository userCredentialsRepository;
 
     /**
-     * Load user credentials by ID number and wrap in CustomUserDetails.
+     * Load user credentials by phone number and wrap in CustomUserDetails.
      *
-     * @param idNumber national ID number (used as username)
+     * @param phoneNumber user phone number (used as username)
      * @return UserDetails implementation
      * @throws UsernameNotFoundException if credentials are not found
      */
     @Override
-    public UserDetails loadUserByUsername(String idNumber)
+    public UserDetails loadUserByUsername(String phoneNumber)
             throws UsernameNotFoundException {
 
         UserCredentials credentials = userCredentialsRepository
-                .findByUser_IdNumber(idNumber)
+                .findByUser_PhoneNumber(phoneNumber)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "Authentication failed: user not found with ID " + idNumber
+                                "Authentication failed: user not found with phone " + phoneNumber
                         )
                 );
 

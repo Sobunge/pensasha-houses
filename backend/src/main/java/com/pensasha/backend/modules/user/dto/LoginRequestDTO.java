@@ -1,22 +1,31 @@
 package com.pensasha.backend.modules.user.dto;
 
-import jakarta.validation.constraints.NotBlank;  // Importing validation annotations from Jakarta API
-import jakarta.validation.constraints.Pattern;  // Importing Pattern annotation from Jakarta API
-import lombok.Getter;  // Lombok annotation for automatic getter generation
-import lombok.Setter;  // Lombok annotation for automatic setter generation
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.Setter;
 
-// DTO class used for user login request
-@Getter  // Lombok annotation to generate getter methods for all fields
-@Setter  // Lombok annotation to generate setter methods for all fields
+/**
+ * DTO used for user login request (phone-based authentication)
+ */
+@Getter
+@Setter
 public class LoginRequestDTO {
 
-    // ID Number of the user, must not be blank (validated by @NotBlank)
-    
-    @NotBlank // Ensures the idNumber is not blank
-    @Pattern(regexp = "\\d+", message = "ID number must contain digits only")
-    private String idNumber;
+    /**
+     * Phone number in international format (E.164 preferred)
+     * Example: +254712345678
+     */
+    @NotBlank(message = "Phone number is required")
+    @Pattern(
+            regexp = "^\\+?[1-9]\\d{7,14}$",
+            message = "Enter a valid phone number"
+    )
+    private String phoneNumber;
 
-    // Password of the user, must not be blank (validated by @NotBlank)
-    @NotBlank(message = "Password is required")  // Ensures the password is not blank
+    /**
+     * User password
+     */
+    @NotBlank(message = "Password is required")
     private String password;
 }

@@ -2,6 +2,7 @@ package com.pensasha.backend.modules.user.tenant;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.lease.Lease;
+import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 import com.pensasha.backend.modules.user.tenant.dto.UpdateTenantDTO;
 import com.pensasha.backend.modules.user.tenant.mapper.TenantMapper;
@@ -14,133 +15,131 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service class for handling business logic related to Tenant entities.
+ * Service class for handling TenantProfile-related business logic.
+ * Works with User + TenantProfile design.
  */
 @Service
 @AllArgsConstructor
 @Slf4j
 public class TenantService {
 
-    private final TenantRepository tenantRepository;
+    private final TenantProfileRepository tenantRepository;
     private final TenantMapper tenantMapper;
 
     /**
-     * Get tenant details by database ID
+     * Get tenant profile by TenantProfile ID
      */
-    public TenantDTO getTenantById(Long id) {
-        log.info("Fetching tenant with ID: {}", id);
+    public TenantDTO getTenantById(Long tenantProfileId) {
+        log.info("Fetching tenant profile with ID: {}", tenantProfileId);
 
-        Tenant tenant = tenantRepository.findById(id)
+        TenantProfile tenantProfile = tenantRepository.findById(tenantProfileId)
                 .orElseThrow(() -> {
-                    log.error("Tenant with ID {} not found", id);
+                    log.error("Tenant profile with ID {} not found", tenantProfileId);
                     return new ResourceNotFoundException(
-                            "Tenant with ID " + id + " not found."
+                            "Tenant profile with ID " + tenantProfileId + " not found."
                     );
                 });
 
-        return tenantMapper.toDTO(tenant);
+        return tenantMapper.toDTO(tenantProfile);
     }
 
     /**
-     * Get paginated list of tenants
+     * Get paginated list of tenant profiles
      */
     public Page<TenantDTO> getAllTenants(Pageable pageable) {
-        log.info(
-            "Fetching tenants page: {}, size: {}",
-            pageable.getPageNumber(),
-            pageable.getPageSize()
-        );
+        log.info("Fetching tenants page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
-        Page<Tenant> tenantsPage = tenantRepository.findAll(pageable);
+        Page<TenantProfile> tenantPage = tenantRepository.findAll(pageable);
 
-        List<TenantDTO> tenantDTOs = tenantsPage.getContent()
+        List<TenantDTO> tenantDTOs = tenantPage.getContent()
                 .stream()
                 .map(tenantMapper::toDTO)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(
-                tenantDTOs,
-                pageable,
-                tenantsPage.getTotalElements()
-        );
+        return new PageImpl<>(tenantDTOs, pageable, tenantPage.getTotalElements());
     }
 
     /**
-     * Update emergency contact for a tenant by ID
+     * Update emergency contact for a tenant profile
      */
-    public TenantDTO updateEmergencyContact(Long id, String emergencyContact) {
-        log.info("Updating emergency contact for tenant with ID: {}", id);
+    public TenantDTO updateEmergencyContact(Long tenantProfileId, String emergencyContact) {
+        log.info("Updating emergency contact for tenant profile ID: {}", tenantProfileId);
 
-        Tenant tenant = tenantRepository.findById(id)
+        TenantProfile tenantProfile = tenantRepository.findById(tenantProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Tenant with ID " + id + " not found."
+                        "Tenant profile with ID " + tenantProfileId + " not found."
                 ));
 
-        tenant.setEmergencyContact(emergencyContact);
+        tenantProfile.setEmergencyContact(emergencyContact);
 
-        Tenant updatedTenant = tenantRepository.save(tenant);
+        TenantProfile updatedTenant = tenantRepository.save(tenantProfile);
 
-        log.info("Emergency contact updated successfully for tenant ID: {}", id);
+        log.info("Emergency contact updated successfully for tenant profile ID: {}", tenantProfileId);
         return tenantMapper.toDTO(updatedTenant);
     }
 
     /**
-     * Update leases for a tenant by ID
+     * Update leases for a tenant profile
      */
-    public TenantDTO updateLeases(Long id, List<Lease> leases) {
-        log.info("Updating leases for tenant with ID: {}", id);
+    public TenantDTO updateLeases(Long tenantProfileId, List<Lease> leases) {
+        log.info("Updating leases for tenant profile ID: {}", tenantProfileId);
 
-        Tenant tenant = tenantRepository.findById(id)
+        TenantProfile tenantProfile = tenantRepository.findById(tenantProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Tenant with ID " + id + " not found."
+                        "Tenant profile with ID " + tenantProfileId + " not found."
                 ));
 
-        tenant.setLeases(leases);
+        tenantProfile.setLeases(leases);
 
-        Tenant updatedTenant = tenantRepository.save(tenant);
+        TenantProfile updatedTenant = tenantRepository.save(tenantProfile);
 
-        log.info("Leases updated successfully for tenant ID: {}", id);
+        log.info("Leases updated successfully for tenant profile ID: {}", tenantProfileId);
         return tenantMapper.toDTO(updatedTenant);
     }
 
     /**
-     * Delete tenant by database ID
+     * Delete tenant profile by ID
      */
-    public boolean deleteTenant(Long id) {
-        log.info("Deleting tenant with ID: {}", id);
+    public boolean deleteTenant(Long tenantProfileId) {
+        log.info("Deleting tenant profile with ID: {}", tenantProfileId);
 
-        if (!tenantRepository.existsById(id)) {
-            log.warn("Tenant with ID {} not found for deletion", id);
+        if (!tenantRepository.existsById(tenantProfileId)) {
+            log.warn("Tenant profile with ID {} not found for deletion", tenantProfileId);
             return false;
         }
 
-        tenantRepository.deleteById(id);
-        log.info("Tenant with ID {} deleted successfully", id);
+        tenantRepository.deleteById(tenantProfileId);
+        log.info("Tenant profile with ID {} deleted successfully", tenantProfileId);
         return true;
     }
 
     /**
-    * Updating tenant information 
-    */
-   public TenantDTO updateTenantDetails(Long id, UpdateTenantDTO updateTenantDTO) {
-       log.info("Updating tenant details for ID: {}", id);
+     * Update tenant profile and linked user information
+     */
+    public TenantDTO updateTenantDetails(Long tenantProfileId, UpdateTenantDTO dto) {
+        log.info("Updating tenant profile and user details for ID: {}", tenantProfileId);
 
-       Tenant tenant = tenantRepository.findById(id)
-               .orElseThrow(() -> new ResourceNotFoundException(
-                       "Tenant with ID " + id + " not found."
-               ));
+        TenantProfile tenantProfile = tenantRepository.findById(tenantProfileId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Tenant profile with ID " + tenantProfileId + " not found."
+                ));
 
-       tenant.setFirstName(updateTenantDTO.getFirstName());
-       tenant.setMiddleName(updateTenantDTO.getMiddleName());
-       tenant.setLastName(updateTenantDTO.getLastName());
-       tenant.setPhoneNumber(updateTenantDTO.getPhoneNumber());
-       tenant.setEmail(updateTenantDTO.getEmail());
-       tenant.setEmergencyContact(updateTenantDTO.getEmergencyContact());
+        // Update tenant-specific fields
+        tenantProfile.setEmergencyContact(dto.getEmergencyContact());
 
-       Tenant updatedTenant = tenantRepository.save(tenant);
+        // Update linked User fields
+        User user = tenantProfile.getUser();
+        if (user != null) {
+            if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
+            if (dto.getMiddleName() != null) user.setMiddleName(dto.getMiddleName());
+            if (dto.getLastName() != null) user.setLastName(dto.getLastName());
+            if (dto.getPhoneNumber() != null) user.setPhoneNumber(dto.getPhoneNumber());
+            if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+        }
 
-       log.info("Tenant details updated successfully for ID: {}", id);
-       return tenantMapper.toDTO(updatedTenant);
-   }
+        TenantProfile updatedTenant = tenantRepository.save(tenantProfile);
 
+        log.info("Tenant profile and user details updated successfully for ID: {}", tenantProfileId);
+        return tenantMapper.toDTO(updatedTenant);
+    }
 }

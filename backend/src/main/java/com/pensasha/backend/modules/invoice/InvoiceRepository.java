@@ -20,7 +20,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
      * @param pageable Pageable object to handle pagination and sorting.
      * @return A paginated list of matching invoices.
      */
-    Page<Invoice> findByTenantIdNumber(String idNumber, Pageable pageable);
+    Page<Invoice> findByTenantUserIdNumber(String idNumber, Pageable pageable);
 
     /**
      * Retrieves a paginated list of invoices for a specific property via the lease's unit.

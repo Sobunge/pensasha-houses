@@ -3,18 +3,15 @@ package com.pensasha.backend.modules.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pensasha.backend.modules.user.caretaker.Caretaker;
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
-import com.pensasha.backend.modules.user.landlord.LandLord;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
+import com.pensasha.backend.modules.user.landlord.LandlordProfile;
+import com.pensasha.backend.modules.user.caretaker.CaretakerProfile;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Factory component responsible for creating User entity instances during registration.
- * Copies common attributes and sets the role.
- * Role-specific attributes can be added later via profile update.
- * Authentication info (password, lock, enabled) is handled separately in UserCredentials.
+ * Factory for creating User and role-specific profiles.
  */
 @Component
 @Slf4j
@@ -24,30 +21,45 @@ public class UserFactory {
     private UserServiceHelper userServiceHelper;
 
     /**
-     * Creates a new User entity based on the role in the DTO.
-     * Only copies common attributes (firstName, middleName, lastName, idNumber, phoneNumber, role).
-     *
-     * @param userDTO The DTO containing user information.
-     * @return A new User (Tenant, Landlord, Caretaker, or Admin) entity.
+     * Creates a new User with common attributes from the DTO.
      */
     public User createUser(CreateUserDTO userDTO) {
-        log.info("Creating user with role: {}", userDTO.getRole());
+        log.info("Creating base user with role: {}", userDTO.getRole());
 
-        User user;
+        User user = new User();
 
-        switch (userDTO.getRole()) {
-            case TENANT -> user = new Tenant();
-            case LANDLORD -> user = new LandLord();
-            case CARETAKER -> user = new Caretaker();
-            case ADMIN -> user = new User() {}; // Anonymous subclass since User is abstract
-            default -> throw new IllegalArgumentException(
-                    "Invalid user type provided for ID: " + userDTO.getIdNumber());
-        }
-
-        // Copy common fields (id, role)
+        // copy shared fields: firstName, middleName, lastName, idNumber, phoneNumber, role
         userServiceHelper.applyCreateAttributes(user, userDTO);
 
-        log.debug("Created {} with ID {}", user.getClass().getSimpleName(), user.getIdNumber());
+        log.debug("Created User for role {} with ID {}", userDTO.getRole(), user.getIdNumber());
         return user;
+    }
+
+    /**
+     * Creates a role-specific profile for a given User.
+     */
+    public Object createProfileForUser(User user, CreateUserDTO userDTO) {
+        switch (userDTO.getRole()) {
+            case TENANT -> {
+                TenantProfile tenantProfile = new TenantProfile();
+                tenantProfile.setUser(user);
+                return tenantProfile;
+            }
+            case LANDLORD -> {
+                LandlordProfile landlordProfile = new LandlordProfile();
+                landlordProfile.setUser(user);
+                return landlordProfile;
+            }
+            case CARETAKER -> {
+                CaretakerProfile caretakerProfile = new CaretakerProfile();
+                caretakerProfile.setUser(user);
+                return caretakerProfile;
+            }
+            case ADMIN -> {
+                return user; // Admin may not need a separate profile
+            }
+            default -> throw new IllegalArgumentException(
+                    "Invalid role for user ID: " + user.getIdNumber());
+        }
     }
 }

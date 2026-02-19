@@ -15,7 +15,7 @@ public class UserServiceHelper {
      * Copy fields common to all users during creation.
      */
     public void applyCreateAttributes(User user, CreateUserDTO dto) {
-        user.setIdNumber(dto.getIdNumber());
+        user.setPhoneNumber(dto.getPhoneNumber());
         user.setRole(dto.getRole());
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.modules.unit.Unit;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,7 +45,7 @@ public class Lease {
      */
     @ManyToOne
     @JoinColumn(name = "tenant_id", nullable = false)
-    private Tenant tenant;
+    private TenantProfile tenant;
 
     /**
      * The unit being leased.

@@ -5,7 +5,8 @@ import java.util.List;
 
 import com.pensasha.backend.modules.maintenance.MaintenanceRequest;
 import com.pensasha.backend.modules.property.Property;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,10 +42,11 @@ public class Unit {
 
     /**
      * Current occupant only
+     * Points to TenantProfile, not User directly
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_id")
-    private Tenant tenant;
+    @JoinColumn(name = "tenant_profile_id")
+    private TenantProfile tenant;
 
     @OneToMany(
         mappedBy = "unit",

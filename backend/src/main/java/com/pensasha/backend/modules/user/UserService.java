@@ -32,24 +32,30 @@ public class UserService {
 
     @Transactional
     public GetUserDTO createUser(CreateUserDTO dto) {
-        // Check if user with ID already exists
-        if (userRepository.existsByIdNumber(dto.getIdNumber())) {
-            throw new IllegalArgumentException("User with this ID already exists: " + dto.getIdNumber());
+
+        // Validate phone number uniqueness
+        if (userRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
+            throw new IllegalArgumentException(
+                    "User with this phone number already exists: " + dto.getPhoneNumber());
         }
 
-        // Create the user entity based on role
+        // Create user entity
         User user = userFactory.createUser(dto);
         userRepository.save(user);
 
-        // Create the credentials
+        // Create credentials
         UserCredentials credentials = new UserCredentials();
         credentials.setUser(user);
         credentials.setPassword(passwordEncoder.encode(dto.getPassword()));
         credentials.setEnabled(true);
         credentials.setLocked(false);
+
         credentialsRepository.save(credentials);
 
-        log.info("Created new user: {} (role: {})", user.getIdNumber(), user.getRole());
+        log.info("Created new user: {} (role: {})",
+                user.getPhoneNumber(),
+                user.getRole());
+
         return userMapper.toDTO(user);
     }
 
@@ -109,6 +115,11 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
+    public User getUserEntityById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    }
+
     public Page<GetUserDTO> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(userMapper::toDTO);
@@ -137,12 +148,12 @@ public class UserService {
     }
 
     /* ===================== Check if user exists ===================== */
-    public boolean userExists(String idNumber) {
-        return userRepository.existsByIdNumber(idNumber);
+    public boolean userExists(String phoneNumber) {
+        return userRepository.existsByPhoneNumber(phoneNumber);
     }
 
     public boolean userExistsById(Long id) {
-    return userRepository.existsById(id);
-}
+        return userRepository.existsById(id);
+    }
 
 }

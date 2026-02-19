@@ -16,8 +16,6 @@ public class CustomUserDetails implements UserDetails {
         this.credentials = credentials;
     }
 
-    /* ===================== DOMAIN ACCESS ===================== */
-
     public User getUser() {
         return credentials.getUser();
     }
@@ -26,33 +24,21 @@ public class CustomUserDetails implements UserDetails {
         return credentials.getUser().getRole();
     }
 
-    /* ===================== AUTHORITIES ===================== */
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Role inferred by inheritance, not enums
-        String role = credentials.getUser()
-                .getClass()
-                .getSimpleName()
-                .toUpperCase();
-
+        String role = credentials.getUser().getRole().name();
         return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
-    /* ===================== AUTH ===================== */
-
     @Override
     public String getUsername() {
-        // Login identifier
-        return credentials.getUser().getIdNumber();
+        return credentials.getUser().getPhoneNumber();
     }
 
     @Override
     public String getPassword() {
         return credentials.getPassword();
     }
-
-    /* ===================== ACCOUNT STATE ===================== */
 
     @Override
     public boolean isAccountNonExpired() {

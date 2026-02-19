@@ -3,7 +3,7 @@ package com.pensasha.backend.modules.maintenance;
 import java.time.LocalDateTime;
 
 import com.pensasha.backend.modules.unit.Unit;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -57,7 +57,7 @@ public class MaintenanceRequest {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant_id", nullable = false, updatable = false)
-    private Tenant tenant;
+    private TenantProfile tenant;
 
     @Version
     private Long version;
@@ -70,7 +70,7 @@ public class MaintenanceRequest {
             MaintenancePriority priority,
             String description,
             Unit unit,
-            Tenant tenant) {
+            TenantProfile tenant) {
 
         if (type == null || priority == null || description == null || unit == null || tenant == null) {
             throw new IllegalArgumentException("Maintenance request fields must not be null");

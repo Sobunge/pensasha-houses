@@ -3,7 +3,7 @@ package com.pensasha.backend.modules.payment;
 import java.time.LocalDate;
 
 import com.pensasha.backend.modules.invoice.Invoice;
-import com.pensasha.backend.modules.user.tenant.Tenant;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,7 +43,7 @@ public class Payment {
      */
     @ManyToOne
     @JoinColumn(name = "tenant_id", nullable = false)
-    private Tenant tenant;
+    private TenantProfile tenant;
 
     /**
      * The invoice this payment is linked to (if any).

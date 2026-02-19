@@ -17,6 +17,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
      * @param pageable Pagination information (e.g., page number, page size).
      * @return A Page of properties that belong to the landlord with the given ID.
      */
-    Page<Property> findByLandLordIdNumber(String landlordIdNumber, Pageable pageable);
+    Page<Property> findByLandlord_User_IdNumber(String idNumber, Pageable pageable);
+
 
 }

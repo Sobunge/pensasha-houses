@@ -22,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @Slf4j
 public class LandLordController {
 
-    private final LandLordService landLordService;
+    private final LandlordService landlordService;
 
     // ---------------------- Get All Landlords ----------------------
     @GetMapping
@@ -33,7 +33,7 @@ public class LandLordController {
         log.info("API call: Get paginated landlords - page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by("idNumber").ascending());
 
-        Page<GetLandLordDTO> landlordPage = landLordService.getAllLandlords(pageable);
+        Page<GetLandLordDTO> landlordPage = landlordService.getAllLandlords(pageable);
 
         // Convert each DTO to an EntityModel with HATEOAS self-link
         List<EntityModel<GetLandLordDTO>> landlordResources = landlordPage.getContent().stream()
@@ -58,7 +58,7 @@ public class LandLordController {
     public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable String idNumber) {
         log.info("API call: Get landlord with ID: {}", idNumber);
 
-        GetLandLordDTO landlordDTO = landLordService.getLandlordByIdNumber(idNumber);
+        GetLandLordDTO landlordDTO = landlordService.getLandlordByIdNumber(idNumber);
 
         EntityModel<GetLandLordDTO> resource = EntityModel.of(landlordDTO,
                 linkTo(methodOn(LandLordController.class).getLandlordById(idNumber)).withSelfRel(),
@@ -69,14 +69,14 @@ public class LandLordController {
     }
 
     // ---------------------- Get landlord by ID ---------------------- //
-    @GetMapping("/by-id/{id}")
-    public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable Long id) {
-        log.info("API call: Get landlord with DB ID: {}", id);
+    @GetMapping("/by-id/{userId}")
+    public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable Long userId) {
+        log.info("API call: Get landlord with DB ID: {}", userId);
 
-        GetLandLordDTO landlordDTO = landLordService.getLandLordById(id);
+        GetLandLordDTO landlordDTO = landlordService.getLandlordByUserId(userId);
 
         EntityModel<GetLandLordDTO> resource = EntityModel.of(landlordDTO,
-                linkTo(methodOn(LandLordController.class).getLandlordById(id)).withSelfRel(),
+                linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel(),
                 linkTo(methodOn(LandLordController.class).getAllLandlords(0, 10)).withRel("all-landlords")
         );
 
@@ -84,45 +84,45 @@ public class LandLordController {
     }
 
     // ---------------------- Update Landlord Properties ----------------------
-    @PutMapping("/{idNumber}/properties")
+    @PutMapping("/{userId}/properties")
     public ResponseEntity<EntityModel<GetLandLordDTO>> updateLandlordProperties(
-            @PathVariable String idNumber,
+            @PathVariable Long userId,
             @RequestBody Set<Property> properties) {
 
-        log.info("API call: Update properties for landlord ID: {}", idNumber);
+        log.info("API call: Update properties for landlord ID: {}", userId);
 
-        GetLandLordDTO updatedLandlord = landLordService.updateLandlordProperties(idNumber, properties);
+        GetLandLordDTO updatedLandlord = landlordService.updateLandlordProperties(userId, properties);
 
         EntityModel<GetLandLordDTO> resource = EntityModel.of(updatedLandlord,
-                linkTo(methodOn(LandLordController.class).getLandlordById(idNumber)).withSelfRel()
+                linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel()
         );
 
         return ResponseEntity.ok(resource);
     }
 
     // ---------------------- Update Landlord Bank Details ----------------------
-    @PutMapping("/{idNumber}/bank-details")
+    @PutMapping("/{userId}/bank-details")
     public ResponseEntity<EntityModel<GetLandLordDTO>> updateBankDetails(
-            @PathVariable String idNumber,
+            @PathVariable Long userId,
             @RequestBody BankDetails bankDetails) {
 
-        log.info("API call: Update bank details for landlord ID: {}", idNumber);
+        log.info("API call: Update bank details for landlord ID: {}", userId);
 
-        GetLandLordDTO updatedLandlord = landLordService.updateLandlordBankDetails(idNumber, bankDetails);
+        GetLandLordDTO updatedLandlord = landlordService.updateLandlordBankDetails(userId, bankDetails);
 
         EntityModel<GetLandLordDTO> resource = EntityModel.of(updatedLandlord,
-                linkTo(methodOn(LandLordController.class).getLandlordById(idNumber)).withSelfRel()
+                linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel()
         );
 
         return ResponseEntity.ok(resource);
     }
 
     // ---------------------- Delete Landlord ----------------------
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLandlord(@PathVariable Long id) {
-        log.info("API call: Delete landlord with DB ID: {}", id);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteLandlord(@PathVariable Long userId) {
+        log.info("API call: Delete landlord with DB ID: {}", userId);
 
-        boolean deleted = landLordService.deleteLandlord(id);
+        boolean deleted = landlordService.deleteLandlordProfile(userId);
 
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }

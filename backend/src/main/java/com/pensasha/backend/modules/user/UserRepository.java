@@ -38,4 +38,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     Boolean existsByIdNumber(String idNumber);
 
+    /**
+     * Checks whether a user with the given phone number exists in the database.
+     * 
+     * @param phoneNumber The phone number to check for existence.
+     * @return true if a user with the given phone number exists, false otherwise.
+     */
+    Boolean existsByPhoneNumber(String phoneNumber);
+
 }

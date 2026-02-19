@@ -1,5 +1,10 @@
 package com.pensasha.backend.security;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -11,10 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
@@ -39,7 +40,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain chain)
             throws ServletException, IOException {
 
-        // Allow CORS preflight requests
+        // Skip CORS preflight requests
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             chain.doFilter(request, response);
             return;
@@ -52,6 +53,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = header.substring(TOKEN_PREFIX.length());
+
         try {
             String username = jwtUtils.extractUsername(token);
 
@@ -60,21 +62,27 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
                 if (jwtUtils.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.debug("Authenticated user: {} with token ID: {}", 
+                                 username, jwtUtils.extractJti(token));
                 }
             }
 
         } catch (ExpiredJwtException e) {
-            logger.warn("Access token expired: {}", e.getMessage());
-            // Do NOT block the request—frontend should call /refresh
+            logger.warn("Access token expired for request to {}: {}", request.getRequestURI(), e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Access token expired");
             return;
 
         } catch (Exception e) {
-            logger.error("JWT processing failed: {}", e.getMessage());
-            // Allow the chain to continue; authentication may not be required for public endpoints
+            logger.error("JWT processing failed: {}", e.getMessage(), e);
+            // Let the request continue; some endpoints may not require auth
         }
 
         chain.doFilter(request, response);
