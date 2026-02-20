@@ -8,8 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Repository interface for the User entity.
- * Provides methods to perform CRUD operations and custom queries for User
- * entities in the database.
+ * Provides CRUD operations and custom queries for User entities.
  */
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -23,27 +22,42 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAllByRole(Role role, Pageable pageable);
 
     /**
-     * Finds a user by their unique ID number.
+     * Finds a user by their unique ID number (optional, collected later).
      * 
-     * @param idNumber The ID number of the user (e.g., ID, passport).
-     * @return An Optional containing the User if found, otherwise empty.
+     * @param idNumber The ID number of the user.
+     * @return An Optional containing the User if found.
      */
     Optional<User> findByIdNumber(String idNumber);
 
     /**
      * Checks whether a user with the given ID number exists in the database.
      * 
-     * @param idNumber The ID number to check for existence.
-     * @return true if a user with the given ID number exists, false otherwise.
+     * @param idNumber The ID number to check.
+     * @return true if a user with the ID exists, false otherwise.
      */
     Boolean existsByIdNumber(String idNumber);
 
     /**
-     * Checks whether a user with the given phone number exists in the database.
+     * Checks whether a user with the given phone number exists.
      * 
-     * @param phoneNumber The phone number to check for existence.
-     * @return true if a user with the given phone number exists, false otherwise.
+     * @param phoneNumber The phone number to check.
+     * @return true if a user with the phone exists, false otherwise.
      */
     Boolean existsByPhoneNumber(String phoneNumber);
 
+    /**
+     * Finds a user by their public ID (used in JWTs and safe external references).
+     * 
+     * @param publicId The publicId of the user.
+     * @return Optional containing the User if found.
+     */
+    Optional<User> findByPublicId(String publicId);
+
+    /**
+     * Checks whether a user with the given publicId exists.
+     * 
+     * @param publicId The publicId to check.
+     * @return true if a user with the publicId exists, false otherwise.
+     */
+    Boolean existsByPublicId(String publicId);
 }
