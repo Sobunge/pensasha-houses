@@ -4,13 +4,16 @@ import { useAuth } from "../Auth/AuthContext";
 import { useNotification } from "../../components/NotificationProvider";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { notify } = useNotification();
   const notifiedRef = useRef(false);
 
-  const unauthorized = user && allowedRoles && !allowedRoles.includes(user.role);
+  // Normalize roles to lowercase for comparison
+  const unauthorized =
+    user &&
+    allowedRoles &&
+    !allowedRoles.some((role) => role.toLowerCase() === user.role.toLowerCase());
 
-  // Always call hooks at top level
   useEffect(() => {
     if (unauthorized && !notifiedRef.current) {
       notify("You don’t have access to this page", "warning", 3000);
@@ -18,11 +21,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
   }, [unauthorized, notify]);
 
-  if (loading) return <p>Loading...</p>;
-
+  // Redirect unauthenticated users to landing page
   if (!user) return <Navigate to="/" replace />;
 
-  if (unauthorized) return <Navigate to={`/${user.role}`} replace />;
+  // Redirect unauthorized users to their defaultRoute
+  if (unauthorized)
+    return <Navigate to={user.defaultRoute?.toLowerCase() || "/"} replace />;
 
   return children;
 };
