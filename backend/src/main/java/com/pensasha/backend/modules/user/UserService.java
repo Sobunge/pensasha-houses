@@ -5,10 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
-import com.pensasha.backend.modules.user.dto.CreateUserDTO;
-import com.pensasha.backend.modules.user.dto.GetUserDTO;
-import com.pensasha.backend.modules.user.dto.ResetPasswordDTO;
-import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
+import com.pensasha.backend.modules.user.dto.*;
 import com.pensasha.backend.modules.user.mapper.UserMapper;
 
 import jakarta.transaction.Transactional;
@@ -33,13 +30,13 @@ public class UserService {
     @Transactional
     public GetUserDTO createUser(CreateUserDTO dto) {
 
-        // Validate phone number uniqueness
+        // Ensure phone number uniqueness
         if (userRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
             throw new IllegalArgumentException(
                     "User with this phone number already exists: " + dto.getPhoneNumber());
         }
 
-        // Create user entity
+        // Create user entity with minimal registration (phone + role)
         User user = userFactory.createUser(dto);
         userRepository.save(user);
 
@@ -52,35 +49,32 @@ public class UserService {
 
         credentialsRepository.save(credentials);
 
-        log.info("Created new user: {} (role: {})",
-                user.getPhoneNumber(),
-                user.getRole());
-
+        log.info("Created new user: {} (role: {})", user.getPhoneNumber(), user.getRole());
         return userMapper.toDTO(user);
     }
 
     /* ===================== UPDATE USER PROFILE ===================== */
 
     @Transactional
-    public GetUserDTO updateUser(String idNumber, UpdateUserDTO dto) {
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + idNumber));
+    public GetUserDTO updateUser(Long id, UpdateUserDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
 
         // Map updated fields from DTO
         userMapper.updateEntity(user, dto);
 
         userRepository.save(user);
-        log.info("Updated user profile: {}", idNumber);
+        log.info("Updated user profile: {}", id);
         return userMapper.toDTO(user);
     }
 
     /* ===================== UPDATE PASSWORD ===================== */
 
     @Transactional
-    public void updatePassword(Long id, ResetPasswordDTO dto) {
+    public void updatePassword(Long userId, ResetPasswordDTO dto) {
         UserCredentials credentials = credentialsRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user ID: " + id));
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user ID: " + userId));
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), credentials.getPassword())) {
             throw new IllegalArgumentException("Current password is incorrect");
@@ -93,21 +87,10 @@ public class UserService {
         credentials.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         credentialsRepository.save(credentials);
 
-        log.info("Password updated for user: {}", id);
+        log.info("Password updated for user: {}", userId);
     }
 
     /* ===================== READ USER ===================== */
-
-    public GetUserDTO getUser(String idNumber) {
-        return userRepository.findByIdNumber(idNumber)
-                .map(userMapper::toDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + idNumber));
-    }
-
-    public User getUserEntity(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-    }
 
     public GetUserDTO getUserById(Long id) {
         return userRepository.findById(id)
@@ -120,10 +103,20 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
+    public GetUserDTO getUserByPublicId(String publicId) {
+        return userRepository.findByPublicId(publicId)
+                .map(userMapper::toDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with publicId: " + publicId));
+    }
+
+    public User getUserEntityByPublicId(String publicId) {
+        return userRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with publicId: " + publicId));
+    }
+
     public Page<GetUserDTO> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(userMapper::toDTO);
-
     }
 
     public Page<GetUserDTO> getUsersByRole(Role role, Pageable pageable) {
@@ -134,9 +127,9 @@ public class UserService {
     /* ===================== DELETE USER ===================== */
 
     @Transactional
-    public void deleteUser(String idNumber) {
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + idNumber));
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
 
         // Delete credentials first
         credentialsRepository.deleteByUser(user);
@@ -144,16 +137,16 @@ public class UserService {
         // Delete user
         userRepository.delete(user);
 
-        log.warn("Deleted user: {}", idNumber);
+        log.warn("Deleted user: {}", id);
     }
 
-    /* ===================== Check if user exists ===================== */
-    public boolean userExists(String phoneNumber) {
-        return userRepository.existsByPhoneNumber(phoneNumber);
-    }
+    /* ===================== CHECK EXISTENCE ===================== */
 
     public boolean userExistsById(Long id) {
         return userRepository.existsById(id);
     }
 
+    public boolean userExistsByPublicId(String publicId) {
+        return userRepository.existsByPublicId(publicId);
+    }
 }
