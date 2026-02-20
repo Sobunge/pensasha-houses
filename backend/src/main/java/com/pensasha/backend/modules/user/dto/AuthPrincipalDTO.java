@@ -1,6 +1,5 @@
 package com.pensasha.backend.modules.user.dto;
 
-import com.pensasha.backend.modules.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -22,7 +21,7 @@ public class AuthPrincipalDTO {
     private String username;
 
     /** Role of the user */
-    private Role role;
+    private String role;
 
     /** Default route for frontend redirection based on role */
     private String defaultRoute;
