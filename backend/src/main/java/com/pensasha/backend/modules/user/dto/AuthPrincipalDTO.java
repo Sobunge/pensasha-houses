@@ -5,25 +5,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * DTO representing authenticated user principal details.
- * Uses user ID as primary identifier instead of phone number.
+ * DTO representing the authenticated user's principal details.
+ * Uses internal ID as primary identifier; exposes publicId and username for frontend.
  */
 @Data
 @AllArgsConstructor
 public class AuthPrincipalDTO {
 
-    /** Internal database ID of the user */
+    /** Internal database ID (primary internal identifier) */
     private Long id;
 
-    /** Optional public identifier (could be UUID or other) */
+    /** Optional external identifier (UUID or similar) for public URLs */
     private String publicId;
 
-    /** Username for display purposes (could be phone number or email) */
+    /** Display username (phone number or email), not used as internal key */
     private String username;
 
     /** Role of the user */
     private Role role;
 
-    /** Default route to redirect after login based on role */
+    /** Default route for frontend redirection based on role */
     private String defaultRoute;
 }
