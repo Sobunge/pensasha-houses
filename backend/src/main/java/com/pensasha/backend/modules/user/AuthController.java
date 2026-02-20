@@ -114,7 +114,7 @@ public class AuthController {
                                 userDetails.getUser().getId(),
                                 null,
                                 userDetails.getUser().getPhoneNumber(),
-                                userDetails.getPrimaryRole(),
+                                userDetails.getPrimaryRole().name().toLowerCase(),
                                 resolveDefaultRoute(userDetails.getPrimaryRole()));
 
                 return ResponseEntity.ok(
@@ -147,7 +147,7 @@ public class AuthController {
                                 userDetails.getUser().getId(),
                                 null,
                                 userDetails.getUser().getPhoneNumber(),
-                                userDetails.getPrimaryRole(),
+                                userDetails.getPrimaryRole().name().toLowerCase(),
                                 resolveDefaultRoute(userDetails.getPrimaryRole()));
 
                 return ResponseEntity.ok(
