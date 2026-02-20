@@ -28,11 +28,6 @@ import jakarta.validation.Valid;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
-/**
- * REST controller for user management.
- * Supports CRUD operations, password updates, and role-based queries.
- * Responses include HATEOAS links for discoverability.
- */
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -41,24 +36,22 @@ public class UserController {
         private UserService userService;
 
         /* ===================== UPDATE PROFILE ===================== */
-
-        @PutMapping("/update/{idNumber}")
+        @PutMapping("/update/{id}")
         public ResponseEntity<EntityModel<GetUserDTO>> updateProfile(
-                        @PathVariable String idNumber,
+                        @PathVariable Long id,
                         @Valid @RequestBody UpdateUserDTO updatedUserDTO,
                         BindingResult result) {
 
-                GetUserDTO updatedUser = userService.updateUser(idNumber, updatedUserDTO);
+                GetUserDTO updatedUser = userService.updateUser(id, updatedUserDTO);
 
                 EntityModel<GetUserDTO> model = EntityModel.of(updatedUser,
-                                linkTo(methodOn(UserController.class).getUser(idNumber)).withSelfRel(),
+                                linkTo(methodOn(UserController.class).getUserById(id)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
 
                 return ResponseEntity.ok(model);
         }
 
         /* ===================== CHANGE PASSWORD ===================== */
-
         @PutMapping("/{id}/changePassword")
         public ResponseEntity<EntityModel<ApiResponse>> changePassword(
                         @PathVariable Long id,
@@ -83,23 +76,20 @@ public class UserController {
                         @AuthenticationPrincipal CustomUserDetails authUser,
                         @RequestBody ResetPasswordDTO dto) {
 
-                // Use the authenticated user's ID
                 userService.updatePassword(authUser.getUser().getId(), dto);
 
                 EntityModel<ApiResponse> response = EntityModel.of(
                                 new ApiResponse("Password updated successfully"),
-                                linkTo(methodOn(UserController.class).getUser(authUser.getUsername())).withSelfRel(),
+                                linkTo(methodOn(UserController.class).getCurrentUser(authUser)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
 
                 return ResponseEntity.ok(response);
         }
 
         /* ===================== DELETE USER ===================== */
-
-        @DeleteMapping("/{idNumber}")
-        public ResponseEntity<EntityModel<ApiResponse>> deleteUser(@PathVariable String idNumber) {
-
-                userService.deleteUser(idNumber);
+        @DeleteMapping("/{id}")
+        public ResponseEntity<EntityModel<ApiResponse>> deleteUser(@PathVariable Long id) {
+                userService.deleteUser(id);
 
                 EntityModel<ApiResponse> response = EntityModel.of(
                                 new ApiResponse("User deleted successfully"),
@@ -108,22 +98,8 @@ public class UserController {
                 return ResponseEntity.ok(response);
         }
 
-        /* ===================== GET SINGLE USER ===================== */
-
-        @GetMapping("/{idNumber}")
-        public ResponseEntity<EntityModel<GetUserDTO>> getUser(@PathVariable String idNumber) {
-
-                GetUserDTO user = userService.getUser(idNumber);
-
-                EntityModel<GetUserDTO> model = EntityModel.of(user,
-                                linkTo(methodOn(UserController.class).getUser(idNumber)).withSelfRel(),
-                                linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
-
-                return ResponseEntity.ok(model);
-        }
-
-        /* ===================== GET CURRENT USER WITH ID ===================== */
-        @GetMapping("/{id}")
+        /* ===================== GET SINGLE USER BY INTERNAL ID ===================== */
+        @GetMapping("/id/{id}")
         public ResponseEntity<EntityModel<GetUserDTO>> getUserById(@PathVariable Long id) {
                 GetUserDTO user = userService.getUserById(id);
                 EntityModel<GetUserDTO> model = EntityModel.of(user,
@@ -132,40 +108,56 @@ public class UserController {
                 return ResponseEntity.ok(model);
         }
 
-        /* ===================== GET CURRENT LOGGED IN USER */
+        /* ===================== GET SINGLE USER BY PUBLIC ID ===================== */
+        @GetMapping("/{publicId}")
+        public ResponseEntity<EntityModel<GetUserDTO>> getUserByPublicId(@PathVariable String publicId) {
+                GetUserDTO user = userService.getUserByPublicId(publicId);
+                EntityModel<GetUserDTO> model = EntityModel.of(user,
+                                linkTo(methodOn(UserController.class).getUserByPublicId(publicId)).withSelfRel(),
+                                linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
+                return ResponseEntity.ok(model);
+        }
+
+        /* ===================== GET CURRENT LOGGED-IN USER ===================== */
         @GetMapping("/me")
         public ResponseEntity<EntityModel<GetUserDTO>> getCurrentUser(
                         @AuthenticationPrincipal CustomUserDetails authUser) {
-                GetUserDTO user = userService.getUser(authUser.getUsername());
+
+                GetUserDTO user = userService.getUserById(authUser.getUser().getId());
                 EntityModel<GetUserDTO> model = EntityModel.of(user,
-                                linkTo(methodOn(UserController.class).getUser(user.getIdNumber())).withSelfRel(),
+                                linkTo(methodOn(UserController.class).getCurrentUser(authUser)).withSelfRel(),
                                 linkTo(methodOn(UserController.class).getAllUsers(0, 10)).withRel("all-users"));
                 return ResponseEntity.ok(model);
         }
 
         /* ===================== GET ALL USERS ===================== */
-
         @GetMapping
         public ResponseEntity<PagedModel<EntityModel<GetAllUsersDTO>>> getAllUsers(
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "10") int size) {
 
                 Pageable pageable = PageRequest.of(page, size);
-
                 Page<GetUserDTO> usersPage = userService.getAllUsers(pageable);
 
-                List<EntityModel<GetAllUsersDTO>> resources = usersPage.stream()
+                // Step 1: map GetUserDTO -> GetAllUsersDTO
+                List<GetAllUsersDTO> dtos = usersPage.stream()
                                 .map(user -> new GetAllUsersDTO(
-                                                user.getFirstName() + " " + user.getLastName(),
-                                                user.getIdNumber(),
-                                                user.getPhoneNumber(),
-                                                user.getProfilePicture(),
-                                                user.getRole()))
+                                                user.getId(), // id
+                                                user.getFirstName() + " " + user.getLastName(), // fullName
+                                                user.getIdNumber(), // idNumber
+                                                user.getPhoneNumber(), // phoneNumber
+                                                user.getProfilePicture(), // profilePicture
+                                                user.getRole() // role
+                                ))
+                                .toList();
+
+                // Step 2: wrap each DTO in EntityModel with proper HATEOAS links
+                List<EntityModel<GetAllUsersDTO>> resources = dtos.stream()
                                 .map(dto -> EntityModel.of(dto,
-                                                linkTo(methodOn(UserController.class).getUser(dto.getIdNumber()))
+                                                linkTo(methodOn(UserController.class)
+                                                                .getUserByPublicId(dto.getId().toString()))
                                                                 .withSelfRel()))
                                 .collect(Collectors.toList());
-
                 PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page,
                                 usersPage.getTotalElements());
 
@@ -179,7 +171,6 @@ public class UserController {
         }
 
         /* ===================== GET USERS BY ROLE ===================== */
-
         @GetMapping("/role/{role}")
         public ResponseEntity<PagedModel<EntityModel<GetAllUsersDTO>>> getUsersByRole(
                         @PathVariable String role,
@@ -195,16 +186,23 @@ public class UserController {
 
                 Page<GetUserDTO> usersPage = userService.getUsersByRole(parsedRole, pageable);
 
-                List<EntityModel<GetAllUsersDTO>> resources = usersPage.stream()
+                // Step 1: map GetUserDTO -> GetAllUsersDTO
+                List<GetAllUsersDTO> dtos = usersPage.stream()
                                 .map(user -> new GetAllUsersDTO(
-                                                user.getFirstName() + " " + user.getLastName(),
-                                                user.getIdNumber(),
-                                                user.getPhoneNumber(),
-                                                user.getProfilePicture(),
-                                                user.getRole()))
+                                                user.getId(), // id
+                                                user.getFirstName() + " " + user.getLastName(), // fullName
+                                                user.getIdNumber(), // idNumber
+                                                user.getPhoneNumber(), // phoneNumber
+                                                user.getProfilePicture(), // profilePicture
+                                                user.getRole() // role
+                                ))
+                                .toList();
+
+                // Step 2: wrap each DTO in EntityModel with proper HATEOAS links
+                List<EntityModel<GetAllUsersDTO>> resources = dtos.stream()
                                 .map(dto -> EntityModel.of(dto,
-                                                linkTo(methodOn(UserController.class).getUser(dto.getIdNumber()))
-                                                                .withSelfRel()))
+                                                linkTo(methodOn(UserController.class)
+                                                                .getUserById(dto.getId())).withSelfRel()))
                                 .collect(Collectors.toList());
 
                 PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(size, page,
