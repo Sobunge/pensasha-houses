@@ -1,7 +1,7 @@
 package com.pensasha.backend.modules.document;
 
 import com.pensasha.backend.modules.user.User;
-import com.pensasha.backend.modules.user.UserRepository;
+import com.pensasha.backend.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class DocumentController {
 
     private final DocumentService documentService;
-    private final UserRepository userRepository;
+    private final AuthUtils authUtils;
 
     /* ===================== UPLOAD ===================== */
     @PostMapping
@@ -34,11 +34,10 @@ public class DocumentController {
             Authentication authentication
     ) throws IOException {
 
-        String idNumber = authentication.getName();
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+        User user = authUtils.getUser(authentication);
 
-        Document savedDocument = documentService.uploadDocument(file, documentType, user);
+        Document savedDocument =
+                documentService.uploadDocument(file, documentType, user);
 
         return ResponseEntity.status(201).body(savedDocument);
     }
@@ -47,11 +46,10 @@ public class DocumentController {
     @GetMapping("/me")
     public ResponseEntity<List<Document>> getMyDocuments(Authentication authentication) {
 
-        String idNumber = authentication.getName();
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+        User user = authUtils.getUser(authentication);
 
-        List<Document> documents = documentService.getDocumentsForUser(user.getId());
+        List<Document> documents =
+                documentService.getDocumentsForUser(user.getId());
 
         return ResponseEntity.ok(documents);
     }
@@ -63,13 +61,16 @@ public class DocumentController {
             Authentication authentication
     ) throws MalformedURLException {
 
-        String idNumber = authentication.getName();
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+        User user = authUtils.getUser(authentication);
 
-        Document document = documentService.getDocument(documentId, user);
-        Path filePath = documentService.getDocumentPath(document); // Returns Path to the file
-        Resource resource = new UrlResource(filePath.toUri());
+        Document document =
+                documentService.getDocument(documentId, user);
+
+        Path filePath =
+                documentService.getDocumentPath(document);
+
+        Resource resource =
+                new UrlResource(filePath.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
             throw new IllegalStateException("File not found or not readable");
@@ -89,9 +90,7 @@ public class DocumentController {
             Authentication authentication
     ) {
 
-        String idNumber = authentication.getName();
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+        User user = authUtils.getUser(authentication);
 
         documentService.deleteDocument(documentId, user);
 
@@ -102,11 +101,10 @@ public class DocumentController {
     @GetMapping("/count/me")
     public ResponseEntity<Long> countMyDocuments(Authentication authentication) {
 
-        String idNumber = authentication.getName();
-        User user = userRepository.findByIdNumber(idNumber)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+        User user = authUtils.getUser(authentication);
 
-        long count = documentService.countDocumentsForUser(user.getId());
+        long count =
+                documentService.countDocumentsForUser(user.getId());
 
         return ResponseEntity.ok(count);
     }
