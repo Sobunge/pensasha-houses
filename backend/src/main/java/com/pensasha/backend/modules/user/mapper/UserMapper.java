@@ -15,35 +15,36 @@ import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
  * - Full conversion to GetUserDTO
  * - Partial updates via UpdateUserDTO (ignores system-managed fields)
  */
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface UserMapper {
 
     /* ===================== READ ===================== */
 
     /**
      * Converts a User entity to a GetUserDTO.
-     * Maps all relevant fields including optional ones.
+     * Maps profilePictureUrl in entity to profilePicture in DTO.
      *
      * @param user the User entity
      * @return the DTO representation
      */
-    @Mapping(target = "profilePicture", source = "profilePictureUrl") // map correctly
+    @Mapping(target = "profilePicture", source = "profilePictureUrl")
     GetUserDTO toDTO(User user);
 
     /* ===================== UPDATE ===================== */
 
     /**
      * Updates an existing User entity from UpdateUserDTO.
-     * Ignores read-only or system-managed fields:
-     * - id
-     * - role
-     * - idNumber (cannot change once set)
-     * - profilePictureUrl (updated separately if needed)
+     * Ignores read-only/system-managed fields:
+     * id, role, idNumber, profilePictureUrl, status, profileCompletionStatus, audit fields.
      *
      * @param user the existing User entity to update
      * @param dto  the DTO containing updated values
      */
     @Mapping(target = "id", ignore = true)
+@Mapping(target = "publicId", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "idNumber", ignore = true)
     @Mapping(target = "profilePictureUrl", ignore = true)
@@ -52,5 +53,4 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     void updateEntity(@MappingTarget User user, UpdateUserDTO dto);
-
 }
