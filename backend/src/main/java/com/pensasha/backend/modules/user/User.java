@@ -1,6 +1,7 @@
 package com.pensasha.backend.modules.user;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,9 +17,25 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 public class User {
 
+    /* ===================== INTERNAL ID ===================== */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    /**
+     * Public safe identifier exposed to frontend and JWT.
+     * Prevents ID enumeration attacks.
+     */
+    @Column(nullable = false, unique = true, updatable = false, length = 50)
+    private String publicId;
+
+    @PrePersist
+    public void generatePublicId() {
+        if (publicId == null) {
+            this.publicId = "usr_" + UUID.randomUUID();
+        }
+    }
 
     /* ===================== IDENTITY ===================== */
 
@@ -35,7 +52,10 @@ public class User {
     @Column(unique = true, length = 30)
     private String idNumber;
 
-    // REQUIRED — primary login identity (E.164 format)
+    /**
+     * REQUIRED — primary login identity (E.164 format)
+     * Example: +254712345678
+     */
     @Column(unique = true, nullable = false, length = 15)
     private String phoneNumber;
 
