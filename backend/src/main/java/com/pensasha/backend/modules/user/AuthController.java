@@ -31,166 +31,168 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JWTUtils jwtUtils;
-    private final UserService userService;
-    private final CustomUserDetailsService userDetailsService;
+        private final AuthenticationManager authenticationManager;
+        private final JWTUtils jwtUtils;
+        private final UserService userService;
+        private final CustomUserDetailsService userDetailsService;
 
-    private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60; // seconds
+        private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60; // seconds
 
-    /* ========================= REGISTER ========================= */
+        /* ========================= REGISTER ========================= */
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(
-            @Valid @RequestBody CreateUserDTO dto,
-            BindingResult result) {
+        @PostMapping("/register")
+        public ResponseEntity<?> register(
+                        @Valid @RequestBody CreateUserDTO dto,
+                        BindingResult result) {
 
-        if (result.hasErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(e -> e.getDefaultMessage())
-                    .toList();
+                if (result.hasErrors()) {
+                        List<String> errors = result.getFieldErrors()
+                                        .stream()
+                                        .map(e -> e.getDefaultMessage())
+                                        .toList();
 
-            return ResponseEntity.badRequest()
-                    .body(Map.of("errors", errors));
+                        return ResponseEntity.badRequest()
+                                        .body(Map.of("errors", errors));
+                }
+
+                if (userService.userExists(dto.getPhoneNumber())) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                        .body(Map.of("error", "User with this phone number already exists"));
+                }
+
+                GetUserDTO created = userService.createUser(dto);
+
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(created);
         }
 
-        if (userService.userExists(dto.getPhoneNumber())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "User with this phone number already exists"));
+        /* ========================= LOGIN ========================= */
+
+        @PostMapping("/login")
+        public ResponseEntity<LoginResponseDTO> login(
+                        @Valid @RequestBody LoginRequestDTO request,
+                        BindingResult result,
+                        HttpServletResponse response) {
+
+                if (result.hasErrors()) {
+                        String message = result.getFieldErrors()
+                                        .get(0)
+                                        .getDefaultMessage();
+
+                        return ResponseEntity.badRequest()
+                                        .body(new LoginResponseDTO(
+                                                        null,
+                                                        new AuthPrincipalDTO(null, null, null, null, message)));
+                }
+
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getPhoneNumber(),
+                                                request.getPassword()));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+                Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
+
+                String accessToken = tokens.get("accessToken");
+                String refreshToken = tokens.get("refreshToken");
+
+                // Set refresh token as HTTP-only cookie
+                ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                                .httpOnly(true)
+                                .secure(true)
+                                .sameSite("Strict")
+                                .path("/api/auth/refresh")
+                                .maxAge(REFRESH_TOKEN_EXPIRATION_MS)
+                                .build();
+
+                response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+                AuthPrincipalDTO principal = new AuthPrincipalDTO(
+                                userDetails.getUser().getId(),
+                                null,
+                                userDetails.getUser().getPhoneNumber(),
+                                userDetails.getPrimaryRole(),
+                                resolveDefaultRoute(userDetails.getPrimaryRole()));
+
+                return ResponseEntity.ok(
+                                new LoginResponseDTO(accessToken, principal));
         }
 
-        GetUserDTO created = userService.createUser(dto);
+        /* ========================= REFRESH ========================= */
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(created);
-    }
+        @PostMapping("/refresh")
+        public ResponseEntity<LoginResponseDTO> refresh(
+                        HttpServletRequest request) {
 
-    /* ========================= LOGIN ========================= */
+                String refreshToken = extractRefreshToken(request);
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(
-            @Valid @RequestBody LoginRequestDTO request,
-            BindingResult result,
-            HttpServletResponse response) {
+                if (refreshToken == null)
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        if (result.hasErrors()) {
-            String message = result.getFieldErrors()
-                    .get(0)
-                    .getDefaultMessage();
+                String phoneNumber = jwtUtils.extractUsername(refreshToken);
 
-            return ResponseEntity.badRequest()
-                    .body(new LoginResponseDTO(
-                            null,
-                            new AuthPrincipalDTO(null, null, null, message)));
+                CustomUserDetails userDetails = (CustomUserDetails) userDetailsService
+                                .loadUserByUsername(phoneNumber);
+
+                if (!jwtUtils.validateRefreshToken(refreshToken, userDetails))
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+                String newAccessToken = jwtUtils.generateTokens(userDetails)
+                                .get("accessToken");
+
+                AuthPrincipalDTO principal = new AuthPrincipalDTO(
+                                userDetails.getUser().getId(),
+                                null,
+                                userDetails.getUser().getPhoneNumber(),
+                                userDetails.getPrimaryRole(),
+                                resolveDefaultRoute(userDetails.getPrimaryRole()));
+
+                return ResponseEntity.ok(
+                                new LoginResponseDTO(newAccessToken, principal));
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getPhoneNumber(),
-                        request.getPassword()));
+        /* ========================= LOGOUT ========================= */
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        @PostMapping("/logout")
+        public ResponseEntity<?> logout(HttpServletResponse response) {
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                                .httpOnly(true)
+                                .secure(true)
+                                .sameSite("Strict")
+                                .path("/api/auth/refresh")
+                                .maxAge(0)
+                                .build();
 
-        Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
+                response.addHeader(HttpHeaders.SET_COOKIE,
+                                deleteCookie.toString());
 
-        String accessToken = tokens.get("accessToken");
-        String refreshToken = tokens.get("refreshToken");
+                return ResponseEntity.ok(
+                                Map.of("message", "Logged out successfully"));
+        }
 
-        // Set refresh token as HTTP-only cookie
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/api/auth/refresh")
-                .maxAge(REFRESH_TOKEN_EXPIRATION_MS)
-                .build();
+        /* ========================= HELPERS ========================= */
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        private String extractRefreshToken(HttpServletRequest request) {
 
-        AuthPrincipalDTO principal = new AuthPrincipalDTO(
-                userDetails.getUser().getId(),
-                userDetails.getUser().getPhoneNumber(),
-                userDetails.getPrimaryRole(),
-                resolveDefaultRoute(userDetails.getPrimaryRole()));
+                return Arrays.stream(
+                                Optional.ofNullable(request.getCookies())
+                                                .orElse(new Cookie[0]))
+                                .filter(c -> "refreshToken".equals(c.getName()))
+                                .map(Cookie::getValue)
+                                .findFirst()
+                                .orElse(null);
+        }
 
-        return ResponseEntity.ok(
-                new LoginResponseDTO(accessToken, principal));
-    }
-
-    /* ========================= REFRESH ========================= */
-
-    @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDTO> refresh(
-            HttpServletRequest request) {
-
-        String refreshToken = extractRefreshToken(request);
-
-        if (refreshToken == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        String phoneNumber = jwtUtils.extractUsername(refreshToken);
-
-        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService
-                .loadUserByUsername(phoneNumber);
-
-        if (!jwtUtils.validateRefreshToken(refreshToken, userDetails))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        String newAccessToken = jwtUtils.generateTokens(userDetails)
-                .get("accessToken");
-
-        AuthPrincipalDTO principal = new AuthPrincipalDTO(
-                userDetails.getUser().getId(),
-                userDetails.getUser().getPhoneNumber(),
-                userDetails.getPrimaryRole(),
-                resolveDefaultRoute(userDetails.getPrimaryRole()));
-
-        return ResponseEntity.ok(
-                new LoginResponseDTO(newAccessToken, principal));
-    }
-
-    /* ========================= LOGOUT ========================= */
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-
-        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/api/auth/refresh")
-                .maxAge(0)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE,
-                deleteCookie.toString());
-
-        return ResponseEntity.ok(
-                Map.of("message", "Logged out successfully"));
-    }
-
-    /* ========================= HELPERS ========================= */
-
-    private String extractRefreshToken(HttpServletRequest request) {
-
-        return Arrays.stream(
-                Optional.ofNullable(request.getCookies())
-                        .orElse(new Cookie[0]))
-                .filter(c -> "refreshToken".equals(c.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private String resolveDefaultRoute(Role role) {
-        return switch (role) {
-            case TENANT -> "/tenant";
-            case LANDLORD -> "/landlord";
-            case CARETAKER -> "/caretaker";
-            case ADMIN -> "/admin";
-        };
-    }
+        private String resolveDefaultRoute(Role role) {
+                return switch (role) {
+                        case TENANT -> "/tenant";
+                        case LANDLORD -> "/landlord";
+                        case CARETAKER -> "/caretaker";
+                        case ADMIN -> "/admin";
+                };
+        }
 }
