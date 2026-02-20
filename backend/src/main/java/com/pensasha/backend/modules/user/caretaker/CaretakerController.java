@@ -35,7 +35,7 @@ public class CaretakerController {
         log.info("API call: Create caretaker profile for userId={}", dto.getUserId());
 
         // Validate and fetch the existing user
-        User user = userService.getUserEntity(dto.getUserId());
+        User user = userService.getUserEntityById(dto.getUserId());
         if (user == null) {
             log.error("User not found with ID {}", dto.getUserId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
