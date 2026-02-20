@@ -142,6 +142,10 @@ public class UserService {
 
     /* ===================== CHECK EXISTENCE ===================== */
 
+    public boolean userExists(String phoneNumber) {
+        return userRepository.existsByPhoneNumber(phoneNumber);
+    }
+    
     public boolean userExistsById(Long id) {
         return userRepository.existsById(id);
     }
