@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.user.dto;
 
+import com.pensasha.backend.modules.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,7 +9,7 @@ import lombok.Data;
 public class AuthPrincipalDTO {
 
     private Long id;
-    private String username;
-    private String role;
-    private String defaultRoute;
+    private String username;   // phone number
+    private Role role; 
+    private String defaultRoute; 
 }
