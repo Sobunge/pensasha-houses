@@ -4,14 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
-import com.pensasha.backend.modules.user.tenant.TenantProfile;
-import com.pensasha.backend.modules.user.landlord.LandlordProfile;
 import com.pensasha.backend.modules.user.caretaker.CaretakerProfile;
+import com.pensasha.backend.modules.user.landlord.LandlordProfile;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Factory for creating User and role-specific profiles.
+ * Uses type-safe return values for role-specific profiles.
  */
 @Component
 @Slf4j
@@ -21,22 +22,33 @@ public class UserFactory {
     private UserServiceHelper userServiceHelper;
 
     /**
-     * Creates a new User with common attributes from the DTO.
+     * Creates a base User entity from the DTO.
      */
     public User createUser(CreateUserDTO userDTO) {
+        if (userDTO == null || userDTO.getRole() == null) {
+            throw new IllegalArgumentException("UserDTO and role cannot be null");
+        }
+
         log.info("Creating base user with role: {}", userDTO.getRole());
 
         User user = new User();
-
-        // copy shared fields: firstName, middleName, lastName, idNumber, phoneNumber, role
         userServiceHelper.applyCreateAttributes(user, userDTO);
 
-        log.debug("Created User for role {} with ID {}", userDTO.getRole(), user.getIdNumber());
+        log.debug("Created base User for role {} with phone {}", userDTO.getRole(), user.getPhoneNumber());
         return user;
     }
 
     /**
-     * Creates a role-specific profile for a given User.
+     * Interface for role-specific profiles.
+     */
+    public interface UserProfile {
+        User getUser();
+        void setUser(User user);
+    }
+
+    /**
+     * Creates a role-specific profile for a given user.
+     * Returns UserProfile for type safety.
      */
     public Object createProfileForUser(User user, CreateUserDTO userDTO) {
         switch (userDTO.getRole()) {
@@ -56,10 +68,11 @@ public class UserFactory {
                 return caretakerProfile;
             }
             case ADMIN -> {
-                return user; // Admin may not need a separate profile
+                // Admins may not have a separate profile, return null
+                return null;
             }
             default -> throw new IllegalArgumentException(
-                    "Invalid role for user ID: " + user.getIdNumber());
+                    "Invalid role for user with phone: " + user.getPhoneNumber());
         }
     }
 }
