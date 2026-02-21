@@ -6,9 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.Set;
+
 /**
  * DTO for creating a new user.
- * Includes phone, password, and role. Optional fields for name can be added later.
+ * Supports multi-role assignment.
  */
 @Data
 @NoArgsConstructor
@@ -28,9 +30,9 @@ public class CreateUserDTO {
     @Size(min = 5, message = "Password must be at least 5 characters")
     private String password;
 
-    /** Role of the user */
-    @NotNull(message = "Role is required")
-    private Role role;
+    /** Roles assigned to the user (multi-role support) */
+    @NotEmpty(message = "At least one role is required")
+    private Set<Role> roles;
 
     /** Optional: first name */
     private String firstName;

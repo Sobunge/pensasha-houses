@@ -35,8 +35,10 @@ public class UserService {
         // Create user entity (minimal registration)
         User user = userFactory.createUser(dto);
 
-        // Assign role(s)
-        user.addRole(dto.getRole());
+        // Assign all roles from DTO
+        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
+            user.getRoles().addAll(dto.getRoles());
+        }
 
         // Persist user
         userRepository.save(user);
@@ -60,6 +62,11 @@ public class UserService {
         User user = getUserEntityById(id);
 
         userMapper.updateEntity(user, dto);
+
+        // Update roles if provided
+        if (dto.getRoles() != null) {
+            user.setRoles(dto.getRoles());
+        }
 
         userRepository.save(user);
         log.info("Updated user profile: {}", id);

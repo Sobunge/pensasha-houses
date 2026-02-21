@@ -7,6 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+
 @Component
 public class AuthUtils {
 
@@ -19,7 +21,6 @@ public class AuthUtils {
     }
 
     private CustomUserDetails getUserDetails() {
-
         Authentication authentication = getAuthentication();
 
         if (authentication == null ||
@@ -42,11 +43,17 @@ public class AuthUtils {
         return getCurrentUser().getId();
     }
 
-    public Role getCurrentUserRole() {
-        return getCurrentUser().getRole();
+    /**
+     * Returns all roles assigned to the current user.
+     */
+    public Set<Role> getCurrentUserRoles() {
+        return getCurrentUser().getRoles();
     }
 
+    /**
+     * Checks if the current user has a specific role.
+     */
     public boolean hasRole(Role role) {
-        return getCurrentUserRole() == role;
+        return getCurrentUserRoles().contains(role);
     }
 }

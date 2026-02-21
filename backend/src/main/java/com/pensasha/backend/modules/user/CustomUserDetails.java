@@ -2,7 +2,7 @@ package com.pensasha.backend.modules.user;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,14 +20,22 @@ public class CustomUserDetails implements UserDetails {
         return credentials.getUser();
     }
 
+    /**
+     * Returns the primary role (first role or main role) for convenience.
+     */
     public Role getPrimaryRole() {
-        return credentials.getUser().getRole();
+        return credentials.getUser().getRoles().stream().findFirst().orElse(Role.TENANT);
     }
 
+    /**
+     * Returns all assigned roles as Spring Security authorities.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = credentials.getUser().getRole().name();
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+        return credentials.getUser().getRoles()
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -42,8 +50,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return credentials.getAccountExpirationDate() == null ||
-                credentials.getAccountExpirationDate().isAfter(LocalDateTime.now());
+        LocalDateTime expiration = credentials.getAccountExpirationDate();
+        return expiration == null || expiration.isAfter(LocalDateTime.now());
     }
 
     @Override
@@ -53,8 +61,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return credentials.getPasswordExpirationDate() == null ||
-                credentials.getPasswordExpirationDate().isAfter(LocalDateTime.now());
+        LocalDateTime pwdExpiration = credentials.getPasswordExpirationDate();
+        return pwdExpiration == null || pwdExpiration.isAfter(LocalDateTime.now());
     }
 
     @Override

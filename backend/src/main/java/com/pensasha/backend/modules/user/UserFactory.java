@@ -1,78 +1,41 @@
 package com.pensasha.backend.modules.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pensasha.backend.modules.user.dto.CreateUserDTO;
-import com.pensasha.backend.modules.user.caretaker.CaretakerProfile;
-import com.pensasha.backend.modules.user.landlord.LandlordProfile;
-import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Factory for creating User and role-specific profiles.
- * Uses type-safe return values for role-specific profiles.
+ * Factory for creating User entities.
+ * Handles setting common attributes and roles.
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class UserFactory {
 
-    @Autowired
-    private UserServiceHelper userServiceHelper;
+    private final UserServiceHelper userServiceHelper;
 
     /**
-     * Creates a base User entity from the DTO.
+     * Creates a base User entity from a DTO.
+     * Assigns all roles from the DTO to the User.
      */
-    public User createUser(CreateUserDTO userDTO) {
-        if (userDTO == null || userDTO.getRole() == null) {
-            throw new IllegalArgumentException("UserDTO and role cannot be null");
+    public User createUser(CreateUserDTO dto) {
+        if (dto == null || dto.getRoles() == null || dto.getRoles().isEmpty()) {
+            throw new IllegalArgumentException("UserDTO and roles cannot be null or empty");
         }
 
-        log.info("Creating base user with role: {}", userDTO.getRole());
+        log.info("Creating base user with roles: {}", dto.getRoles());
 
         User user = new User();
-        userServiceHelper.applyCreateAttributes(user, userDTO);
+        userServiceHelper.applyCreateAttributes(user, dto);
 
-        log.debug("Created base User for role {} with phone {}", userDTO.getRole(), user.getPhoneNumber());
+        // Assign roles from DTO
+        user.getRoles().addAll(dto.getRoles());
+
+        log.debug("Created base User with phone {}", user.getPhoneNumber());
         return user;
-    }
-
-    /**
-     * Interface for role-specific profiles.
-     */
-    public interface UserProfile {
-        User getUser();
-        void setUser(User user);
-    }
-
-    /**
-     * Creates a role-specific profile for a given user.
-     * Returns UserProfile for type safety.
-     */
-    public Object createProfileForUser(User user, CreateUserDTO userDTO) {
-        switch (userDTO.getRole()) {
-            case TENANT -> {
-                TenantProfile tenantProfile = new TenantProfile();
-                tenantProfile.setUser(user);
-                return tenantProfile;
-            }
-            case LANDLORD -> {
-                LandlordProfile landlordProfile = new LandlordProfile();
-                landlordProfile.setUser(user);
-                return landlordProfile;
-            }
-            case CARETAKER -> {
-                CaretakerProfile caretakerProfile = new CaretakerProfile();
-                caretakerProfile.setUser(user);
-                return caretakerProfile;
-            }
-            case ADMIN -> {
-                // Admins may not have a separate profile, return null
-                return null;
-            }
-            default -> throw new IllegalArgumentException(
-                    "Invalid role for user with phone: " + user.getPhoneNumber());
-        }
     }
 }

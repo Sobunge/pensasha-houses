@@ -1,15 +1,17 @@
 package com.pensasha.backend.modules.user.dto;
 
-import org.springframework.validation.annotation.Validated;
-
+import com.pensasha.backend.modules.user.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.Set;
 
 /**
  * DTO for updating user profile information.
- * Includes validation rules for each field to ensure data integrity.
+ * Supports optional multi-role updates.
  */
 @Data
 @NoArgsConstructor
@@ -43,4 +45,7 @@ public class UpdateUserDTO {
     @Email(message = "Email must be a valid email address")
     @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;
+
+    /** Optional roles update for multi-role support */
+    private Set<Role> roles;
 }

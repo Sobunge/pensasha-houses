@@ -27,9 +27,9 @@ public interface LandlordMapper {
     @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     @Mapping(target = "idNumber", source = "user.idNumber")
     @Mapping(target = "profilePicture", source = "user.profilePictureUrl")
-    @Mapping(target = "role", source = "user.role")
+    @Mapping(target = "roles", source = "user.roles") // updated to multi-role
     @Mapping(target = "propertyIds", source = "properties", qualifiedByName = "propertySetToIds")
-    @Mapping(target = "bankDetailsId", source = "bankDetails.id")
+    @Mapping(target = "bankDetailsId", expression = "java(profile.getBankDetails() != null ? profile.getBankDetails().getId() : null)")
     GetLandLordDTO toGetDTO(LandlordProfile profile);
 
     /*
@@ -43,7 +43,6 @@ public interface LandlordMapper {
         if (properties == null || properties.isEmpty()) {
             return Set.of();
         }
-
         return properties.stream()
                 .map(Property::getId)
                 .collect(Collectors.toSet());

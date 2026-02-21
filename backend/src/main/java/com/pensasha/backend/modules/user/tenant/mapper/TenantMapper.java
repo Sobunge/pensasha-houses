@@ -2,6 +2,7 @@ package com.pensasha.backend.modules.user.tenant.mapper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
@@ -13,8 +14,7 @@ import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 
 /**
  * Mapper for converting between TenantProfile entity and TenantDTO.
- * Handles extraction of lease IDs and unit IDs.
- * Ignores system-managed and identity fields when mapping from DTO.
+ * Handles extraction of lease IDs, unit IDs, and multi-role mapping.
  */
 @Mapper(componentModel = "spring")
 public interface TenantMapper {
@@ -30,6 +30,7 @@ public interface TenantMapper {
 
     @Mapping(target = "leaseIds", expression = "java(getLeaseIds(tenantProfile))")
     @Mapping(target = "unitIds", expression = "java(getUnitIdsFromLeases(tenantProfile))")
+    @Mapping(target = "roles", expression = "java(getRolesAsStrings(tenantProfile))")
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "middleName", source = "user.middleName")
     @Mapping(target = "lastName", source = "user.lastName")
@@ -37,7 +38,6 @@ public interface TenantMapper {
     @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     @Mapping(target = "idNumber", source = "user.idNumber")
     @Mapping(target = "profilePicture", source = "user.profilePictureUrl")
-    @Mapping(target = "role", source = "user.role")
     TenantDTO toDTO(TenantProfile tenantProfile);
 
     /* ====================== HELPER METHODS ====================== */
@@ -63,5 +63,15 @@ public interface TenantMapper {
                 .map(unit -> unit.getId())
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    default Set<String> getRolesAsStrings(TenantProfile tenantProfile) {
+        if (tenantProfile.getUser() == null || tenantProfile.getUser().getRoles() == null) {
+            return Collections.emptySet();
+        }
+        return tenantProfile.getUser().getRoles()
+                .stream()
+                .map(Enum::name)
+                .collect(Collectors.toSet());
     }
 }

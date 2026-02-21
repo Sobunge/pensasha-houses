@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
  * DTO for listing users in summary views.
- * Includes ID, full name, phone number, profile picture, and role.
+ * Supports multi-role users.
  */
 @Data
 @NoArgsConstructor
@@ -29,6 +31,6 @@ public class GetAllUsersDTO {
     /** URL to profile picture */
     private String profilePicture;
 
-    /** User role */
-    private Role role;
+    /** Roles assigned to the user */
+    private Set<Role> roles;
 }

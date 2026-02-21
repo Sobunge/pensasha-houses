@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
  * DTO for detailed user information.
- * Includes internal ID, full identity, contact info, profile, and role.
+ * Supports multi-role users and includes identity, contact info, and profile.
  */
 @Data
 @NoArgsConstructor
@@ -38,6 +40,6 @@ public class GetUserDTO {
     /** URL to profile picture */
     private String profilePicture;
 
-    /** User role */
-    private Role role;
+    /** Roles assigned to the user */
+    private Set<Role> roles;
 }

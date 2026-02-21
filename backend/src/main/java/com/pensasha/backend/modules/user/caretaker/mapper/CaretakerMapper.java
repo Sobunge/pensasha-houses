@@ -17,9 +17,9 @@ public interface CaretakerMapper {
     @Mapping(source = "user.phoneNumber", target = "phoneNumber")
     @Mapping(source = "user.email", target = "email")
     @Mapping(source = "user.profilePictureUrl", target = "profilePicture")
-    @Mapping(source = "user.role", target = "role")
+    @Mapping(source = "user.roles", target = "roles") // updated to multi-role
     @Mapping(source = "user.idNumber", target = "idNumber")
-    @Mapping(source = "assignedProperty.id", target = "propertyId") // added mapping for propertyId
+    @Mapping(target = "propertyId", expression = "java(caretakerProfile.getAssignedProperty() != null ? caretakerProfile.getAssignedProperty().getId() : null)")
     GetCaretakerDTO toGetDTO(CaretakerProfile caretakerProfile);
 
     // ====================== Create DTO -> Entity ======================
