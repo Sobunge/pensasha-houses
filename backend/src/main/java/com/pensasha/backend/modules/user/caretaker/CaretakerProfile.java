@@ -3,7 +3,6 @@ package com.pensasha.backend.modules.user.caretaker;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,16 +16,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class CaretakerProfile {
 
+    /* ===================== INTERNAL ID ===================== */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /* ===================== RELATION TO USER ===================== */
 
-    @OneToOne(fetch = FetchType.LAZY)
+    /**
+     * Each caretaker profile belongs to exactly one user.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
@@ -34,9 +36,23 @@ public class CaretakerProfile {
 
     /**
      * The property assigned to this caretaker.
-     * Multiple caretakers can be assigned to a property if needed.
+     * Multiple caretakers can be assigned to the same property if needed.
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id")
     private Property assignedProperty;
+
+    /* ===================== HELPER METHODS ===================== */
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void assignProperty(Property property) {
+        this.assignedProperty = property;
+    }
+
+    public void removePropertyAssignment() {
+        this.assignedProperty = null;
+    }
 }
