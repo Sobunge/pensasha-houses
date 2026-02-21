@@ -8,7 +8,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,11 +29,10 @@ public class DocumentController {
     @PostMapping
     public ResponseEntity<Document> uploadDocument(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("documentType") String documentType,
-            Authentication authentication
+            @RequestParam("documentType") String documentType
     ) throws IOException {
 
-        User user = authUtils.getUser(authentication);
+        User user = authUtils.getCurrentUser();
 
         Document savedDocument =
                 documentService.uploadDocument(file, documentType, user);
@@ -44,9 +42,9 @@ public class DocumentController {
 
     /* ===================== READ (MY DOCUMENTS) ===================== */
     @GetMapping("/me")
-    public ResponseEntity<List<Document>> getMyDocuments(Authentication authentication) {
+    public ResponseEntity<List<Document>> getMyDocuments() {
 
-        User user = authUtils.getUser(authentication);
+        User user = authUtils.getCurrentUser();
 
         List<Document> documents =
                 documentService.getDocumentsForUser(user.getId());
@@ -57,11 +55,10 @@ public class DocumentController {
     /* ===================== DOWNLOAD ===================== */
     @GetMapping("/download/{documentId}")
     public ResponseEntity<Resource> downloadDocument(
-            @PathVariable UUID documentId,
-            Authentication authentication
+            @PathVariable UUID documentId
     ) throws MalformedURLException {
 
-        User user = authUtils.getUser(authentication);
+        User user = authUtils.getCurrentUser();
 
         Document document =
                 documentService.getDocument(documentId, user);
@@ -86,11 +83,10 @@ public class DocumentController {
     /* ===================== DELETE ===================== */
     @DeleteMapping("/{documentId}")
     public ResponseEntity<Void> deleteDocument(
-            @PathVariable UUID documentId,
-            Authentication authentication
+            @PathVariable UUID documentId
     ) {
 
-        User user = authUtils.getUser(authentication);
+        User user = authUtils.getCurrentUser();
 
         documentService.deleteDocument(documentId, user);
 
@@ -99,9 +95,9 @@ public class DocumentController {
 
     /* ===================== COUNT ===================== */
     @GetMapping("/count/me")
-    public ResponseEntity<Long> countMyDocuments(Authentication authentication) {
+    public ResponseEntity<Long> countMyDocuments() {
 
-        User user = authUtils.getUser(authentication);
+        User user = authUtils.getCurrentUser();
 
         long count =
                 documentService.countDocumentsForUser(user.getId());
