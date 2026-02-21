@@ -1,14 +1,19 @@
 package com.pensasha.backend.modules.user;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
+import com.pensasha.backend.modules.user.caretaker.CaretakerProfile;
+import com.pensasha.backend.modules.user.landlord.LandlordProfile;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -54,12 +59,10 @@ public class User {
 
     /**
      * REQUIRED — primary login identity (E.164 format)
-     * Example: +254712345678
      */
     @Column(unique = true, nullable = false, length = 15)
     private String phoneNumber;
 
-    // Optional email
     @Column(unique = true, length = 100)
     private String email;
 
@@ -70,16 +73,37 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProfileCompletionStatus profileCompletionStatus =
             ProfileCompletionStatus.BASIC;
+
+    /* ===================== ROLES ===================== */
+
+    /**
+     * A user can have multiple roles (TENANT, LANDLORD, CARETAKER, etc.)
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Set<Role> roles = new HashSet<>();
+
+    /* ===================== ROLE PROFILES ===================== */
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private TenantProfile tenantProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private LandlordProfile landlordProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CaretakerProfile caretakerProfile;
 
     /* ===================== AUDIT ===================== */
 
@@ -90,19 +114,53 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    /* ===================== ROLE HELPERS ===================== */
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(role);
+    }
+
+    public boolean hasRole(Role role) {
+        return this.roles.contains(role);
+    }
+
+    /* ===================== PROFILE HELPERS ===================== */
+
+    public void setTenantProfile(TenantProfile profile) {
+        this.tenantProfile = profile;
+        if (profile != null) {
+            profile.setUser(this);
+        }
+    }
+
+    public void setLandlordProfile(LandlordProfile profile) {
+        this.landlordProfile = profile;
+        if (profile != null) {
+            profile.setUser(this);
+        }
+    }
+
+    public void setCaretakerProfile(CaretakerProfile profile) {
+        this.caretakerProfile = profile;
+        if (profile != null) {
+            profile.setUser(this);
+        }
+    }
+
     /* ===================== FACTORY ===================== */
 
     /**
      * Minimal registration entry.
-     * Used at first signup (phone + role only).
+     * Used at first signup (phone + initial role only).
      */
-    public static User minimal(
-            String phoneNumber,
-            Role role
-    ) {
+    public static User minimal(String phoneNumber, Role role) {
         User user = new User();
         user.setPhoneNumber(phoneNumber);
-        user.setRole(role);
+        user.addRole(role);
         return user;
     }
 }
