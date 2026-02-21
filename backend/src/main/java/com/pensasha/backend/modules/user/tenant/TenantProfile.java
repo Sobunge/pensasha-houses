@@ -1,19 +1,18 @@
 package com.pensasha.backend.modules.user.tenant;
 
+import com.pensasha.backend.modules.lease.Lease;
+import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.pensasha.backend.modules.lease.Lease;
-import com.pensasha.backend.modules.user.User;
 
 /**
  * Role-specific profile for a Tenant.
- * Contains tenant-only attributes like leases and emergency contact.
+ * Contains tenant-only attributes such as leases and emergency contact.
  * Linked to a User entity for identity and authentication.
  */
 @Entity
@@ -21,8 +20,9 @@ import com.pensasha.backend.modules.user.User;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class TenantProfile {
+
+    /* ===================== INTERNAL ID ===================== */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,11 @@ public class TenantProfile {
 
     /* ===================== RELATION TO USER ===================== */
 
-    @OneToOne(fetch = FetchType.LAZY)
+    /**
+     * Owning side of the relationship.
+     * Each tenant profile belongs to exactly one user.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
@@ -38,17 +42,35 @@ public class TenantProfile {
 
     /**
      * Bidirectional relationship to Lease.
-     * MUST match the field name in Lease:
-     *     private TenantProfile tenant;
+     * MUST match field in Lease entity:
+     *      private TenantProfile tenant;
      */
     @OneToMany(
-        mappedBy = "tenant",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY
+            mappedBy = "tenant",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
-    private List<Lease> leases;
+    private List<Lease> leases = new ArrayList<>();
 
-    @Column(length = 15)
+    /**
+     * Emergency contact phone number (E.164 recommended).
+     */
+    @Column(length = 20)
     private String emergencyContact;
+
+    /* ===================== HELPER METHODS ===================== */
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void addLease(Lease lease) {
+        leases.add(lease);
+        lease.setTenant(this);
+    }
+
+    public void removeLease(Lease lease) {
+        leases.remove(lease);
+        lease.setTenant(null);
+    }
 }
