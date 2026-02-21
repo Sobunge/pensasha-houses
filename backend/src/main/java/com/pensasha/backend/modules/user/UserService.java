@@ -2,7 +2,12 @@ package com.pensasha.backend.modules.user;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.dto.*;
+import com.pensasha.backend.modules.user.landlord.LandlordProfile;
+import com.pensasha.backend.modules.user.landlord.LandlordProfileRepository;
 import com.pensasha.backend.modules.user.mapper.UserMapper;
+import com.pensasha.backend.modules.user.tenant.TenantProfile;
+import com.pensasha.backend.modules.user.tenant.TenantProfileRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +21,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final TenantProfileRepository tenantProfileRepository;
+    private final LandlordProfileRepository landlordProfileRepository;
     private final UserRepository userRepository;
     private final UserCredentialsRepository credentialsRepository;
     private final UserFactory userFactory;
@@ -32,16 +39,35 @@ public class UserService {
                     "User with this phone number already exists: " + dto.getPhoneNumber());
         }
 
-        // Create user entity (minimal registration)
+        // Create user entity
         User user = userFactory.createUser(dto);
-
-        // Assign all roles from DTO
-        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
-            user.getRoles().addAll(dto.getRoles());
-        }
 
         // Persist user
         userRepository.save(user);
+
+        // Assign roles from DTO
+        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
+            user.getRoles().addAll(dto.getRoles());
+
+            // For each role, create the corresponding profile
+            for (Role role : dto.getRoles()) {
+                switch (role) {
+                    case TENANT -> {
+                        TenantProfile tenantProfile = new TenantProfile();
+                        tenantProfile.setUser(user);
+                        tenantProfileRepository.save(tenantProfile);
+                        user.setTenantProfile(tenantProfile);
+                    }
+                    case LANDLORD -> {
+                        LandlordProfile landlordProfile = new LandlordProfile();
+                        landlordProfile.setUser(user);
+                        landlordProfileRepository.save(landlordProfile);
+                        user.setLandlordProfile(landlordProfile);
+                    }
+                    default -> log.warn("Unknown role: {}", role);
+                }
+            }
+        }
 
         // Create credentials
         UserCredentials credentials = new UserCredentials();
@@ -54,7 +80,6 @@ public class UserService {
         log.info("Created new user: {} (roles: {})", user.getPhoneNumber(), user.getRoles());
         return userMapper.toDTO(user);
     }
-
     /* ===================== UPDATE USER PROFILE ===================== */
 
     @Transactional
