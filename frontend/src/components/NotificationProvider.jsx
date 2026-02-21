@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { Snackbar, Alert, Slide, Button } from "@mui/material";
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { Snackbar, Alert, Slide, Button, useTheme } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Info";
@@ -11,44 +11,25 @@ export const useNotification = () => useContext(NotificationContext);
 const SlideDown = (props) => <Slide {...props} direction="down" />;
 
 export const NotificationProvider = ({ children }) => {
-  const [queue, setQueue] = useState([]);   // waiting notifications
-  const [current, setCurrent] = useState(null); // active notification
+  const theme = useTheme();
+  const [queue, setQueue] = useState([]);
 
-  const notify = (
-    message,
-    severity = "info",
-    duration = 4000,
-    position = { vertical: "top", horizontal: "center" },
-    action = null,
-    actionLabel = null
-  ) => {
-    // Dedupe: if identical message+severity is already current or queued, ignore
-    if (
-      (current && current.message === message && current.severity === severity) ||
-      queue.some((q) => q.message === message && q.severity === severity)
-    ) {
-      return;
-    }
+  const notify = useCallback(
+    (message, severity = "info", duration = 4000, position = { vertical: "top", horizontal: "center" }, action = null, actionLabel = null) => {
+      // Deduplicate
+      setQueue((prev) => {
+        if (prev.some((n) => n.message === message && n.severity === severity)) return prev;
+        return [
+          ...prev,
+          { id: Date.now() + Math.random(), message, severity, duration, position, action, actionLabel },
+        ];
+      });
+    },
+    []
+  );
 
-    const id = Date.now() + Math.random();
-    setQueue((prev) => [
-      ...prev,
-      { id, message, severity, duration, position, action, actionLabel },
-    ]);
-  };
-
-  // When no current is shown, pop the next one from the queue
-  useEffect(() => {
-    if (!current && queue.length > 0) {
-      setCurrent(queue[0]);
-      setQueue((prev) => prev.slice(1));
-    }
-  }, [queue, current]);
-
-  const handleClose = (event, reason) => {
-    // ignore clickaway so user can click elsewhere without closing accidentally
-    if (reason === "clickaway") return;
-    setCurrent(null);
+  const handleClose = (id) => {
+    setQueue((prev) => prev.filter((n) => n.id !== id));
   };
 
   const severityIcons = {
@@ -65,6 +46,8 @@ export const NotificationProvider = ({ children }) => {
     info: "#2196F3",
   };
 
+  const current = queue[0] || null;
+
   return (
     <NotificationContext.Provider value={{ notify }}>
       {children}
@@ -74,17 +57,17 @@ export const NotificationProvider = ({ children }) => {
           key={current.id}
           open
           autoHideDuration={current.duration}
-          onClose={handleClose}
+          onClose={() => handleClose(current.id)}
           anchorOrigin={current.position}
           TransitionComponent={SlideDown}
         >
           <Alert
             role="alert"
-            onClose={handleClose}
+            onClose={() => handleClose(current.id)}
             severity={current.severity}
             icon={severityIcons[current.severity]}
             sx={{
-              bgcolor: "#ffffff",
+              bgcolor: theme.palette.mode === "dark" ? "#222" : "#fff",
               border: `2px solid ${severityColors[current.severity]}`,
               borderRadius: 3,
               width: { xs: "90%", sm: "400px" },
@@ -106,8 +89,12 @@ export const NotificationProvider = ({ children }) => {
                   color="inherit"
                   size="small"
                   onClick={() => {
-                    current.action();
-                    handleClose();
+                    try {
+                      current.action();
+                    } catch (e) {
+                      console.error("Notification action failed:", e);
+                    }
+                    handleClose(current.id);
                   }}
                 >
                   {current.actionLabel || "ACTION"}

@@ -1,23 +1,37 @@
 import React from "react";
-import { Box, Typography, Breadcrumbs, Link, IconButton, Menu, MenuItem } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Breadcrumbs,
+  IconButton,
+  Menu,
+  MenuItem,
+  Link as MuiLink,
+} from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { useAuth } from "../pages/Auth/AuthContext";
 
-function DashboardHeader({ title = "My Dashboard", breadcrumbs = [] }) {
+const DashboardHeader = React.memo(function DashboardHeader({
+  title = "My Dashboard",
+  breadcrumbs = [],
+}) {
   const { user } = useAuth();
-  const onDashboard =
-    breadcrumbs.length === 0 && window.location.pathname === `/${user.role}`;
 
-  // State for collapsed menu
+  const userRole = user?.role || "dashboard";
+  const onDashboard = breadcrumbs.length === 0 && window.location.pathname === `/${userRole}`;
+
+  // State for collapsed early menu
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const handleOpenMenu = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
-  // Show only last 2 items on mobile
-  const collapsedBreadcrumbs = breadcrumbs.length > 2 ? breadcrumbs.slice(-2) : breadcrumbs;
+  // Split breadcrumbs: last 2 always visible, rest in menu
+  const collapsedBreadcrumbs =
+    breadcrumbs.length > 2 ? breadcrumbs.slice(-2) : breadcrumbs;
   const earlyItems = breadcrumbs.length > 2 ? breadcrumbs.slice(0, -2) : [];
 
   return (
@@ -28,23 +42,31 @@ function DashboardHeader({ title = "My Dashboard", breadcrumbs = [] }) {
         aria-label="breadcrumb"
         sx={{ mb: 2, overflowX: "auto", whiteSpace: "nowrap" }}
       >
-        {/* Home link */}
+        {/* Home Link */}
         {onDashboard ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "text.primary" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              color: "text.primary",
+            }}
+          >
             <HomeIcon fontSize="small" /> Home
           </Box>
         ) : (
-          <Link
+          <MuiLink
             underline="hover"
             color="inherit"
-            href={`/${user.role}`}
+            component={RouterLink}
+            to={`/${userRole}`}
             sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
           >
             <HomeIcon fontSize="small" /> Home
-          </Link>
+          </MuiLink>
         )}
 
-        {/* Collapsed early items */}
+        {/* Collapsed early breadcrumbs menu */}
         {earlyItems.length > 0 && (
           <>
             <IconButton
@@ -54,9 +76,27 @@ function DashboardHeader({ title = "My Dashboard", breadcrumbs = [] }) {
             >
               <MoreHorizIcon fontSize="small" />
             </IconButton>
-            <Menu anchorEl={anchorEl} open={openMenu} onClose={handleCloseMenu}>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={openMenu}
+              onClose={handleCloseMenu}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
               {earlyItems.map((item, idx) => (
-                <MenuItem key={idx} onClick={handleCloseMenu} component="a" href={item.href}>
+                <MenuItem
+                  key={idx}
+                  onClick={handleCloseMenu}
+                  component={RouterLink}
+                  to={item.href || "#"}
+                >
                   {item.label}
                 </MenuItem>
               ))}
@@ -71,9 +111,16 @@ function DashboardHeader({ title = "My Dashboard", breadcrumbs = [] }) {
               {item.label}
             </Typography>
           ) : (
-            <Link key={index} underline="hover" color="inherit" href={item.href} noWrap>
+            <MuiLink
+              key={index}
+              underline="hover"
+              color="inherit"
+              component={RouterLink}
+              to={item.href || "#"}
+              noWrap
+            >
               {item.label}
-            </Link>
+            </MuiLink>
           )
         )}
       </Breadcrumbs>
@@ -82,7 +129,7 @@ function DashboardHeader({ title = "My Dashboard", breadcrumbs = [] }) {
       <Typography
         variant="h5"
         fontWeight={700}
-        align="center"
+        align={{ xs: "center", sm: "left" }}
         sx={{
           fontSize: { xs: "1.2rem", sm: "1.5rem", md: "1.8rem" },
           wordBreak: "break-word",
@@ -92,6 +139,6 @@ function DashboardHeader({ title = "My Dashboard", breadcrumbs = [] }) {
       </Typography>
     </Box>
   );
-}
+});
 
 export default DashboardHeader;

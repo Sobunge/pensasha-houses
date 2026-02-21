@@ -67,34 +67,44 @@ public class AuthController {
 
     /* ========================= LOGIN ========================= */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequestDTO request,
             BindingResult result,
             HttpServletResponse response) {
 
+        // Validate input
         if (result.hasErrors()) {
             String message = result.getFieldErrors().get(0).getDefaultMessage();
-            return ResponseEntity.badRequest()
-                    .body(new LoginResponseDTO(
-                            null,
-                            new AuthPrincipalDTO(null, null, null, message, message)));
+            return ResponseEntity.badRequest().body(Map.of("error", message));
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getPhoneNumber(),
-                        request.getPassword()));
+        // Check if user exists first
+        if (!userService.userExists(request.getPhoneNumber())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Phone number not registered"));
+        }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getPhoneNumber(),
+                            request.getPassword()));
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        setRefreshTokenCookie(response, tokens.get("refreshToken"));
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
 
-        return ResponseEntity.ok(new LoginResponseDTO(
-                tokens.get("accessToken"),
-                buildAuthPrincipal(userDetails)));
+            setRefreshTokenCookie(response, tokens.get("refreshToken"));
+
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", tokens.get("accessToken"),
+                    "principal", buildAuthPrincipal(userDetails)));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid phone number or password"));
+        }
     }
 
     /* ========================= REFRESH ========================= */

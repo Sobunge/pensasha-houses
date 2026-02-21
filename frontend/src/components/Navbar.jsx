@@ -7,6 +7,7 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Box,
@@ -75,7 +76,7 @@ function Navbar() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "rgba(30, 30, 30, 0.71)", // semi-transparent dark background
+        bgcolor: "rgba(30, 30, 30, 0.71)",
         backdropFilter: "blur(10px)",
         borderRadius: 3,
         px: 3,
@@ -107,18 +108,31 @@ function Navbar() {
       {/* Navigation items */}
       <List sx={{ flexGrow: 1 }}>
         {navItems.map((item) => (
-          <ListItem
-            key={item.label}
-            button
-            component={item.requiresAuth ? "div" : RouterLink}
-            to={!item.requiresAuth ? item.link : undefined}
-            onClick={item.requiresAuth ? handleAuthOpen : () => setMobileOpen(false)}
-            sx={getDrawerItemStyles(item.link)}
-          >
-            <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.label} />
+          <ListItem key={item.label} disablePadding>
+            {item.requiresAuth ? (
+              <ListItemButton onClick={handleAuthOpen} sx={getDrawerItemStyles(item.link)}>
+                <ListItemIcon
+                  sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            ) : (
+              <ListItemButton
+                component={RouterLink}
+                to={item.link}
+                sx={getDrawerItemStyles(item.link)}
+                onClick={() => setMobileOpen(false)}
+              >
+                <ListItemIcon
+                  sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            )}
           </ListItem>
         ))}
       </List>
@@ -126,30 +140,28 @@ function Navbar() {
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)", mb: 3 }} />
 
       {/* Login Button */}
-      <ListItem
-        button
-        onClick={handleAuthOpen}
-        sx={{
-          px: 2,
-          py: 1.5,
-          borderRadius: 2,
-          backgroundColor: "rgba(248,181,0,0.15)",
-          justifyContent: "center",
-          fontWeight: 600,
-          color: "#F8B500",
-          "&:hover": { backgroundColor: "rgba(248,181,0,0.25)", transform: "translateX(2px)" },
-        }}
-      >
-        <ListItemIcon sx={{ minWidth: 35 }}>
-          <LoginIcon sx={{ color: "#F8B500" }} />
-        </ListItemIcon>
-        <ListItemText primary="Login / Sign Up" />
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={handleAuthOpen}
+          sx={{
+            px: 2,
+            py: 1.5,
+            borderRadius: 2,
+            backgroundColor: "rgba(248,181,0,0.15)",
+            justifyContent: "center",
+            fontWeight: 600,
+            color: "#F8B500",
+            "&:hover": { backgroundColor: "rgba(248,181,0,0.25)", transform: "translateX(2px)" },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 35 }}>
+            <LoginIcon sx={{ color: "#F8B500" }} />
+          </ListItemIcon>
+          <ListItemText primary="Login / Sign Up" />
+        </ListItemButton>
       </ListItem>
 
-      <Typography
-        variant="caption"
-        sx={{ textAlign: "center", mt: 6, color: "#fff", opacity: 0.7 }}
-      >
+      <Typography variant="caption" sx={{ textAlign: "center", mt: 6, color: "#fff", opacity: 0.7 }}>
         Swipe or tap outside to close
       </Typography>
     </Box>
@@ -158,11 +170,7 @@ function Navbar() {
   return (
     <>
       {/* AppBar */}
-      <AppBar
-        position="fixed"
-        elevation={2}
-        sx={{ backgroundColor: "rgba(42,42,42,0.9)", backdropFilter: "blur(6px)" }}
-      >
+      <AppBar position="fixed" elevation={2} sx={{ backgroundColor: "rgba(42,42,42,0.9)", backdropFilter: "blur(6px)" }}>
         <Container maxWidth="lg">
           <Toolbar sx={{ justifyContent: "space-between", minHeight: 64 }}>
             <Box component={RouterLink} to="/" sx={{ display: "flex", alignItems: "center", gap: 1, textDecoration: "none" }}>
@@ -175,16 +183,26 @@ function Navbar() {
             {!isMobile && (
               <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                 {navItems.map((item) => (
-                  <Button
-                    key={item.label}
-                    component={item.requiresAuth ? "button" : RouterLink}
-                    to={!item.requiresAuth ? item.link : undefined}
-                    onClick={item.requiresAuth ? handleAuthOpen : undefined}
-                    startIcon={item.icon}
-                    sx={getButtonStyles(item.link)}
-                  >
-                    {item.label}
-                  </Button>
+                  item.requiresAuth ? (
+                    <Button
+                      key={item.label}
+                      onClick={handleAuthOpen}
+                      startIcon={item.icon}
+                      sx={getButtonStyles(item.link)}
+                    >
+                      {item.label}
+                    </Button>
+                  ) : (
+                    <Button
+                      key={item.label}
+                      component={RouterLink}
+                      to={item.link}
+                      startIcon={item.icon}
+                      sx={getButtonStyles(item.link)}
+                    >
+                      {item.label}
+                    </Button>
+                  )
                 ))}
                 <Button
                   variant="contained"

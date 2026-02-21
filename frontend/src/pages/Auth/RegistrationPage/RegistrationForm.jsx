@@ -25,33 +25,19 @@ import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
 /* ---------------- Phone Helpers ---------------- */
-
-// Convert to +254XXXXXXXXX
 const normalizePhone = (phone) => {
   let digits = phone.replace(/\D/g, "");
-
-  if (digits.startsWith("0")) {
-    digits = "254" + digits.substring(1);
-  }
-
+  if (digits.startsWith("0")) digits = "254" + digits.substring(1);
   if (digits.startsWith("254")) return "+" + digits;
-
   return "+254" + digits; // fallback
 };
 
 const validatePhoneNumber = (value) => {
   if (!value) return "Phone number is required";
-
   const digits = value.replace(/\D/g, "");
-
-  const valid = /^(7|1)\d{8}$/.test(digits); // user enters 7XXXXXXXX or 1XXXXXXXX
-
-  if (!valid) return "Enter a valid phone number";
-
+  if (!/^(7|1)\d{8}$/.test(digits)) return "Enter a valid phone number";
   return null;
 };
-
-/* ---------------- Password & Role ---------------- */
 
 const validatePassword = (value) => {
   if (!value) return "Password is required";
@@ -65,7 +51,6 @@ const validateRole = (value) => {
 };
 
 /* ---------------- Registration Form ---------------- */
-
 export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const [formData, setFormData] = useState({
     phoneNumber: "",
@@ -88,16 +73,12 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const { notify } = useNotification();
 
   /* ---------------- Validation ---------------- */
-
   const phoneError = validatePhoneNumber(formData.phoneNumber);
   const passwordError = validatePassword(formData.password);
-
   const confirmError =
-    formData.confirmPassword &&
-      formData.password !== formData.confirmPassword
+    formData.confirmPassword && formData.password !== formData.confirmPassword
       ? "Passwords do not match"
       : null;
-
   const roleError = validateRole(formData.role);
 
   const showPhoneError = touched.phoneNumber && Boolean(phoneError);
@@ -106,7 +87,6 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const showRoleError = touched.role && Boolean(roleError);
 
   /* ---------------- Handlers ---------------- */
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -134,7 +114,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
       const payload = {
         phoneNumber: normalizePhone(formData.phoneNumber),
         password: formData.password,
-        role: formData.role,
+        roles: [formData.role], // ✅ wrap in array to match backend
       };
 
       await api.post("/auth/register", payload);
@@ -143,7 +123,6 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
       onSuccess?.();
     } catch (err) {
       console.error("Registration error:", err.response?.data || err.message);
-
       notify(
         err.response?.data?.error || "Registration failed. Try again.",
         "error",
@@ -155,7 +134,6 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
   };
 
   /* ---------------- UI ---------------- */
-
   return (
     <Box
       component="form"
@@ -178,8 +156,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
       </Typography>
 
       <Stack spacing={2} sx={{ width: "100%" }}>
-
-        {/* Phone Number */}
+        {/* Phone */}
         <TextField
           fullWidth
           label="Phone Number"
@@ -196,14 +173,12 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             startAdornment: (
               <InputAdornment position="start">
                 <PhoneIcon fontSize="small" sx={{ mr: 0.5 }} />
-                <Typography sx={{ fontWeight: 500 }}>
-                  +254
-                </Typography>
+                <Typography sx={{ fontWeight: 500 }}>+254</Typography>
               </InputAdornment>
             ),
           }}
         />
-        
+
         {/* Password */}
         <TextField
           fullWidth
@@ -297,9 +272,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           size="small"
           fullWidth
           disabled={loading}
-          startIcon={
-            loading ? <CircularProgress size={20} /> : <PersonAddIcon />
-          }
+          startIcon={loading ? <CircularProgress size={20} /> : <PersonAddIcon />}
           sx={{
             mt: 1,
             py: 1.2,
@@ -323,10 +296,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
               textDecoration: "none",
               fontWeight: 500,
               color: "primary.main",
-              "&:hover": {
-                textDecoration: "underline",
-                color: "primary.dark",
-              },
+              "&:hover": { textDecoration: "underline", color: "primary.dark" },
             }}
           >
             Sign In
