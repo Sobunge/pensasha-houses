@@ -9,6 +9,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.pensasha.backend.modules.lease.Lease;
+import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.tenant.TenantProfile;
 import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 
@@ -30,7 +31,7 @@ public interface TenantMapper {
 
     @Mapping(target = "leaseIds", expression = "java(getLeaseIds(tenantProfile))")
     @Mapping(target = "unitIds", expression = "java(getUnitIdsFromLeases(tenantProfile))")
-    @Mapping(target = "roles", expression = "java(getRolesAsStrings(tenantProfile))")
+    @Mapping(target = "roles", expression = "java(getRoles(tenantProfile))") // Corrected
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "middleName", source = "user.middleName")
     @Mapping(target = "lastName", source = "user.lastName")
@@ -65,13 +66,10 @@ public interface TenantMapper {
                 .collect(Collectors.toList());
     }
 
-    default Set<String> getRolesAsStrings(TenantProfile tenantProfile) {
+    default Set<Role> getRoles(TenantProfile tenantProfile) {
         if (tenantProfile.getUser() == null || tenantProfile.getUser().getRoles() == null) {
             return Collections.emptySet();
         }
-        return tenantProfile.getUser().getRoles()
-                .stream()
-                .map(Enum::name)
-                .collect(Collectors.toSet());
+        return tenantProfile.getUser().getRoles();
     }
 }

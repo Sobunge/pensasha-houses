@@ -3,11 +3,15 @@ package com.pensasha.backend.security;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import com.pensasha.backend.modules.user.CustomUserDetails;
+import com.pensasha.backend.modules.user.Role;
+import com.pensasha.backend.modules.user.User;
+import com.pensasha.backend.modules.user.UserCredentials;
 
 class JWTUtilsTest {
 
@@ -15,28 +19,37 @@ class JWTUtilsTest {
 
     @BeforeEach
     void setUp() {
-        // Base64-encoded secret (must be ≥ 32 bytes after decoding)
+        // Base64-encoded secret (≥ 32 bytes after decoding)
         String testSecret = "dGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQ=";
         jwtUtils = new JWTUtils(testSecret);
     }
 
     @Test
-    void testGenerateAndValidateToken() {
-        // 1. Create a mock user
-        UserDetails userDetails = User.withUsername("sobunge")
-                .password("samuel1995")
-                .roles("ADMIN")
-                .build();
+    void generateAndValidateToken_ShouldSucceed() {
+        // Create a mock User and credentials
+        User mockUser = new User();
+        mockUser.setPhoneNumber("+254707335375");
+        mockUser.setRoles(Set.of(Role.ADMIN));
 
-        // 2. Generate tokens
+        UserCredentials credentials = new UserCredentials();
+        credentials.setUser(mockUser);
+        credentials.setPassword("samuel1995");
+        credentials.setEnabled(true);
+        credentials.setLocked(false);
+
+        // Wrap in CustomUserDetails
+        CustomUserDetails userDetails = new CustomUserDetails(credentials);
+
+        // Generate token
         Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
         String accessToken = tokens.get("accessToken");
         assertNotNull(accessToken, "Access token should not be null");
 
-        // 3. Extract username and validate token
+        // Extract username
         String extractedUsername = jwtUtils.extractUsername(accessToken);
-        assertEquals("sobunge", extractedUsername, "Extracted username should match");
+        assertEquals("+254707335375", extractedUsername, "Extracted username should match");
 
+        // Validate token
         boolean isValid = jwtUtils.validateToken(accessToken, userDetails);
         assertTrue(isValid, "Token should be valid");
     }
