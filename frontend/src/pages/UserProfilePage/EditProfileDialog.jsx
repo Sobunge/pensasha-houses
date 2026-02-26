@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/pages/UserProfilePage/EditProfileDialog.jsx
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +13,10 @@ import {
   Typography,
   InputAdornment,
   CircularProgress,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -22,9 +27,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import api from "../../api/api";
 import useProfileForm from "../../components/hooks/useProfileForm";
 
-/**
- * Resolve API endpoint based on role
- */
+// Map role to endpoint
 const getProfileEndpoint = (role, id) => {
   const roleMap = {
     TENANT: `/tenants/${id}`,
@@ -32,24 +35,20 @@ const getProfileEndpoint = (role, id) => {
     CARETAKER: `/caretakers/${id}`,
     ADMIN: `/admins/${id}`,
   };
-
   return roleMap[role];
 };
 
-export default function EditProfileDialog({
-  open,
-  handleClose,
-  profile,
-  refreshProfile,
-}) {
-  const { formData, errors, handleChange, handleSubmit, fields } =
-    useProfileForm(profile || {});
-
+export default function EditProfileDialog({ open, handleClose, profile, refreshProfile }) {
+  const [selectedRole, setSelectedRole] = useState(profile?.roles?.[0] || "");
+  const { formData, errors, handleChange, handleSubmit, fields, setRole } = useProfileForm(profile || {});
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Render dynamic fields (supports nested)
-   */
+  // Update formData when role changes
+  useEffect(() => {
+    setRole(selectedRole);
+  }, [selectedRole, setRole]);
+
+  // Render dynamic fields (supports nested)
   const renderFields = (fields, parentKey = null) =>
     fields.map((field) => {
       if (field.nested) {
@@ -62,9 +61,7 @@ export default function EditProfileDialog({
               {field.label}
             </Typography>
 
-            <Stack spacing={2}>
-              {renderFields(field.nested, field.key)}
-            </Stack>
+            <Stack spacing={2}>{renderFields(field.nested, field.key)}</Stack>
           </Box>
         );
       }
@@ -114,23 +111,20 @@ export default function EditProfileDialog({
       );
     });
 
-  /**
-   * Save handler
-   */
+  // Save handler
   const handleSave = async () => {
-    if (!profile?.id || !profile?.role) return;
+    if (!profile?.id || !selectedRole) return;
 
     const payload = handleSubmit();
     if (!payload) return;
 
-    const endpoint = getProfileEndpoint(profile.role, profile.id);
+    const endpoint = getProfileEndpoint(selectedRole, profile.id);
     if (!endpoint) {
-      console.error("Unknown role:", profile.role);
+      console.error("Unknown role:", selectedRole);
       return;
     }
 
     setLoading(true);
-
     try {
       await api.put(endpoint, payload);
       await refreshProfile();
@@ -143,13 +137,7 @@ export default function EditProfileDialog({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      fullWidth
-      maxWidth="sm"
-      PaperProps={{ sx: { borderRadius: 3, p: 1.5 } }}
-    >
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3, p: 1.5 } }}>
       <DialogTitle
         sx={{
           display: "flex",
@@ -163,25 +151,41 @@ export default function EditProfileDialog({
           <AccountCircleIcon />
         </Avatar>
 
-        <Typography variant="subtitle1" fontWeight={600}>
+        <Typography
+          variant="subtitle1"
+          component="div"   // <-- prevent h6 inside h2
+          fontWeight={600}
+        >
           Edit Profile
         </Typography>
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={2.5} sx={{ mt: 2 }}>
+          {/* Role selector for multi-role users */}
+          {profile.roles?.length > 1 && (
+            <FormControl fullWidth>
+              <InputLabel id="role-select-label">Role</InputLabel>
+              <Select
+                labelId="role-select-label"
+                value={selectedRole}
+                label="Role"
+                onChange={(e) => setSelectedRole(e.target.value)}
+              >
+                {profile.roles.map((role) => (
+                  <MenuItem key={role} value={role}>
+                    {role}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+
           {renderFields(fields)}
         </Stack>
       </DialogContent>
 
-      <DialogActions
-        sx={{
-          px: 3,
-          pb: 2,
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
+      <DialogActions sx={{ px: 3, pb: 2, display: "flex", justifyContent: "space-between" }}>
         <Button
           startIcon={<CloseIcon />}
           onClick={handleClose}

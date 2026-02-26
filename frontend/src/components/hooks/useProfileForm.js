@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 /**
  * Hook for managing profile form state with validation and placeholders
@@ -7,54 +7,58 @@ import { useState, useEffect } from "react";
 export default function useProfileForm(profile) {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+  const [role, setRole] = useState(profile?.roles?.[0] || "");
 
-  const getFieldsByRole = (role) => {
-    const baseFields = [
-      { key: "firstName", label: "First Name", required: true, placeholder: "Enter first name" },
-      { key: "middleName", label: "Middle Name", placeholder: "Enter middle name (optional)" },
-      { key: "lastName", label: "Last Name", required: true, placeholder: "Enter last name" },
-      { key: "email", label: "Email", required: true, type: "email", placeholder: "Enter email address" },
-      { key: "phoneNumber", label: "Phone", required: true, type: "phone", placeholder: "Enter phone number" },
-    ];
+  const getFieldsByRole = useCallback(
+    (r) => {
+      const baseFields = [
+        { key: "firstName", label: "First Name", required: true, placeholder: "Enter first name" },
+        { key: "middleName", label: "Middle Name", placeholder: "Enter middle name (optional)" },
+        { key: "lastName", label: "Last Name", required: true, placeholder: "Enter last name" },
+        { key: "email", label: "Email", required: true, type: "email", placeholder: "Enter email address" },
+        { key: "phoneNumber", label: "Phone", required: true, type: "phone", placeholder: "Enter phone number" },
+      ];
 
-    switch (role) {
-      case "TENANT":
-        return [
-          ...baseFields,
-          { key: "emergencyContact", label: "Emergency Contact", required: true, type: "phone", placeholder: "Enter emergency contact number" },
-        ];
-      case "LANDLORD":
-        return [
-          ...baseFields,
-          {
-            key: "bankDetails",
-            label: "Bank Details",
-            nested: [
-              { key: "bankName", label: "Bank Name", required: true, placeholder: "Enter bank name" },
-              { key: "accountName", label: "Account Name", required: true, placeholder: "Enter account name" },
-            ],
-          },
-        ];
-      case "CARETAKER":
-        return [
-          ...baseFields,
-          {
-            key: "assignedProperty",
-            label: "Assigned Property",
-            nested: [
-              { key: "name", label: "Property Name", required: true, placeholder: "Enter property name" },
-              { key: "location", label: "Location", required: true, placeholder: "Enter property location" },
-            ],
-          },
-        ];
-      default:
-        return baseFields;
-    }
-  };
+      switch (r) {
+        case "TENANT":
+          return [
+            ...baseFields,
+            { key: "emergencyContact", label: "Emergency Contact", required: true, type: "phone", placeholder: "Enter emergency contact number" },
+          ];
+        case "LANDLORD":
+          return [
+            ...baseFields,
+            {
+              key: "bankDetails",
+              label: "Bank Details",
+              nested: [
+                { key: "bankName", label: "Bank Name", required: true, placeholder: "Enter bank name" },
+                { key: "accountName", label: "Account Name", required: true, placeholder: "Enter account name" },
+              ],
+            },
+          ];
+        case "CARETAKER":
+          return [
+            ...baseFields,
+            {
+              key: "assignedProperty",
+              label: "Assigned Property",
+              nested: [
+                { key: "name", label: "Property Name", required: true, placeholder: "Enter property name" },
+                { key: "location", label: "Location", required: true, placeholder: "Enter property location" },
+              ],
+            },
+          ];
+        default:
+          return baseFields;
+      }
+    },
+    []
+  );
 
-  // Populate form data from profile
+  // Populate form data whenever role changes or profile changes
   useEffect(() => {
-    if (!profile) return;
+    if (!profile || !role) return;
 
     const initialData = {};
     const populateData = (fields, source, target) => {
@@ -68,10 +72,10 @@ export default function useProfileForm(profile) {
       });
     };
 
-    populateData(getFieldsByRole(profile.role), profile, initialData);
+    populateData(getFieldsByRole(role), profile, initialData);
     setFormData(initialData);
     setErrors({});
-  }, [profile]);
+  }, [profile, role, getFieldsByRole]);
 
   // Validation rules
   const validateField = (key, value, field) => {
@@ -132,7 +136,7 @@ export default function useProfileForm(profile) {
   };
 
   const handleSubmit = () => {
-    const fields = getFieldsByRole(profile.role);
+    const fields = getFieldsByRole(role);
     const validation = validateAll(fields, formData);
     setErrors(validation.errors);
 
@@ -149,6 +153,7 @@ export default function useProfileForm(profile) {
     errors,
     handleChange,
     handleSubmit,
-    fields: profile ? getFieldsByRole(profile.role) : [],
+    fields: getFieldsByRole(role),
+    setRole, // expose setter to switch role dynamically
   };
 }

@@ -28,7 +28,7 @@ export default function useProfile() {
       let fullProfile = baseProfile;
 
       switch (activeRole) {
-        case "TENANT":
+        case "tenant":
           if (baseProfile.id) {
             const tenantRes = await api.get(`/tenants/${baseProfile.id}`);
             fullProfile = {
@@ -38,7 +38,7 @@ export default function useProfile() {
           }
           break;
 
-        case "LANDLORD":
+        case "landlord":
           if (baseProfile.id) {
             const landlordRes = await api.get(
               `/landlords/by-id/${baseProfile.id}`
@@ -50,7 +50,7 @@ export default function useProfile() {
           }
           break;
 
-        case "CARETAKER":
+        case "caretaker":
           if (baseProfile.id) {
             const caretakerRes = await api.get(`/caretakers/${baseProfile.id}`);
             fullProfile = {
@@ -60,7 +60,7 @@ export default function useProfile() {
           }
           break;
 
-        case "ADMIN":
+        case "admin":
           // No extra fetch needed
           break;
 
