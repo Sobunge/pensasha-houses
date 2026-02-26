@@ -21,84 +21,78 @@ import StorageIcon from "@mui/icons-material/Storage";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import SearchIcon from "@mui/icons-material/Search";
 
-
-// ======================= TENANT MENU =======================
-export const tenantMenuItems = [
-  { label: "Dashboard", link: "/tenant", icon: <DashboardIcon /> },
-  { label: "Profile", link: "/tenant/user-profile", icon: <PersonIcon /> },
-  { label: "My Rental Units", link: "/tenant/properties", icon: <ApartmentIcon /> },
-  { label: "Browse Units", link: "/tenant/browse-units", icon: <SearchIcon /> },
-  { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
-  { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
-  { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
-  { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
-
-  // Role-specific
-  { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
-  { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
+// ======================= CORE MENU =======================
+export const coreMenuItems = [
+  { label: "Dashboard", link: "/dashboard", icon: <DashboardIcon /> },
+  { label: "Profile", link: "/dashboard/profile", icon: <PersonIcon /> },
 ];
 
+// ======================= ROLE-SPECIFIC MENU =======================
+export const roleItems = {
+  tenant: [
+    { label: "My Rental Units", link: "/tenant/properties", icon: <ApartmentIcon /> },
+    { label: "Browse Units", link: "/tenant/browse-units", icon: <SearchIcon /> },
+    { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
+    { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
+    { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
+    { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
+    { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
+  ],
 
-// ======================= LANDLORD MENU =======================
-export const landlordMenuItems = [
-  { label: "Dashboard", link: "/landlord", icon: <DashboardIcon /> },
-  { label: "Profile", link: "/landlord/user-profile", icon: <PersonIcon /> },
-  { label: "Properties", link: "/landlord/properties", icon: <HomeWorkIcon /> },
-  { label: "Announcements", link: "/landlord/announcements", icon: <AnnouncementIcon /> },
-  { label: "Messages", link: "/landlord/messages", icon: <MailIcon /> },
-  { label: "Activity Feeds", link: "/landlord/activities", icon: <NotificationsIcon /> },
-  { label: "Maintenance Requests", link: "/landlord/maintenance-requests", icon: <BuildIcon /> },
+  landlord: [
+    { label: "Properties", link: "/landlord/properties", icon: <HomeWorkIcon /> },
+    { label: "Announcements", link: "/landlord/announcements", icon: <AnnouncementIcon /> },
+    { label: "Messages", link: "/landlord/messages", icon: <MailIcon /> },
+    { label: "Activity Feeds", link: "/landlord/activities", icon: <NotificationsIcon /> },
+    { label: "Maintenance Requests", link: "/landlord/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Tenants", link: "/landlord/tenants", icon: <PersonIcon /> },
+    { label: "Caretakers", link: "/landlord/caretakers", icon: <BuildIcon /> },
+    { label: "Finances", link: "/landlord/finances", icon: <PaymentIcon /> },
+    { label: "Reports", link: "/landlord/reports", icon: <DescriptionIcon /> },
+  ],
 
-  // Role-specific
-  { label: "Tenants", link: "/landlord/tenants", icon: <PersonIcon /> },
-  { label: "Caretakers", link: "/landlord/caretakers", icon: <BuildIcon /> },
-  { label: "Finances", link: "/landlord/finances", icon: <PaymentIcon /> },
-  { label: "Reports", link: "/landlord/reports", icon: <DescriptionIcon /> },
-];
+  caretaker: [
+    { label: "Properties", link: "/caretaker/properties", icon: <HomeWorkIcon /> },
+    { label: "Announcements", link: "/caretaker/announcements", icon: <AnnouncementIcon /> },
+    { label: "Messages", link: "/caretaker/messages", icon: <MailIcon /> },
+    { label: "Activity Feeds", link: "/caretaker/activities", icon: <NotificationsIcon /> },
+    { label: "Maintenance Requests", link: "/caretaker/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Assigned Tasks", link: "/caretaker/tasks", icon: <BuildIcon /> },
+    { label: "Reports", link: "/caretaker/reports", icon: <DescriptionIcon /> },
+  ],
 
+  admin: [
+    { label: "Properties", link: "/admin/properties", icon: <ApartmentIcon /> },
+    { label: "Tenants", link: "/admin/tenants", icon: <PeopleAltIcon /> },
+    { label: "Landlords", link: "/admin/landlords", icon: <PersonIcon /> },
+    { label: "Caretakers", link: "/admin/caretakers", icon: <SupportAgentIcon /> },
+    { label: "Announcements", link: "/admin/announcements", icon: <AnnouncementIcon /> },
+    { label: "Messages", link: "/admin/messages", icon: <MailIcon /> },
+    { label: "Activity Feeds", link: "/admin/activities", icon: <NotificationsIcon /> },
+    { label: "Maintenance Requests", link: "/admin/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Finances", link: "/admin/finances", icon: <PaymentIcon /> },
+    { label: "Documents", link: "/admin/documents", icon: <DescriptionIcon /> },
+    { label: "Reports", link: "/admin/reports", icon: <AssessmentIcon /> },
+    { label: "System Logs", link: "/admin/logs", icon: <StorageIcon /> },
+    { label: "User Management", link: "/admin/users", icon: <AdminPanelSettingsIcon /> },
+    { label: "Roles & Permissions", link: "/admin/roles", icon: <SecurityIcon /> },
+    { label: "System Settings", link: "/admin/settings", icon: <SettingsIcon /> },
+  ],
+};
 
-// ======================= CARETAKER MENU =======================
-export const caretakerMenuItems = [
-  { label: "Dashboard", link: "/caretaker", icon: <DashboardIcon /> },
-  { label: "Profile", link: "/caretaker/user-profile", icon: <PersonIcon /> },
-  { label: "Properties", link: "/caretaker/properties", icon: <HomeWorkIcon /> },
-  { label: "Announcements", link: "/caretaker/announcements", icon: <AnnouncementIcon /> },
-  { label: "Messages", link: "/caretaker/messages", icon: <MailIcon /> },
-  { label: "Activity Feeds", link: "/caretaker/activities", icon: <NotificationsIcon /> },
+// ======================= HELPER TO MERGE MULTI-ROLE MENUS =======================
+export const getMenuItemsForRoles = (roles = []) => {
+  const merged = roles.reduce((acc, role) => {
+    const items = roleItems[role] || [];
+    items.forEach((item) => {
+      // Avoid duplicates by link
+      if (!acc.find((i) => i.link === item.link)) {
+        acc.push(item);
+      }
+    });
+    return acc;
+  }, []);
 
-  // Role-specific
-  { label: "Maintenance Requests", link: "/caretaker/maintenance-requests", icon: <BuildIcon /> },
-  { label: "Assigned Tasks", link: "/caretaker/tasks", icon: <BuildIcon /> },
-  { label: "Reports", link: "/caretaker/reports", icon: <DescriptionIcon /> },
-];
-
-
-// ======================= ADMIN MENU =======================
-export const adminMenuItems = [
-  // --- Core Pages ---
-  { label: "Dashboard", link: "/admin", icon: <DashboardIcon /> },
-  { label: "Profile", link: "/admin/user-profile", icon: <PersonIcon /> },
-
-  // --- Management ---
-  { label: "Properties", link: "/admin/properties", icon: <ApartmentIcon /> },
-  { label: "Tenants", link: "/admin/tenants", icon: <PeopleAltIcon /> },
-  { label: "Landlords", link: "/admin/landlords", icon: <PersonIcon /> },
-  { label: "Caretakers", link: "/admin/caretakers", icon: <SupportAgentIcon /> },
-
-  // --- Communication & Notifications ---
-  { label: "Announcements", link: "/admin/announcements", icon: <AnnouncementIcon /> },
-  { label: "Messages", link: "/admin/messages", icon: <MailIcon /> },
-  { label: "Activity Feeds", link: "/admin/activities", icon: <NotificationsIcon /> },
-
-  // --- Operations ---
-  { label: "Maintenance Requests", link: "/admin/maintenance-requests", icon: <BuildIcon /> },
-  { label: "finances", link: "/admin/finances", icon: <PaymentIcon /> },
-  { label: "Documents", link: "/admin/documents", icon: <DescriptionIcon /> },
-  { label: "Reports", link: "/admin/reports", icon: <AssessmentIcon /> },
-  { label: "System Logs", link: "/admin/logs", icon: <StorageIcon /> },
-
-  // --- Security & Settings ---
-  { label: "User Management", link: "/admin/users", icon: <AdminPanelSettingsIcon /> },
-  { label: "Roles & Permissions", link: "/admin/roles", icon: <SecurityIcon /> },
-  { label: "System Settings", link: "/admin/settings", icon: <SettingsIcon /> },
-];
+  return [...coreMenuItems, ...merged];
+};

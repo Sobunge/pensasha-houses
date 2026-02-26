@@ -12,30 +12,34 @@ import {
 } from "@mui/material";
 import { useLocation, Link } from "react-router-dom";
 import { useAuth } from "../pages/Auth/AuthContext";
-import {
-  tenantMenuItems,
-  landlordMenuItems,
-  caretakerMenuItems,
-  adminMenuItems,
-} from "../config/menuItems";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import { DRAWER_WIDTH } from "../layouts/constants";
+import { getMenuItemsForRoles } from "../config/menuItems";
 
 function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
 
-  const menuItems =
-    user?.role === "tenant"
-      ? tenantMenuItems
-      : user?.role === "landlord"
-        ? landlordMenuItems
-        : user?.role === "caretaker"
-          ? caretakerMenuItems
-          : user?.role === "admin"
-            ? adminMenuItems
-            : [];
+  // Get merged menu items for multi-role users
+  const mergedMenuItems = React.useMemo(() => {
+    return getMenuItemsForRoles(user?.roles || []);
+  }, [user?.roles]);
+
+  // ================= ACTIVE STATE LOGIC =================
+  const isMenuItemActive = (item) => {
+    const path = location.pathname;
+
+    // Exact match
+    if (path === item.link) return true;
+
+    // Nested routes match, except for core Dashboard to avoid both active
+    if (item.link !== "/dashboard" && path.startsWith(item.link + "/")) {
+      return true;
+    }
+
+    return false;
+  };
 
   const drawerContent = (
     <Box
@@ -71,49 +75,40 @@ function UserSidebar({ mobileOpen, onClose }) {
 
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
-      {/* Scrollable Menu (flex-based, no magic numbers) */}
+      {/* Scrollable Menu */}
       <Box sx={{ flexGrow: 1, pt: 2, overflow: "hidden" }}>
         <SimpleBar style={{ height: "100%" }} autoHide>
           <List sx={{ p: 1 }}>
-            {menuItems.map((item) => {
-              const basePath = `/${user?.role}`;
-              const isActive =
-                location.pathname === item.link ||
-                (location.pathname.startsWith(item.link + "/") &&
-                  item.link !== basePath);
+            {mergedMenuItems.map((item) => {
+              const active = isMenuItemActive(item);
 
               return (
                 <ListItemButton
-                  key={item.label}
+                  key={item.link}
                   component={Link}
                   to={item.link}
                   onClick={onClose}
                   sx={{
                     borderRadius: 1,
-                    color: isActive ? "#f8b500" : "#ddd",
-                    backgroundColor: isActive ? "#222" : "transparent",
+                    color: active ? "#f8b500" : "#ddd",
+                    backgroundColor: active ? "#222" : "transparent",
                     transition: "all 0.2s ease-in-out",
                     "&:hover": {
                       backgroundColor: "#222",
                       color: "#f8b500",
-                      "& .MuiListItemIcon-root": {
-                        color: "#f8b500",
-                      },
+                      "& .MuiListItemIcon-root": { color: "#f8b500" },
                     },
                   }}
                 >
                   <ListItemIcon
-                    sx={{
-                      minWidth: 40,
-                      color: isActive ? "#f8b500" : "#aaa",
-                    }}
+                    sx={{ minWidth: 40, color: active ? "#f8b500" : "#aaa" }}
                   >
                     {item.icon}
                   </ListItemIcon>
                   <ListItemText
                     primary={item.label}
                     primaryTypographyProps={{
-                      fontWeight: isActive ? 600 : 500,
+                      fontWeight: active ? 600 : 500,
                       fontSize: "0.875rem",
                     }}
                   />

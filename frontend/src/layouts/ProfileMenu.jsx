@@ -17,17 +17,14 @@ import { useAuth } from "../pages/Auth/AuthContext";
 function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
   const { notify } = useNotification();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
-  // Get user role dynamically
-  const role = user?.role; // fallback if role not set
-
-  // Dynamic profile link
-  const profileLink = `/${role}/user-profile`;
+  // ✅ Unified profile route
+  const profileLink = "/dashboard/profile";
 
   const hoverStyle = {
     backgroundColor: "#f8b500",
@@ -74,7 +71,7 @@ function ProfileMenu() {
           },
         }}
       >
-        {/* My Profile (dynamic link) */}
+        {/* My Profile */}
         <MenuItem
           component={RouterLink}
           to={profileLink}
@@ -109,7 +106,7 @@ function ProfileMenu() {
           <ListItemIcon sx={{ minWidth: 36 }}>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <Typography variant="body2" sx={{ fontWeight: 500, color: "inherit" }}>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
             Logout
           </Typography>
         </MenuItem>

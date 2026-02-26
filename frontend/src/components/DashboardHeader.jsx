@@ -1,3 +1,4 @@
+// src/components/DashboardHeader.jsx
 import React from "react";
 import {
   Box,
@@ -19,17 +20,19 @@ const DashboardHeader = React.memo(function DashboardHeader({
   breadcrumbs = [],
 }) {
   const { user } = useAuth();
-
   const userRole = user?.role || "dashboard";
-  const onDashboard = breadcrumbs.length === 0 && window.location.pathname === `/${userRole}`;
 
-  // State for collapsed early menu
+  // Determine if user is on the dashboard home
+  const onDashboard =
+    breadcrumbs.length === 0 && window.location.pathname === `/${userRole}`;
+
+  // State for collapsed menu
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const handleOpenMenu = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
-  // Split breadcrumbs: last 2 always visible, rest in menu
+  // Split breadcrumbs into collapsed early items and last two visible
   const collapsedBreadcrumbs =
     breadcrumbs.length > 2 ? breadcrumbs.slice(-2) : breadcrumbs;
   const earlyItems = breadcrumbs.length > 2 ? breadcrumbs.slice(0, -2) : [];
@@ -42,16 +45,9 @@ const DashboardHeader = React.memo(function DashboardHeader({
         aria-label="breadcrumb"
         sx={{ mb: 2, overflowX: "auto", whiteSpace: "nowrap" }}
       >
-        {/* Home Link */}
+        {/* Home link */}
         {onDashboard ? (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-              color: "text.primary",
-            }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "text.primary" }}>
             <HomeIcon fontSize="small" /> Home
           </Box>
         ) : (
@@ -76,19 +72,12 @@ const DashboardHeader = React.memo(function DashboardHeader({
             >
               <MoreHorizIcon fontSize="small" />
             </IconButton>
-
             <Menu
               anchorEl={anchorEl}
               open={openMenu}
               onClose={handleCloseMenu}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              transformOrigin={{ vertical: "top", horizontal: "left" }}
             >
               {earlyItems.map((item, idx) => (
                 <MenuItem
@@ -129,10 +118,10 @@ const DashboardHeader = React.memo(function DashboardHeader({
       <Typography
         variant="h5"
         fontWeight={700}
-        align={{ xs: "center", sm: "left" }}
         sx={{
           fontSize: { xs: "1.2rem", sm: "1.5rem", md: "1.8rem" },
           wordBreak: "break-word",
+          textAlign: { xs: "center", sm: "left" }, // responsive alignment
         }}
       >
         {title}

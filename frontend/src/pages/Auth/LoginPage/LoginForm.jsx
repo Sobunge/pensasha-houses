@@ -64,7 +64,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
   const showPasswordError = touched.password && Boolean(passwordError);
 
   /* ---------------- Handlers ---------------- */
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -82,7 +81,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
     }
 
     setLoading(true);
-
     try {
       const normalizedPhone = normalizePhone(formData.phoneNumber);
 
@@ -97,15 +95,23 @@ export default function LoginForm({ switchToSignup, onClose }) {
         throw new Error("Invalid login response");
       }
 
+      // ✅ Set token globally for all API calls
       setAccessToken(accessToken);
+
+      // Normalize roles: ensure it's always an array
+      const roles = Array.isArray(principal.roles)
+        ? principal.roles
+        : [principal.role];
 
       const user = {
         id: principal.id,
         phoneNumber: principal.phoneNumber,
-        role: principal.role,
-        defaultRoute: principal.defaultRoute,
+        roles,
+        defaultRoute: "/dashboard", // unified multi-role dashboard
+        accessToken,
       };
 
+      // Save user in session & AuthContext
       sessionStorage.setItem("user", JSON.stringify(user));
       loginAs(user);
 
@@ -113,14 +119,14 @@ export default function LoginForm({ switchToSignup, onClose }) {
 
       if (onClose) onClose();
 
-      navigate(principal.defaultRoute || "/");
-
+      // Navigate to unified dashboard
+      navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
 
-      // Interceptor already normalized message
       const message =
         err?.message ||
+        err?.response?.data?.message ||
         "Unable to login. Please try again.";
 
       notify(message, "error");
@@ -130,7 +136,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
   };
 
   /* ---------------- UI ---------------- */
-
   return (
     <Box
       component="form"

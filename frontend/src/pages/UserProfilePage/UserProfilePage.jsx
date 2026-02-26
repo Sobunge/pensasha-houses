@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Divider,
-  Button,
-  Skeleton,
-  Stack,
-} from "@mui/material";
-
+// src/pages/UserProfilePage/UserProfilePage.jsx
+import React, { useState, useEffect } from "react";
+import { Box, Paper, Typography, Divider, Button, Stack } from "@mui/material";
+import { useParams } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
@@ -26,32 +19,64 @@ import EditProfileDialog from "./EditProfileDialog";
 import ChangeProfilePicDialog from "./ChangeProfilePicDialog";
 
 import useProfile from "../../components/hooks/useProfile";
+import api from "../../api/api";
 
 export default function UserProfilePage() {
-  const { profile, role, loading, error, refreshProfile } = useProfile();
+  const { userId } = useParams();
+  const { profile: selfProfile, loading: selfLoading, refreshProfile } = useProfile();
+
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(selfLoading);
+  const [error, setError] = useState(null);
 
   const [openEditProfile, setOpenEditProfile] = useState(false);
   const [openChangePic, setOpenChangePic] = useState(false);
   const [openManageDocs, setOpenManageDocs] = useState(false);
 
+  // Fetch profile (self or other user)
+  useEffect(() => {
+    if (!userId) {
+      setProfile(selfProfile);
+      setLoading(selfLoading);
+      return;
+    }
+
+    const fetchUser = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get(`/users/${userId}`);
+        setProfile(res.data);
+      } catch (err) {
+        setError("Failed to load profile. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId, selfProfile, selfLoading]);
+
   if (error) {
     return (
-      <Typography
-        variant="h6"
-        sx={{ p: 3, textAlign: "center", color: "error.main" }}
-      >
-        Failed to load profile. Please try again later.
+      <Typography variant="h6" sx={{ p: 3, textAlign: "center", color: "error.main" }}>
+        {error}
       </Typography>
     );
   }
 
-  if (!profile && !loading) {
+  if (!profile && loading) {
     return (
-      <Typography
-        variant="h6"
-        sx={{ p: 3, textAlign: "center", color: "text.secondary" }}
-      >
-        Please log in to view your profile.
+      <Typography variant="h6" sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
+        Loading profile...
+      </Typography>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <Typography variant="h6" sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
+        Please log in to view this profile.
       </Typography>
     );
   }
@@ -63,31 +88,21 @@ export default function UserProfilePage() {
     "&:hover": { bgcolor: "#1565c0" },
   };
 
-  return (
-    <Box
-      sx={{
-        pb: { xs: 2, md: 3 },
-        px: { xs: 2, md: 3 },
-        bgcolor: "#f5f5f5",
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-      }}
-    >
-      {/* ===== HEADER ===== */}
-      <DashboardHeader
-        title="My Profile"
-        breadcrumbs={[{ label: "My Profile" }]}
-      />
+  const primaryRole = profile.roles?.[0] || "";
 
-      {/* ===== PROFILE HEADER ===== */}
+  return (
+    <Box sx={{ pb: 3, px: 3, bgcolor: "#f5f5f5", display: "flex", flexDirection: "column", gap: 3 }}>
+      {/* HEADER */}
+      <DashboardHeader title="Profile" breadcrumbs={[{ label: "Profile" }]} />
+
+      {/* PROFILE HEADER */}
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
         {loading ? (
           <Stack direction="row" spacing={4} alignItems="center">
-            <Skeleton variant="circular" width={110} height={110} />
+            <Box sx={{ width: 110, height: 110, bgcolor: "grey.300", borderRadius: "50%" }} />
             <Box sx={{ flex: 1 }}>
-              <Skeleton width="50%" height={40} />
-              <Skeleton width="30%" height={25} sx={{ mt: 1 }} />
+              <Box sx={{ width: "50%", height: 40, bgcolor: "grey.300", mb: 1 }} />
+              <Box sx={{ width: "30%", height: 25, bgcolor: "grey.300" }} />
             </Box>
           </Stack>
         ) : (
@@ -95,13 +110,13 @@ export default function UserProfilePage() {
         )}
       </Paper>
 
-      {/* ===== BASE PROFILE INFO ===== */}
+      {/* PERSONAL INFO */}
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" fontWeight={600}>
             Personal Information
           </Typography>
-          {!loading && (
+          {!loading && !userId && (
             <Button
               variant="contained"
               startIcon={<EditIcon />}
@@ -113,33 +128,58 @@ export default function UserProfilePage() {
             </Button>
           )}
         </Box>
-
         <Divider sx={{ mb: 3 }} />
 
         {loading ? (
           <Stack spacing={2}>
-            <Skeleton width="80%" height={25} />
-            <Skeleton width="60%" height={25} />
-            <Skeleton width="90%" height={25} />
+            <Box sx={{ width: "80%", height: 25, bgcolor: "grey.300" }} />
+            <Box sx={{ width: "60%", height: 25, bgcolor: "grey.300" }} />
+            <Box sx={{ width: "90%", height: 25, bgcolor: "grey.300" }} />
           </Stack>
         ) : (
           <>
             <BaseProfileInfo profile={profile} />
             <Divider sx={{ my: 3 }} />
-            {role === "TENANT" && <TenantProfileInfo profile={profile} />}
-            {role === "LANDLORD" && <LandlordProfileInfo profile={profile} />}
-            {role === "CARETAKER" && <CaretakerProfileInfo profile={profile} />}
+
+            {/* Multi-role sections */}
+            {profile.roles?.includes("TENANT") && (
+              <>
+                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                  Tenant Info
+                </Typography>
+                <TenantProfileInfo profile={profile} />
+                <Divider sx={{ my: 3 }} />
+              </>
+            )}
+            {profile.roles?.includes("LANDLORD") && (
+              <>
+                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                  Landlord Info
+                </Typography>
+                <LandlordProfileInfo profile={profile} />
+                <Divider sx={{ my: 3 }} />
+              </>
+            )}
+            {profile.roles?.includes("CARETAKER") && (
+              <>
+                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                  Caretaker Info
+                </Typography>
+                <CaretakerProfileInfo profile={profile} />
+                <Divider sx={{ my: 3 }} />
+              </>
+            )}
           </>
         )}
       </Paper>
 
-      {/* ===== DOCUMENTS ===== */}
+      {/* DOCUMENTS */}
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" fontWeight={600}>
             Documents
           </Typography>
-          {!loading && (
+          {!loading && !userId && (
             <Button
               variant="contained"
               startIcon={<UploadFileIcon />}
@@ -151,26 +191,20 @@ export default function UserProfilePage() {
             </Button>
           )}
         </Box>
-
         <Divider sx={{ mb: 2 }} />
 
-        {loading ? (
-          <Stack spacing={1}>
-            <Skeleton width="100%" height={40} />
-            <Skeleton width="100%" height={40} />
-            <Skeleton width="100%" height={40} />
-          </Stack>
-        ) : (
+        {!loading && (
           <ProfileDocuments
             openDialog={openManageDocs}
             setOpenDialog={setOpenManageDocs}
-            role={role}
+            role={primaryRole}
+            userId={userId || null} // pass userId if viewing another profile
           />
         )}
       </Paper>
 
-      {/* ===== DIALOGS ===== */}
-      {!loading && openEditProfile && (
+      {/* DIALOGS */}
+      {!loading && !userId && openEditProfile && (
         <EditProfileDialog
           open={openEditProfile}
           handleClose={() => setOpenEditProfile(false)}
@@ -178,8 +212,7 @@ export default function UserProfilePage() {
           refreshProfile={refreshProfile}
         />
       )}
-
-      {!loading && openChangePic && (
+      {!loading && !userId && openChangePic && (
         <ChangeProfilePicDialog
           open={openChangePic}
           handleClose={() => setOpenChangePic(false)}

@@ -1,4 +1,3 @@
-// src/components/UsersNavbar.jsx
 import React, { useState } from "react";
 import {
   AppBar,
@@ -26,6 +25,9 @@ function UsersNavbar({ onMenuClick }) {
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
   const [anchorElMessages, setAnchorElMessages] = useState(null);
 
+  const unreadMessagesCount = sampleMessages.filter((m) => m.unread).length;
+  const unreadNotificationsCount = 3; // replace with dynamic data later
+
   return (
     <AppBar
       position="fixed"
@@ -46,18 +48,14 @@ function UsersNavbar({ onMenuClick }) {
           src="/assets/images/logo.svg"
           alt="Pensasha Logo"
           sx={{
-            display: { xs: "block", md: "none" }, // only on mobile
+            display: { xs: "block", md: "none" },
             height: 32,
-            mr: 2, // spacing to menu button
+            mr: 2,
           }}
         />
 
         {/* Mobile menu button */}
-        <IconButton
-          edge="start"
-          onClick={onMenuClick}
-          sx={{ display: { md: "none" } }}
-        >
+        <IconButton edge="start" onClick={onMenuClick} sx={{ display: { md: "none" } }}>
           <MenuIcon />
         </IconButton>
 
@@ -65,7 +63,7 @@ function UsersNavbar({ onMenuClick }) {
 
         {/* Messages */}
         <IconButton onClick={(e) => setAnchorElMessages(e.currentTarget)}>
-          <Badge badgeContent={2} color="warning">
+          <Badge badgeContent={Number(unreadMessagesCount)} color="warning">
             <MailIcon />
           </Badge>
         </IconButton>
@@ -81,7 +79,7 @@ function UsersNavbar({ onMenuClick }) {
 
         {/* Notifications */}
         <IconButton onClick={(e) => setAnchorElNotifications(e.currentTarget)}>
-          <Badge badgeContent={3} color="error">
+          <Badge badgeContent={Number(unreadNotificationsCount)} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>

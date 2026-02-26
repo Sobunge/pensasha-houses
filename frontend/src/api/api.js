@@ -40,7 +40,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // ================= NETWORK ERROR =================
+    // NETWORK ERROR
     if (!error.response) {
       return Promise.reject({
         code: "NETWORK_ERROR",
@@ -50,17 +50,17 @@ api.interceptors.response.use(
 
     const status = error.response.status;
 
-    // ================= SKIP AUTH ENDPOINTS =================
+    // SKIP AUTH ENDPOINTS
     const isAuthEndpoint =
       originalRequest.url?.includes("/auth/login") ||
       originalRequest.url?.includes("/auth/refresh");
 
-    // ================= TOKEN EXPIRED → REFRESH =================
+    // TOKEN EXPIRED → REFRESH
     if (
       status === 401 &&
       !originalRequest._retry &&
       !isAuthEndpoint &&
-      accessToken // only if user had session
+      accessToken
     ) {
       originalRequest._retry = true;
 
@@ -84,7 +84,6 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // Refresh failed → logout
         setAccessToken(null);
-
         if (logoutHandler) logoutHandler();
 
         return Promise.reject({
@@ -94,7 +93,7 @@ api.interceptors.response.use(
       }
     }
 
-    // ================= NORMAL ERRORS =================
+    // NORMAL ERRORS
     return Promise.reject({
       code: status,
       message:
@@ -104,5 +103,21 @@ api.interceptors.response.use(
     });
   }
 );
+
+// ================= LOGIN HELPER =================
+export const login = async (username, password) => {
+  try {
+    const res = await api.post("/auth/login", { username, password });
+
+    // Always replace any existing token
+    if (res.data?.accessToken) {
+      setAccessToken(res.data.accessToken);
+    }
+
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};
 
 export default api;

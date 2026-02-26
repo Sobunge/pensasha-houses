@@ -25,6 +25,7 @@ public class JWTUtils {
 
     private static final long ACCESS_TOKEN_EXPIRATION_MS = 15 * 60 * 1000; // 15 min
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+    private static final long CLOCK_SKEW_MS = 120_000; // 2 minutes
 
     public JWTUtils(@Value("${jwt.secret}") String secretKey) {
         this.secretKey = secretKey;
@@ -43,7 +44,6 @@ public class JWTUtils {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", custom.getUser().getId());
 
-        // Include all roles as a Set<String>
         Set<String> roleNames = custom.getUser().getRoles()
                 .stream()
                 .map(Role::name)
@@ -57,7 +57,7 @@ public class JWTUtils {
         return tokens;
     }
 
-    private String generateToken(Map<String, Object> claims, String subject, long expirationMs) {
+     private String generateToken(Map<String, Object> claims, String subject, long expirationMs) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
@@ -68,7 +68,7 @@ public class JWTUtils {
     }
 
     /* ===================== CLAIM EXTRACTION ===================== */
-    private Claims extractAllClaims(String token) {
+      private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build().parseSignedClaims(token).getPayload();
@@ -89,22 +89,17 @@ public class JWTUtils {
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> {
             Object val = claims.get("userId");
-            if (val instanceof Integer)
-                return ((Integer) val).longValue();
-            if (val instanceof Long)
-                return (Long) val;
+            if (val instanceof Integer) return ((Integer) val).longValue();
+            if (val instanceof Long) return (Long) val;
             return null;
         });
     }
 
-    @SuppressWarnings("unchecked")
     public Set<String> extractRoles(String token) {
         return extractClaim(token, claims -> {
             Object val = claims.get("roles");
-            if (val instanceof Set<?>)
-                return (Set<String>) val;
-            if (val instanceof List<?>) {
-                return ((List<?>) val).stream().map(Object::toString).collect(Collectors.toSet());
+            if (val instanceof Collection<?>) {
+                return ((Collection<?>) val).stream().map(Object::toString).collect(Collectors.toSet());
             }
             return Set.of();
         });
@@ -121,15 +116,17 @@ public class JWTUtils {
 
     /* ===================== VALIDATION ===================== */
     public boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        Date expiration = extractExpiration(token);
+        return expiration.before(new Date(System.currentTimeMillis() - CLOCK_SKEW_MS));
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+        return extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     public boolean validateRefreshToken(String token, UserDetails userDetails) {
-        return validateToken(token, userDetails);
+        // Optionally allow longer skew for refresh tokens
+        return extractUsername(token).equals(userDetails.getUsername())
+                && !extractExpiration(token).before(new Date(System.currentTimeMillis() - CLOCK_SKEW_MS));
     }
 }

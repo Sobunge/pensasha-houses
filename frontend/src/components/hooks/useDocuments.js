@@ -12,26 +12,35 @@ export default function useDocuments() {
   const { notify } = useNotification();
 
   /* ===================== FETCH DOCUMENTS ===================== */
-  const fetchDocuments = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchDocuments = useCallback(
+    async (role, userId = null) => {
+      if (!role) return;
 
-    try {
-      const res = await api.get("/documents/me");
-      setDocuments(res.data);
-    } catch (err) {
-      const msg = extractServerMessage(err, "Failed to fetch documents");
-      notify(msg, "error");
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [notify]);
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Fetch documents for a specific role and optional user
+        const res = await api.get("/documents/me", {
+          params: { role, userId },
+        });
+        setDocuments(res.data);
+      } catch (err) {
+        const msg = extractServerMessage(err, "Failed to fetch documents");
+        notify(msg, "error");
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [notify]
+  );
 
   /* ===================== UPLOAD ===================== */
   const uploadDocument = useCallback(
-    async (file, documentType) => {
-      if (!file || !documentType) return null;
+    async (file, documentType, role, userId = null) => {
+      if (!file || !documentType || !role) return null;
+
       setUploading(true);
       setError(null);
 
@@ -39,6 +48,8 @@ export default function useDocuments() {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("documentType", documentType);
+        formData.append("role", role);
+        if (userId) formData.append("userId", userId);
 
         const res = await api.post("/documents", formData, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -46,7 +57,6 @@ export default function useDocuments() {
 
         setDocuments((prev) => [...prev, res.data]);
         notify("Document uploaded successfully", "success");
-
         return res.data;
       } catch (err) {
         const msg = extractServerMessage(err, "Failed to upload document");
@@ -62,14 +72,16 @@ export default function useDocuments() {
 
   /* ===================== DELETE ===================== */
   const deleteDocument = useCallback(
-    async (id, displayName) => {
-      if (!id) return;
+    async (id, role, userId = null) => {
+      if (!id || !role) return;
       setError(null);
 
       try {
-        await api.delete(`/documents/${id}`);
+        await api.delete(`/documents/${id}`, {
+          data: { role, userId },
+        });
         setDocuments((prev) => prev.filter((doc) => doc.id !== id));
-        notify(`Deleted "${displayName || "Document"}"`, "success");
+        notify(`Deleted document`, "success");
       } catch (err) {
         const msg = extractServerMessage(err, "Failed to delete document");
         notify(msg, "error");
@@ -82,11 +94,12 @@ export default function useDocuments() {
 
   /* ===================== DOWNLOAD ===================== */
   const downloadDocument = useCallback(
-    async (doc) => {
-      if (!doc?.id) return;
+    async (doc, role, userId = null) => {
+      if (!doc?.id || !role) return;
 
       try {
         const res = await api.get(`/documents/download/${doc.id}`, {
+          params: { role, userId },
           responseType: "blob",
         });
 
@@ -113,11 +126,10 @@ export default function useDocuments() {
   const extractServerMessage = (err, defaultMsg) => {
     if (!err?.response) return "Network error. Please check your connection.";
 
-    // Prefer server-provided message if available
     const serverMsg = err.response.data?.message;
     switch (err.response.status) {
       case 400:
-      case 413: // payload too large
+      case 413:
         return serverMsg || "Invalid request";
       case 401:
         return serverMsg || "Session expired. Please login again.";
