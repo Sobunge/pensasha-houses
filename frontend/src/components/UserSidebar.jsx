@@ -1,5 +1,5 @@
 // src/components/UserSidebar.jsx
-import React from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import {
   Box,
   Drawer,
@@ -10,7 +10,7 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { useLocation, Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../pages/Auth/AuthContext";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
@@ -20,26 +20,26 @@ import { getMenuItemsForRoles } from "../config/menuItems";
 function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
+  const firstMenuItemRef = useRef(null);
 
-  // Get merged menu items for multi-role users
-  const mergedMenuItems = React.useMemo(() => {
-    return getMenuItemsForRoles(user?.roles || []);
-  }, [user?.roles]);
+  // Merge menu items for multi-role users
+  const mergedMenuItems = useMemo(() => getMenuItemsForRoles(user?.roles || []), [user?.roles]);
 
-  // ================= ACTIVE STATE LOGIC =================
+  // Determine if a menu item is active
   const isMenuItemActive = (item) => {
     const path = location.pathname;
-
-    // Exact match
     if (path === item.link) return true;
-
-    // Nested routes match, except for core Dashboard to avoid both active
-    if (item.link !== "/dashboard" && path.startsWith(item.link + "/")) {
-      return true;
-    }
-
+    if (item.link !== "/dashboard" && path.startsWith(item.link + "/")) return true;
     return false;
   };
+
+  // Focus main content when mobile drawer closes
+  useEffect(() => {
+    if (!mobileOpen) {
+      const main = document.getElementById("mainContent");
+      if (main) main.focus();
+    }
+  }, [mobileOpen]);
 
   const drawerContent = (
     <Box
@@ -52,22 +52,8 @@ function UserSidebar({ mobileOpen, onClose }) {
       }}
     >
       {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 1,
-          p: 2,
-          flexShrink: 0,
-        }}
-      >
-        <Box
-          component="img"
-          src="/assets/images/logo.svg"
-          alt="Pensasha Logo"
-          sx={{ height: 30 }}
-        />
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, p: 2, flexShrink: 0 }}>
+        <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 30 }} />
         <Typography variant="h6" fontWeight={600}>
           Pensasha Houses
         </Typography>
@@ -79,15 +65,15 @@ function UserSidebar({ mobileOpen, onClose }) {
       <Box sx={{ flexGrow: 1, pt: 2, overflow: "hidden" }}>
         <SimpleBar style={{ height: "100%" }} autoHide>
           <List sx={{ p: 1 }}>
-            {mergedMenuItems.map((item) => {
+            {mergedMenuItems.map((item, idx) => {
               const active = isMenuItemActive(item);
-
               return (
                 <ListItemButton
                   key={item.link}
                   component={Link}
                   to={item.link}
                   onClick={onClose}
+                  ref={idx === 0 ? firstMenuItemRef : null}
                   sx={{
                     borderRadius: 1,
                     color: active ? "#f8b500" : "#ddd",
@@ -100,17 +86,12 @@ function UserSidebar({ mobileOpen, onClose }) {
                     },
                   }}
                 >
-                  <ListItemIcon
-                    sx={{ minWidth: 40, color: active ? "#f8b500" : "#aaa" }}
-                  >
+                  <ListItemIcon sx={{ minWidth: 40, color: active ? "#f8b500" : "#aaa" }}>
                     {item.icon}
                   </ListItemIcon>
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{
-                      fontWeight: active ? 600 : 500,
-                      fontSize: "0.875rem",
-                    }}
+                    primaryTypographyProps={{ fontWeight: active ? 600 : 500, fontSize: "0.875rem" }}
                   />
                 </ListItemButton>
               );
@@ -122,41 +103,26 @@ function UserSidebar({ mobileOpen, onClose }) {
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
       {/* Footer */}
-      <Box
-        sx={{
-          p: 2,
-          textAlign: "center",
-          fontSize: "0.8rem",
-          color: "rgba(255,255,255,0.6)",
-          flexShrink: 0,
-        }}
-      >
+      <Box sx={{ p: 2, textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.6)", flexShrink: 0 }}>
         © {new Date().getFullYear()} Pensasha Houses
       </Box>
     </Box>
   );
 
   return (
-    <Box
-      component="nav"
-      sx={{
-        width: { md: DRAWER_WIDTH },
-        flexShrink: { md: 0 },
-      }}
-    >
+    <Box component="nav" sx={{ width: { md: DRAWER_WIDTH }, flexShrink: { md: 0 } }}>
       {/* Mobile Drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={onClose}
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{
+          keepMounted: true,
+          disableEnforceFocus: true, // prevents focus warnings with aria-hidden
+        }}
         sx={{
           display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": {
-            width: DRAWER_WIDTH,
-            bgcolor: "#111",
-            borderRight: "1px solid rgba(255,255,255,0.1)",
-          },
+          "& .MuiDrawer-paper": { width: DRAWER_WIDTH, bgcolor: "#111", borderRight: "1px solid rgba(255,255,255,0.1)" },
         }}
       >
         {drawerContent}
@@ -168,11 +134,7 @@ function UserSidebar({ mobileOpen, onClose }) {
         open
         sx={{
           display: { xs: "none", md: "block" },
-          "& .MuiDrawer-paper": {
-            width: DRAWER_WIDTH,
-            bgcolor: "#111",
-            borderRight: "1px solid rgba(255,255,255,0.1)",
-          },
+          "& .MuiDrawer-paper": { width: DRAWER_WIDTH, bgcolor: "#111", borderRight: "1px solid rgba(255,255,255,0.1)" },
         }}
       >
         {drawerContent}

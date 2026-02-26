@@ -1,5 +1,5 @@
 // src/layouts/DashboardLayout.jsx
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import UsersNavbar from "../components/UsersNavbar";
@@ -11,7 +11,16 @@ import { NAVBAR_HEIGHT } from "../layouts/constants";
 function DashboardLayout() {
   const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mainRef = useRef(null);
 
+  // Move focus to main content when mobile drawer closes
+  useEffect(() => {
+    if (!mobileOpen && mainRef.current) {
+      mainRef.current.focus();
+    }
+  }, [mobileOpen]);
+
+  // If user not logged in, render nothing
   if (!user) return null;
 
   return (
@@ -34,7 +43,10 @@ function DashboardLayout() {
 
         {/* Scrollable main content */}
         <Box
+          ref={mainRef}
           component="main"
+          role="main"
+          tabIndex={-1}
           sx={{
             flexGrow: 1,
             mt: `${NAVBAR_HEIGHT}px`,
