@@ -13,6 +13,7 @@ import {
   InputAdornment,
   CircularProgress,
 } from "@mui/material";
+
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
@@ -20,6 +21,20 @@ import PersonIcon from "@mui/icons-material/Person";
 
 import api from "../../api/api";
 import useProfileForm from "../../components/hooks/useProfileForm";
+
+/**
+ * Resolve API endpoint based on role
+ */
+const getProfileEndpoint = (role, id) => {
+  const roleMap = {
+    TENANT: `/tenants/${id}`,
+    LANDLORD: `/landlords/${id}`,
+    CARETAKER: `/caretakers/${id}`,
+    ADMIN: `/admins/${id}`,
+  };
+
+  return roleMap[role];
+};
 
 export default function EditProfileDialog({
   open,
@@ -29,8 +44,12 @@ export default function EditProfileDialog({
 }) {
   const { formData, errors, handleChange, handleSubmit, fields } =
     useProfileForm(profile || {});
+
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Render dynamic fields (supports nested)
+   */
   const renderFields = (fields, parentKey = null) =>
     fields.map((field) => {
       if (field.nested) {
@@ -42,7 +61,10 @@ export default function EditProfileDialog({
             >
               {field.label}
             </Typography>
-            <Stack spacing={2}>{renderFields(field.nested, field.key)}</Stack>
+
+            <Stack spacing={2}>
+              {renderFields(field.nested, field.key)}
+            </Stack>
           </Box>
         );
       }
@@ -50,7 +72,10 @@ export default function EditProfileDialog({
       const value = parentKey
         ? formData[parentKey]?.[field.key] ?? ""
         : formData[field.key] ?? "";
-      const error = parentKey ? errors[parentKey]?.[field.key] : errors[field.key];
+
+      const error = parentKey
+        ? errors[parentKey]?.[field.key]
+        : errors[field.key];
 
       return (
         <TextField
@@ -58,7 +83,9 @@ export default function EditProfileDialog({
           label={field.label}
           placeholder={field.placeholder || ""}
           value={value}
-          onChange={(e) => handleChange(field.key, e.target.value, parentKey, field)}
+          onChange={(e) =>
+            handleChange(field.key, e.target.value, parentKey, field)
+          }
           error={Boolean(error)}
           helperText={error}
           fullWidth
@@ -87,32 +114,24 @@ export default function EditProfileDialog({
       );
     });
 
+  /**
+   * Save handler
+   */
   const handleSave = async () => {
-    if (!profile?.id) return;
+    if (!profile?.id || !profile?.role) return;
 
     const payload = handleSubmit();
     if (!payload) return;
 
-    setLoading(true);
-    try {
-      let endpoint;
-      switch (profile.role) {
-        case "TENANT":
-          endpoint = `/tenants/${profile.id}`;
-          break;
-        case "LANDLORD":
-          endpoint = `/landlords/${profile.id}`;
-          break;
-        case "CARETAKER":
-          endpoint = `/caretakers/${profile.id}`;
-          break;
-        case "ADMIN":
-          endpoint = `/admins/${profile.id}`;
-          break;
-        default:
-          throw new Error("Unknown role");
-      }
+    const endpoint = getProfileEndpoint(profile.role, profile.id);
+    if (!endpoint) {
+      console.error("Unknown role:", profile.role);
+      return;
+    }
 
+    setLoading(true);
+
+    try {
       await api.put(endpoint, payload);
       await refreshProfile();
       handleClose();
@@ -143,6 +162,7 @@ export default function EditProfileDialog({
         <Avatar sx={{ bgcolor: "#f8b500", width: 40, height: 40 }}>
           <AccountCircleIcon />
         </Avatar>
+
         <Typography variant="subtitle1" fontWeight={600}>
           Edit Profile
         </Typography>
@@ -165,6 +185,7 @@ export default function EditProfileDialog({
         <Button
           startIcon={<CloseIcon />}
           onClick={handleClose}
+          disabled={loading}
           sx={{
             bgcolor: "#f44336",
             color: "#fff",
@@ -174,7 +195,6 @@ export default function EditProfileDialog({
             textTransform: "none",
             "&:hover": { bgcolor: "#d32f2f" },
           }}
-          disabled={loading}
         >
           Cancel
         </Button>
@@ -183,6 +203,7 @@ export default function EditProfileDialog({
           startIcon={loading ? <CircularProgress size={18} /> : <SaveIcon />}
           variant="contained"
           onClick={handleSave}
+          disabled={loading}
           sx={{
             bgcolor: "#f8b500",
             color: "#111",
@@ -192,7 +213,6 @@ export default function EditProfileDialog({
             textTransform: "none",
             "&:hover": { bgcolor: "#c59000" },
           }}
-          disabled={loading}
         >
           {loading ? "Saving..." : "Save"}
         </Button>
