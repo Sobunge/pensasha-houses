@@ -46,6 +46,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        String path = request.getRequestURI();
+
+        // ================= SKIP LOGIN / REFRESH =================
+        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/refresh")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null || !header.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response);
@@ -69,8 +77,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                             );
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    logger.debug("Authenticated user: {} with token ID: {}", 
-                                 username, jwtUtils.extractJti(token));
+                    logger.debug("Authenticated user: {} with token ID: {}",
+                            username, jwtUtils.extractJti(token));
                 }
             }
 
