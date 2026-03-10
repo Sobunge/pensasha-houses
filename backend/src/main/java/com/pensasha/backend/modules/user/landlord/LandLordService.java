@@ -20,7 +20,7 @@ import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LandlordService {
+public class LandLordService {
 
     private final LandlordProfileRepository landlordProfileRepository;
     private final UserRepository userRepository;

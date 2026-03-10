@@ -22,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @Slf4j
 public class LandLordController {
 
-    private final LandlordService landlordService;
+    private final LandLordService landlordService;
 
     // ---------------------- Get All Landlords ----------------------
     @GetMapping
