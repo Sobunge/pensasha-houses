@@ -12,16 +12,29 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Helper for parsing role strings into Role enums.
- * Supports single or multiple roles (comma-separated).
- */
 @Component
 @RequiredArgsConstructor
 public class RoleResolver {
 
     private final RoleRepository roleRepository;
 
+    /**
+     * Resolve a single role
+     */
+    public Role resolveRole(String roleName) {
+        if (roleName == null || roleName.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Role cannot be null or empty");
+        }
+
+        return roleRepository.findByName(roleName.toUpperCase())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Invalid role: " + roleName));
+    }
+
+    /**
+     * Resolve multiple roles
+     */
     public Set<Role> resolveRoles(Set<String> roleNames) {
         if (roleNames == null || roleNames.isEmpty()) {
             throw new ResponseStatusException(
@@ -29,9 +42,7 @@ public class RoleResolver {
         }
 
         return roleNames.stream()
-                .map(name -> roleRepository.findByName(name.toUpperCase())
-                        .orElseThrow(() -> new ResponseStatusException(
-                                HttpStatus.BAD_REQUEST, "Invalid role: " + name)))
+                .map(this::resolveRole) // ✅ reuse single method (cleaner)
                 .collect(Collectors.toSet());
     }
 }
