@@ -31,8 +31,7 @@ public class LandLordService {
         log.info("Fetching landlord profile for userId={}", userId);
 
         LandlordProfile profile = landlordProfileRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Landlord profile not found for userId: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Landlord profile not found for userId: " + userId));
 
         return landlordMapper.toGetDTO(profile);
     }
@@ -41,18 +40,23 @@ public class LandLordService {
     public GetLandLordDTO getLandlordByIdNumber(String idNumber) {
         log.info("Fetching landlord profile by user idNumber={}", idNumber);
 
+        // Fetch the user by idNumber
         User user = userRepository.findByIdNumber(idNumber)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "User not found with idNumber: " + idNumber));
 
-        if (user.getRoles() == null || !user.getRoles().contains(Role.LANDLORD)) {
+        // Ensure the user has the LANDLORD role
+        if (user.getRoles() == null || user.getRoles().stream()
+                .noneMatch(r -> "LANDLORD".equalsIgnoreCase(r.getName()))) {
             throw new IllegalStateException("User is not a landlord");
         }
 
+        // Fetch the landlord profile associated with the user
         LandlordProfile profile = landlordProfileRepository.findById(user.getId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Landlord profile not found for userId: " + user.getId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Landlord profile not found for userId: " + user.getId()));
 
+        // Map entity to DTO including roles and permissions
         return landlordMapper.toGetDTO(profile);
     }
 
@@ -84,8 +88,7 @@ public class LandLordService {
         log.info("Updating properties for landlord userId={}", userId);
 
         LandlordProfile profile = landlordProfileRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Landlord profile not found for userId: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Landlord profile not found for userId: " + userId));
 
         profile.setProperties(properties);
         return landlordMapper.toGetDTO(landlordProfileRepository.save(profile));
@@ -96,8 +99,7 @@ public class LandLordService {
         log.info("Updating bank details for landlord userId={}", userId);
 
         LandlordProfile profile = landlordProfileRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Landlord profile not found for userId: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Landlord profile not found for userId: " + userId));
 
         profile.setBankDetails(bankDetails);
         return landlordMapper.toGetDTO(landlordProfileRepository.save(profile));
