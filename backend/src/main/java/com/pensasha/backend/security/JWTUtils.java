@@ -21,57 +21,65 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JWTUtils {
 
-    private final String secretKey;
+    private final SecretKey signingKey;
 
     private static final long ACCESS_TOKEN_EXPIRATION_MS = 15 * 60 * 1000; // 15 min
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
     private static final long CLOCK_SKEW_MS = 120_000; // 2 minutes
 
     public JWTUtils(@Value("${jwt.secret}") String secretKey) {
-        this.secretKey = secretKey;
-    }
-
-    /* ===================== SIGNING KEY ===================== */
-    private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     /* ===================== TOKEN GENERATION ===================== */
     public Map<String, String> generateTokens(UserDetails userDetails) {
-        CustomUserDetails custom = (CustomUserDetails) userDetails;
+
+        if (!(userDetails instanceof CustomUserDetails custom)) {
+            throw new IllegalArgumentException("Invalid user details type");
+        }
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", custom.getUser().getId());
 
+        // FIX: Role is entity → use getName()
         Set<String> roleNames = custom.getUser().getRoles()
                 .stream()
-                .map(Role::name)
+                .map(Role::getName)
                 .collect(Collectors.toSet());
+
         claims.put("roles", roleNames);
 
+        String subject = userDetails.getUsername();
+
         Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", generateToken(claims, userDetails.getUsername(), ACCESS_TOKEN_EXPIRATION_MS));
-        tokens.put("refreshToken", generateToken(claims, userDetails.getUsername(), REFRESH_TOKEN_EXPIRATION_MS));
+        tokens.put("accessToken", generateToken(claims, subject, ACCESS_TOKEN_EXPIRATION_MS));
+        tokens.put("refreshToken", generateToken(claims, subject, REFRESH_TOKEN_EXPIRATION_MS));
 
         return tokens;
     }
 
-     private String generateToken(Map<String, Object> claims, String subject, long expirationMs) {
+    private String generateToken(Map<String, Object> claims, String subject, long expirationMs) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + expirationMs);
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
-                .id(UUID.randomUUID().toString()).issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(getSigningKey())
+                .id(UUID.randomUUID().toString())
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(signingKey)
                 .compact();
     }
 
     /* ===================== CLAIM EXTRACTION ===================== */
-      private Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build().parseSignedClaims(token).getPayload();
+                .verifyWith(signingKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> resolver) {
@@ -89,8 +97,9 @@ public class JWTUtils {
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> {
             Object val = claims.get("userId");
-            if (val instanceof Integer) return ((Integer) val).longValue();
-            if (val instanceof Long) return (Long) val;
+            if (val instanceof Number num) {
+                return num.longValue();
+            }
             return null;
         });
     }
@@ -98,16 +107,17 @@ public class JWTUtils {
     public Set<String> extractRoles(String token) {
         return extractClaim(token, claims -> {
             Object val = claims.get("roles");
-            if (val instanceof Collection<?>) {
-                return ((Collection<?>) val).stream().map(Object::toString).collect(Collectors.toSet());
+            if (val instanceof Collection<?> collection) {
+                return collection.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toSet());
             }
             return Set.of();
         });
     }
 
     public String extractPrimaryRole(String token) {
-        Set<String> roles = extractRoles(token);
-        return roles.isEmpty() ? null : roles.iterator().next();
+        return extractRoles(token).stream().findFirst().orElse(null);
     }
 
     public Date extractExpiration(String token) {
@@ -121,12 +131,13 @@ public class JWTUtils {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return extractUsername(token).equals(userDetails.getUsername())
+                && !isTokenExpired(token);
     }
 
     public boolean validateRefreshToken(String token, UserDetails userDetails) {
-        // Optionally allow longer skew for refresh tokens
         return extractUsername(token).equals(userDetails.getUsername())
-                && !extractExpiration(token).before(new Date(System.currentTimeMillis() - CLOCK_SKEW_MS));
+                && !extractExpiration(token)
+                        .before(new Date(System.currentTimeMillis() - CLOCK_SKEW_MS));
     }
 }
