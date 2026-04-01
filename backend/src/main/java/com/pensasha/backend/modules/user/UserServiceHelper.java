@@ -6,26 +6,38 @@ import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 import lombok.AllArgsConstructor;
 
 import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @AllArgsConstructor
 public class UserServiceHelper {
 
+    private final RoleRepository roleRepository;
+
     /**
      * Copy fields common to all users during creation.
-     * Safely assigns multiple roles.
+     * Converts role names (String) → Role entities.
      */
     public void applyCreateAttributes(User user, CreateUserDTO dto) {
         user.setPhoneNumber(dto.getPhoneNumber());
 
-        // Initialize roles set if null
+        // Initialize roles set
         if (user.getRoles() == null) {
             user.setRoles(new HashSet<>());
         }
 
-        // Assign role(s) from DTO
+        // Convert and assign roles
         if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
-            user.getRoles().addAll(dto.getRoles());
+            Set<Role> roles = new HashSet<>();
+
+            for (String roleName : dto.getRoles()) {
+                Role role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Role not found: " + roleName));
+                roles.add(role);
+            }
+
+            user.setRoles(roles);
         }
 
         // Optional names
@@ -35,7 +47,7 @@ public class UserServiceHelper {
 
     /**
      * Copy fields common to all users during update.
-     * Safely updates multiple roles if provided.
+     * Converts role names (String) → Role entities.
      */
     public void applyUpdateAttributes(User user, UpdateUserDTO dto) {
         user.setFirstName(dto.getFirstName());
@@ -46,10 +58,16 @@ public class UserServiceHelper {
 
         // Update roles safely
         if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
-            if (user.getRoles() == null) {
-                user.setRoles(new HashSet<>());
+            Set<Role> roles = new HashSet<>();
+
+            for (String roleName : dto.getRoles()) {
+                Role role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Role not found: " + roleName));
+                roles.add(role);
             }
-            user.setRoles(dto.getRoles());
+
+            user.setRoles(roles);
         }
     }
 }
