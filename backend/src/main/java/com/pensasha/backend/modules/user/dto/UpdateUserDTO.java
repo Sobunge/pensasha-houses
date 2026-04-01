@@ -1,6 +1,5 @@
 package com.pensasha.backend.modules.user.dto;
 
-import com.pensasha.backend.modules.user.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,5 +46,5 @@ public class UpdateUserDTO {
     private String email;
 
     /** Optional roles update for multi-role support */
-    private Set<Role> roles;
+    private Set<String> roles;
 }

@@ -30,14 +30,14 @@ export const coreMenuItems = [
 // ======================= ROLE-SPECIFIC MENU =======================
 export const roleItems = {
   tenant: [
-    { label: "My Rental Units", link: "/tenant/properties", icon: <ApartmentIcon /> },
-    { label: "Browse Units", link: "/tenant/browse-units", icon: <SearchIcon /> },
-    { label: "Announcements", link: "/tenant/announcements", icon: <AnnouncementIcon /> },
-    { label: "Messages", link: "/tenant/messages", icon: <MessageIcon /> },
-    { label: "Activity Feeds", link: "/tenant/activities", icon: <NotificationsIcon /> },
-    { label: "Maintenance Requests", link: "/tenant/maintenance-requests", icon: <BuildIcon /> },
-    { label: "Documents", link: "/tenant/documents", icon: <DescriptionIcon /> },
-    { label: "Rent Payments", link: "/tenant/rent-payments", icon: <PaymentIcon /> },
+    { label: "My Rental Units", link: "/dashboard/properties", icon: <ApartmentIcon /> },
+    { label: "Browse Units", link: "/dashboard/browse-units", icon: <SearchIcon /> },
+    { label: "Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
+    { label: "Messages", link: "/dashboard/messages", icon: <MessageIcon /> },
+    { label: "Activity Feeds", link: "/dashboard/activities", icon: <NotificationsIcon /> },
+    { label: "Maintenance Requests", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Documents", link: "/dashboard/documents", icon: <DescriptionIcon /> },
+    { label: "Rent Payments", link: "/dashboard/rent-payments", icon: <PaymentIcon /> },
   ],
 
   landlord: [
