@@ -1,6 +1,5 @@
 package com.pensasha.backend.modules.user.dto;
 
-import com.pensasha.backend.modules.user.Role;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
