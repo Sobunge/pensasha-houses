@@ -2,6 +2,7 @@ package com.pensasha.backend.modules.user;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,18 +43,13 @@ public class AuthController {
 
     /* ========================= REGISTER ========================= */
     @PostMapping("/register")
-    public ResponseEntity<?> register(
-            @Valid @RequestBody CreateUserDTO dto,
-            BindingResult result) {
-
+    public ResponseEntity<?> register(@Valid @RequestBody CreateUserDTO dto, BindingResult result) {
         if (result.hasErrors()) {
             List<String> errors = result.getFieldErrors()
                     .stream()
                     .map(e -> e.getDefaultMessage())
                     .collect(Collectors.toList());
-
-            return ResponseEntity.badRequest()
-                    .body(Map.of("errors", errors));
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
         }
 
         if (userService.userExists(dto.getPhoneNumber())) {
@@ -67,18 +63,15 @@ public class AuthController {
 
     /* ========================= LOGIN ========================= */
     @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @Valid @RequestBody LoginRequestDTO request,
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request,
             BindingResult result,
             HttpServletResponse response) {
 
-        // Validate input
         if (result.hasErrors()) {
             String message = result.getFieldErrors().get(0).getDefaultMessage();
             return ResponseEntity.badRequest().body(Map.of("error", message));
         }
 
-        // Check if user exists first
         if (!userService.userExists(request.getPhoneNumber())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Phone number not registered"));
@@ -111,16 +104,14 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request) {
         String refreshToken = extractRefreshToken(request);
-        if (refreshToken == null) {
+        if (refreshToken == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         String phoneNumber = jwtUtils.extractUsername(refreshToken);
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(phoneNumber);
 
-        if (!jwtUtils.validateRefreshToken(refreshToken, userDetails)) {
+        if (!jwtUtils.validateRefreshToken(refreshToken, userDetails))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         String newAccessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
         return ResponseEntity.ok(new LoginResponseDTO(newAccessToken, buildAuthPrincipal(userDetails)));
@@ -163,21 +154,20 @@ public class AuthController {
     }
 
     private AuthPrincipalDTO buildAuthPrincipal(CustomUserDetails userDetails) {
-        // Use single-role constructor
+        User user = userDetails.getUser();
+
+        // Collect all roles in lowercase strings
+        Set<String> roles = user.getRoles()
+                .stream()
+                .map(Role::getName) // Role entity has getName()
+                .collect(Collectors.toSet());
+
         return new AuthPrincipalDTO(
-                userDetails.getUser().getId(),
+                user.getId(),
                 null,
-                userDetails.getUser().getPhoneNumber(),
-                userDetails.getPrimaryRole().name().toLowerCase(),
-                resolveDefaultRoute(userDetails.getPrimaryRole()));
+                user.getPhoneNumber(),
+                roles,
+                "/dashboard");
     }
 
-    private String resolveDefaultRoute(Role role) {
-        return switch (role) {
-            case TENANT -> "/tenant";
-            case LANDLORD -> "/landlord";
-            case CARETAKER -> "/caretaker";
-            case ADMIN -> "/admin";
-        };
-    }
 }
