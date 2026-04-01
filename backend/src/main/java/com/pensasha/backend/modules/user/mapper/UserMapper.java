@@ -1,49 +1,42 @@
 package com.pensasha.backend.modules.user.mapper;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 
-import java.util.Set;
-
 /**
  * Mapper for converting between User entity and DTOs.
- * Supports:
- * - Full conversion to GetUserDTO
- * - Partial updates via UpdateUserDTO (ignores system-managed fields)
- * - Optional multi-role updates
+ *
+ * Responsibilities:
+ * - Entity → DTO conversion (including roles & permissions flattening)
+ * - Partial updates (excluding system-managed fields)
+ *
+ * NOTE:
+ * - Does NOT handle DTO → Entity role resolution (handled in service layer)
  */
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface UserMapper {
 
     /* ===================== READ ===================== */
 
-    /**
-     * Converts a User entity to a GetUserDTO.
-     * Maps profilePictureUrl in entity to profilePicture in DTO.
-     *
-     * @param user the User entity
-     * @return the DTO representation
-     */
     @Mapping(target = "profilePicture", source = "profilePictureUrl")
+    @Mapping(target = "roles", expression = "java(mapPermissions(user.getRoles()))")
     GetUserDTO toDTO(User user);
 
     /* ===================== UPDATE ===================== */
 
-    /**
-     * Updates an existing User entity from UpdateUserDTO.
-     * Ignores read-only/system-managed fields:
-     * id, publicId, idNumber, audit fields, and profile statuses.
-     * Multi-role updates are applied if roles are provided in DTO.
-     *
-     * @param user the existing User entity to update
-     * @param dto  the DTO containing updated values
-     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "publicId", ignore = true)
     @Mapping(target = "idNumber", ignore = true)
@@ -52,18 +45,47 @@ public interface UserMapper {
     @Mapping(target = "profileCompletionStatus", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+
+    // Relationships handled in service layer
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "permissions", ignore = true)
+    
     @Mapping(target = "tenantProfile", ignore = true)
     @Mapping(target = "landlordProfile", ignore = true)
     @Mapping(target = "caretakerProfile", ignore = true)
+
     void updateEntity(@MappingTarget User user, UpdateUserDTO dto);
 
+    /* ===================== ROLE MAPPING ===================== */
+
     /**
-     * Helper method to update roles in the entity.
-     * Can be called manually after mapping if dto.getRoles() is not null.
+     * Maps Role → String (for DTO roles)
      */
-    default void updateRoles(User user, Set<com.pensasha.backend.modules.user.Role> roles) {
-        if (roles != null && !roles.isEmpty()) {
-            user.setRoles(roles);
-        }
+    default String map(Role role) {
+        return role.getName();
+    }
+
+    /**
+     * Maps Set<Role> → Set<String>
+     */
+    default Set<String> map(Set<Role> roles) {
+        if (roles == null) return null;
+
+        return roles.stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Extracts permissions from roles and flattens them
+     */
+    default Set<String> mapPermissions(Set<Role> roles) {
+        if (roles == null) return null;
+
+        return roles.stream()
+                .filter(role -> role.getPermissions() != null)
+                .flatMap(role -> role.getPermissions().stream())
+                .map(permission -> permission.getName())
+                .collect(Collectors.toSet());
     }
 }
