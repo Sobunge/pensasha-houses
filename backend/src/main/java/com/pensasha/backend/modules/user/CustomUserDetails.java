@@ -8,6 +8,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+/**
+ * Custom UserDetails implementation for Spring Security using entity-based
+ * roles and permissions.
+ */
 public class CustomUserDetails implements UserDetails {
 
     private final UserCredentials credentials;
@@ -21,21 +25,34 @@ public class CustomUserDetails implements UserDetails {
     }
 
     /**
-     * Returns the primary role (first role or main role) for convenience.
+     * Returns the primary role (first role) for convenience.
      */
     public Role getPrimaryRole() {
-        return credentials.getUser().getRoles().stream().findFirst().orElse(Role.TENANT);
+        return credentials.getUser().getRoles().stream().findFirst().orElse(null);
     }
 
     /**
-     * Returns all assigned roles as Spring Security authorities.
+     * Returns all roles and permissions as Spring Security authorities.
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return credentials.getUser().getRoles()
-                .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                .collect(Collectors.toList());
+        User user = credentials.getUser();
+
+        return user.getRoles().stream()
+                .flatMap(role -> {
+                    // Single ROLE_<role> authority as a stream
+                    var roleAuthorityStream = java.util.stream.Stream.of(
+                            new SimpleGrantedAuthority("ROLE_" + role.getName()));
+
+                    // Permissions as a stream
+                    var permAuthorityStream = role.getPermissions()
+                            .stream()
+                            .map(p -> new SimpleGrantedAuthority(p.getName()));
+
+                    // Concatenate role + permissions into a single stream
+                    return java.util.stream.Stream.concat(roleAuthorityStream, permAuthorityStream);
+                })
+                .collect(Collectors.toSet());
     }
 
     @Override

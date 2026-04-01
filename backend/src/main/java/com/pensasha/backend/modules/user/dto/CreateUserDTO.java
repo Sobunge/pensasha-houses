@@ -32,7 +32,7 @@ public class CreateUserDTO {
 
     /** Roles assigned to the user (multi-role support) */
     @NotEmpty(message = "At least one role is required")
-    private Set<Role> roles;
+    private Set<String> roles;
 
     /** Optional: first name */
     private String firstName;

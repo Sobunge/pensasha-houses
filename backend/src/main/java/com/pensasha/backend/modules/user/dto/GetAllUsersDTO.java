@@ -32,5 +32,5 @@ public class GetAllUsersDTO {
     private String profilePicture;
 
     /** Roles assigned to the user */
-    private Set<Role> roles;
+    private Set<String> roles;
 }

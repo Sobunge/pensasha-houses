@@ -1,20 +1,33 @@
 package com.pensasha.backend.modules.user;
 
-/**
- * Enumeration representing the different user roles within the system.
- * Used to assign and control access levels for various types of users.
- */
-public enum Role {
+import java.util.HashSet;
+import java.util.Set;
 
-    /** System administrator with full access rights */
-    ADMIN,
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-    /** Landlord who owns properties and manages their details */
-    LANDLORD,
+@Entity
+@Table(name = "roles")
+@Getter
+@Setter
+public class Role {
+    @Id
+    @GeneratedValue
+    private Long id;
 
-    /** Caretaker responsible for managing a specific property on behalf of the landlord */
-    CARETAKER,
+    @Column(unique = true)
+    private String name;
 
-    /** Tenant who rents a unit within a property */
-    TENANT;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
+    private Set<Permission> permissions = new HashSet<>();
 }

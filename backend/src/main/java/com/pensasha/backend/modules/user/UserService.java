@@ -11,6 +11,10 @@ import com.pensasha.backend.modules.user.tenant.TenantProfileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +27,7 @@ public class UserService {
 
     private final TenantProfileRepository tenantProfileRepository;
     private final LandlordProfileRepository landlordProfileRepository;
+    private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserCredentialsRepository credentialsRepository;
     private final UserFactory userFactory;
@@ -30,7 +35,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     /* ===================== CREATE USER ===================== */
-
     @Transactional
     public GetUserDTO createUser(CreateUserDTO dto) {
 
@@ -42,29 +46,33 @@ public class UserService {
         // Create user entity
         User user = userFactory.createUser(dto);
 
-        // Persist user
+        // Persist user first so profiles can reference it
         userRepository.save(user);
 
-        // Assign roles from DTO
+        // Assign roles from DTO (strings -> Role entities)
         if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
-            user.getRoles().addAll(dto.getRoles());
+            for (String roleName : dto.getRoles()) {
+                Role roleEntity = roleRepository.findByName(roleName.toUpperCase())
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Invalid role name: " + roleName));
 
-            // For each role, create the corresponding profile
-            for (Role role : dto.getRoles()) {
-                switch (role) {
-                    case TENANT -> {
+                user.addRole(roleEntity);
+
+                // Create associated profile if needed
+                switch (roleEntity.getName().toUpperCase()) {
+                    case "TENANT" -> {
                         TenantProfile tenantProfile = new TenantProfile();
                         tenantProfile.setUser(user);
                         tenantProfileRepository.save(tenantProfile);
                         user.setTenantProfile(tenantProfile);
                     }
-                    case LANDLORD -> {
+                    case "LANDLORD" -> {
                         LandlordProfile landlordProfile = new LandlordProfile();
                         landlordProfile.setUser(user);
                         landlordProfileRepository.save(landlordProfile);
                         user.setLandlordProfile(landlordProfile);
                     }
-                    default -> log.warn("Unknown role: {}", role);
+                    default -> log.warn("No profile mapping for role: {}", roleName);
                 }
             }
         }
@@ -77,27 +85,37 @@ public class UserService {
         credentials.setLocked(false);
         credentialsRepository.save(credentials);
 
-        log.info("Created new user: {} (roles: {})", user.getPhoneNumber(), user.getRoles());
+        log.info("Created new user: {} (roles: {})", user.getPhoneNumber(),
+                user.getRoles().stream().map(Role::getName).toList());
+
         return userMapper.toDTO(user);
     }
-    /* ===================== UPDATE USER PROFILE ===================== */
 
+    /* ===================== UPDATE USER PROFILE ===================== */
     @Transactional
     public GetUserDTO updateUser(Long id, UpdateUserDTO dto) {
         User user = getUserEntityById(id);
 
+        // Update basic fields via mapper
         userMapper.updateEntity(user, dto);
 
-        // Update roles if provided
-        if (dto.getRoles() != null) {
-            user.setRoles(dto.getRoles());
+        // Update roles if provided (DTO has Set<String> role names)
+        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
+            Set<Role> newRoles = dto.getRoles().stream()
+                    .map(roleName -> roleRepository.findByName(roleName)
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                    "Role not found: " + roleName)))
+                    .collect(Collectors.toSet());
+
+            user.setRoles(newRoles);
         }
 
         userRepository.save(user);
-        log.info("Updated user profile: {}", id);
+        log.info("Updated user profile: {} with roles: {}", id, user.getRoles());
         return userMapper.toDTO(user);
     }
 
+    
     /* ===================== UPDATE PASSWORD ===================== */
 
     @Transactional

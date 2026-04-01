@@ -23,7 +23,6 @@ import java.util.UUID;
 public class User {
 
     /* ===================== INTERNAL ID ===================== */
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,7 +42,6 @@ public class User {
     }
 
     /* ===================== IDENTITY ===================== */
-
     @Column(length = 50)
     private String firstName;
 
@@ -53,13 +51,9 @@ public class User {
     @Column(length = 50)
     private String lastName;
 
-    // Optional — collected later during verification
     @Column(unique = true, length = 30)
     private String idNumber;
 
-    /**
-     * REQUIRED — primary login identity (E.164 format)
-     */
     @Column(unique = true, nullable = false, length = 15)
     private String phoneNumber;
 
@@ -67,7 +61,6 @@ public class User {
     private String email;
 
     /* ===================== PROFILE ===================== */
-
     @Column(name = "profile_picture_url", length = 255)
     private String profilePictureUrl;
 
@@ -77,25 +70,14 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProfileCompletionStatus profileCompletionStatus =
-            ProfileCompletionStatus.BASIC;
+    private ProfileCompletionStatus profileCompletionStatus = ProfileCompletionStatus.BASIC;
 
-    /* ===================== ROLES ===================== */
-
-    /**
-     * A user can have multiple roles (TENANT, LANDLORD, CARETAKER, etc.)
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id")
-    )
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    /* ===================== ROLES (Entity-based RBAC) ===================== */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     /* ===================== ROLE PROFILES ===================== */
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private TenantProfile tenantProfile;
 
@@ -106,7 +88,6 @@ public class User {
     private CaretakerProfile caretakerProfile;
 
     /* ===================== AUDIT ===================== */
-
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -115,7 +96,6 @@ public class User {
     private LocalDateTime updatedAt;
 
     /* ===================== ROLE HELPERS ===================== */
-
     public void addRole(Role role) {
         this.roles.add(role);
     }
@@ -124,39 +104,44 @@ public class User {
         this.roles.remove(role);
     }
 
-    public boolean hasRole(Role role) {
-        return this.roles.contains(role);
+    public boolean hasRole(String roleName) {
+        return this.roles.stream().anyMatch(r -> r.getName().equalsIgnoreCase(roleName));
+    }
+
+    public Set<String> getPermissions() {
+        Set<String> permissions = new HashSet<>();
+        for (Role role : roles) {
+            role.getPermissions().forEach(p -> permissions.add(p.getName()));
+        }
+        return permissions;
+    }
+    
+    public boolean hasPermission(String permissionName) {
+        return this.roles.stream()
+                .flatMap(r -> r.getPermissions().stream())
+                .anyMatch(p -> p.getName().equalsIgnoreCase(permissionName));
     }
 
     /* ===================== PROFILE HELPERS ===================== */
-
     public void setTenantProfile(TenantProfile profile) {
         this.tenantProfile = profile;
-        if (profile != null) {
+        if (profile != null)
             profile.setUser(this);
-        }
     }
 
     public void setLandlordProfile(LandlordProfile profile) {
         this.landlordProfile = profile;
-        if (profile != null) {
+        if (profile != null)
             profile.setUser(this);
-        }
     }
 
     public void setCaretakerProfile(CaretakerProfile profile) {
         this.caretakerProfile = profile;
-        if (profile != null) {
+        if (profile != null)
             profile.setUser(this);
-        }
     }
 
     /* ===================== FACTORY ===================== */
-
-    /**
-     * Minimal registration entry.
-     * Used at first signup (phone + initial role only).
-     */
     public static User minimal(String phoneNumber, Role role) {
         User user = new User();
         user.setPhoneNumber(phoneNumber);

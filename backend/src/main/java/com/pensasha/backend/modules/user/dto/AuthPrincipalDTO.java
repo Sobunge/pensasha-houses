@@ -3,7 +3,6 @@ package com.pensasha.backend.modules.user.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -29,20 +28,4 @@ public class AuthPrincipalDTO {
     /** Default route for frontend redirection based on primary role */
     private String defaultRoute;
 
-     /**
-     * Convenience constructor for single-role users.
-     *
-     * @param id          Internal ID
-     * @param publicId    Public identifier (nullable)
-     * @param username    Username/phone/email
-     * @param role        Single role as string
-     * @param defaultRoute Default route for frontend
-     */
-    public AuthPrincipalDTO(Long id, String publicId, String username, String role, String defaultRoute) {
-        this.id = id;
-        this.publicId = publicId;
-        this.username = username;
-        this.roles = role != null ? Collections.singleton(role) : Collections.emptySet();
-        this.defaultRoute = defaultRoute;
-    }
 }

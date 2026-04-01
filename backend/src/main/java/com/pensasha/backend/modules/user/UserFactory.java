@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Factory for creating User entities.
- * Handles setting common attributes and roles.
+ * Delegates attribute and role assignment to UserServiceHelper.
  */
 @Component
 @Slf4j
@@ -20,7 +20,6 @@ public class UserFactory {
 
     /**
      * Creates a base User entity from a DTO.
-     * Assigns all roles from the DTO to the User.
      */
     public User createUser(CreateUserDTO dto) {
         if (dto == null || dto.getRoles() == null || dto.getRoles().isEmpty()) {
@@ -30,10 +29,9 @@ public class UserFactory {
         log.info("Creating base user with roles: {}", dto.getRoles());
 
         User user = new User();
-        userServiceHelper.applyCreateAttributes(user, dto);
 
-        // Assign roles from DTO
-        user.getRoles().addAll(dto.getRoles());
+        // Delegate all attribute + role logic
+        userServiceHelper.applyCreateAttributes(user, dto);
 
         log.debug("Created base User with phone {}", user.getPhoneNumber());
         return user;
