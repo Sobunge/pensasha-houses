@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import com.pensasha.backend.modules.property.Property;
+import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.landlord.LandlordProfile;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 
@@ -27,9 +28,17 @@ public interface LandlordMapper {
     @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     @Mapping(target = "idNumber", source = "user.idNumber")
     @Mapping(target = "profilePicture", source = "user.profilePictureUrl")
-    @Mapping(target = "roles", source = "user.roles") // updated to multi-role
+    @Mapping(target = "permissions", expression = "java(mapPermissions(user.getRoles()))")
+
+    // 🔥 FIX: Explicit role mapping
+    @Mapping(target = "roles", source = "user.roles", qualifiedByName = "rolesToStrings")
+
     @Mapping(target = "propertyIds", source = "properties", qualifiedByName = "propertySetToIds")
-    @Mapping(target = "bankDetailsId", expression = "java(profile.getBankDetails() != null ? profile.getBankDetails().getId() : null)")
+
+    @Mapping(
+        target = "bankDetailsId",
+        expression = "java(profile.getBankDetails() != null ? profile.getBankDetails().getId() : null)"
+    )
     GetLandLordDTO toGetDTO(LandlordProfile profile);
 
     /*
@@ -43,8 +52,29 @@ public interface LandlordMapper {
         if (properties == null || properties.isEmpty()) {
             return Set.of();
         }
+
         return properties.stream()
                 .map(Property::getId)
                 .collect(Collectors.toSet());
     }
+
+    // 🔥 FIX: Explicit Role -> String mapping
+    @Named("rolesToStrings")
+    default Set<String> rolesToStrings(Set<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return Set.of();
+        }
+
+        return roles.stream()
+                .map(Role::getName) // ⚠️ or Role::name if it's an enum
+                .collect(Collectors.toSet());
+    }
+
+    default Set<String> mapPermissions(Set<Role> roles) {
+    if (roles == null || roles.isEmpty()) return Set.of();
+    return roles.stream()
+            .flatMap(role -> role.getPermissions().stream())
+            .map(p -> p.getName())
+            .collect(Collectors.toSet());
+}
 }
