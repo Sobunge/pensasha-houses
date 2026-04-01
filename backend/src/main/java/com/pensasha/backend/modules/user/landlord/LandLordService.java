@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.Property;
-import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.UserRepository;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
