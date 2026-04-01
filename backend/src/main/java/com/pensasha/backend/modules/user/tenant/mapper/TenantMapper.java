@@ -15,7 +15,7 @@ import com.pensasha.backend.modules.user.tenant.dto.TenantDTO;
 
 /**
  * Mapper for converting between TenantProfile entity and TenantDTO.
- * Handles extraction of lease IDs, unit IDs, and multi-role mapping.
+ * Handles lease extraction, unit IDs, roles, and permissions.
  */
 @Mapper(componentModel = "spring")
 public interface TenantMapper {
@@ -23,15 +23,21 @@ public interface TenantMapper {
     /* ====================== DTO -> ENTITY ====================== */
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true) // User is set separately
-    @Mapping(target = "leases", ignore = true) // Set via service if needed
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "leases", ignore = true)
     TenantProfile toEntity(TenantDTO tenantDTO);
 
     /* ====================== ENTITY -> DTO ====================== */
 
     @Mapping(target = "leaseIds", expression = "java(getLeaseIds(tenantProfile))")
     @Mapping(target = "unitIds", expression = "java(getUnitIdsFromLeases(tenantProfile))")
-    @Mapping(target = "roles", expression = "java(getRoles(tenantProfile))") // Corrected
+
+    // FIXED: roles now String-based
+    @Mapping(target = "roles", expression = "java(getRoleNames(tenantProfile))")
+
+    // NEW: permissions
+    @Mapping(target = "permissions", expression = "java(getPermissions(tenantProfile))")
+
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "middleName", source = "user.middleName")
     @Mapping(target = "lastName", source = "user.lastName")
@@ -39,9 +45,10 @@ public interface TenantMapper {
     @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     @Mapping(target = "idNumber", source = "user.idNumber")
     @Mapping(target = "profilePicture", source = "user.profilePictureUrl")
+
     TenantDTO toDTO(TenantProfile tenantProfile);
 
-    /* ====================== HELPER METHODS ====================== */
+    /* ====================== HELPERS ====================== */
 
     default List<Long> getLeaseIds(TenantProfile tenantProfile) {
         if (tenantProfile.getLeases() == null || tenantProfile.getLeases().isEmpty()) {
@@ -66,10 +73,29 @@ public interface TenantMapper {
                 .collect(Collectors.toList());
     }
 
-    default Set<Role> getRoles(TenantProfile tenantProfile) {
+    /* ====================== ROLE + PERMISSION ====================== */
+
+    default Set<String> getRoleNames(TenantProfile tenantProfile) {
         if (tenantProfile.getUser() == null || tenantProfile.getUser().getRoles() == null) {
             return Collections.emptySet();
         }
-        return tenantProfile.getUser().getRoles();
+
+        return tenantProfile.getUser().getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+    }
+
+    default Set<String> getPermissions(TenantProfile tenantProfile) {
+        if (tenantProfile.getUser() == null || tenantProfile.getUser().getRoles() == null) {
+            return Collections.emptySet();
+        }
+
+        return tenantProfile.getUser().getRoles()
+                .stream()
+                .filter(role -> role.getPermissions() != null)
+                .flatMap(role -> role.getPermissions().stream())
+                .map(permission -> permission.getName())
+                .collect(Collectors.toSet());
     }
 }
