@@ -23,16 +23,13 @@ import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
  * NOTE:
  * - Does NOT handle DTO → Entity role resolution (handled in service layer)
  */
-@Mapper(
-    componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
 
     /* ===================== READ ===================== */
 
     @Mapping(target = "profilePicture", source = "profilePictureUrl")
-    @Mapping(target = "roles", expression = "java(mapPermissions(user.getRoles()))")
+    @Mapping(target = "permissions", expression = "java(mapPermissions(user.getRoles()))")
     GetUserDTO toDTO(User user);
 
     /* ===================== UPDATE ===================== */
@@ -49,7 +46,7 @@ public interface UserMapper {
     // Relationships handled in service layer
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "permissions", ignore = true)
-    
+
     @Mapping(target = "tenantProfile", ignore = true)
     @Mapping(target = "landlordProfile", ignore = true)
     @Mapping(target = "caretakerProfile", ignore = true)
@@ -66,21 +63,11 @@ public interface UserMapper {
     }
 
     /**
-     * Maps Set<Role> → Set<String>
-     */
-    default Set<String> map(Set<Role> roles) {
-        if (roles == null) return null;
-
-        return roles.stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
-    }
-
-    /**
      * Extracts permissions from roles and flattens them
      */
     default Set<String> mapPermissions(Set<Role> roles) {
-        if (roles == null) return null;
+        if (roles == null)
+            return null;
 
         return roles.stream()
                 .filter(role -> role.getPermissions() != null)
