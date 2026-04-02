@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -25,6 +26,7 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('INVOICE_CREATE') or hasRole('ADMIN')")
     public ResponseEntity<EntityModel<Invoice>> createInvoice(@RequestBody Invoice invoice) {
         Invoice createdInvoice = invoiceService.createInvoice(invoice);
         EntityModel<Invoice> resource = toModel(createdInvoice);
@@ -32,6 +34,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{invoiceNumber}")
+    @PreAuthorize("hasAuthority('INVOICE_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<EntityModel<Invoice>> getInvoice(@PathVariable UUID invoiceNumber) {
         Invoice invoice = invoiceService.getInvoice(invoiceNumber);
         if (invoice == null) {
@@ -41,6 +44,7 @@ public class InvoiceController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('INVOICE_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<Invoice>>> getAllInvoices(Pageable pageable) {
         Page<Invoice> invoices = invoiceService.getAllInvoices(pageable);
         PagedModel<EntityModel<Invoice>> resources = PagedModel.of(
@@ -50,6 +54,7 @@ public class InvoiceController {
     }
 
     @PatchMapping("/{invoiceNumber}/status")
+    @PreAuthorize("hasAuthority('INVOICE_UPDATE_STATUS') or hasRole('ADMIN')")
     public ResponseEntity<EntityModel<Invoice>> updateInvoiceStatus(
             @PathVariable UUID invoiceNumber,
             @RequestParam InvoiceStatus status) {
@@ -58,18 +63,21 @@ public class InvoiceController {
     }
 
     @DeleteMapping("/{invoiceNumber}")
+    @PreAuthorize("hasAuthority('INVOICE_DELETE') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteInvoice(@PathVariable UUID invoiceNumber) {
         invoiceService.deleteInvoice(invoiceNumber);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/generate-monthly")
+    @PreAuthorize("hasAuthority('INVOICE_GENERATE_MONTHLY') or hasRole('ADMIN')")
     public ResponseEntity<String> generateMonthlyInvoices() {
         invoiceService.generateMonthlyInvoices();
         return ResponseEntity.ok("Monthly invoices generated successfully.");
     }
 
     @GetMapping("/by-property-date")
+    @PreAuthorize("hasAuthority('INVOICE_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<Invoice>>> getInvoicesByPropertyAndDateRange(
             @RequestParam Long propertyId,
             @RequestParam String startDate,

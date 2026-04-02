@@ -20,6 +20,13 @@ public enum Permissions {
     RENT_CONFIRM_PAYMENT,
     RENT_MANAGE_INVOICES, // optional, for admin/landlord actions
 
+    // ===================== INVOICE =====================
+    INVOICE_CREATE,
+    INVOICE_VIEW,
+    INVOICE_UPDATE_STATUS,
+    INVOICE_DELETE,
+    INVOICE_GENERATE_MONTHLY,
+
     // ===================== MAINTENANCE =====================
     MAINTENANCE_CREATE,
     MAINTENANCE_VIEW,
