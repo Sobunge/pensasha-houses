@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class UnitController {
      * Adds a new unit.
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('PROPERTY_CREATE') or hasRole('ADMIN')")
     public ResponseEntity<Unit> addUnit(@RequestBody Unit unit) {
         log.info("Received request to add new unit.");
         Unit createdUnit = unitService.addUnit(unit);
@@ -37,6 +39,7 @@ public class UnitController {
      * Retrieves a unit by its ID.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<Unit> getUnitById(@PathVariable Long id) {
         log.info("Fetching unit with ID: {}", id);
         Unit unit = unitService.getUnitById(id);
@@ -47,6 +50,7 @@ public class UnitController {
      * Retrieves all units with pagination.
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<Page<Unit>> getAllUnits(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -59,6 +63,7 @@ public class UnitController {
      * Updates a unit by its ID.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<Unit> updateUnit(@PathVariable Long id, @RequestBody Unit unitDetails) {
         log.info("Updating unit with ID: {}", id);
         Unit updatedUnit = unitService.updateUnit(id, unitDetails);
@@ -69,6 +74,7 @@ public class UnitController {
      * Deletes a unit by its ID.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUnit(@PathVariable Long id) {
         log.info("Deleting unit with ID: {}", id);
         unitService.deleteUnit(id);
@@ -79,6 +85,7 @@ public class UnitController {
      * Checks if a unit is available (not occupied).
      */
     @GetMapping("/{id}/availability")
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<Boolean> isUnitAvailable(@PathVariable Long id) {
         log.info("Checking availability for unit with ID: {}", id);
         boolean available = unitService.isUnitAvailable(id);
@@ -89,17 +96,18 @@ public class UnitController {
      * Calculates the rent due for a unit.
      */
     @GetMapping("/{id}/rent-due")
+    @PreAuthorize("hasAuthority('RENT_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<BigDecimal> calculateRentDue(@PathVariable Long id) {
         log.info("Calculating rent due for unit with ID: {}", id);
         BigDecimal rentDue = unitService.calculateRentDue(id);
         return ResponseEntity.ok(rentDue);
     }
 
-
     /**
      * Retrieves all units associated with a specific tenant ID.
      */
     @GetMapping("/tenant/{tenantId}")
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<java.util.List<Unit>> getUnitsByTenantId(@PathVariable Long tenantId) {
         log.info("Fetching units for tenant with ID: {}", tenantId);
         List<Unit> units = unitService.getUnitsByTenantId(tenantId);
