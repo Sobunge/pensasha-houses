@@ -31,35 +31,56 @@ public class RoleSeeder {
         Role caretaker = getOrCreate("CARETAKER");
         Role admin = getOrCreate("ADMIN");
 
-        // TENANT
-        tenant.setPermissions(Set.of(
-            get(Permissions.PROPERTY_VIEW),
-            get(Permissions.RENT_PAY),
-            get(Permissions.RENT_VIEW),
-            get(Permissions.MAINTENANCE_CREATE),
-            get(Permissions.MESSAGE_SEND),
-            get(Permissions.ANNOUNCEMENT_VIEW)
+        tenant.setPermissions(getPermissions(
+            Permissions.PROPERTY_VIEW,
+            Permissions.RENT_PAY,
+            Permissions.RENT_VIEW,
+            Permissions.MAINTENANCE_CREATE,
+            Permissions.MAINTENANCE_VIEW,
+            Permissions.DOCUMENT_CREATE,
+            Permissions.DOCUMENT_VIEW,
+            Permissions.MESSAGE_SEND,
+            Permissions.MESSAGE_VIEW,
+            Permissions.ANNOUNCEMENT_VIEW
         ));
 
-        // LANDLORD
-        landlord.setPermissions(Set.of(
-            get(Permissions.PROPERTY_CREATE),
-            get(Permissions.PROPERTY_UPDATE),
-            get(Permissions.TENANT_APPROVE),
-            get(Permissions.RENT_VIEW),
-            get(Permissions.RENT_CONFIRM_PAYMENT),
-            get(Permissions.MAINTENANCE_ASSIGN),
-            get(Permissions.REPORT_VIEW)
+        landlord.setPermissions(getPermissions(
+            Permissions.PROPERTY_CREATE,
+            Permissions.PROPERTY_VIEW,
+            Permissions.PROPERTY_UPDATE,
+            Permissions.PROPERTY_DELETE,
+            Permissions.TENANT_VIEW,
+            Permissions.TENANT_CREATE,
+            Permissions.TENANT_UPDATE,
+            Permissions.TENANT_APPROVE,
+            Permissions.RENT_VIEW,
+            Permissions.RENT_UPDATE,
+            Permissions.INVOICE_CREATE,
+            Permissions.INVOICE_VIEW,
+            Permissions.INVOICE_UPDATE,
+            Permissions.INVOICE_GENERATE,
+            Permissions.MAINTENANCE_VIEW,
+            Permissions.MAINTENANCE_ASSIGN,
+            Permissions.MAINTENANCE_UPDATE,
+            Permissions.DOCUMENT_VIEW,
+            Permissions.MESSAGE_SEND,
+            Permissions.MESSAGE_VIEW,
+            Permissions.ANNOUNCEMENT_CREATE,
+            Permissions.ANNOUNCEMENT_VIEW,
+            Permissions.ANNOUNCEMENT_UPDATE,
+            Permissions.REPORT_VIEW,
+            Permissions.REPORT_GENERATE
         ));
 
-        // CARETAKER
-        caretaker.setPermissions(Set.of(
-            get(Permissions.MAINTENANCE_VIEW),
-            get(Permissions.MAINTENANCE_RESOLVE),
-            get(Permissions.MESSAGE_VIEW)
+        caretaker.setPermissions(getPermissions(
+            Permissions.MAINTENANCE_VIEW,
+            Permissions.MAINTENANCE_UPDATE,
+            Permissions.MAINTENANCE_ASSIGN,
+            Permissions.MESSAGE_SEND,
+            Permissions.MESSAGE_VIEW,
+            Permissions.ANNOUNCEMENT_VIEW
         ));
 
-        // ADMIN → all permissions
         admin.setPermissions(
             Arrays.stream(Permissions.values())
                 .map(this::get)
@@ -67,6 +88,12 @@ public class RoleSeeder {
         );
 
         roleRepo.saveAll(List.of(tenant, landlord, caretaker, admin));
+    }
+
+    private Set<Permission> getPermissions(Permissions... perms) {
+        return Arrays.stream(perms)
+                .map(this::get)
+                .collect(Collectors.toSet());
     }
 
     private Role getOrCreate(String name) {
@@ -80,6 +107,7 @@ public class RoleSeeder {
 
     private Permission get(Permissions p) {
         return permRepo.findByName(p.name())
-            .orElseThrow();
+            .orElseThrow(() ->
+                new IllegalStateException("Permission not found: " + p.name()));
     }
 }

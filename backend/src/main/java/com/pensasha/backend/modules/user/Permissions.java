@@ -2,6 +2,7 @@ package com.pensasha.backend.modules.user;
 
 public enum Permissions {
 
+
     // ===================== PROPERTY =====================
     PROPERTY_CREATE,
     PROPERTY_VIEW,
@@ -10,73 +11,73 @@ public enum Permissions {
 
     // ===================== TENANT =====================
     TENANT_VIEW,
+    TENANT_CREATE,
+    TENANT_UPDATE,
+    TENANT_DELETE,
     TENANT_APPROVE,
-    TENANT_MANAGE_PROFILE, // e.g., update tenant info
-    TENANT_DELETE, // if needed, for admin actions
 
-    // ===================== RENT =====================
+    // ===================== RENT / PAYMENT =====================
     RENT_PAY,
     RENT_VIEW,
-    RENT_CONFIRM_PAYMENT,
-    RENT_MANAGE_INVOICES, // optional, for admin/landlord actions
+    RENT_UPDATE, // replaces confirm payment (more flexible)
 
     // ===================== INVOICE =====================
     INVOICE_CREATE,
     INVOICE_VIEW,
-    INVOICE_UPDATE_STATUS,
+    INVOICE_UPDATE,
     INVOICE_DELETE,
-    INVOICE_GENERATE_MONTHLY,
+    INVOICE_GENERATE,
 
     // ===================== MAINTENANCE =====================
     MAINTENANCE_CREATE,
     MAINTENANCE_VIEW,
+    MAINTENANCE_UPDATE,
     MAINTENANCE_ASSIGN,
-    MAINTENANCE_RESOLVE,
     MAINTENANCE_DELETE,
 
     // ===================== CARETAKER =====================
     CARETAKER_CREATE,
     CARETAKER_VIEW,
-    CARETAKER_ASSIGN_PROPERTY,
+    CARETAKER_UPDATE,
     CARETAKER_DELETE,
 
     // ===================== LANDLORD =====================
-    LANDLORD_VIEW, // view landlord profiles
-    LANDLORD_CREATE, // create landlord profiles
-    LANDLORD_UPDATE, // update general landlord info
-    LANDLORD_UPDATE_BANK, // specifically update bank details
-    LANDLORD_MANAGE_PROPERTIES, // assign or update properties for landlord
-    LANDLORD_DELETE, // delete landlord profiles
+    LANDLORD_VIEW,
+    LANDLORD_CREATE,
+    LANDLORD_UPDATE,
+    LANDLORD_DELETE,
 
-    // ===================== DOCUMENTS =====================
+    // ===================== DOCUMENT =====================
+    DOCUMENT_CREATE,
     DOCUMENT_VIEW,
-    DOCUMENT_UPLOAD,
-    DOCUMENT_DELETE, // if needed
+    DOCUMENT_DELETE,
 
-    // ===================== MESSAGES =====================
+    // ===================== MESSAGE =====================
     MESSAGE_SEND,
     MESSAGE_VIEW,
-    MESSAGE_MANAGE, // e.g., delete, moderate
+    MESSAGE_DELETE,
 
-    // ===================== ANNOUNCEMENTS =====================
-    ANNOUNCEMENT_VIEW,
+    // ===================== ANNOUNCEMENT =====================
     ANNOUNCEMENT_CREATE,
+    ANNOUNCEMENT_VIEW,
     ANNOUNCEMENT_UPDATE,
-    ANNOUNCEMENT_DELETE, // if needed
+    ANNOUNCEMENT_DELETE,
 
-    // ===================== REPORTS =====================
+    // ===================== REPORT =====================
     REPORT_VIEW,
-    REPORT_GENERATE, // if applicable
+    REPORT_GENERATE,
 
     // ===================== ADMIN =====================
-    USER_VIEW,
     USER_CREATE,
+    USER_VIEW,
     USER_UPDATE,
     USER_DELETE,
-    ROLE_VIEW,
+
     ROLE_CREATE,
+    ROLE_VIEW,
     ROLE_UPDATE,
     ROLE_DELETE,
-    SYSTEM_SETTINGS_VIEW,
-    SYSTEM_SETTINGS_UPDATE
+
+    SYSTEM_CONFIG_VIEW,
+    SYSTEM_CONFIG_UPDATE
 }
