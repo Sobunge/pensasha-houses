@@ -25,6 +25,9 @@ public class AuthPrincipalDTO {
     /** Roles of the user (multi-role support) */
     private Set<String> roles;
 
+    /* Permissions derived from roles, if needed for frontend authorization */
+    private Set<String> permissions;
+
     /** Default route for frontend redirection based on primary role */
     private String defaultRoute;
 
