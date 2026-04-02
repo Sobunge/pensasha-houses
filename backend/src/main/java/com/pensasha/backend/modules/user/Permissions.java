@@ -25,6 +25,7 @@ public enum Permissions {
     MAINTENANCE_VIEW,
     MAINTENANCE_ASSIGN,
     MAINTENANCE_RESOLVE,
+    MAINTENANCE_DELETE,
 
     // ===================== CARETAKER =====================
     CARETAKER_CREATE,

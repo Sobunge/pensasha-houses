@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pensasha.backend.modules.maintenance.dto.CreateMaintenanceRequestDTO;
@@ -25,6 +26,7 @@ public class MaintenanceRequestController {
      * CREATE a new maintenance request
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('MAINTENANCE_CREATE') or hasRole('ADMIN')")
     public ResponseEntity<MaintenanceRequestResponseDTO> createRequest(
             @RequestParam Long tenantId,
             @Valid @RequestBody CreateMaintenanceRequestDTO dto) {
@@ -37,6 +39,7 @@ public class MaintenanceRequestController {
      * GET a single maintenance request by ID
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('MAINTENANCE_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<MaintenanceRequestResponseDTO> getRequest(@PathVariable Long id) {
         MaintenanceRequestResponseDTO response = maintenanceRequestService.getRequest(id);
         return ResponseEntity.ok(response);
@@ -46,6 +49,7 @@ public class MaintenanceRequestController {
      * UPDATE maintenance request details (type, priority, description)
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('MAINTENANCE_ASSIGN','MAINTENANCE_RESOLVE') or hasRole('ADMIN')")
     public ResponseEntity<MaintenanceRequestResponseDTO> updateRequest(
             @PathVariable Long id,
             @Valid @RequestBody UpdateMaintenanceRequestDTO dto) {
@@ -63,6 +67,7 @@ public class MaintenanceRequestController {
      * UPDATE maintenance request status
      */
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyAuthority('MAINTENANCE_ASSIGN','MAINTENANCE_RESOLVE') or hasRole('ADMIN')")
     public ResponseEntity<MaintenanceRequestResponseDTO> updateStatus(
             @PathVariable Long id,
             @RequestParam MaintenanceStatus status) {
@@ -75,6 +80,7 @@ public class MaintenanceRequestController {
      * DELETE a maintenance request
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('MAINTENANCE_DELETE') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteRequest(@PathVariable Long id) {
         maintenanceRequestService.deleteRequest(id);
         return ResponseEntity.noContent().build();
@@ -84,12 +90,14 @@ public class MaintenanceRequestController {
      * GET all maintenance requests for a tenant
      */
     @GetMapping("/tenant/{tenantId}")
+    @PreAuthorize("hasAuthority('MAINTENANCE_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<List<MaintenanceRequestResponseDTO>> getRequestsByTenant(@PathVariable Long tenantId) {
         List<MaintenanceRequestResponseDTO> requests = maintenanceRequestService.getRequestsByTenant(tenantId);
         return ResponseEntity.ok(requests);
     }
 
     @GetMapping("/tenant/{tenantId}/counts")
+    @PreAuthorize("hasAuthority('MAINTENANCE_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<Map<String, Integer>> getRequestCounts(@PathVariable Long tenantId) {
         List<MaintenanceRequestResponseDTO> requests = maintenanceRequestService.getRequestsByTenant(tenantId);
 
