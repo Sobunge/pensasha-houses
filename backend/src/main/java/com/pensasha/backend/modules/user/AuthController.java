@@ -156,18 +156,19 @@ public class AuthController {
     private AuthPrincipalDTO buildAuthPrincipal(CustomUserDetails userDetails) {
         User user = userDetails.getUser();
 
-        // Collect all roles in lowercase strings
         Set<String> roles = user.getRoles()
                 .stream()
-                .map(Role::getName) // Role entity has getName()
+                .map(Role::getName)
                 .collect(Collectors.toSet());
+
+        Set<String> permissions = user.getPermissions(); // role-based only
 
         return new AuthPrincipalDTO(
                 user.getId(),
-                null,
+                user.getPublicId(),
                 user.getPhoneNumber(),
                 roles,
+                permissions,
                 "/dashboard");
     }
-
 }
