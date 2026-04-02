@@ -17,14 +17,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/properties") // Base URL for property-related endpoints
@@ -36,6 +35,7 @@ public class PropertyController {
 
         // Add a new property
         @PostMapping
+        @PreAuthorize("hasAuthority('PROPERTY_CREATE') or hasRole('ADMIN')")
         public ResponseEntity<?> addProperty(
                         @Valid @RequestBody PropertyDTO propertyDTO, // Validates the input PropertyDTO
                         BindingResult bindingResult, @RequestParam(value = "page", defaultValue = "0") int page,
@@ -64,6 +64,8 @@ public class PropertyController {
 
         // Update an existing property
         @PutMapping("/{id}")
+        @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')") // Only users with update permission or
+                                                                             // admin can update
         public ResponseEntity<?> updateProperty(
                         @PathVariable Long id, // Property ID to update
                         @Valid @RequestBody PropertyDTO propertyDTO, // Validates the input PropertyDTO
@@ -94,6 +96,7 @@ public class PropertyController {
 
         // Get a property by its ID
         @GetMapping("/{id}")
+        @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
         public ResponseEntity<EntityModel<PropertyDTO>> getProperty(@PathVariable Long id) {
                 // Fetch the property using the service
                 return propertyService.getProperty(id)
@@ -112,6 +115,7 @@ public class PropertyController {
 
         // Get all properties
         @GetMapping
+        @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
         public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getAllProperties(
                         @RequestParam(value = "page", defaultValue = "0") int page,
                         @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -153,6 +157,7 @@ public class PropertyController {
 
         // Gettting all properties of a landlord
         @GetMapping("/landlord/{id}")
+        @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
         public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getPropertiesByLandlord(
                         @PathVariable Long id, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
 
@@ -192,6 +197,8 @@ public class PropertyController {
 
         // Delete a property by ID
         @DeleteMapping("/{id}")
+        @PreAuthorize("hasAuthority('PROPERTY_DELETE') or hasRole('ADMIN')") // Only users with delete permission or
+                                                                             // admin can delete
         public ResponseEntity<?> deleteProperty(@PathVariable Long id) {
                 return propertyService.getProperty(id)
                                 .map(propertyDTO -> {
