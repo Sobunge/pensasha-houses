@@ -61,6 +61,7 @@ public enum Permissions {
     // ===================== ANNOUNCEMENTS =====================
     ANNOUNCEMENT_VIEW,
     ANNOUNCEMENT_CREATE,
+    ANNOUNCEMENT_UPDATE,
     ANNOUNCEMENT_DELETE, // if needed
 
     // ===================== REPORTS =====================

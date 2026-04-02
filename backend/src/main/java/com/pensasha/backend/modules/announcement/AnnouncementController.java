@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
@@ -56,6 +57,7 @@ public class AnnouncementController {
      * @return created AnnouncementDTO with HTTP 201 status
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('ANNOUNCEMENT_CREATE') or hasRole('ADMIN')")
     public ResponseEntity<AnnouncementDTO> createAnnouncement(
             @RequestParam(required = false) Long userId,
             @Valid @RequestBody AnnouncementDTO dto) {
@@ -85,6 +87,7 @@ public class AnnouncementController {
      * @return AnnouncementDTO if found
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ANNOUNCEMENT_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<AnnouncementDTO> getAnnouncement(
             @PathVariable Long id) {
 
@@ -104,6 +107,7 @@ public class AnnouncementController {
      * @return updated AnnouncementDTO
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ANNOUNCEMENT_UPDATE') or hasRole('ADMIN')")
     public ResponseEntity<AnnouncementDTO> updateAnnouncement(
             @PathVariable Long id,
             @Valid @RequestBody AnnouncementDTO dto) {
@@ -123,6 +127,7 @@ public class AnnouncementController {
      * @return empty response with HTTP 204 status
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ANNOUNCEMENT_DELETE') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteAnnouncement(
             @PathVariable Long id) {
 
@@ -141,6 +146,7 @@ public class AnnouncementController {
      * @return list of AnnouncementDTOs
      */
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAuthority('ANNOUNCEMENT_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<List<AnnouncementDTO>> getAnnouncementsForUser(
             @PathVariable Long userId) {
 
