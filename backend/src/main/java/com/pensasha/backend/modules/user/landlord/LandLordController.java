@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.hateoas.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pensasha.backend.modules.property.Property;
@@ -26,6 +27,7 @@ public class LandLordController {
 
     // ---------------------- Get All Landlords ----------------------
     @GetMapping
+    @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<GetLandLordDTO>>> getAllLandlords(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -55,6 +57,7 @@ public class LandLordController {
 
     // ---------------------- Get Landlord by National ID ----------------------
     @GetMapping("/by-national-id/{idNumber}")
+    @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable String idNumber) {
         log.info("API call: Get landlord with ID: {}", idNumber);
 
@@ -70,6 +73,7 @@ public class LandLordController {
 
     // ---------------------- Get landlord by ID ---------------------- //
     @GetMapping("/by-id/{userId}")
+    @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable Long userId) {
         log.info("API call: Get landlord with DB ID: {}", userId);
 
@@ -85,6 +89,7 @@ public class LandLordController {
 
     // ---------------------- Update Landlord Properties ----------------------
     @PutMapping("/{userId}/properties")
+    @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')")
     public ResponseEntity<EntityModel<GetLandLordDTO>> updateLandlordProperties(
             @PathVariable Long userId,
             @RequestBody Set<Property> properties) {
@@ -102,6 +107,7 @@ public class LandLordController {
 
     // ---------------------- Update Landlord Bank Details ----------------------
     @PutMapping("/{userId}/bank-details")
+    @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')")
     public ResponseEntity<EntityModel<GetLandLordDTO>> updateBankDetails(
             @PathVariable Long userId,
             @RequestBody BankDetails bankDetails) {
@@ -119,6 +125,7 @@ public class LandLordController {
 
     // ---------------------- Delete Landlord ----------------------
     @DeleteMapping("/{userId}")
+    @PreAuthorize("hasAuthority('LANDLORD_UPDATE_BANK') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLandlord(@PathVariable Long userId) {
         log.info("API call: Delete landlord with DB ID: {}", userId);
 

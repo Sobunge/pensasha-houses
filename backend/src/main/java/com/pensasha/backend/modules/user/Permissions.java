@@ -31,6 +31,14 @@ public enum Permissions {
     CARETAKER_ASSIGN_PROPERTY,
     CARETAKER_DELETE,
 
+    // ===================== LANDLORD =====================
+    LANDLORD_VIEW, // view landlord profiles
+    LANDLORD_CREATE, // create landlord profiles
+    LANDLORD_UPDATE, // update general landlord info
+    LANDLORD_UPDATE_BANK, // specifically update bank details
+    LANDLORD_MANAGE_PROPERTIES, // assign or update properties for landlord
+    LANDLORD_DELETE, // delete landlord profiles
+
     // ===================== DOCUMENTS =====================
     DOCUMENT_VIEW,
     DOCUMENT_UPLOAD,
