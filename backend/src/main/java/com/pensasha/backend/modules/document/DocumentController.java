@@ -8,6 +8,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,7 @@ public class DocumentController {
 
     /* ===================== UPLOAD ===================== */
     @PostMapping
+    @PreAuthorize("hasAuthority('DOCUMENT_UPLOAD') or hasRole('ADMIN')")
     public ResponseEntity<Document> uploadDocument(
             @RequestParam("file") MultipartFile file,
             @RequestParam("documentType") String documentType
@@ -42,6 +44,7 @@ public class DocumentController {
 
     /* ===================== READ (MY DOCUMENTS) ===================== */
     @GetMapping("/me")
+    @PreAuthorize("hasAuthority('DOCUMENT_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<List<Document>> getMyDocuments() {
 
         User user = authUtils.getCurrentUser();
@@ -54,6 +57,7 @@ public class DocumentController {
 
     /* ===================== DOWNLOAD ===================== */
     @GetMapping("/download/{documentId}")
+    @PreAuthorize("hasAuthority('DOCUMENT_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<Resource> downloadDocument(
             @PathVariable UUID documentId
     ) throws MalformedURLException {
@@ -82,6 +86,7 @@ public class DocumentController {
 
     /* ===================== DELETE ===================== */
     @DeleteMapping("/{documentId}")
+    @PreAuthorize("hasAuthority('DOCUMENT_DELETE') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteDocument(
             @PathVariable UUID documentId
     ) {
@@ -95,6 +100,7 @@ public class DocumentController {
 
     /* ===================== COUNT ===================== */
     @GetMapping("/count/me")
+    @PreAuthorize("hasAuthority('DOCUMENT_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<Long> countMyDocuments() {
 
         User user = authUtils.getCurrentUser();
