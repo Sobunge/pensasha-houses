@@ -3,6 +3,7 @@ package com.pensasha.backend.modules.user;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -38,20 +39,18 @@ public class CustomUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         User user = credentials.getUser();
 
-        return user.getRoles().stream()
-                .flatMap(role -> {
-                    // Single ROLE_<role> authority as a stream
-                    var roleAuthorityStream = java.util.stream.Stream.of(
-                            new SimpleGrantedAuthority("ROLE_" + role.getName()));
+        // Roles
+        var roleAuthorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()));
 
-                    // Permissions as a stream
-                    var permAuthorityStream = role.getPermissions()
-                            .stream()
-                            .map(p -> new SimpleGrantedAuthority(p.getName()));
+        // Permissions (deduplicated)
+        var permissionAuthorities = user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(p -> p.getName())
+                .distinct()
+                .map(SimpleGrantedAuthority::new);
 
-                    // Concatenate role + permissions into a single stream
-                    return java.util.stream.Stream.concat(roleAuthorityStream, permAuthorityStream);
-                })
+        return Stream.concat(roleAuthorities, permissionAuthorities)
                 .collect(Collectors.toSet());
     }
 
