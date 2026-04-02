@@ -12,6 +12,7 @@ public enum Permissions {
     TENANT_VIEW,
     TENANT_APPROVE,
     TENANT_MANAGE_PROFILE, // e.g., update tenant info
+    TENANT_DELETE, // if needed, for admin actions
 
     // ===================== RENT =====================
     RENT_PAY,

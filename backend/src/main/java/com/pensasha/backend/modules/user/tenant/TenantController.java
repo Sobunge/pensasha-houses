@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class TenantController {
          * Get tenant details by database ID.
          */
         @GetMapping("/{id}")
+        @PreAuthorize("hasAuthority('TENANT_VIEW') or hasRole('ADMIN')")
         public ResponseEntity<TenantDTO> getTenantById(@PathVariable Long id) {
                 log.info("GET /api/tenants/{}", id);
                 TenantDTO tenantDTO = tenantService.getTenantById(id);
@@ -38,6 +40,7 @@ public class TenantController {
          * Get all tenants with pagination.
          */
         @GetMapping
+        @PreAuthorize("hasAuthority('TENANT_VIEW') or hasRole('ADMIN')")
         public ResponseEntity<Page<TenantDTO>> getAllTenants(
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "10") int size) {
@@ -56,6 +59,7 @@ public class TenantController {
          * Update emergency contact for a tenant by ID.
          */
         @PatchMapping("/{id}/emergency-contact")
+         @PreAuthorize("hasAuthority('TENANT_MANAGE_PROFILE') or hasRole('ADMIN')")
         public ResponseEntity<TenantDTO> updateEmergencyContact(
                         @PathVariable Long id,
                         @RequestParam String emergencyContact) {
@@ -70,6 +74,7 @@ public class TenantController {
          * Update leases for a tenant by ID.
          */
         @PutMapping("/{id}/leases")
+        @PreAuthorize("hasAuthority('RENT_MANAGE_INVOICES') or hasRole('ADMIN')")
         public ResponseEntity<TenantDTO> updateLeases(
                         @PathVariable Long id,
                         @RequestBody List<Lease> leases) {
@@ -84,6 +89,7 @@ public class TenantController {
          * Delete tenant by database ID.
          */
         @DeleteMapping("/{id}")
+        @PreAuthorize("hasAuthority('TENANT_DELETE') or hasRole('ADMIN')")
         public ResponseEntity<Void> deleteTenant(@PathVariable Long id) {
                 log.info("DELETE /api/tenants/{}", id);
 
@@ -97,6 +103,7 @@ public class TenantController {
          * Update tenant information by ID.
          */
         @PutMapping("/{id}")
+        @PreAuthorize("hasAuthority('TENANT_MANAGE_PROFILE') or hasRole('ADMIN')")
         public ResponseEntity<TenantDTO> updateTenant(
                         @PathVariable Long id,
                         @Valid @RequestBody UpdateTenantDTO updateTenantDTO) {
