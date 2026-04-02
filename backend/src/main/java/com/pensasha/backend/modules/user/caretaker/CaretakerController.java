@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pensasha.backend.modules.user.User;
@@ -29,6 +30,7 @@ public class CaretakerController {
      * Create a new caretaker profile linked to an existing user.
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('CARETAKER_CREATE') or hasRole('ADMIN')")
     public ResponseEntity<GetCaretakerDTO> createCaretaker(
             @RequestBody CreateCaretakerDTO dto) {
 
@@ -52,6 +54,7 @@ public class CaretakerController {
      * Assign or update a caretaker's property.
      */
     @PutMapping("/{profileId}/assign-property/{propertyId}")
+    @PreAuthorize("hasAuthority('CARETAKER_ASSIGN_PROPERTY') or hasRole('ADMIN')")
     public ResponseEntity<GetCaretakerDTO> assignProperty(
             @PathVariable Long profileId,
             @PathVariable Long propertyId) {
@@ -66,6 +69,7 @@ public class CaretakerController {
      * Retrieve a caretaker profile by ID.
      */
     @GetMapping("/{profileId}")
+    @PreAuthorize("hasAuthority('CARETAKER_ASSIGN_PROPERTY') or hasRole('ADMIN')")
     public ResponseEntity<GetCaretakerDTO> getCaretaker(@PathVariable Long profileId) {
 
         log.info("API call: Get caretaker profile {}", profileId);
@@ -78,6 +82,7 @@ public class CaretakerController {
      * Retrieve all caretaker profiles.
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('CARETAKER_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<List<GetCaretakerDTO>> getAllCaretakers() {
 
         log.info("API call: Get all caretaker profiles");
@@ -91,6 +96,7 @@ public class CaretakerController {
      */
     @DeleteMapping("/{profileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('CARETAKER_DELETE') or hasRole('ADMIN')")
     public void deleteCaretaker(@PathVariable Long profileId) {
 
         log.info("API call: Delete caretaker profile {}", profileId);
