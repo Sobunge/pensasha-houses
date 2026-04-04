@@ -1,40 +1,30 @@
 // src/pages/Auth/ProtectedRoute.jsx
 import React, { useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../Auth/AuthContext";
+import { useAuth } from "./AuthContext";
 import { useNotification } from "../../components/NotificationProvider";
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
+const ProtectedRoute = ({ children, requiredPermission }) => {
   const { user } = useAuth();
   const { notify } = useNotification();
   const notifiedRef = useRef(false);
 
-  // Normalize roles to lowercase for comparison
-  const userRoles = user?.roles?.map((r) => r.toLowerCase()) || [];
+  // ===== Permission & Auth Checks =====
+  const hasPermission = !requiredPermission || user?.permissions?.includes(requiredPermission);
+  const isUnauthenticated = !user;
+  const isUnauthorized = user && !hasPermission;
 
-  // Check if user has any allowed role
-  const unauthorized =
-    allowedRoles &&
-    !allowedRoles.some((role) => userRoles.includes(role.toLowerCase()));
-
+  // ===== Notification (always safe) =====
   useEffect(() => {
-    if (unauthorized && !notifiedRef.current) {
+    if (isUnauthorized && !notifiedRef.current) {
       notify("You don’t have access to this page", "warning", 3000);
       notifiedRef.current = true;
     }
-  }, [unauthorized, notify]);
+  }, [isUnauthorized, notify]);
 
-  // Redirect unauthenticated users to landing page
-  if (!user) return <Navigate to="/" replace />;
-
-  // Redirect unauthorized users to their defaultRoute (first role if multi)
-  if (unauthorized)
-    return (
-      <Navigate
-        to={user.defaultRoute || "/dashboard"}
-        replace
-      />
-    );
+  // ===== Redirect Logic =====
+  if (isUnauthenticated) return <Navigate to="/" replace />;
+  if (isUnauthorized) return <Navigate to="/dashboard" replace />;
 
   return children;
 };
