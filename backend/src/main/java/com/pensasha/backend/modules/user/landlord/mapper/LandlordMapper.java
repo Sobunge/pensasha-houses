@@ -28,17 +28,14 @@ public interface LandlordMapper {
     @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     @Mapping(target = "idNumber", source = "user.idNumber")
     @Mapping(target = "profilePicture", source = "user.profilePictureUrl")
-    @Mapping(target = "permissions", expression = "java(mapPermissions(user.getRoles()))")
+    @Mapping(target = "permissions", source = "profile", qualifiedByName = "extractPermissions")
 
     // 🔥 FIX: Explicit role mapping
     @Mapping(target = "roles", source = "user.roles", qualifiedByName = "rolesToStrings")
 
     @Mapping(target = "propertyIds", source = "properties", qualifiedByName = "propertySetToIds")
 
-    @Mapping(
-        target = "bankDetailsId",
-        expression = "java(profile.getBankDetails() != null ? profile.getBankDetails().getId() : null)"
-    )
+    @Mapping(target = "bankDetailsId", expression = "java(profile.getBankDetails() != null ? profile.getBankDetails().getId() : null)")
     GetLandLordDTO toGetDTO(LandlordProfile profile);
 
     /*
@@ -71,10 +68,30 @@ public interface LandlordMapper {
     }
 
     default Set<String> mapPermissions(Set<Role> roles) {
-    if (roles == null || roles.isEmpty()) return Set.of();
-    return roles.stream()
-            .flatMap(role -> role.getPermissions().stream())
-            .map(p -> p.getName())
-            .collect(Collectors.toSet());
-}
+        if (roles == null || roles.isEmpty())
+            return Set.of();
+        return roles.stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(p -> p.getName())
+                .collect(Collectors.toSet());
+    }
+
+    @Named("extractPermissions")
+    default Set<String> extractPermissions(LandlordProfile profile) {
+        if (profile == null)
+            return Set.of();
+
+        var user = profile.getUser();
+        if (user == null)
+            return Set.of();
+
+        var roles = user.getRoles();
+        if (roles == null || roles.isEmpty())
+            return Set.of();
+
+        return roles.stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(p -> p.getName())
+                .collect(Collectors.toSet());
+    }
 }
