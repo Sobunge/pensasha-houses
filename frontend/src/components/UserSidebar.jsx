@@ -15,17 +15,24 @@ import { useAuth } from "../pages/Auth/AuthContext";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import { DRAWER_WIDTH } from "../layouts/constants";
-import { getMenuItemsForRoles } from "../config/menuItems";
+import { getMenuItems } from "../config/menuItems";
 
 function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
   const firstMenuItemRef = useRef(null);
 
-  // Merge menu items for multi-role users
-  const mergedMenuItems = useMemo(() => getMenuItemsForRoles(user?.roles || []), [user?.roles]);
+  // 🔥 Extract permissions instead of roles
+  const userPermissions = useMemo(() => {
+    return user?.permissions || [];
+  }, [user]);
 
-  // Determine if a menu item is active
+  // 🔥 Permission-based menu
+  const menuItems = useMemo(() => {
+    return getMenuItems(userPermissions);
+  }, [userPermissions]);
+
+  // Determine active route
   const isMenuItemActive = (item) => {
     const path = location.pathname;
     if (path === item.link) return true;
@@ -33,7 +40,7 @@ function UserSidebar({ mobileOpen, onClose }) {
     return false;
   };
 
-  // Focus main content when mobile drawer closes
+  // Accessibility: focus main content when drawer closes
   useEffect(() => {
     if (!mobileOpen) {
       const main = document.getElementById("mainContent");
@@ -52,7 +59,7 @@ function UserSidebar({ mobileOpen, onClose }) {
       }}
     >
       {/* Header */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, p: 2, flexShrink: 0 }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, p: 2 }}>
         <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 30 }} />
         <Typography variant="h6" fontWeight={600}>
           Pensasha Houses
@@ -61,12 +68,13 @@ function UserSidebar({ mobileOpen, onClose }) {
 
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
-      {/* Scrollable Menu */}
+      {/* Menu */}
       <Box sx={{ flexGrow: 1, pt: 2, overflow: "hidden" }}>
         <SimpleBar style={{ height: "100%" }} autoHide>
           <List sx={{ p: 1 }}>
-            {mergedMenuItems.map((item, idx) => {
+            {menuItems.map((item, idx) => {
               const active = isMenuItemActive(item);
+
               return (
                 <ListItemButton
                   key={item.link}
@@ -86,12 +94,21 @@ function UserSidebar({ mobileOpen, onClose }) {
                     },
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: 40, color: active ? "#f8b500" : "#aaa" }}>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 40,
+                      color: active ? "#f8b500" : "#aaa",
+                    }}
+                  >
                     {item.icon}
                   </ListItemIcon>
+
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{ fontWeight: active ? 600 : 500, fontSize: "0.875rem" }}
+                    primaryTypographyProps={{
+                      fontWeight: active ? 600 : 500,
+                      fontSize: "0.875rem",
+                    }}
                   />
                 </ListItemButton>
               );
@@ -103,7 +120,14 @@ function UserSidebar({ mobileOpen, onClose }) {
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
 
       {/* Footer */}
-      <Box sx={{ p: 2, textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.6)", flexShrink: 0 }}>
+      <Box
+        sx={{
+          p: 2,
+          textAlign: "center",
+          fontSize: "0.8rem",
+          color: "rgba(255,255,255,0.6)",
+        }}
+      >
         © {new Date().getFullYear()} Pensasha Houses
       </Box>
     </Box>
@@ -111,30 +135,38 @@ function UserSidebar({ mobileOpen, onClose }) {
 
   return (
     <Box component="nav" sx={{ width: { md: DRAWER_WIDTH }, flexShrink: { md: 0 } }}>
-      {/* Mobile Drawer */}
+      {/* Mobile */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={onClose}
         ModalProps={{
           keepMounted: true,
-          disableEnforceFocus: true, // prevents focus warnings with aria-hidden
+          disableEnforceFocus: true,
         }}
         sx={{
           display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": { width: DRAWER_WIDTH, bgcolor: "#111", borderRight: "1px solid rgba(255,255,255,0.1)" },
+          "& .MuiDrawer-paper": {
+            width: DRAWER_WIDTH,
+            bgcolor: "#111",
+            borderRight: "1px solid rgba(255,255,255,0.1)",
+          },
         }}
       >
         {drawerContent}
       </Drawer>
 
-      {/* Desktop Drawer */}
+      {/* Desktop */}
       <Drawer
         variant="permanent"
         open
         sx={{
           display: { xs: "none", md: "block" },
-          "& .MuiDrawer-paper": { width: DRAWER_WIDTH, bgcolor: "#111", borderRight: "1px solid rgba(255,255,255,0.1)" },
+          "& .MuiDrawer-paper": {
+            width: DRAWER_WIDTH,
+            bgcolor: "#111",
+            borderRight: "1px solid rgba(255,255,255,0.1)",
+          },
         }}
       >
         {drawerContent}
