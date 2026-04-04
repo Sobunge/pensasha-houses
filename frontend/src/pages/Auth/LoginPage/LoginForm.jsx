@@ -103,10 +103,16 @@ export default function LoginForm({ switchToSignup, onClose }) {
         ? principal.roles
         : [principal.role];
 
+      // Adding permissions
+      const permissions = Array.isArray(principal.permissions)
+        ? principal.permissions
+        : [];
+
       const user = {
         id: principal.id,
         phoneNumber: principal.phoneNumber,
         roles,
+        permissions,
         defaultRoute: "/dashboard", // unified multi-role dashboard
         accessToken,
       };
