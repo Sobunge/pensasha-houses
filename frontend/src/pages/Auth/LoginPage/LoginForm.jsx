@@ -110,7 +110,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
 
       const user = {
         id: principal.id,
-        phoneNumber: principal.phoneNumber,
+        phoneNumber: principal.username,
         roles,
         permissions,
         defaultRoute: "/dashboard", // unified multi-role dashboard
