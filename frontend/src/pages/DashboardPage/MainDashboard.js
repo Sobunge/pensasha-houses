@@ -55,7 +55,7 @@ const MainDashboard = () => {
       { title: "Financial Overview", component: <FinancialOverviewCard />, permission: "RENT_VIEW" },
 
       // Tenant
-      { title: "My Unit", component: <PropertyInfoCard />, permission: "PROPERTY_VIEW" },
+     // { title: "My Unit", component: <PropertyInfoCard />, permission: "PROPERTY_VIEW" },
       { title: "My Payments", component: <PaymentsCard />, permission: "RENT_VIEW" },
       { title: "Maintenance Requests", component: <MaintenanceCard />, permission: "MAINTENANCE_CREATE" },
 
