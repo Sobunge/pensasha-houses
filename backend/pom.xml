@@ -19,8 +19,8 @@
     <description>Pensasha Houses backend application</description>
 
     <properties>
-        <java.version>21</java.version>
-        <mapstruct.version>1.6.3</mapstruct.version>
+        <java.version>25</java.version>
+        <org.mapstruct.version>1.6.3</org.mapstruct.version>
     </properties>
 
     <dependencies>
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
+            <version>${org.mapstruct.version}</version>
         </dependency>
 
         <!-- Testing -->
@@ -132,7 +132,7 @@
                     <path>
                         <groupId>org.mapstruct</groupId>
                         <artifactId>mapstruct-processor</artifactId>
-                        <version>${mapstruct.version}</version>
+                        <version>${org.mapstruct.version}</version>
                     </path>
                 </annotationProcessorPaths>
                 <compilerArgs>
