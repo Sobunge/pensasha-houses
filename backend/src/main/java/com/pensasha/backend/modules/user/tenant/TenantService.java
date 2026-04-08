@@ -36,8 +36,7 @@ public class TenantService {
                 .orElseThrow(() -> {
                     log.error("Tenant profile with ID {} not found", tenantProfileId);
                     return new ResourceNotFoundException(
-                            "Tenant profile with ID " + tenantProfileId + " not found."
-                    );
+                            "Tenant profile with ID " + tenantProfileId + " not found.");
                 });
 
         return tenantMapper.toDTO(tenantProfile);
@@ -67,8 +66,7 @@ public class TenantService {
 
         TenantProfile tenantProfile = tenantRepository.findById(tenantProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Tenant profile with ID " + tenantProfileId + " not found."
-                ));
+                        "Tenant profile with ID " + tenantProfileId + " not found."));
 
         tenantProfile.setEmergencyContact(emergencyContact);
 
@@ -86,8 +84,7 @@ public class TenantService {
 
         TenantProfile tenantProfile = tenantRepository.findById(tenantProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Tenant profile with ID " + tenantProfileId + " not found."
-                ));
+                        "Tenant profile with ID " + tenantProfileId + " not found."));
 
         tenantProfile.setLeases(leases);
 
@@ -121,8 +118,7 @@ public class TenantService {
 
         TenantProfile tenantProfile = tenantRepository.findById(tenantProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Tenant profile with ID " + tenantProfileId + " not found."
-                ));
+                        "Tenant profile with ID " + tenantProfileId + " not found."));
 
         // Update tenant-specific fields
         tenantProfile.setEmergencyContact(dto.getEmergencyContact());
@@ -130,11 +126,18 @@ public class TenantService {
         // Update linked User fields
         User user = tenantProfile.getUser();
         if (user != null) {
-            if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
-            if (dto.getMiddleName() != null) user.setMiddleName(dto.getMiddleName());
-            if (dto.getLastName() != null) user.setLastName(dto.getLastName());
-            if (dto.getPhoneNumber() != null) user.setPhoneNumber(dto.getPhoneNumber());
-            if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+            if (dto.getFirstName() != null)
+                user.setFirstName(dto.getFirstName());
+            if (dto.getMiddleName() != null)
+                user.setMiddleName(dto.getMiddleName());
+            if (dto.getLastName() != null)
+                user.setLastName(dto.getLastName());
+            if (dto.getIdNumber() != null)
+                user.setIdNumber(dto.getIdNumber());
+            if (dto.getPhoneNumber() != null)
+                user.setPhoneNumber(dto.getPhoneNumber());
+            if (dto.getEmail() != null)
+                user.setEmail(dto.getEmail());
         }
 
         TenantProfile updatedTenant = tenantRepository.save(tenantProfile);

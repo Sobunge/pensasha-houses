@@ -36,7 +36,7 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "publicId", ignore = true)
-    @Mapping(target = "idNumber", ignore = true)
+    @Mapping(target = "idNumber", source = "idNumber")
     @Mapping(target = "profilePictureUrl", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "profileCompletionStatus", ignore = true)
