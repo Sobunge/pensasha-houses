@@ -1,6 +1,6 @@
 // src/pages/UserProfilePage/UserProfilePage.jsx
 import React, { useState, useEffect } from "react";
-import { Box, Paper, Typography, Divider, Button, Stack } from "@mui/material";
+import { Box, Paper, Typography, Divider, Button, Stack, CircularProgress, Fade } from "@mui/material";
 import { useParams } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -57,19 +57,47 @@ export default function UserProfilePage() {
     fetchUser();
   }, [userId, selfProfile, selfLoading]);
 
-  if (error) {
+  // Visual Loading State
+  if (!profile && loading) {
     return (
-      <Typography variant="h6" sx={{ p: 3, textAlign: "center", color: "error.main" }}>
-        {error}
-      </Typography>
+      <Fade in timeout={800}>
+        <Box 
+          sx={{ 
+            display: "flex", 
+            flexDirection: "column", 
+            alignItems: "center", 
+            justifyContent: "center",
+            minHeight: "60vh",
+            gap: 2
+          }}
+        >
+          <CircularProgress size={45} thickness={4} sx={{ color: "#f8b500" }} />
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: "text.secondary", 
+              fontWeight: 600, 
+              textTransform: "uppercase", 
+              letterSpacing: 1.5 
+            }}
+          >
+            Retrieving Profile...
+          </Typography>
+        </Box>
+      </Fade>
     );
   }
 
-  if (!profile && loading) {
+  if (error) {
     return (
-      <Typography variant="h6" sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
-        Loading profile...
-      </Typography>
+      <Box sx={{ p: 5, textAlign: "center" }}>
+        <Typography variant="h6" sx={{ color: "error.main", fontWeight: 700 }}>
+          Oops!
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {error}
+        </Typography>
+      </Box>
     );
   }
 
@@ -198,7 +226,7 @@ export default function UserProfilePage() {
             openDialog={openManageDocs}
             setOpenDialog={setOpenManageDocs}
             role={primaryRole}
-            userId={userId || null} // pass userId if viewing another profile
+            userId={userId || null}
           />
         )}
       </Paper>
