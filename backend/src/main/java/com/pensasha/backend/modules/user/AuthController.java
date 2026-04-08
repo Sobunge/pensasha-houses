@@ -22,7 +22,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +41,6 @@ public class AuthController {
     private final UserService userService;
     private final EmailService emailService;
     private final CustomUserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository tokenRepository;
 
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60; // seconds
