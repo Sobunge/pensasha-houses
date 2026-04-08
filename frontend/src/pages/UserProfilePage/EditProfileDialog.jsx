@@ -1,5 +1,5 @@
 // src/pages/UserProfilePage/EditProfileDialog.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -39,18 +39,23 @@ const getProfileEndpoint = (role, id) => {
 };
 
 export default function EditProfileDialog({ open, handleClose, profile, refreshProfile }) {
-  const [selectedRole, setSelectedRole] = useState(profile?.roles?.[0] || "");
-  const { formData, errors, handleChange, handleSubmit, fields, setRole } = useProfileForm(profile || {});
+  const { 
+    formData, 
+    errors, 
+    handleChange, 
+    handleSubmit, 
+    fields, 
+    setRole, 
+    role: selectedRole 
+  } = useProfileForm(profile || {});
+
   const [loading, setLoading] = useState(false);
 
-  // Update formData when role changes
-  useEffect(() => {
-    setRole(selectedRole);
-  }, [selectedRole, setRole]);
-
   // Render dynamic fields (supports nested)
-  const renderFields = (fields, parentKey = null) =>
-    fields.map((field) => {
+  const renderFields = (fieldsToRender, parentKey = null) => {
+    if (!fieldsToRender) return null;
+
+    return fieldsToRender.map((field) => {
       if (field.nested) {
         return (
           <Box key={field.key} sx={{ pl: parentKey ? 3 : 0 }}>
@@ -110,6 +115,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
         />
       );
     });
+  };
 
   // Save handler
   const handleSave = async () => {
@@ -153,7 +159,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
 
         <Typography
           variant="subtitle1"
-          component="div"   // <-- prevent h6 inside h2
+          component="div"
           fontWeight={600}
         >
           Edit Profile
@@ -170,7 +176,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
                 labelId="role-select-label"
                 value={selectedRole}
                 label="Role"
-                onChange={(e) => setSelectedRole(e.target.value)}
+                onChange={(e) => setRole(e.target.value)}
               >
                 {profile.roles.map((role) => (
                   <MenuItem key={role} value={role}>
