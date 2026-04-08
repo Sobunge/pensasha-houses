@@ -1,6 +1,7 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ScrollToTop from "./config/ScrollToTop";
 
 // Layouts
 import AppLayout from "./layouts/AppLayout";
@@ -24,6 +25,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* ===== Public Routes ===== */}
           <Route element={<AppLayout />}>
