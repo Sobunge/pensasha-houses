@@ -1,7 +1,7 @@
 // src/pages/Tenant/TenantDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Card, Button, Avatar, CircularProgress } from "@mui/material";
+import { Box, Typography, Button, CircularProgress, Stack } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PaymentIcon from "@mui/icons-material/Payment";
@@ -11,7 +11,6 @@ import MaintenanceCard from "../../components/cards/MaintenanceCard";
 import AnnouncementsCard from "../../components/cards/AnnouncementsCard";
 import PaymentsCard from "../../components/cards/PaymentsCard";
 import DocumentsCard from "../../components/cards/DocumentsCard";
-import DashboardHeader from "../../components/DashboardHeader";
 import api from "../../api/api";
 import { useAuth } from "../Auth/AuthContext";
 
@@ -56,7 +55,7 @@ function TenantDashboard() {
   if (!user || loadingUnits) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
+        <CircularProgress sx={{ color: "#f8b500" }} />
       </Box>
     );
   }
@@ -65,72 +64,99 @@ function TenantDashboard() {
   const visibleUnits = tenantUnits.slice(0, 2);
 
   return (
-    <Box sx={{ flexGrow: 1, width: "100%", bgcolor: "#f7f7f7", pb: { xs: 2, md: 3 }, px: { xs:2, md: 3 } }}>
+    <Box>
+      {/* ===== Action Header ===== */}
+      <Stack
+        direction="column" // Force vertical stacking for a centered look
+        alignItems="center"
+        spacing={2}
+        sx={{
+          mb: 4,
+          pb: 3,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          width: "100%",
+          textAlign: "center" // Ensures the Typography aligns center
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: "#1a1a1a", letterSpacing: "-0.02em" }}>
+              Tenancy Overview
+            </Typography>
 
-      {/* My Dashboard Header */}
-      <DashboardHeader
-        title="My Dashboard"
-        breadcrumbs={[]}
-      />
-
-
-      {/* Hero Card */}
-      <Card sx={{ mb: 4, p: 3, borderRadius: 3, boxShadow: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            alignItems: "center",
-            justifyContent: { xs: "center", md: "space-between" },
-            gap: 2,
-            width: "100%",
-            textAlign: { xs: "center", md: "left" },
-          }}
-        >
-          <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: "center", gap: 2 }}>
-            <Avatar
-              src="/assets/images/avatar.png"
-              alt={user.name || user.idNumber}
+            <Box
               sx={{
-                width: hasUnits ? 56 : 72,
-                height: hasUnits ? 56 : 72,
-                bgcolor: "#f8b500",
-                color: "#111",
-                boxShadow: 2,
-              }}
-            />
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#111" }}>
-                Welcome back, {user.name || user.idNumber} 👋
-              </Typography>
-              <Typography variant="body2" sx={{ color: hasUnits ? "#555" : "#888", mt: 0.5 }}>
-                {hasUnits
-                  ? `You have ${tenantUnits.length} rental unit${tenantUnits.length > 1 ? "s" : ""}`
-                  : "You don’t have any rental units yet"}
-              </Typography>
-            </Box>
-          </Box>
-
-          {hasUnits && (
-            <Button
-              variant="contained"
-              startIcon={<PaymentIcon />}
-              sx={{
-                bgcolor: "#f8b500",
-                color: "#111",
-                fontWeight: 600,
-                textTransform: "none",
-                borderRadius: 2,
-                px: 3,
-                mt: { xs: 2, md: 0 },
-                alignSelf: { xs: "center", md: "auto" },
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: "20px",
+                bgcolor: hasUnits ? "rgba(76, 175, 80, 0.08)" : "rgba(0, 0, 0, 0.04)",
+                border: "1px solid",
+                borderColor: hasUnits ? "rgba(76, 175, 80, 0.15)" : "transparent",
               }}
             >
-              Pay Rent Now
-            </Button>
-          )}
+              <Box
+                sx={{
+                  width: 6,
+                  height: 6,
+                  bgcolor: hasUnits ? "#4caf50" : "#9e9e9e",
+                  borderRadius: "50%",
+                }}
+              />
+              <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700, textTransform: "uppercase" }}>
+                {hasUnits ? "Active Tenant" : "No Active Lease"}
+              </Typography>
+            </Box>
+          </Stack>
+
+          {/* THIS IS THE CENTERED LINE */}
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 500,
+              textAlign: "center", // Explicitly centered
+              width: "100%"
+            }}
+          >
+            {hasUnits ? (
+              <>
+                Managing <strong>{tenantUnits.length}</strong> active {tenantUnits.length === 1 ? "lease" : "leases"}
+              </>
+            ) : (
+              "No active lease agreements found"
+            )}
+          </Typography>
         </Box>
-      </Card>
+
+        {hasUnits && (
+          <Button
+            variant="contained"
+            disableElevation
+            startIcon={<PaymentIcon />}
+            sx={{
+              bgcolor: "#f8b500",
+              color: "#111",
+              fontWeight: 700,
+              textTransform: "none",
+              borderRadius: "12px",
+              px: 6, // Wider button looks better when centered
+              py: 1.2,
+              boxShadow: "0 4px 14px 0 rgba(248, 181, 0, 0.35)",
+              "&:hover": {
+                bgcolor: "#ffc62c",
+                transform: "translateY(-1px)",
+              },
+              transition: "all 0.2s ease",
+            }}
+          >
+            Pay Rent
+          </Button>
+        )}
+      </Stack>
 
       {/* Rental Units Section */}
       <Section title="Your Rental Units & Rent">
@@ -140,37 +166,21 @@ function TenantDashboard() {
               <Box
                 key={unit.id}
                 sx={{
-                  flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" },
-                  display: "flex",
-                  justifyContent: { xs: "center", md: "flex-start" },
+                  flex: { xs: "1 1 100%", sm: "1 1 48%", md: "0 0 350px" },
                 }}
               >
                 <PropertyInfoCard property={unit} />
               </Box>
             ))}
             {tenantUnits.length > visibleUnits.length && (
-              <Box
-                sx={{
-                  flex: { xs: "1 1 100%", sm: "1 1 48%", md: "1 1 30%" },
-                  display: "flex",
-                  justifyContent: { xs: "center", md: "flex-start" },
-                }}
-              >
+              <Box sx={{ flex: "1 1 100%", mt: 1 }}>
                 <Button
-                  variant="outlined"
-                  size="small"
+                  variant="text"
                   endIcon={<ArrowForwardIcon />}
-                  sx={{
-                    width: "100%",
-                    minHeight: 40,
-                    borderRadius: 3,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    "&:hover": { backgroundColor: "#fef2b2", borderColor: "#f8b500" },
-                  }}
+                  sx={{ color: "#f8b500", fontWeight: 700 }}
                   onClick={() => navigate("/tenant/properties")}
                 >
-                  View All Properties
+                  View all units
                 </Button>
               </Box>
             )}
@@ -186,19 +196,15 @@ function TenantDashboard() {
       </Section>
 
       {/* Requests & Updates */}
-      <Section title="Requests & Updates">
+      <Section title="Maintenance & Announcements">
         <MaintenanceCard tenantId={user.id} />
         <AnnouncementsCard userId={user.id} />
       </Section>
 
-      {/* Documents */}
-      <Section title="Your Documents">
-        <DocumentsCard userId={user.id} />
-      </Section>
-
-      {/* Payments */}
-      <Section title="Recent Payments">
+      {/* Documents & Payments */}
+      <Section title="Billing & Documents">
         <PaymentsCard />
+        <DocumentsCard userId={user.id} />
       </Section>
     </Box>
   );
@@ -206,10 +212,10 @@ function TenantDashboard() {
 
 /* ---------------- Helper Components ---------------- */
 const Section = ({ title, children }) => (
-  <Box sx={{ mb: 4, textAlign: { xs: "center", md: "center", lg: "left" } }}>
+  <Box sx={{ mb: 5 }}>
     <Typography
       variant="subtitle2"
-      sx={{ textTransform: "uppercase", letterSpacing: 1, fontWeight: 600, mb: 2, color: "#2a2a2a" }}
+      sx={{ textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, mb: 2, color: "#888" }}
     >
       {title}
     </Typography>
@@ -218,7 +224,6 @@ const Section = ({ title, children }) => (
         display: "flex",
         flexWrap: "wrap",
         gap: 3,
-        justifyContent: { xs: "center", md: "center", lg: "flex-start" },
       }}
     >
       {children}
@@ -231,33 +236,29 @@ const EmptyState = ({ message, ctaText, ctaIcon, onClick }) => (
     sx={{
       width: "100%",
       textAlign: "center",
-      mt: 1,
-      p: 3,
+      p: 4,
       borderRadius: 3,
       bgcolor: "#ffffff",
-      border: "1px dashed #ffc62c",
+      border: "2px dashed #e0e0e0",
     }}
   >
-    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#2a2a2a", mb: 1 }}>
-      No Rental Unit Assigned
+    <Typography variant="h6" sx={{ fontWeight: 600, color: "#2a2a2a", mb: 1 }}>
+      No Units Found
     </Typography>
-    <Typography variant="body2" sx={{ color: "#555", mb: 3, maxWidth: 360, mx: "auto" }}>
+    <Typography variant="body2" sx={{ color: "#666", mb: 3, maxWidth: 400, mx: "auto" }}>
       {message}
     </Typography>
     <Button
       variant="contained"
-      size="medium"
       startIcon={ctaIcon}
       onClick={onClick}
       sx={{
         bgcolor: "#f8b500",
         color: "#111",
         fontWeight: 600,
-        textTransform: "none",
-        borderRadius: 3,
+        borderRadius: 2,
         px: 4,
         "&:hover": { bgcolor: "#ffc62c" },
-        mx: { xs: "auto", md: "auto", lg: 0 },
       }}
     >
       {ctaText}

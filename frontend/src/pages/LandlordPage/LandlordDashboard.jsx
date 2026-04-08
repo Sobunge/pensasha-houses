@@ -1,6 +1,6 @@
 // src/pages/LandlordPage/LandlordDashboard.jsx
 import React from "react";
-import { Box, Typography, Card, Avatar, Button } from "@mui/material";
+import { Box, Typography, Button, Stack } from "@mui/material";
 import { motion } from "framer-motion";
 
 import DashboardStats from "./DashboardStats";
@@ -10,7 +10,7 @@ import TenantSummaryCard from "./TenantSummaryCard";
 import RecentPaymentsCard from "./RecentPaymentsCard";
 import MaintenanceRequestsCard from "./MaintenanceRequestsCard";
 
-// Reusable Section Title (centered)
+// Reusable Section Title
 const SectionTitle = ({ children }) => (
   <Typography
     variant="subtitle2"
@@ -37,62 +37,39 @@ const LandlordDashboard = () => {
   ];
 
   return (
-    <Box sx={{ minHeight: "100%" }}>
-      {/* Hero Section */}
-      <motion.div
-        initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+    <Box>
+      {/* ===== Top Action Bar ===== */}
+      <Stack 
+        direction="row" 
+        justifyContent="space-between" 
+        alignItems="center" 
+        sx={{ mb: 4 }}
       >
-        <Card
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: "#2a2a2a" }}>
+            Portfolio Portfolio
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Managing 3 active properties
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
           sx={{
-            mb: 4,
-            p: { xs: 2, sm: 3 },
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            borderRadius: 3,
-            boxShadow: 3,
-            bgcolor: "#fff",
+            bgcolor: "#f8b500",
+            color: "#111",
+            fontWeight: 600,
+            textTransform: "none",
+            borderRadius: 2,
+            px: 3,
+            "&:hover": { bgcolor: "#ffc62c" },
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar
-              src="/assets/images/landlord-avatar.png"
-              alt="Landlord"
-              sx={{ width: 56, height: 56, bgcolor: "#f8b500", color: "#111" }}
-            />
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "text.primary" }}>
-                Welcome back, Samuel 👋
-              </Typography>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                You’re managing 3 properties this month
-              </Typography>
-            </Box>
-          </Box>
+          + Add New Property
+        </Button>
+      </Stack>
 
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: "#f8b500",
-              color: "#111",
-              fontWeight: 600,
-              textTransform: "none",
-              borderRadius: 2,
-              px: 3,
-              mt: { xs: 2, md: 0 },
-              "&:hover": { bgcolor: "#ffc62c" },
-            }}
-          >
-            + Add New Property
-          </Button>
-        </Card>
-      </motion.div>
-
-      {/* Dashboard Stats */}
+      {/* ===== Dashboard Stats ===== */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -101,13 +78,13 @@ const LandlordDashboard = () => {
         <DashboardStats />
       </motion.div>
 
-      {/* Dashboard Sections */}
+      {/* ===== Dashboard Sections (Flex Layout) ===== */}
       <Box
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          justifyContent: "center", // center all cards horizontally
-          gap: 2,
+          justifyContent: "center",
+          gap: 3,
           mt: 3,
           px: { xs: 2, md: 0 },
         }}
@@ -116,11 +93,10 @@ const LandlordDashboard = () => {
           <Box
             key={section.title}
             sx={{
-              flex: "0 0 350px", // fixed width
-              minWidth: 350,
+              flex: { xs: "1 1 100%", md: "0 0 350px" },
+              minWidth: 320,
               display: "flex",
               flexDirection: "column",
-              alignItems: "center", // center content inside card
             }}
           >
             <motion.div
