@@ -139,6 +139,22 @@ public class UserService {
         log.info("Password updated for user: {}", userId);
     }
 
+    /*=================== RESET PASSWORD ====================== */
+
+    @Transactional
+    public void resetPassword(String phoneNumber, String newPassword) {
+
+        UserCredentials credentials = credentialsRepository
+                .findByUser_PhoneNumber(phoneNumber)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Credentials not found for user with phone number: " + phoneNumber));
+
+        credentials.setPassword(passwordEncoder.encode(newPassword));
+        credentialsRepository.save(credentials);
+
+        log.info("Password reset for user with phone number: {}", phoneNumber);
+    }
+
     /* ===================== READ USERS ===================== */
 
     public GetUserDTO getUserById(Long id) {
@@ -148,6 +164,12 @@ public class UserService {
     public User getUserEntityById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    }
+
+    public User getUserEntityByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found with phone number: " + phoneNumber));
     }
 
     public GetUserDTO getUserByPublicId(String publicId) {

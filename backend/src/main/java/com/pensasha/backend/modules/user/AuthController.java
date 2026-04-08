@@ -1,8 +1,10 @@
 package com.pensasha.backend.modules.user;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +40,10 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JWTUtils jwtUtils;
     private final UserService userService;
+    private final EmailService emailService;
     private final CustomUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository tokenRepository;
 
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60; // seconds
 
@@ -130,6 +136,42 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
+    /* ========================= FORGOT PASSWORD ========================= */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        User user = userService.getUserEntityByPhoneNumber(request.getPhoneNumber());
+        if (user == null) {
+            // Security Tip: Return 200 even if user doesn't exist to prevent account
+            // enumeration
+            return ResponseEntity.ok("If an account exists, a reset link has been sent.");
+        }
+
+        String token = UUID.randomUUID().toString();
+        tokenRepository.save(new PasswordResetToken(token, user));
+
+        String resetLink = "https://fairwayshotel.com/reset-password?token=" + token;
+        emailService.sendResetEmail(user.getEmail(), resetLink);
+
+        return ResponseEntity.ok("Reset link sent to your registered email.");
+    }
+
+    /* ========================= RESET PASSWORD ========================= */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        PasswordResetToken resetToken = tokenRepository.findByToken(request.getToken()).get();
+
+        if (resetToken == null || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body("Invalid or expired token.");
+        }
+
+        userService.resetPassword(resetToken.getUser().getPhoneNumber(), request.getNewPassword());
+
+        // Delete token so it can't be used twice
+        tokenRepository.delete(resetToken);
+
+        return ResponseEntity.ok("Password successfully updated.");
     }
 
     /* ========================= HELPERS ========================= */

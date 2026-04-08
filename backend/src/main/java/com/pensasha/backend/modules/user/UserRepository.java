@@ -30,6 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     Optional<User> findByIdNumber(String idNumber);
 
+    Optional<User> findByPhoneNumber(String phoneNumber);
+
     /**
      * Checks whether a user with the given ID number exists.
      *
