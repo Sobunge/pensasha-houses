@@ -31,12 +31,13 @@ public class UpdateUserDTO {
     @Size(min = 3, max = 20, message = "Last name must be between 3 and 20 characters")
     private String lastName;
 
+    @NotBlank(message = "ID Number is required")
+    @Pattern(regexp = "^[0-9]{6,12}$", message = "ID Number must be between 6 and 12 digits")
+    private String idNumber;
+
     /** Phone number: required, Kenyan format */
     @NotBlank(message = "Phone number is required")
-    @Pattern(
-        regexp = "^(?:\\+254|0)[17][0-9]{8}$",
-        message = "Phone number must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)"
-    )
+    @Pattern(regexp = "^(?:\\+254|0)[17][0-9]{8}$", message = "Phone number must be valid (e.g., +2547XXXXXXX or 07XXXXXXXX)")
     private String phoneNumber;
 
     /** Email address: required, RFC-compliant */
