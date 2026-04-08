@@ -5,18 +5,16 @@ import { useState, useEffect, useCallback, useMemo } from "react";
  * @param {Object} profile - user profile
  */
 export default function useProfileForm(profile) {
-  // 1. Manage role state internally
   const [role, setRole] = useState(profile?.roles?.[0] || "");
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
-  // 2. Define fields using useMemo so they only recalculate when the role changes
   const fields = useMemo(() => {
     const baseFields = [
-      { key: "firstName", label: "First Name", required: true, placeholder: "Enter first name" },
+      { key: "firstName", label: "First Name", required: true, min: 3, max: 20, placeholder: "Enter first name" },
       { key: "middleName", label: "Middle Name", placeholder: "Enter middle name (optional)" },
-      { key: "lastName", label: "Last Name", required: true, placeholder: "Enter last name" },
-      { key: "idNumber", label: "ID Number", required: true, placeholder: "Enter ID number" },
+      { key: "lastName", label: "Last Name", required: true, min: 3, max: 20, placeholder: "Enter last name" },
+      { key: "idNumber", label: "ID Number", required: true, type: "id", placeholder: "Enter ID number" },
       { key: "email", label: "Email", required: true, type: "email", placeholder: "Enter email address" },
       { key: "phoneNumber", label: "Phone", required: true, type: "phone", placeholder: "Enter phone number" },
     ];
@@ -57,7 +55,6 @@ export default function useProfileForm(profile) {
     }
   }, [role]);
 
-  // 3. Populate form data whenever role or profile changes
   useEffect(() => {
     if (!profile) return;
 
@@ -76,19 +73,42 @@ export default function useProfileForm(profile) {
     populateData(fields, profile, initialData);
     setFormData(initialData);
     setErrors({});
-  }, [profile, fields]); // Recalculate whenever fields (role-based) or profile changes
+  }, [profile, fields]);
 
+  // NEW: Enhanced Validation Logic matching Spring Boot DTO
   const validateField = (key, value, field) => {
-    if (field.required && !value) return "This field is required";
-
-    if (field.type === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (value && !emailRegex.test(value)) return "Invalid email address";
+    if (field.required && (!value || value.toString().trim() === "")) {
+      return `${field.label} is required`;
     }
 
-    if (field.type === "phone") {
-      const phoneRegex = /^[0-9+()\-\s]*$/;
-      if (value && !phoneRegex.test(value)) return "Invalid phone number";
+    if (value) {
+      // Name length validation (3-20 chars)
+      if (field.min && value.length < field.min) {
+        return `${field.label} must be at least ${field.min} characters`;
+      }
+      if (field.max && value.length > field.max) {
+        return `${field.label} must not exceed ${field.max} characters`;
+      }
+
+      // Email validation
+      if (field.type === "email") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return "Invalid email address";
+      }
+
+      // Kenyan Phone Number validation (Matches your DTO Regex)
+      if (field.type === "phone") {
+        const phoneRegex = /^(?:\+254|0)[17][0-9]{8}$/;
+        if (!phoneRegex.test(value)) {
+          return "Use format +2547XXXXXXXX or 07XXXXXXXX";
+        }
+      }
+
+      // ID Number validation (6-12 digits)
+      if (field.type === "id") {
+        const idRegex = /^[0-9]{6,12}$/;
+        if (!idRegex.test(value)) return "ID Number must be 6-12 digits";
+      }
     }
 
     return "";
@@ -150,9 +170,9 @@ export default function useProfileForm(profile) {
   return {
     formData,
     errors,
-    role,      // Exposed so the Dialog knows which role is active
-    setRole,   // Exposed so the Dialog can switch roles
-    fields,    // The actual array for renderFields()
+    role,
+    setRole,
+    fields,
     handleChange,
     handleSubmit,
   };
