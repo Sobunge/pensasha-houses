@@ -9,6 +9,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 // Pages
 import LandingPage from "./pages/LandingPage/LandingPage";
 import ListingsPage from "./pages/ListingsPage/ListingsPage";
+import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 import PropertyDetails from "./pages/ListingsPage/PropertyDetails";
 import NotFound from "./pages/NotFoundPage/NotFound";
 
@@ -43,8 +44,9 @@ function App() {
           >
             {/* Main Dashboard (dynamic based on permissions) */}
             <Route index element={<MainDashboard />} />
-
+            
             {/* Optional shared pages if needed */}
+            <Route path="profile" element={<UserProfilePage />} />
             <Route path="properties" element={<ListingsPage />} />
             <Route path="properties/:id" element={<PropertyDetails />} />
 
