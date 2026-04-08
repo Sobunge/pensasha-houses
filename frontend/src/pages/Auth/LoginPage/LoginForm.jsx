@@ -22,7 +22,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 import { useNotification } from "../../../components/NotificationProvider";
 import { useAuth } from "../AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import api, { setAccessToken } from "../../../api/api";
 
 /* ---------------- Phone Helpers ---------------- */
@@ -95,15 +95,14 @@ export default function LoginForm({ switchToSignup, onClose }) {
         throw new Error("Invalid login response");
       }
 
-      // ✅ Set token globally for all API calls
+      // 1. Set token globally for all API calls
       setAccessToken(accessToken);
 
-      // Normalize roles: ensure it's always an array
+      // 2. Normalize roles & permissions
       const roles = Array.isArray(principal.roles)
         ? principal.roles
         : [principal.role];
 
-      // Adding permissions
       const permissions = Array.isArray(principal.permissions)
         ? principal.permissions
         : [];
@@ -113,26 +112,29 @@ export default function LoginForm({ switchToSignup, onClose }) {
         phoneNumber: principal.username,
         roles,
         permissions,
-        defaultRoute: "/dashboard", // unified multi-role dashboard
+        defaultRoute: "/dashboard",
         accessToken,
       };
 
-      // Save user in session & AuthContext
+      // 3. Save user in session & AuthContext
       sessionStorage.setItem("user", JSON.stringify(user));
       loginAs(user);
 
       notify("Login successful!", "success");
 
+      // 4. Cleanup Modal & Reset Window Scroll
+      // We reset the window scroll because the landing page might be scrolled down,
+      // and we want the dashboard to start fresh at the top.
       if (onClose) onClose();
+      window.scrollTo(0, 0);
 
-      // Navigate to unified dashboard
-      navigate("/dashboard");
+      // 5. Navigate to unified dashboard (replace prevents back-button loop)
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error("Login error:", err);
-
       const message =
-        err?.message ||
         err?.response?.data?.message ||
+        err?.message ||
         "Unable to login. Please try again.";
 
       notify(message, "error");
@@ -199,7 +201,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon />
+                <LockIcon fontSize="small" />
               </InputAdornment>
             ),
             endAdornment: (
@@ -208,6 +210,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
+                  size="small"
                 >
                   {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
@@ -218,7 +221,11 @@ export default function LoginForm({ switchToSignup, onClose }) {
       </Stack>
 
       <Box sx={{ width: "100%", textAlign: "right", mt: 1 }}>
-        <MuiLink href="/forgot-password" sx={{ fontSize: "0.85rem" }}>
+        <MuiLink 
+          component={RouterLink} 
+          to="/forgot-password" 
+          sx={{ fontSize: "0.85rem", color: "primary.main", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+        >
           Forgot password?
         </MuiLink>
       </Box>
@@ -228,15 +235,17 @@ export default function LoginForm({ switchToSignup, onClose }) {
           fullWidth
           type="submit"
           variant="contained"
-          size="small"
           disabled={loading}
           startIcon={
-            loading ? <CircularProgress size={20} /> : <LockOutlinedIcon />
+            loading ? <CircularProgress size={20} color="inherit" /> : <LockOutlinedIcon />
           }
           sx={{
             py: 1.2,
             fontWeight: 600,
             textTransform: "none",
+            bgcolor: "#f8b500",
+            color: "#111",
+            "&:hover": { bgcolor: "#e0a400" },
           }}
         >
           {loading ? "Logging in..." : "Login"}
@@ -250,7 +259,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
             component="button"
             type="button"
             onClick={switchToSignup}
-            sx={{ fontWeight: 500 }}
+            sx={{ fontWeight: 600, color: "#f8b500", textDecoration: "none" }}
           >
             Sign Up
           </MuiLink>
