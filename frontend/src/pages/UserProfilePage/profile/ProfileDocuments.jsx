@@ -33,11 +33,21 @@ import useDocuments from "../../../components/hooks/useDocuments";
 export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
   const documentTypes = ["ID Copy", "Lease Agreement", "Passport", "Utility Bill"];
   const [selectedDocType, setSelectedDocType] = useState("");
-  const { documents, loading, uploading, fetchDocuments, uploadDocument, deleteDocument, downloadDocument } = useDocuments();
+  
+  const { 
+    documents, 
+    loading, 
+    uploading, 
+    fetchDocuments, 
+    uploadDocument, 
+    deleteDocument, 
+    downloadDocument 
+  } = useDocuments();
 
+  // 1. Fetch documents immediately on mount
   useEffect(() => {
-    if (openDialog && role) fetchDocuments(role);
-  }, [openDialog, fetchDocuments, role]);
+    fetchDocuments();
+  }, [fetchDocuments]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -46,29 +56,33 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
       await uploadDocument(file, selectedDocType, role);
       setSelectedDocType("");
       e.target.value = "";
-      fetchDocuments(role);
+      // Refresh list after upload
+      fetchDocuments();
     } catch (err) {
-      console.error(err);
+      console.error("Upload failed:", err);
     }
   };
+
+  // Ensure documents is always treated as an array to prevent .map crashes
+  const safeDocuments = Array.isArray(documents) ? documents : [];
 
   return (
     <Box>
       {loading ? (
         <Stack spacing={1}>
-          <Skeleton width="100%" height={40} />
-          <Skeleton width="100%" height={40} />
+          <Skeleton variant="rectangular" width="100%" height={60} sx={{ borderRadius: 2 }} />
+          <Skeleton variant="rectangular" width="100%" height={60} sx={{ borderRadius: 2 }} />
         </Stack>
-      ) : documents.length === 0 ? (
-        <Box sx={{ py: 4, textAlign: "center" }}>
-          <PictureAsPdfIcon sx={{ fontSize: 42, color: "#c59000", mb: 1 }} />
-          <Typography fontWeight={600} color="#111111">
-            No documents uploaded for {role?.toLowerCase()}
+      ) : safeDocuments.length === 0 ? (
+        <Box sx={{ py: 4, textAlign: "center", border: "1px dashed #ccc", borderRadius: 2 }}>
+          <PictureAsPdfIcon sx={{ fontSize: 42, color: "#ccc", mb: 1 }} />
+          <Typography fontWeight={600} color="text.secondary">
+            No documents uploaded {role ? `for ${role.toLowerCase()}` : ""}
           </Typography>
         </Box>
       ) : (
         <List sx={{ mb: 2 }}>
-          {documents.map((doc) => (
+          {safeDocuments.map((doc) => (
             <ListItem
               key={doc.id}
               sx={{
@@ -80,10 +94,18 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
               }}
               secondaryAction={
                 <Stack direction="row" spacing={0.5}>
-                  <IconButton aria-label="download" sx={{ color: "#f8b500" }} onClick={() => downloadDocument(doc, role)}>
+                  <IconButton 
+                    aria-label="download" 
+                    sx={{ color: "#f8b500" }} 
+                    onClick={() => downloadDocument(doc, role)}
+                  >
                     <DownloadIcon />
                   </IconButton>
-                  <IconButton aria-label="delete" sx={{ color: "error.main" }} onClick={() => deleteDocument(doc.id, role)}>
+                  <IconButton 
+                    aria-label="delete" 
+                    sx={{ color: "error.main" }} 
+                    onClick={() => deleteDocument(doc.id, role)}
+                  >
                     <DeleteOutlineIcon />
                   </IconButton>
                 </Stack>
@@ -92,16 +114,25 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
               <ListItemIcon>
                 <PictureAsPdfIcon sx={{ color: "#f8b500" }} />
               </ListItemIcon>
-              <ListItemText primary={doc.documentType} secondary="Uploaded file" primaryTypographyProps={{ fontWeight: 600 }} />
+              <ListItemText 
+                primary={doc.documentType} 
+                secondary={doc.fileName || "Uploaded file"} 
+                primaryTypographyProps={{ fontWeight: 600 }} 
+              />
             </ListItem>
           ))}
         </List>
       )}
 
+      {/* Upload Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 700, pr: 5 }}>
-          Upload Document for {role?.toLowerCase()}
-          <IconButton aria-label="close" onClick={() => setOpenDialog(false)} sx={{ position: "absolute", right: 8, top: 8, color: "text.secondary" }}>
+          Upload Document {role ? `as ${role.toLowerCase()}` : ""}
+          <IconButton 
+            aria-label="close" 
+            onClick={() => setOpenDialog(false)} 
+            sx={{ position: "absolute", right: 8, top: 8, color: "text.secondary" }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -109,17 +140,31 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
         <DialogContent>
           <Stack spacing={3} mt={1}>
             <FormControl fullWidth>
-              <Select value={selectedDocType} onChange={(e) => setSelectedDocType(e.target.value)} displayEmpty>
+              <Select 
+                value={selectedDocType} 
+                onChange={(e) => setSelectedDocType(e.target.value)} 
+                displayEmpty
+              >
                 <MenuItem value="" disabled>Select document type</MenuItem>
                 {documentTypes.map((type) => (
-                  <MenuItem key={type} value={type} disabled={documents.some((d) => d.documentType === type)}>
+                  <MenuItem 
+                    key={type} 
+                    value={type} 
+                    disabled={safeDocuments.some((d) => d.documentType === type)}
+                  >
                     {type}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <Button variant="contained" component="label" startIcon={<UploadFileIcon />} disabled={!selectedDocType || uploading} sx={{ bgcolor: "#f8b500", color: "#111", fontWeight: 600 }}>
+            <Button 
+              variant="contained" 
+              component="label" 
+              startIcon={<UploadFileIcon />} 
+              disabled={!selectedDocType || uploading} 
+              sx={{ bgcolor: "#f8b500", color: "#111", fontWeight: 600, "&:hover": { bgcolor: "#e0a400" } }}
+            >
               {uploading ? "Uploading..." : "Select a PDF to upload"}
               <input type="file" hidden accept="application/pdf" onChange={handleFileUpload} />
             </Button>
@@ -129,7 +174,12 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
         <Divider />
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setOpenDialog(false)} variant="contained" startIcon={<CheckCircleOutlineIcon />} sx={{ bgcolor: "success.main", fontWeight: 600 }}>
+          <Button 
+            onClick={() => setOpenDialog(false)} 
+            variant="contained" 
+            startIcon={<CheckCircleOutlineIcon />} 
+            sx={{ bgcolor: "success.main", fontWeight: 600 }}
+          >
             Done
           </Button>
         </DialogActions>

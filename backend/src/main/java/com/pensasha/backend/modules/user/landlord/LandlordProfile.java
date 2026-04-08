@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.user.landlord;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
@@ -33,6 +34,7 @@ public class LandlordProfile {
     @OneToOne(optional = false)
     @MapsId
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     /* ===================== LANDLORD SPECIFIC FIELDS ===================== */

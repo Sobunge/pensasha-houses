@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.user.caretaker;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
@@ -30,6 +31,7 @@ public class CaretakerProfile {
      */
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnore
     private User user;
 
     /* ===================== CARETAKER SPECIFIC FIELDS ===================== */

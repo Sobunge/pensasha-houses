@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,6 +46,7 @@ public class Document {
     /* ===================== RELATIONSHIP ===================== */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     /* ===================== CONSTRUCTOR ===================== */

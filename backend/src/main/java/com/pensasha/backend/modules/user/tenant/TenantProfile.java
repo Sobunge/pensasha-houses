@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.user.tenant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pensasha.backend.modules.lease.Lease;
 import com.pensasha.backend.modules.user.User;
 import jakarta.persistence.*;
@@ -36,6 +37,7 @@ public class TenantProfile {
      */
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnore
     private User user;
 
     /* ===================== TENANT SPECIFIC FIELDS ===================== */

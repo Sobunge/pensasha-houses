@@ -11,34 +11,45 @@ export default function useDocuments() {
 
   const { notify } = useNotification();
 
+  /* ===================== HELPER ===================== */
+  const extractServerMessage = (err, defaultMsg) => {
+    if (!err?.response) return "Network error. Please check your connection.";
+    const serverMsg = err.response.data?.message;
+    switch (err.response.status) {
+      case 400: return serverMsg || "Invalid request";
+      case 401: return serverMsg || "Session expired. Please login again.";
+      case 403: return serverMsg || "You are not authorized.";
+      case 413: return serverMsg || "File too large.";
+      case 500: return serverMsg || "Internal server error.";
+      default: return serverMsg || defaultMsg;
+    }
+  };
+
   /* ===================== FETCH DOCUMENTS ===================== */
-  const fetchDocuments = useCallback(
-    async (role, userId = null) => {
-      if (!role) return;
+  const fetchDocuments = useCallback(async () => {
+    // Removed role requirement here so list loads immediately based on JWT
+    setLoading(true);
+    setError(null);
 
-      setLoading(true);
-      setError(null);
-
-      try {
-        // Fetch documents for a specific role and optional user
-        const res = await api.get("/documents/me", {
-          params: { role, userId },
-        });
-        setDocuments(res.data);
-      } catch (err) {
-        const msg = extractServerMessage(err, "Failed to fetch documents");
-        notify(msg, "error");
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [notify]
-  );
+    try {
+      const res = await api.get("/documents/me");
+      // Force array format to prevent .map() crashes
+      const data = Array.isArray(res.data) ? res.data : [];
+      setDocuments(data);
+    } catch (err) {
+      setDocuments([]); // Reset to empty on failure
+      const msg = extractServerMessage(err, "Failed to fetch documents");
+      notify(msg, "error");
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [notify]);
 
   /* ===================== UPLOAD ===================== */
   const uploadDocument = useCallback(
     async (file, documentType, role, userId = null) => {
+      // Role IS required for uploads to categorize the file correctly
       if (!file || !documentType || !role) return null;
 
       setUploading(true);
@@ -55,6 +66,7 @@ export default function useDocuments() {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
+        // Optimistically add the new document to the list
         setDocuments((prev) => [...prev, res.data]);
         notify("Document uploaded successfully", "success");
         return res.data;
@@ -73,20 +85,21 @@ export default function useDocuments() {
   /* ===================== DELETE ===================== */
   const deleteDocument = useCallback(
     async (id, role, userId = null) => {
-      if (!id || !role) return;
+      if (!id) return;
       setError(null);
 
       try {
         await api.delete(`/documents/${id}`, {
-          data: { role, userId },
+          // Sending context if needed, though JWT handles ownership
+          params: { role, userId },
         });
+        
         setDocuments((prev) => prev.filter((doc) => doc.id !== id));
-        notify(`Deleted document`, "success");
+        notify(`Document deleted`, "success");
       } catch (err) {
         const msg = extractServerMessage(err, "Failed to delete document");
         notify(msg, "error");
         setError(err);
-        throw err;
       }
     },
     [notify]
@@ -95,7 +108,7 @@ export default function useDocuments() {
   /* ===================== DOWNLOAD ===================== */
   const downloadDocument = useCallback(
     async (doc, role, userId = null) => {
-      if (!doc?.id || !role) return;
+      if (!doc?.id) return;
 
       try {
         const res = await api.get(`/documents/download/${doc.id}`, {
@@ -106,43 +119,20 @@ export default function useDocuments() {
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", doc.displayName || doc.fileName);
+        link.setAttribute("download", doc.fileName || "document.pdf");
         document.body.appendChild(link);
         link.click();
         link.remove();
+        window.URL.revokeObjectURL(url); // Clean up memory
 
-        notify(`Downloaded "${doc.displayName || doc.fileName}"`, "success");
+        notify(`Download started`, "info");
       } catch (err) {
         const msg = extractServerMessage(err, "Failed to download document");
         notify(msg, "error");
-        setError(err);
-        throw err;
       }
     },
     [notify]
   );
-
-  /* ===================== HELPER ===================== */
-  const extractServerMessage = (err, defaultMsg) => {
-    if (!err?.response) return "Network error. Please check your connection.";
-
-    const serverMsg = err.response.data?.message;
-    switch (err.response.status) {
-      case 400:
-      case 413:
-        return serverMsg || "Invalid request";
-      case 401:
-        return serverMsg || "Session expired. Please login again.";
-      case 403:
-        return serverMsg || "You are not authorized to perform this action.";
-      case 404:
-        return serverMsg || "Resource not found.";
-      case 500:
-        return serverMsg || "Server error. Please try again later.";
-      default:
-        return serverMsg || defaultMsg;
-    }
-  };
 
   return {
     documents,
