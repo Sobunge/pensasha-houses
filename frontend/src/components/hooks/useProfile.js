@@ -4,12 +4,12 @@ import api from "../../api/api";
 
 export default function useProfile() {
   const { user: authUser, activeRole } = useAuth();
-
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchProfile = useCallback(async () => {
+    // If no user, reset and exit
     if (!authUser) {
       setProfile(null);
       setLoading(false);
@@ -17,81 +17,47 @@ export default function useProfile() {
     }
 
     setLoading(true);
-
     try {
-      // Get base user
       const res = await api.get("/users/me");
-
-      // IMPORTANT — Spring HATEOAS response
       const baseProfile = res.data?.content || res.data;
 
-      let fullProfile = baseProfile;
+      // Map role to specific endpoints
+      const roleEndpoints = {
+        tenant: `/tenants/${baseProfile.id}`,
+        landlord: `/landlords/by-id/${baseProfile.id}`,
+        caretaker: `/caretakers/${baseProfile.id}`
+      };
 
-      switch (activeRole) {
-        case "tenant":
-          if (baseProfile.id) {
-            const tenantRes = await api.get(`/tenants/${baseProfile.id}`);
-            fullProfile = {
-              ...baseProfile,
-              ...(tenantRes.data?.content || tenantRes.data),
-            };
-          }
-          break;
+      let extraData = {};
+      const endpoint = roleEndpoints[activeRole?.toLowerCase()];
 
-        case "landlord":
-          if (baseProfile.id) {
-            const landlordRes = await api.get(
-              `/landlords/by-id/${baseProfile.id}`
-            );
-            fullProfile = {
-              ...baseProfile,
-              ...(landlordRes.data?.content || landlordRes.data),
-            };
-          }
-          break;
-
-        case "caretaker":
-          if (baseProfile.id) {
-            const caretakerRes = await api.get(`/caretakers/${baseProfile.id}`);
-            fullProfile = {
-              ...baseProfile,
-              ...(caretakerRes.data?.content || caretakerRes.data),
-            };
-          }
-          break;
-
-        case "admin":
-          // No extra fetch needed
-          break;
-
-        default:
-          console.warn("Unknown active role:", activeRole);
+      if (endpoint && baseProfile.id) {
+        try {
+          const roleRes = await api.get(endpoint);
+          extraData = roleRes.data?.content || roleRes.data;
+        } catch (roleErr) {
+          console.warn(`Could not fetch extra info for role: ${activeRole}`, roleErr);
+          // We don't throw here so the user can still see their base profile
+        }
       }
 
       setProfile({
-        ...fullProfile,
-        activeRole, // attach role for UI
+        ...baseProfile,
+        ...extraData,
+        activeRole, 
       });
-
       setError(null);
     } catch (err) {
-      console.error("Failed to fetch profile:", err);
-      setProfile(null);
       setError(err);
+      setProfile(null);
     } finally {
       setLoading(false);
     }
-  }, [authUser, activeRole]);
+  }, [authUser?.id, activeRole]); // Depend on ID rather than the whole object
 
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
 
-  return {
-    profile,
-    role: activeRole,
-    loading,
-    error,
-    refreshProfile: fetchProfile,
-  };
+  return { profile, loading, error, refreshProfile: fetchProfile };
 }
