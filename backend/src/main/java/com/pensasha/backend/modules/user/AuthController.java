@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.pensasha.backend.modules.user.dto.*;
 import com.pensasha.backend.security.CustomUserDetailsService;
@@ -43,6 +44,9 @@ public class AuthController {
     private final EmailService emailService;
     private final CustomUserDetailsService userDetailsService;
     private final PasswordResetTokenRepository tokenRepository;
+
+    @Value("${FRONTEND_URL}")
+    private String frontendUrl;
 
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60; // seconds
 
@@ -151,8 +155,7 @@ public class AuthController {
             String token = UUID.randomUUID().toString();
             tokenRepository.save(new PasswordResetToken(token, user));
 
-            String baseUrl = "https://localhost:3000";
-            String resetLink = baseUrl + "/reset-password?token=" + token;
+            String resetLink = frontendUrl + "/reset-password/" + token;
 
             emailService.sendResetEmail(user.getEmail(), resetLink);
         }
@@ -187,6 +190,26 @@ public class AuthController {
         tokenRepository.delete(resetToken);
 
         return ResponseEntity.ok("Password successfully updated. You can now log in.");
+    }
+
+    /* ========================= Verify Reset Token ========================= */
+    @GetMapping("/verify-reset-token")
+    public ResponseEntity<?> verifyToken(@RequestParam("token") String token) {
+        Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(token);
+
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token not found");
+        }
+
+        PasswordResetToken resetToken = tokenOpt.get();
+
+        // Check expiry
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            tokenRepository.delete(resetToken); // Cleanup
+            return ResponseEntity.status(HttpStatus.GONE).body("Token has expired");
+        }
+
+        return ResponseEntity.ok("Token is valid");
     }
 
     /* ========================= HELPERS ========================= */
