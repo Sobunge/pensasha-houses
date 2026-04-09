@@ -27,11 +27,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.dto.*;
 import com.pensasha.backend.security.CustomUserDetailsService;
 import com.pensasha.backend.security.JWTUtils;
 
 import lombok.RequiredArgsConstructor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -44,6 +48,7 @@ public class AuthController {
     private final EmailService emailService;
     private final CustomUserDetailsService userDetailsService;
     private final PasswordResetTokenRepository tokenRepository;
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     @Value("${FRONTEND_URL}")
     private String frontendUrl;
@@ -164,32 +169,30 @@ public class AuthController {
     }
 
     /* ========================= RESET PASSWORD ========================= */
-    @Transactional // Important for delete operations
+
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        // 1. Find the token safely using Optional
-        Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(request.getToken());
+        try {
+            // We delegate all logic (finding token, expiry check, and deletion) to the
+            // service
+            userService.resetPassword(request.getToken(), request.getNewPassword());
 
-        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.ok("Password successfully updated. You can now log in.");
+
+        } catch (ResourceNotFoundException e) {
+            // Triggered if the token doesn't exist in the DB
             return ResponseEntity.badRequest().body("Invalid or missing reset token.");
+
+        } catch (IllegalStateException e) {
+            // Triggered if the token is found but expired
+            return ResponseEntity.badRequest().body(e.getMessage());
+
+        } catch (Exception e) {
+            // Catch-all for unexpected database or server issues
+            log.error("Password reset error: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while updating your password.");
         }
-
-        PasswordResetToken resetToken = tokenOpt.get();
-
-        // 2. Check if the token has expired
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            // CLEANUP: Delete the expired token from the DB
-            tokenRepository.delete(resetToken);
-            return ResponseEntity.badRequest().body("This reset link has expired. Please request a new one.");
-        }
-
-        // 3. Update the user's password
-        userService.resetPassword(resetToken.getUser().getPhoneNumber(), request.getNewPassword());
-
-        // 4. CLEANUP: Delete the token so it can't be used again
-        tokenRepository.delete(resetToken);
-
-        return ResponseEntity.ok("Password successfully updated. You can now log in.");
     }
 
     /* ========================= Verify Reset Token ========================= */
@@ -204,7 +207,7 @@ public class AuthController {
         PasswordResetToken resetToken = tokenOpt.get();
 
         // Check expiry
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now(java.time.ZoneOffset.UTC))) {
             tokenRepository.delete(resetToken); // Cleanup
             return ResponseEntity.status(HttpStatus.GONE).body("Token has expired");
         }

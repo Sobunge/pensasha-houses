@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Box, Container, TextField, Button, Typography, Paper, InputAdornment } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
+import CircularProgress from "@mui/material/CircularProgress";
 import PhoneIcon from "@mui/icons-material/Phone";
+import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
 import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
@@ -8,6 +11,7 @@ export default function ForgotPasswordPage() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const { notify } = useNotification();
+  const navigate = useNavigate(); // 2. Initialize navigate
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,14 +20,18 @@ export default function ForgotPasswordPage() {
       const digits = phone.replace(/\D/g, "");
       const normalizedPhone = "+254" + (digits.startsWith("0") ? digits.substring(1) : digits);
 
-      // We send the request
       await api.post("/auth/forgot-password", { phoneNumber: normalizedPhone });
 
-      // We show a success message regardless to protect user privacy
       notify("If an account exists, a reset link has been sent to the registered email.", "success");
-      setPhone(""); // Clear the input
+      
+      setPhone(""); 
+      
+      // 3. Redirect to home page after a small delay so they can see the notification
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+
     } catch (err) {
-      // This will now only trigger on actual server/network errors
       const message = "Server error. Please try again later.";
       notify(message, "error");
     } finally {
@@ -40,19 +48,13 @@ export default function ForgotPasswordPage() {
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-
-        px: { xs: 2, sm: 0 }, 
+        px: { xs: 2, sm: 0 },
         py: { xs: 4, md: 0 },
-
-        // --- BACKGROUND IMAGE SETTINGS ---
         backgroundImage: "url('/assets/images/background_2.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed", // Keeps image still while scrolling
-
-        // --- DARK OVERLAY ---
-        // This makes the form stand out more against the photo
+        backgroundAttachment: "fixed",
         "&::before": {
           content: '""',
           position: "absolute",
@@ -71,7 +73,6 @@ export default function ForgotPasswordPage() {
           sx={{
             p: 4,
             borderRadius: 4,
-            // Frosted glass effect
             bgcolor: "rgba(255, 255, 255, 0.85)",
             backdropFilter: "blur(8px)",
             textAlign: "center",
@@ -110,6 +111,9 @@ export default function ForgotPasswordPage() {
               type="submit"
               variant="contained"
               disabled={loading}
+              startIcon={
+                loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />
+              }
               sx={{
                 py: 1.8,
                 fontSize: "1rem",

@@ -32,6 +32,6 @@ public class PasswordResetToken {
     public PasswordResetToken(String token, User user) {
         this.token = token;
         this.user = user;
-        this.expiryDate = LocalDateTime.now().plusMinutes(30); // Valid for 30 mins
+        this.expiryDate = LocalDateTime.now(java.time.ZoneOffset.UTC).plusMinutes(30); // Valid for 30 mins
     }
 }

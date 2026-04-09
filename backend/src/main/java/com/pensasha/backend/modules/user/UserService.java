@@ -33,6 +33,7 @@ public class UserService {
     private final UserFactory userFactory;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     /* ===================== CREATE USER ===================== */
     @Transactional
@@ -115,7 +116,6 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
-    
     /* ===================== UPDATE PASSWORD ===================== */
 
     @Transactional
@@ -139,20 +139,32 @@ public class UserService {
         log.info("Password updated for user: {}", userId);
     }
 
-    /*=================== RESET PASSWORD ====================== */
-
+    /* =================== RESET PASSWORD ====================== */
     @Transactional
-    public void resetPassword(String phoneNumber, String newPassword) {
+    public void resetPassword(String token, String newPassword) {
+        // 1. Find the token safely (avoid .get() which crashes if token is missing)
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid or non-existent reset token."));
 
-        UserCredentials credentials = credentialsRepository
-                .findByUser_PhoneNumber(phoneNumber)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Credentials not found for user with phone number: " + phoneNumber));
+        // 2. SAFETY CHECK: Ensure token isn't expired
+        if (resetToken.getExpiryDate().isBefore(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC))) {
+            // Clean up the expired token while we're at it
+            passwordResetTokenRepository.delete(resetToken);
+            throw new IllegalStateException("This reset link has expired.");
+        }
 
+        // 3. Find Credentials by User ID
+        UserCredentials credentials = credentialsRepository.findById(resetToken.getUser().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for this user"));
+
+        // 4. Update and Save
         credentials.setPassword(passwordEncoder.encode(newPassword));
         credentialsRepository.save(credentials);
 
-        log.info("Password reset for user with phone number: {}", phoneNumber);
+        // 5. CRITICAL: Delete the token after successful use
+        passwordResetTokenRepository.delete(resetToken);
+
+        log.info("Password successfully reset for User ID: {}", resetToken.getUser().getId());
     }
 
     /* ===================== READ USERS ===================== */

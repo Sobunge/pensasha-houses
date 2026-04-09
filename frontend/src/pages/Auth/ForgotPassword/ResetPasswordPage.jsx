@@ -10,6 +10,7 @@ import {
   IconButton,
   CircularProgress,
 } from "@mui/material";
+import LockResetIcon from "@mui/icons-material/LockReset";
 import { useParams, useNavigate } from "react-router-dom";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -26,13 +27,17 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [verifying, setVerifying] = useState(true); // State for initial token check
+  const [verifying, setVerifying] = useState(true);
 
-  // 1. INITIAL VERIFICATION: Check if token is valid on mount
+  // --- VALIDATION STATES ---
+  const [errors, setErrors] = useState({
+    password: "",
+    confirmPassword: "",
+  });
+
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        // Calling the new verification endpoint
         await api.get(`/auth/verify-reset-token?token=${token}`);
         setVerifying(false);
       } catch (err) {
@@ -42,24 +47,33 @@ export default function ResetPasswordPage() {
       }
     };
 
-    if (token) {
-      verifyToken();
-    } else {
-      navigate("/");
-    }
+    if (token) verifyToken();
+    else navigate("/");
   }, [token, navigate, notify]);
+
+  // --- REAL-TIME VALIDATION LOGIC ---
+  const validate = () => {
+    let tempErrors = { password: "", confirmPassword: "" };
+    let isValid = true;
+
+    if (password.length < 5) {
+      tempErrors.password = "Password must be at least 5 characters.";
+      isValid = false;
+    }
+
+    if (confirmPassword !== password) {
+      tempErrors.confirmPassword = "Passwords do not match.";
+      isValid = false;
+    }
+
+    setErrors(tempErrors);
+    return isValid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password.length < 5) {
-      notify("Password must be at least 5 characters.", "error");
-      return;
-    }
-    if (password !== confirmPassword) {
-      notify("Passwords do not match.", "error");
-      return;
-    }
+    if (!validate()) return; // Stop if validation fails
 
     setLoading(true);
     try {
@@ -68,7 +82,7 @@ export default function ResetPasswordPage() {
         newPassword: password,
       });
 
-      notify("Password reset successful! Please login with your new password.", "success");
+      notify("Password reset successful! Please login.", "success");
       navigate("/", { replace: true });
     } catch (err) {
       const message = err?.response?.data || "Failed to reset password.";
@@ -78,7 +92,6 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Show loading spinner while verifying the token
   if (verifying) {
     return (
       <Box sx={{ display: "flex", height: "80vh", alignItems: "center", justifyContent: "center" }}>
@@ -91,28 +104,21 @@ export default function ResetPasswordPage() {
     <Box
       sx={{
         flex: 1,
-        /* Adjusted minHeight to prevent scrolling issues with fixed headers */
-        minHeight: "calc(100vh - 64px)", 
+        minHeight: "calc(100vh - 64px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
         px: { xs: 2, sm: 0 },
         py: { xs: 4, md: 0 },
-
         backgroundImage: "url('/assets/images/background_2.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
         backgroundAttachment: "fixed",
-
         "&::before": {
           content: '""',
           position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: "rgba(0, 0, 0, 0.45)",
           zIndex: 1,
         },
@@ -140,9 +146,15 @@ export default function ResetPasswordPage() {
             <TextField
               fullWidth
               label="New Password"
+              placeholder="Enter your new password"
               type={showPassword ? "text" : "password"}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors({ ...errors, password: "" }); // Clear error on type
+              }}
+              error={Boolean(errors.password)}
+              helperText={errors.password}
               required
               sx={{ mb: 2 }}
               InputProps={{
@@ -164,15 +176,28 @@ export default function ResetPasswordPage() {
             <TextField
               fullWidth
               label="Confirm New Password"
+              placeholder="Confirm your new password"
               type={showPassword ? "text" : "password"}
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: "" });
+              }}
+              error={Boolean(errors.confirmPassword)}
+              helperText={errors.confirmPassword}
               required
               sx={{ mb: 4 }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <LockIcon sx={{ color: "#F8B500", mr: 1 }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
                   </InputAdornment>
                 ),
               }}
@@ -183,6 +208,7 @@ export default function ResetPasswordPage() {
               type="submit"
               variant="contained"
               disabled={loading}
+              startIcon={!loading && <LockResetIcon />}
               sx={{
                 py: 1.8,
                 fontSize: "1rem",
@@ -191,11 +217,7 @@ export default function ResetPasswordPage() {
                 bgcolor: "#F8B500",
                 color: "#111",
                 textTransform: "none",
-                "&:hover": {
-                  bgcolor: "#e0a400",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 4px 15px rgba(248,181,0,0.3)",
-                },
+                "&:hover": { bgcolor: "#e0a400" },
                 transition: "all 0.2s ease",
               }}
             >
