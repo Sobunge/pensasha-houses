@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pensasha.backend.modules.user.dto.*;
 import com.pensasha.backend.security.CustomUserDetailsService;
@@ -137,39 +138,55 @@ public class AuthController {
     }
 
     /* ========================= FORGOT PASSWORD ========================= */
+    @Transactional
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         User user = userService.getUserEntityByPhoneNumber(request.getPhoneNumber());
-        if (user == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("User with phone number " + request.getPhoneNumber() + " not found.");
+
+        if (user != null) {
+            // 1. DELETE existing tokens for this user so only the NEWEST link works
+            tokenRepository.deleteByUser(user);
+
+            // 2. Create the new token
+            String token = UUID.randomUUID().toString();
+            tokenRepository.save(new PasswordResetToken(token, user));
+
+            String baseUrl = "https://localhost:3000";
+            String resetLink = baseUrl + "/reset-password?token=" + token;
+
+            emailService.sendResetEmail(user.getEmail(), resetLink);
         }
 
-        String token = UUID.randomUUID().toString();
-        tokenRepository.save(new PasswordResetToken(token, user));
-
-        String resetLink = "https://localhost:8080/reset-password?token=" + token;
-        emailService.sendResetEmail(user.getEmail(), resetLink);
-
-        return ResponseEntity.ok("Reset link sent to your registered email.");
+        return ResponseEntity.ok("If an account is associated with this number, a reset link has been sent.");
     }
 
     /* ========================= RESET PASSWORD ========================= */
+    @Transactional // Important for delete operations
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(request.getToken()).get();
+        // 1. Find the token safely using Optional
+        Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(request.getToken());
 
-        if (resetToken == null || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest().body("Invalid or expired token.");
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Invalid or missing reset token.");
         }
 
+        PasswordResetToken resetToken = tokenOpt.get();
+
+        // 2. Check if the token has expired
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            // CLEANUP: Delete the expired token from the DB
+            tokenRepository.delete(resetToken);
+            return ResponseEntity.badRequest().body("This reset link has expired. Please request a new one.");
+        }
+
+        // 3. Update the user's password
         userService.resetPassword(resetToken.getUser().getPhoneNumber(), request.getNewPassword());
 
-        // Delete token so it can't be used twice
+        // 4. CLEANUP: Delete the token so it can't be used again
         tokenRepository.delete(resetToken);
 
-        return ResponseEntity.ok("Password successfully updated.");
+        return ResponseEntity.ok("Password successfully updated. You can now log in.");
     }
 
     /* ========================= HELPERS ========================= */

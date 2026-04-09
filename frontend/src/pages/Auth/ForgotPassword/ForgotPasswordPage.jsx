@@ -16,11 +16,15 @@ export default function ForgotPasswordPage() {
       const digits = phone.replace(/\D/g, "");
       const normalizedPhone = "+254" + (digits.startsWith("0") ? digits.substring(1) : digits);
 
+      // We send the request
       await api.post("/auth/forgot-password", { phoneNumber: normalizedPhone });
+
+      // We show a success message regardless to protect user privacy
       notify("If an account exists, a reset link has been sent to the registered email.", "success");
+      setPhone(""); // Clear the input
     } catch (err) {
-      // Logic updated to show specific error if user is not found
-      const message = err.response?.data || "Failed to send reset link. Please try again.";
+      // This will now only trigger on actual server/network errors
+      const message = "Server error. Please try again later.";
       notify(message, "error");
     } finally {
       setLoading(false);
@@ -35,14 +39,14 @@ export default function ForgotPasswordPage() {
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        
+
         // --- BACKGROUND IMAGE SETTINGS ---
         backgroundImage: "url('/assets/images/background_2.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundAttachment: "fixed", // Keeps image still while scrolling
-        
+
         // --- DARK OVERLAY ---
         // This makes the form stand out more against the photo
         "&::before": {
@@ -52,7 +56,7 @@ export default function ForgotPasswordPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.4)", 
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
           zIndex: 1,
         },
       }}
@@ -64,7 +68,7 @@ export default function ForgotPasswordPage() {
             p: 4,
             borderRadius: 4,
             // Frosted glass effect
-            bgcolor: "rgba(255, 255, 255, 0.85)", 
+            bgcolor: "rgba(255, 255, 255, 0.85)",
             backdropFilter: "blur(8px)",
             textAlign: "center",
           }}
@@ -72,7 +76,7 @@ export default function ForgotPasswordPage() {
           <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, color: "#1a1a1a" }}>
             Reset Password
           </Typography>
-          
+
           <Typography variant="body1" sx={{ color: "text.secondary", mb: 4 }}>
             Enter your phone number below. We'll send a secure reset link to your email.
           </Typography>
@@ -96,7 +100,7 @@ export default function ForgotPasswordPage() {
                 ),
               }}
             />
-            
+
             <Button
               fullWidth
               type="submit"
