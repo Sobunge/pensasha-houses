@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -8,7 +8,7 @@ import {
   Paper,
   InputAdornment,
   IconButton,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import LockIcon from "@mui/icons-material/Lock";
@@ -18,6 +18,7 @@ import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
 export default function ResetPasswordPage() {
+  const { token } = useParams();
   const navigate = useNavigate();
   const { notify } = useNotification();
 
@@ -25,16 +26,32 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(true); // State for initial token check
 
-  const { token } = useParams();
+  // 1. INITIAL VERIFICATION: Check if token is valid on mount
+  useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        // Calling the new verification endpoint
+        await api.get(`/auth/verify-reset-token?token=${token}`);
+        setVerifying(false);
+      } catch (err) {
+        const message = err?.response?.data || "This reset link is invalid or has expired.";
+        notify(message, "error");
+        navigate("/", { replace: true });
+      }
+    };
+
+    if (token) {
+      verifyToken();
+    } else {
+      navigate("/");
+    }
+  }, [token, navigate, notify]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!token) {
-      notify("Invalid or missing reset token.", "error");
-      return;
-    }
     if (password.length < 5) {
       notify("Password must be at least 5 characters.", "error");
       return;
@@ -48,41 +65,47 @@ export default function ResetPasswordPage() {
     try {
       await api.post("/auth/reset-password", {
         token: token,
-        newPassword: password
+        newPassword: password,
       });
 
       notify("Password reset successful! Please login with your new password.", "success");
       navigate("/", { replace: true });
     } catch (err) {
-      const message = err?.response?.data || "Failed to reset password. The link may be expired.";
+      const message = err?.response?.data || "Failed to reset password.";
       notify(message, "error");
     } finally {
       setLoading(false);
     }
   };
 
+  // Show loading spinner while verifying the token
+  if (verifying) {
+    return (
+      <Box sx={{ display: "flex", height: "80vh", alignItems: "center", justifyContent: "center" }}>
+        <CircularProgress sx={{ color: "#F8B500" }} />
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{
-        /* 1. LAYOUT: AppLayout handles pt: 64px, so we fill the rest */
         flex: 1,
-        minHeight: "calc(100dvh - 114px)",
+        /* Adjusted minHeight to prevent scrolling issues with fixed headers */
+        minHeight: "calc(100vh - 64px)", 
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-
         px: { xs: 2, sm: 0 },
         py: { xs: 4, md: 0 },
 
-        /* 2. BACKGROUND: Same as Forgot Password for consistency */
         backgroundImage: "url('/assets/images/background_2.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundAttachment: "fixed",
 
-        /* 3. DARK OVERLAY */
         "&::before": {
           content: '""',
           position: "absolute",
@@ -101,8 +124,7 @@ export default function ResetPasswordPage() {
           sx={{
             p: { xs: 3, md: 5 },
             borderRadius: 4,
-            /* 4. FROSTED GLASS EFFECT */
-            bgcolor: "rgba(255, 255, 255, 0.88)",
+            bgcolor: "rgba(255, 255, 255, 0.9)",
             backdropFilter: "blur(10px)",
             textAlign: "center",
           }}
@@ -111,7 +133,7 @@ export default function ResetPasswordPage() {
             New Password
           </Typography>
           <Typography variant="body1" sx={{ color: "text.secondary", mb: 4 }}>
-            Please enter and confirm your new password below to secure your account.
+            Secure your Pensasha account by entering a new password below.
           </Typography>
 
           <form onSubmit={handleSubmit}>
@@ -172,7 +194,7 @@ export default function ResetPasswordPage() {
                 "&:hover": {
                   bgcolor: "#e0a400",
                   transform: "translateY(-1px)",
-                  boxShadow: "0 4px 15px rgba(248,181,0,0.3)"
+                  boxShadow: "0 4px 15px rgba(248,181,0,0.3)",
                 },
                 transition: "all 0.2s ease",
               }}
