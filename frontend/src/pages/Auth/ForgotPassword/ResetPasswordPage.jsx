@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { 
-  Box, 
-  Container, 
-  TextField, 
-  Button, 
-  Typography, 
-  Paper, 
-  InputAdornment, 
+import {
+  Box,
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  InputAdornment,
   IconButton,
-  CircularProgress 
+  CircularProgress
 } from "@mui/material";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -18,16 +18,15 @@ import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
 export default function ResetPasswordPage() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { notify } = useNotification();
-  
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const token = searchParams.get("token");
+  const { token } = useParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +50,7 @@ export default function ResetPasswordPage() {
         token: token,
         newPassword: password
       });
-      
+
       notify("Password reset successful! Please login with your new password.", "success");
       navigate("/", { replace: true });
     } catch (err) {
@@ -66,19 +65,23 @@ export default function ResetPasswordPage() {
     <Box
       sx={{
         /* 1. LAYOUT: AppLayout handles pt: 64px, so we fill the rest */
-        minHeight: "85vh", 
+        flex: 1,
+        minHeight: "calc(100dvh - 114px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        
+
+        px: { xs: 2, sm: 0 },
+        py: { xs: 4, md: 0 },
+
         /* 2. BACKGROUND: Same as Forgot Password for consistency */
         backgroundImage: "url('/assets/images/background_2.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundAttachment: "fixed",
-        
+
         /* 3. DARK OVERLAY */
         "&::before": {
           content: '""',
@@ -87,7 +90,7 @@ export default function ResetPasswordPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.45)", 
+          backgroundColor: "rgba(0, 0, 0, 0.45)",
           zIndex: 1,
         },
       }}
@@ -99,7 +102,7 @@ export default function ResetPasswordPage() {
             p: { xs: 3, md: 5 },
             borderRadius: 4,
             /* 4. FROSTED GLASS EFFECT */
-            bgcolor: "rgba(255, 255, 255, 0.88)", 
+            bgcolor: "rgba(255, 255, 255, 0.88)",
             backdropFilter: "blur(10px)",
             textAlign: "center",
           }}
@@ -166,10 +169,10 @@ export default function ResetPasswordPage() {
                 bgcolor: "#F8B500",
                 color: "#111",
                 textTransform: "none",
-                "&:hover": { 
-                    bgcolor: "#e0a400", 
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 4px 15px rgba(248,181,0,0.3)"
+                "&:hover": {
+                  bgcolor: "#e0a400",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 15px rgba(248,181,0,0.3)"
                 },
                 transition: "all 0.2s ease",
               }}

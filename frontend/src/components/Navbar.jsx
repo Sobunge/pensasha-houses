@@ -40,6 +40,7 @@ function Navbar() {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isTiny = useMediaQuery(theme.breakpoints.down("sm")); // Check for very small phones
   const location = useLocation();
 
   useEffect(() => {
@@ -76,24 +77,21 @@ function Navbar() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "rgba(30, 30, 30, 0.71)",
-        backdropFilter: "blur(10px)",
-        borderRadius: 3,
+        bgcolor: "rgba(30, 30, 30, 0.9)", // Increased opacity for better legibility
+        backdropFilter: "blur(12px)",
         px: 3,
-        py: 4,
-        boxShadow: "0 16px 48px rgba(0,0,0,0.25)",
-        position: "relative",
+        py: { xs: 2, md: 4 }, // Responsive vertical padding
+        boxShadow: "0 16px 48px rgba(0,0,0,0.4)",
         color: "#fff",
       }}
     >
-      {/* Logo + Close */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Box
           component={RouterLink}
           to="/"
           sx={{ display: "flex", alignItems: "center", gap: 1, textDecoration: "none" }}
         >
-          <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 36 }} />
+          <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
           <Typography variant="h6" sx={{ fontWeight: 700, color: "#F8B500" }}>
             Pensasha
           </Typography>
@@ -103,148 +101,141 @@ function Navbar() {
         </IconButton>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.2)", mb: 3 }} />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", mb: 3 }} />
 
-      {/* Navigation items */}
       <List sx={{ flexGrow: 1 }}>
         {navItems.map((item) => (
           <ListItem key={item.label} disablePadding>
-            {item.requiresAuth ? (
-              <ListItemButton onClick={handleAuthOpen} sx={getDrawerItemStyles(item.link)}>
-                <ListItemIcon
-                  sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} />
-              </ListItemButton>
-            ) : (
-              <ListItemButton
-                component={RouterLink}
-                to={item.link}
-                sx={getDrawerItemStyles(item.link)}
-                onClick={() => setMobileOpen(false)}
-              >
-                <ListItemIcon
-                  sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} />
-              </ListItemButton>
-            )}
+            <ListItemButton
+              component={item.requiresAuth ? "div" : RouterLink}
+              to={item.requiresAuth ? undefined : item.link}
+              onClick={item.requiresAuth ? handleAuthOpen : () => setMobileOpen(false)}
+              sx={getDrawerItemStyles(item.link)}
+            >
+              <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.2)", mb: 3 }} />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", mb: 3 }} />
 
-      {/* Login Button */}
       <ListItem disablePadding>
         <ListItemButton
           onClick={handleAuthOpen}
           sx={{
-            px: 2,
             py: 1.5,
             borderRadius: 2,
-            backgroundColor: "rgba(248,181,0,0.15)",
+            backgroundColor: "#F8B500",
             justifyContent: "center",
-            fontWeight: 600,
-            color: "#F8B500",
-            "&:hover": { backgroundColor: "rgba(248,181,0,0.25)", transform: "translateX(2px)" },
+            fontWeight: 700,
+            color: "#111",
+            "&:hover": { backgroundColor: "#e0a400" },
           }}
         >
           <ListItemIcon sx={{ minWidth: 35 }}>
-            <LoginIcon sx={{ color: "#F8B500" }} />
+            <LoginIcon sx={{ color: "#111" }} />
           </ListItemIcon>
           <ListItemText primary="Login / Sign Up" />
         </ListItemButton>
       </ListItem>
-
-      <Typography variant="caption" sx={{ textAlign: "center", mt: 6, color: "#fff", opacity: 0.7 }}>
-        Swipe or tap outside to close
-      </Typography>
     </Box>
   );
 
   return (
     <>
-      {/* AppBar */}
-      <AppBar position="fixed" elevation={2} sx={{ backgroundColor: "rgba(42,42,42,0.9)", backdropFilter: "blur(6px)" }}>
+      <AppBar 
+        position="fixed" 
+        elevation={0} 
+        sx={{ 
+          backgroundColor: "rgba(42, 42, 42, 0.9)", 
+          backdropFilter: "blur(8px)",
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          flexShrink: 0 // Prevent the navbar from squishing
+        }}
+      >
         <Container maxWidth="lg">
-          <Toolbar sx={{ justifyContent: "space-between", minHeight: 64 }}>
-            <Box component={RouterLink} to="/" sx={{ display: "flex", alignItems: "center", gap: 1, textDecoration: "none" }}>
-              <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#fff" }}>
-                Pensasha Houses
+          <Toolbar 
+            disableGutters 
+            sx={{ 
+              justifyContent: "space-between", 
+              minHeight: { xs: 56, md: 64 } // Responsive height
+            }}
+          >
+            <Box 
+              component={RouterLink} 
+              to="/" 
+              sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none" }}
+            >
+              <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: { xs: 28, md: 32 } }} />
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: "#fff", 
+                  letterSpacing: "-0.5px",
+                  fontSize: { xs: "1.1rem", md: "1.25rem" }
+                }}
+              >
+                Pensasha{!isTiny && " Houses"}
               </Typography>
             </Box>
 
-            {!isMobile && (
-              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            {!isMobile ? (
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {navItems.map((item) => (
-                  item.requiresAuth ? (
-                    <Button
-                      key={item.label}
-                      onClick={handleAuthOpen}
-                      startIcon={item.icon}
-                      sx={getButtonStyles(item.link)}
-                    >
-                      {item.label}
-                    </Button>
-                  ) : (
-                    <Button
-                      key={item.label}
-                      component={RouterLink}
-                      to={item.link}
-                      startIcon={item.icon}
-                      sx={getButtonStyles(item.link)}
-                    >
-                      {item.label}
-                    </Button>
-                  )
+                  <Button
+                    key={item.label}
+                    component={item.requiresAuth ? "button" : RouterLink}
+                    to={item.requiresAuth ? undefined : item.link}
+                    onClick={item.requiresAuth ? handleAuthOpen : undefined}
+                    startIcon={item.icon}
+                    sx={getButtonStyles(item.link)}
+                  >
+                    {item.label}
+                  </Button>
                 ))}
                 <Button
                   variant="contained"
-                  startIcon={<LoginIcon />}
                   onClick={handleAuthOpen}
                   sx={{
+                    ml: 1,
                     textTransform: "none",
                     fontWeight: 600,
-                    borderRadius: 2,
+                    borderRadius: "8px",
                     backgroundColor: "#F8B500",
                     color: "#111",
-                    "&:hover": { backgroundColor: "#c59000" },
+                    "&:hover": { backgroundColor: "#e0a400" },
                   }}
                 >
-                  Login / Sign Up
+                  Login
                 </Button>
               </Box>
-            )}
-
-            {isMobile && (
-              <IconButton color="inherit" edge="end" onClick={handleDrawerToggle}>
-                <MenuIcon />
+            ) : (
+              <IconButton color="inherit" onClick={handleDrawerToggle} sx={{ p: 1 }}>
+                <MenuIcon fontSize="medium" />
               </IconButton>
             )}
           </Toolbar>
         </Container>
       </AppBar>
 
-      {/* Drawer */}
       <Backdrop
         open={mobileOpen}
         onClick={() => setMobileOpen(false)}
-        sx={{ zIndex: theme.zIndex.drawer - 1, backgroundColor: "rgba(0,0,0,0.25)" }}
+        sx={{ zIndex: theme.zIndex.drawer - 1, backgroundColor: "rgba(0,0,0,0.5)" }}
       />
       <Drawer
         anchor="right"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        PaperProps={{ sx: { border: "none", boxShadow: "none", bgcolor: "transparent" } }}
+        PaperProps={{ sx: { border: "none", bgcolor: "transparent", boxShadow: "none" } }}
       >
         <Slide direction="left" in={mobileOpen} mountOnEnter unmountOnExit>
-          {drawerContent}
+          <Box>{drawerContent}</Box>
         </Slide>
       </Drawer>
 

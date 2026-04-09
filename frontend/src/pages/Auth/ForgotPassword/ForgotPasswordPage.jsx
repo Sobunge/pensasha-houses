@@ -34,11 +34,15 @@ export default function ForgotPasswordPage() {
   return (
     <Box
       sx={{
-        minHeight: "83.1vh",
+        flex: 1,
+        minHeight: "calc(100dvh - 114px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
+
+        px: { xs: 2, sm: 0 }, 
+        py: { xs: 4, md: 0 },
 
         // --- BACKGROUND IMAGE SETTINGS ---
         backgroundImage: "url('/assets/images/background_2.webp')",

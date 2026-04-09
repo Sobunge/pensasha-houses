@@ -25,7 +25,7 @@ function AppLayout() {
           display: "flex", 
           flexDirection: "column",
           // This pt (padding-top) prevents content from hiding under the fixed Navbar
-          pt: { xs: "64px", md: "64px" }, 
+          pt: { xs: "56px", md: "64px" },
         }}
       >
         <Outlet />

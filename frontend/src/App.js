@@ -33,7 +33,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/properties" element={<ListingsPage />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />
             <Route path="*" element={<NotFound />} />
