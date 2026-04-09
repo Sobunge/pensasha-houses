@@ -6,34 +6,41 @@ import backgroundImage from "../../assets/background.jpg";
 const COLORS = { primary: "#F8B500", primaryDark: "#c59000", dark: "#111" };
 
 function Hero() {
-  const navbarHeightDesktop = 64; // desktop navbar height
-  const navbarHeightMobile = 56;  // mobile navbar height
-
   return (
     <Box
       sx={{
-        minHeight: {
-          xs: `calc(100vh - ${navbarHeightMobile}px)`,
-          md: `calc(100vh - ${navbarHeightDesktop}px)`,
-        },
-        mt: { xs: `${navbarHeightMobile}px`, md: `${navbarHeightDesktop}px` }, // push Hero below navbar
+        /* 1. HEIGHT: We use minHeight: "85vh" to make it feel full-screen 
+           while leaving a "peek" of the content below to encourage scrolling.
+        */
+        minHeight: "92vh", 
+        
+        /* 2. CENTERING: Flexbox handles the vertical and horizontal 
+           alignment of your text and buttons.
+        */
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
+
+        /* 3. BACKGROUND: Clean integration using the imported image.
+        */
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
         color: "#fff",
+
+        /* NOTE: No 'mt' (margin-top) needed here anymore! 
+           AppLayout.jsx handles the 64px offset.
+        */
       }}
     >
-      {/* Overlay */}
+      {/* Overlay: Darks the photo so text is readable */}
       <Box
         sx={{
           position: "absolute",
           inset: 0,
-          backgroundColor: "rgba(0,0,0,0.55)", // slightly darker overlay for better contrast
+          backgroundColor: "rgba(0,0,0,0.55)",
           zIndex: 0,
         }}
       />
@@ -46,32 +53,25 @@ function Hero() {
             variant="h2"
             sx={{
               fontWeight: 700,
-              fontSize: { xs: "2rem", md: "3.5rem" },
+              fontSize: { xs: "2.2rem", md: "3.5rem" },
               lineHeight: 1.2,
-              textShadow: "0 3px 12px rgba(0,0,0,0.6)", // subtle shadow for depth
+              textShadow: "0 3px 12px rgba(0,0,0,0.6)",
             }}
           >
             Discover Your Next Home
           </Typography>
 
-          {/* Subtitle with background highlight */}
-          <Box
-            sx={{
-              px: { xs: 2, md: 3 },
-              py: 1.5,
-              borderRadius: 2,
-              textAlign: "center",
-              textShadow: "0 2px 6px rgba(0,0,0,0.5)",
-            }}
-          >
+          {/* Subtitle */}
+          <Box sx={{ px: { xs: 2, md: 3 }, py: 1.5 }}>
             <Typography
               variant="subtitle1"
               sx={{
                 maxWidth: 600,
-                fontSize: { xs: "1rem", md: "1.25rem" },
+                fontSize: { xs: "1.05rem", md: "1.25rem" },
                 fontWeight: 500,
-                color: "#fff",
+                color: "rgba(255, 255, 255, 0.9)",
                 lineHeight: 1.6,
+                textShadow: "0 2px 6px rgba(0,0,0,0.5)",
               }}
             >
               Pensasha connects tenants with their dream homes, helps landlords find
@@ -89,14 +89,18 @@ function Hero() {
             sx={{
               backgroundColor: COLORS.primary,
               color: COLORS.dark,
-              fontWeight: 600,
-              px: 4,
-              py: 1.5,
+              fontWeight: 700,
+              px: 5,
+              py: 1.8,
               borderRadius: 2,
               textTransform: "none",
-              fontSize: { xs: "0.95rem", md: "1rem" },
-              "&:hover": { backgroundColor: COLORS.primaryDark },
-              boxShadow: "0 4px 20px rgba(0,0,0,0.3)", // subtle button shadow
+              fontSize: "1.1rem",
+              transition: "0.3s ease",
+              "&:hover": { 
+                backgroundColor: COLORS.primaryDark,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 25px rgba(248,181,0,0.4)",
+              },
             }}
           >
             Browse Properties

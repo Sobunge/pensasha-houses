@@ -13,28 +13,68 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Normalize phone to match backend (+254...)
       const digits = phone.replace(/\D/g, "");
       const normalizedPhone = "+254" + (digits.startsWith("0") ? digits.substring(1) : digits);
 
       await api.post("/auth/forgot-password", { phoneNumber: normalizedPhone });
       notify("If an account exists, a reset link has been sent to the registered email.", "success");
     } catch (err) {
-      notify("Failed to send reset link. Please try again.", "error");
+      // Logic updated to show specific error if user is not found
+      const message = err.response?.data || "Failed to send reset link. Please try again.";
+      notify(message, "error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ minHeight: "80vh", display: "flex", alignItems: "center", pt: 12 }}>
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 3, bgcolor: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)" }}>
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: "#111" }}>
+    <Box
+      sx={{
+        minHeight: "83.1vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        
+        // --- BACKGROUND IMAGE SETTINGS ---
+        backgroundImage: "url('/assets/images/background_2.webp')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed", // Keeps image still while scrolling
+        
+        // --- DARK OVERLAY ---
+        // This makes the form stand out more against the photo
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.4)", 
+          zIndex: 1,
+        },
+      }}
+    >
+      <Container maxWidth="sm" sx={{ position: "relative", zIndex: 2 }}>
+        <Paper
+          elevation={6}
+          sx={{
+            p: 4,
+            borderRadius: 4,
+            // Frosted glass effect
+            bgcolor: "rgba(255, 255, 255, 0.85)", 
+            backdropFilter: "blur(8px)",
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, color: "#1a1a1a" }}>
             Reset Password
           </Typography>
+          
           <Typography variant="body1" sx={{ color: "text.secondary", mb: 4 }}>
-            Enter your phone number below. We will find your account and send a secure reset link to your email.
+            Enter your phone number below. We'll send a secure reset link to your email.
           </Typography>
 
           <form onSubmit={handleSubmit}>
@@ -45,27 +85,33 @@ export default function ForgotPasswordPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
+              variant="outlined"
               sx={{ mb: 3 }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <PhoneIcon sx={{ color: "#F8B500", mr: 1 }} />
-                    <Typography sx={{ fontWeight: 600 }}>+254</Typography>
+                    <Typography sx={{ fontWeight: 700, color: "#1a1a1a" }}>+254</Typography>
                   </InputAdornment>
                 ),
               }}
             />
+            
             <Button
               fullWidth
               type="submit"
               variant="contained"
               disabled={loading}
               sx={{
-                py: 1.5,
+                py: 1.8,
+                fontSize: "1rem",
                 fontWeight: 700,
+                borderRadius: 2,
                 bgcolor: "#F8B500",
                 color: "#111",
-                "&:hover": { bgcolor: "#e0a400" },
+                textTransform: "none",
+                "&:hover": { bgcolor: "#e0a400", transform: "translateY(-1px)" },
+                transition: "all 0.2s ease-in-out",
               }}
             >
               {loading ? "Sending link..." : "Send Reset Link"}

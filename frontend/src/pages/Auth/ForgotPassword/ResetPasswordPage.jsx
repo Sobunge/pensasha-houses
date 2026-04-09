@@ -22,19 +22,16 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const { notify } = useNotification();
   
-  // State
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Extract token from URL: /reset-password?token=...
   const token = searchParams.get("token");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!token) {
       notify("Invalid or missing reset token.", "error");
       return;
@@ -56,7 +53,6 @@ export default function ResetPasswordPage() {
       });
       
       notify("Password reset successful! Please login with your new password.", "success");
-      // Redirect to home so they can open the Login Modal
       navigate("/", { replace: true });
     } catch (err) {
       const message = err?.response?.data || "Failed to reset password. The link may be expired.";
@@ -67,14 +63,52 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <Box sx={{ minHeight: "80vh", display: "flex", alignItems: "center", pt: 12, pb: 6 }}>
-      <Container maxWidth="sm">
-        <Paper elevation={4} sx={{ p: 4, borderRadius: 3, textAlign: "center" }}>
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+    <Box
+      sx={{
+        /* 1. LAYOUT: AppLayout handles pt: 64px, so we fill the rest */
+        minHeight: "85vh", 
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        
+        /* 2. BACKGROUND: Same as Forgot Password for consistency */
+        backgroundImage: "url('/assets/images/background_2.webp')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+        
+        /* 3. DARK OVERLAY */
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.45)", 
+          zIndex: 1,
+        },
+      }}
+    >
+      <Container maxWidth="sm" sx={{ position: "relative", zIndex: 2 }}>
+        <Paper
+          elevation={6}
+          sx={{
+            p: { xs: 3, md: 5 },
+            borderRadius: 4,
+            /* 4. FROSTED GLASS EFFECT */
+            bgcolor: "rgba(255, 255, 255, 0.88)", 
+            backdropFilter: "blur(10px)",
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, color: "#111" }}>
             New Password
           </Typography>
-          <Typography variant="body2" sx={{ color: "text.secondary", mb: 4 }}>
-            Please enter and confirm your new password below.
+          <Typography variant="body1" sx={{ color: "text.secondary", mb: 4 }}>
+            Please enter and confirm your new password below to secure your account.
           </Typography>
 
           <form onSubmit={handleSubmit}>
@@ -89,7 +123,7 @@ export default function ResetPasswordPage() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#F8B500" }} />
+                    <LockIcon sx={{ color: "#F8B500", mr: 1 }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -113,7 +147,7 @@ export default function ResetPasswordPage() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#F8B500" }} />
+                    <LockIcon sx={{ color: "#F8B500", mr: 1 }} />
                   </InputAdornment>
                 ),
               }}
@@ -125,11 +159,19 @@ export default function ResetPasswordPage() {
               variant="contained"
               disabled={loading}
               sx={{
-                py: 1.5,
+                py: 1.8,
+                fontSize: "1rem",
                 fontWeight: 700,
+                borderRadius: 2,
                 bgcolor: "#F8B500",
                 color: "#111",
-                "&:hover": { bgcolor: "#e0a400" },
+                textTransform: "none",
+                "&:hover": { 
+                    bgcolor: "#e0a400", 
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 4px 15px rgba(248,181,0,0.3)"
+                },
+                transition: "all 0.2s ease",
               }}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : "Update Password"}
