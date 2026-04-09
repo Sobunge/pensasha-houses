@@ -141,15 +141,15 @@ public class AuthController {
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         User user = userService.getUserEntityByPhoneNumber(request.getPhoneNumber());
         if (user == null) {
-            // Security Tip: Return 200 even if user doesn't exist to prevent account
-            // enumeration
-            return ResponseEntity.ok("If an account exists, a reset link has been sent.");
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("User with phone number " + request.getPhoneNumber() + " not found.");
         }
 
         String token = UUID.randomUUID().toString();
         tokenRepository.save(new PasswordResetToken(token, user));
 
-        String resetLink = "https://fairwayshotel.com/reset-password?token=" + token;
+        String resetLink = "https://localhost:8080/reset-password?token=" + token;
         emailService.sendResetEmail(user.getEmail(), resetLink);
 
         return ResponseEntity.ok("Reset link sent to your registered email.");
