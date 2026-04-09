@@ -224,6 +224,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
         <MuiLink 
           component={RouterLink} 
           to="/forgot-password" 
+          onClick={onClose}
           sx={{ fontSize: "0.85rem", color: "primary.main", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
         >
           Forgot password?
