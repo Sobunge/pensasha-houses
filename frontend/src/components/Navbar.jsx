@@ -40,15 +40,28 @@ function Navbar() {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const isTiny = useMediaQuery(theme.breakpoints.down("sm")); // Check for very small phones
+  const isTiny = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
 
+  // Fix 1: Close drawer when window is resized to desktop size
   useEffect(() => {
     if (!isMobile && mobileOpen) setMobileOpen(false);
   }, [isMobile, mobileOpen]);
 
+  // Fix 2: Close drawer automatically whenever the URL changes
+  // This handles the "Forgot Password" toggle or clicking any link in the drawer
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  const handleAuthOpen = () => setAuthOpen(true);
+
+  // Fix 3: Ensure drawer closes when Auth Modal opens
+  const handleAuthOpen = () => {
+    setMobileOpen(false);
+    setAuthOpen(true);
+  };
+  
   const handleAuthClose = () => setAuthOpen(false);
 
   const getButtonStyles = (link) => ({
@@ -77,10 +90,10 @@ function Navbar() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "rgba(30, 30, 30, 0.9)", // Increased opacity for better legibility
+        bgcolor: "rgba(30, 30, 30, 0.95)", // High opacity for readability
         backdropFilter: "blur(12px)",
         px: 3,
-        py: { xs: 2, md: 4 }, // Responsive vertical padding
+        py: { xs: 2, md: 4 },
         boxShadow: "0 16px 48px rgba(0,0,0,0.4)",
         color: "#fff",
       }}
@@ -109,7 +122,7 @@ function Navbar() {
             <ListItemButton
               component={item.requiresAuth ? "div" : RouterLink}
               to={item.requiresAuth ? undefined : item.link}
-              onClick={item.requiresAuth ? handleAuthOpen : () => setMobileOpen(false)}
+              onClick={item.requiresAuth ? handleAuthOpen : undefined}
               sx={getDrawerItemStyles(item.link)}
             >
               <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}>
@@ -154,7 +167,7 @@ function Navbar() {
           backgroundColor: "rgba(42, 42, 42, 0.9)", 
           backdropFilter: "blur(8px)",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
-          flexShrink: 0 // Prevent the navbar from squishing
+          flexShrink: 0 
         }}
       >
         <Container maxWidth="lg">
@@ -162,7 +175,7 @@ function Navbar() {
             disableGutters 
             sx={{ 
               justifyContent: "space-between", 
-              minHeight: { xs: 56, md: 64 } // Responsive height
+              minHeight: { xs: 56, md: 64 } 
             }}
           >
             <Box 
