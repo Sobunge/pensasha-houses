@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box, Container, TextField, Button, Typography, Paper, InputAdornment } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
-import api from "../../api/api";
-import { useNotification } from "../../components/NotificationProvider";
+import api from "../../../api/api";
+import { useNotification } from "../../../components/NotificationProvider";
 
 export default function ForgotPasswordPage() {
   const [phone, setPhone] = useState("");

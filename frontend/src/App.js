@@ -9,6 +9,8 @@ import DashboardLayout from "./layouts/DashboardLayout";
 
 // Pages
 import LandingPage from "./pages/LandingPage/LandingPage";
+import ForgotPasswordPage from "./pages/Auth/ForgotPassword/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/Auth/ForgotPassword/ResetPasswordPage";
 import ListingsPage from "./pages/ListingsPage/ListingsPage";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 import PropertyDetails from "./pages/ListingsPage/PropertyDetails";
@@ -30,6 +32,8 @@ function App() {
           {/* ===== Public Routes ===== */}
           <Route element={<AppLayout />}>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/properties" element={<ListingsPage />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />
             <Route path="*" element={<NotFound />} />

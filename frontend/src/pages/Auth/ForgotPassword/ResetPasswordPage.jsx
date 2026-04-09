@@ -14,8 +14,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import api from "../../api/api";
-import { useNotification } from "../../components/NotificationProvider";
+import api from "../../../api/api";
+import { useNotification } from "../../../components/NotificationProvider";
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
