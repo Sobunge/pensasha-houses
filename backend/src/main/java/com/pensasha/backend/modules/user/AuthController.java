@@ -249,7 +249,7 @@ public class AuthController {
         return new AuthPrincipalDTO(
                 user.getId(),
                 user.getPublicId(),
-                user.getPhoneNumber(),
+                user.getFirstName(),
                 roles,
                 permissions,
                 "/dashboard");

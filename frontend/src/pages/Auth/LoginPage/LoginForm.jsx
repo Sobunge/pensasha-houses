@@ -109,7 +109,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
 
       const user = {
         id: principal.id,
-        phoneNumber: principal.username,
+        name: principal.firstname,
         roles,
         permissions,
         defaultRoute: "/dashboard",
@@ -119,7 +119,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
       // 3. Save user in session & AuthContext
       sessionStorage.setItem("user", JSON.stringify(user));
       loginAs(user);
-
       notify("Login successful!", "success");
 
       // 4. Cleanup Modal & Reset Window Scroll

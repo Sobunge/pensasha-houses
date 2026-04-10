@@ -19,8 +19,8 @@ public class AuthPrincipalDTO {
     /** Optional external identifier (UUID or similar) for public URLs */
     private String publicId;
 
-    /** Display username (phone number or email), not used as internal key */
-    private String username;
+    /** Display username , not used as internal key */
+    private String firstname;
 
     /** Roles of the user (multi-role support) */
     private Set<String> roles;
