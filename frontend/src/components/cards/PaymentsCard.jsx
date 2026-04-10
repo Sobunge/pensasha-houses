@@ -8,17 +8,18 @@ import {
   ListItem,
   Button,
   Divider,
+  Stack,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import PaymentIcon from "@mui/icons-material/Payment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import CancelIcon from "@mui/icons-material/Cancel";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 
 const STATUS_CONFIG = {
   Paid: { icon: CheckCircleIcon, color: "success.main" },
-  Pending: { icon: HourglassEmptyIcon, color: "warning.main" },
+  Pending: { icon: HourglassEmptyIcon, color: "#f8b500" }, // Consistent icon type
   Failed: { icon: CancelIcon, color: "error.main" },
 };
 
@@ -27,123 +28,141 @@ function PaymentsCard({ payments = [] }) {
 
   return (
     <Card
-      elevation={2}
+      elevation={0}
       sx={{
-        width: "100%",
-        borderRadius: 3,
+        flex: { xs: "1 1 100%", md: "1 1 45%", lg: "0 1 400px" },
+        minWidth: { xs: "100%", sm: "320px" }, // Maintains layout consistency
+        borderRadius: 4,
+        border: "1px solid",
+        borderColor: "divider",
         display: "flex",
         flexDirection: "column",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        "&:hover": { 
+          boxShadow: "0 12px 40px rgba(0,0,0,0.08)", 
+          transform: "translateY(-5px)" 
+        },
       }}
     >
-      {/* Card Header */}
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: 1,
-          p: { xs: 1.5, sm: 2 },
-          borderBottom: 1,
+          gap: 1.5,
+          p: 2,
+          bgcolor: "rgba(248, 181, 0, 0.04)",
+          borderBottom: "1px solid",
           borderColor: "divider",
-          bgcolor: "background.paper",
         }}
       >
-        <PaymentIcon color="warning" />
-        <Typography variant="subtitle1" fontWeight={600}>
+        <PaymentIcon sx={{ color: "#f8b500" }} />
+        <Typography variant="subtitle1" fontWeight={700} color="text.primary">
           Payment History
         </Typography>
       </Box>
 
-      {/* Card Content */}
+      {/* Content */}
       <CardContent
         sx={{
-          p: { xs: 1.5, sm: 2 },
+          p: 3,
           display: "flex",
           flexDirection: "column",
-          gap: 2,
           flexGrow: 1,
+          minHeight: 160,
         }}
       >
         {hasPayments ? (
           <List disablePadding>
-            {payments.map((payment, index) => {
-              const StatusIcon = STATUS_CONFIG[payment.status]?.icon;
-              const statusColor = STATUS_CONFIG[payment.status]?.color;
+            {payments.slice(0, 3).map((payment, index) => {
+              const config = STATUS_CONFIG[payment.status] || STATUS_CONFIG.Pending;
+              const StatusIcon = config.icon;
 
               return (
                 <Box key={index}>
                   <ListItem
                     disableGutters
                     sx={{
-                      py: { xs: 0.75, sm: 1 },
+                      py: 1.5,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
                     }}
                   >
-                    {/* Left */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      {StatusIcon && <StatusIcon sx={{ color: statusColor }} />}
-                      <Box>
-                        <Typography sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
-                          {payment.date}
+                    <Stack direction="row" spacing={2} alignItems="center" sx={{ width: '100%' }}>
+                      <Box 
+                        sx={{ 
+                          bgcolor: "rgba(0,0,0,0.03)", 
+                          p: 1.2, 
+                          borderRadius: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <StatusIcon sx={{ color: config.color, fontSize: 20 }} />
+                      </Box>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" fontWeight={800} sx={{ color: '#1a1a1a' }}>
+                          {payment.amount}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {payment.status}
+                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                          {payment.date} • {payment.status}
                         </Typography>
                       </Box>
-                    </Box>
-
-                    {/* Right */}
-                    <Typography sx={{ fontWeight: 600 }}>{payment.amount}</Typography>
+                    </Stack>
                   </ListItem>
-
-                  {index < payments.length - 1 && (
-                    <Divider sx={{ display: { xs: "none", sm: "block" } }} />
+                  {index < Math.min(payments.length - 1, 2) && (
+                    <Divider sx={{ opacity: 0.6 }} />
                   )}
                 </Box>
               );
             })}
           </List>
         ) : (
-          // Empty State
-          <Box
-            sx={{
-              py: 3,
-              textAlign: "center",
-              color: "text.secondary",
-            }}
-          >
-            <Typography variant="body2" sx={{ mb: 0.5 }}>
-              No payment records yet
-            </Typography>
-            <Typography variant="caption">
-              Your rent payments will appear here once recorded.
+          <Box sx={{ py: 3, textAlign: "center", my: 'auto' }}>
+            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+              No recent transactions found
             </Typography>
           </Box>
         )}
       </CardContent>
 
-      {/* Footer / CTA */}
-      <Divider />
-      <Box
-        sx={{
-          p: { xs: 1.5, sm: 2 },
-          display: "flex",
-          justifyContent: { xs: "center", sm: "flex-end" },
+      <Divider sx={{ borderStyle: "dashed", opacity: 0.6 }} />
+
+      {/* Responsive Action Button */}
+      <Box 
+        sx={{ 
+          p: 2, 
+          display: "flex", 
+          justifyContent: { xs: "center", sm: "flex-end" } 
         }}
       >
         <Button
           component={RouterLink}
           to="/tenant/rent-payments"
           variant="contained"
-          size="small"
-          endIcon={<ArrowForwardIcon />}
+          startIcon={<ReceiptLongIcon />}
           sx={{
+            bgcolor: "#f8b500",
+            color: "#000000",
             textTransform: "none",
-            fontWeight: 600,
+            fontWeight: 800,
+            fontSize: { xs: "0.825rem", sm: "0.875rem" },
+            px: { xs: 2, sm: 3 },
+            py: 1.2,
+            borderRadius: 2.5,
+            width: { xs: "100%", sm: "auto" }, // Responsive sizing
+            boxShadow: "0 4px 12px 0 rgba(248, 181, 0, 0.25)",
+            "& .MuiButton-startIcon": { color: "#000000" },
+            "&:hover": { 
+              bgcolor: "#eab000", 
+              boxShadow: "0 6px 16px rgba(248, 181, 0, 0.4)",
+              transform: "translateY(-1px)",
+            }
           }}
         >
-          View All Payments
+          View Full History
         </Button>
       </Box>
     </Card>

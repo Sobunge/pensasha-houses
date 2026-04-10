@@ -1,10 +1,10 @@
 // src/pages/Dashboard/MainDashboard.jsx
 import React from "react";
-import { Box, Card, Avatar, Typography, Stack, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { Box, Card, Avatar, Typography, Stack, ToggleButtonGroup, ToggleButton} from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Auth/AuthContext";
 
-// ===== IMPORT YOUR SPECIFIC DASHBOARD FILES =====
+// ===== DASHBOARD COMPONENTS =====
 import AdminDashboard from "../AdminPage/AdminDashboard";
 import LandlordDashboard from "../LandlordPage/LandlordDashboard";
 import CaretakerDashboard from "../CaretakerPage/CaretakerDashboard";
@@ -15,7 +15,6 @@ const MainDashboard = () => {
 
   if (!user) return null;
 
-  // Map the role to the component
   const renderRoleDashboard = () => {
     switch (activeRole) {
       case "ROLE_ADMIN":     return <AdminDashboard />;
@@ -27,38 +26,85 @@ const MainDashboard = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, bgcolor: "#f7f7f7", minHeight: "100vh" }}>
+    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: "#fafafa", minHeight: "100vh" }}>
       
-      {/* GLOBAL HERO & SWITCHER (Always stays at top) */}
+      {/* GLOBAL HERO & SWITCHER */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card sx={{ mb: 4, p: 2, borderRadius: 3, boxShadow: 3 }}>
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems="center" spacing={2}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Avatar sx={{ bgcolor: "#f8b500", color: "#111", width: 48, height: 48 }}>
+        <Card 
+          elevation={0}
+          sx={{ 
+            mb: 4, 
+            p: { xs: 2, sm: 3 }, 
+            borderRadius: 4, 
+            border: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.03)"
+          }}
+        >
+          <Stack 
+            direction={{ xs: "column", md: "row" }} 
+            justifyContent="space-between" 
+            alignItems={{ xs: "flex-start", md: "center" }} 
+            spacing={3}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
+              <Avatar 
+                sx={{ 
+                  bgcolor: "#f8b500", 
+                  color: "#000", 
+                  width: { xs: 50, sm: 60 }, 
+                  height: { xs: 50, sm: 60 },
+                  fontWeight: 800,
+                  fontSize: "1.2rem",
+                  boxShadow: "0 4px 12px rgba(248, 181, 0, 0.3)"
+                }}
+              >
                 {user.name?.[0] || "U"}
               </Avatar>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: "#1a1a1a", lineHeight: 1.2 }}>
                   Welcome back{user?.name ? `, ${user.name}` : ""} 👋
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Active Role: <strong>{activeRole?.replace("ROLE_", "")}</strong>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontWeight: 500 }}>
+                  Managing as <span style={{ color: "#f8b500", fontWeight: 800 }}>{activeRole?.replace("ROLE_", "")}</span>
                 </Typography>
               </Box>
             </Box>
 
-            {/* Switcher only shows if user has multiple roles */}
+            {/* Premium Role Switcher */}
             {user.roles?.length > 1 && (
               <ToggleButtonGroup
                 value={activeRole}
                 exclusive
                 onChange={(e, next) => next && setActiveRole(next)}
                 size="small"
-                color="primary"
-                sx={{ bgcolor: "#f5f5f5" }}
+                sx={{ 
+                  bgcolor: "rgba(0,0,0,0.03)", 
+                  p: 0.5, 
+                  borderRadius: 3,
+                  border: "none",
+                  width: { xs: "100%", md: "auto" },
+                  "& .MuiToggleButtonGroup-grouped": {
+                    border: 0,
+                    borderRadius: 2.5,
+                    mx: 0.2,
+                    "&.Mui-selected": {
+                      bgcolor: "background.paper",
+                      color: "#000",
+                      fontWeight: 800,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      "&:hover": { bgcolor: "background.paper" }
+                    },
+                    "&:not(.Mui-selected)": {
+                      color: "text.secondary",
+                      fontWeight: 600,
+                    }
+                  }
+                }}
               >
                 {user.roles.map((role) => (
-                  <ToggleButton key={role} value={role} sx={{ px: 3, fontWeight: 600 }}>
+                  <ToggleButton key={role} value={role} sx={{ px: 3, py: 1, textTransform: "none", flexGrow: { xs: 1, md: 0 } }}>
                     {role.replace("ROLE_", "")}
                   </ToggleButton>
                 ))}
@@ -71,11 +117,11 @@ const MainDashboard = () => {
       {/* DASHBOARD CONTENT AREA */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={activeRole} // Triggers animation on switch
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
+          key={activeRole}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
           {renderRoleDashboard()}
         </motion.div>
