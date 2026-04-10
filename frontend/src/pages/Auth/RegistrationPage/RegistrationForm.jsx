@@ -1,4 +1,3 @@
-// src/components/Auth/RegistrationPage/RegistrationForm.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -16,20 +15,27 @@ import {
 } from "@mui/material";
 
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonIcon from "@mui/icons-material/Person";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LockIcon from "@mui/icons-material/Lock";
+import EmailIcon from "@mui/icons-material/Email";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
-/* ---------------- Phone Helpers ---------------- */
+/* ---------------- Helpers ---------------- */
 const normalizePhone = (phone) => {
   let digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) digits = "254" + digits.substring(1);
   if (digits.startsWith("254")) return "+" + digits;
-  return "+254" + digits; // fallback
+  return "+254" + digits;
+};
+
+const validateRequired = (value, fieldName) => {
+  if (!value || !value.trim()) return `${fieldName} is required`;
+  return null;
 };
 
 const validatePhoneNumber = (value) => {
@@ -39,52 +45,52 @@ const validatePhoneNumber = (value) => {
   return null;
 };
 
+const validateEmail = (value) => {
+  if (!value) return "Email is required";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(value)) return "Enter a valid email address";
+  return null;
+};
+
 const validatePassword = (value) => {
   if (!value) return "Password is required";
   if (value.length < 8) return "Password must be at least 8 characters";
   return null;
 };
 
-const validateRole = (value) => {
-  if (!value) return "Role is required";
-  return null;
-};
-
 /* ---------------- Registration Form ---------------- */
 export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     phoneNumber: "",
+    email: "",
     password: "",
-    confirmPassword: "",
     role: "",
   });
 
   const [touched, setTouched] = useState({
+    firstName: false,
+    lastName: false,
     phoneNumber: false,
+    email: false,
     password: false,
-    confirmPassword: false,
     role: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const { notify } = useNotification();
 
   /* ---------------- Validation ---------------- */
+  const firstNameError = validateRequired(formData.firstName, "First name");
+  const lastNameError = validateRequired(formData.lastName, "Last name");
   const phoneError = validatePhoneNumber(formData.phoneNumber);
+  const emailError = validateEmail(formData.email);
   const passwordError = validatePassword(formData.password);
-  const confirmError =
-    formData.confirmPassword && formData.password !== formData.confirmPassword
-      ? "Passwords do not match"
-      : null;
-  const roleError = validateRole(formData.role);
+  const roleError = validateRequired(formData.role, "Role");
 
-  const showPhoneError = touched.phoneNumber && Boolean(phoneError);
-  const showPasswordError = touched.password && Boolean(passwordError);
-  const showConfirmError = touched.confirmPassword && Boolean(confirmError);
-  const showRoleError = touched.role && Boolean(roleError);
+  const hasErrors = firstNameError || lastNameError || phoneError || emailError || passwordError || roleError;
 
   /* ---------------- Handlers ---------------- */
   const handleChange = (e) => {
@@ -98,48 +104,41 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (phoneError || passwordError || confirmError || roleError) {
+    if (hasErrors) {
       setTouched({
+        firstName: true,
+        lastName: true,
         phoneNumber: true,
+        email: true,
         password: true,
-        confirmPassword: true,
         role: true,
       });
       return;
     }
 
     setLoading(true);
-
     try {
       const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         phoneNumber: normalizePhone(formData.phoneNumber),
+        email: formData.email,
         password: formData.password,
-        roles: [formData.role], // ✅ wrap in array to match backend
+        roles: [formData.role],
       };
 
       await api.post("/auth/register", payload);
-
       notify("Registration successful!", "success", 3000);
       onSuccess?.();
     } catch (err) {
-      console.error("Registration error:", err.response?.data || err.message);
-      notify(
-        err.response?.data?.error || "Registration failed. Try again.",
-        "error",
-        3500
-      );
+      notify(err.response?.data?.error || "Registration failed.", "error", 3500);
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- UI ---------------- */
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
+    <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
         <PersonAddIcon />
       </Avatar>
@@ -148,14 +147,52 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
         Create Your Account
       </Typography>
 
-      <Typography
-        variant="body2"
-        sx={{ color: "text.secondary", textAlign: "center", mb: 3 }}
-      >
-        Register using your phone number.
-      </Typography>
+      <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
 
-      <Stack spacing={2} sx={{ width: "100%" }}>
+        {/* Names Row - Forced side-by-side */}
+        <Box sx={{ display: "flex", gap: 1, width: "100%" }}>
+          <TextField
+            fullWidth
+            label="First Name"
+            placeholder="First Name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            onBlur={handleBlur("firstName")}
+            size="small"
+            required
+            error={touched.firstName && !!firstNameError}
+            helperText={touched.firstName ? firstNameError : ""}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Last Name"
+            placeholder="Last Name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            onBlur={handleBlur("lastName")}
+            size="small"
+            required
+            error={touched.lastName && !!lastNameError}
+            helperText={touched.lastName ? lastNameError : ""}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
         {/* Phone */}
         <TextField
           fullWidth
@@ -167,8 +204,8 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           size="small"
           required
           placeholder="7XXXXXXXX"
-          error={showPhoneError}
-          helperText={showPhoneError ? phoneError : ""}
+          error={touched.phoneNumber && !!phoneError}
+          helperText={touched.phoneNumber ? phoneError : ""}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -179,66 +216,54 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           }}
         />
 
+        {/* Email */}
+        <TextField
+          fullWidth
+          label="Email Address"
+          placeholder="Email Address"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          onBlur={handleBlur("email")}
+          size="small"
+          required
+          error={touched.email && !!emailError}
+          helperText={touched.email ? emailError : ""}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <EmailIcon fontSize="small" />
+              </InputAdornment>
+            ),
+          }}
+        />
+
         {/* Password */}
         <TextField
           fullWidth
           label="Password"
+          placeholder="Password"
           name="password"
           type={showPassword ? "text" : "password"}
           value={formData.password}
           onChange={handleChange}
           onBlur={handleBlur("password")}
           size="small"
+          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
           required
-          placeholder="Enter your password"
-          error={showPasswordError}
-          helperText={showPasswordError ? passwordError : ""}
+          error={touched.password && !!passwordError}
+          helperText={touched.password ? passwordError : ""}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon />
+                <LockIcon fontSize="small" />
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                   {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        {/* Confirm Password */}
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          name="confirmPassword"
-          type={showConfirm ? "text" : "password"}
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          onBlur={handleBlur("confirmPassword")}
-          size="small"
-          required
-          placeholder="Re-enter your password"
-          error={showConfirmError}
-          helperText={showConfirmError ? confirmError : ""}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  edge="end"
-                >
-                  {showConfirm ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
               </InputAdornment>
             ),
@@ -255,8 +280,20 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           onBlur={handleBlur("role")}
           size="small"
           required
-          error={showRoleError}
-          helperText={showRoleError ? roleError : ""}
+          error={touched.role && !!roleError}
+          helperText={touched.role ? roleError : ""}
+          // This keeps the label "Role *" on the top border
+          InputLabelProps={{ shrink: true }}
+          SelectProps={{
+            displayEmpty: true,
+            renderValue: (selected) => {
+              if (!selected) {
+                return <Typography sx={{ color: "text.secondary", fontSize: "0.9rem" }}>Select Role</Typography>;
+              }
+              // Converts "TENANT" to "Tenant" for display
+              return selected.charAt(0) + selected.slice(1).toLowerCase();
+            },
+          }}
         >
           <MenuItem value="" disabled>
             Select Role
@@ -265,7 +302,6 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           <MenuItem value="LANDLORD">Landlord</MenuItem>
         </TextField>
 
-        {/* Submit */}
         <Button
           type="submit"
           variant="contained"
@@ -273,32 +309,16 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           fullWidth
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : <PersonAddIcon />}
-          sx={{
-            mt: 1,
-            py: 1.2,
-            fontWeight: 600,
-            textTransform: "none",
-            "&:hover": { bgcolor: "#f8b500", color: "#000" },
-          }}
+          sx={{ mt: 1, py: 1.2, fontWeight: 600, textTransform: "none", bgcolor: "#f8b500", "&:hover": { bgcolor: "#e0a400" } }}
         >
-          {loading ? "Registering..." : "Register"}
+          {loading ? "Creating Account..." : "Register"}
         </Button>
 
         <Divider sx={{ my: 1 }} />
 
         <Typography variant="body2" align="center">
           Already have an account?{" "}
-          <MuiLink
-            component="button"
-            onClick={switchToLogin}
-            sx={{
-              cursor: "pointer",
-              textDecoration: "none",
-              fontWeight: 500,
-              color: "primary.main",
-              "&:hover": { textDecoration: "underline", color: "primary.dark" },
-            }}
-          >
+          <MuiLink component="button" onClick={switchToLogin} sx={{ cursor: "pointer", textDecoration: "none", fontWeight: 500 }}>
             Sign In
           </MuiLink>
         </Typography>

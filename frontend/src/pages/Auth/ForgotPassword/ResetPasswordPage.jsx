@@ -156,7 +156,7 @@ export default function ResetPasswordPage() {
               error={Boolean(errors.password)}
               helperText={errors.password}
               required
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -186,7 +186,7 @@ export default function ResetPasswordPage() {
               error={Boolean(errors.confirmPassword)}
               helperText={errors.confirmPassword}
               required
-              sx={{ mb: 4 }}
+              sx={{ mb: 4, "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">

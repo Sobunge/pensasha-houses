@@ -195,6 +195,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           onBlur={handleBlur("password")}
           required
           size="small"
+          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
           placeholder="Enter your password"
           error={showPasswordError}
           helperText={showPasswordError ? passwordError : ""}
