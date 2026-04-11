@@ -33,8 +33,8 @@ export const permissionMenuItems = [
     permissions: ["PROPERTY_VIEW"],
   },
   {
-    label: "My Properties",
-    link: "/dashboard/properties",
+    label: "My Rental Units",
+    link: "/dashboard/my-units",
     icon: <ApartmentIcon />,
     permissions: ["PROPERTY_VIEW"],
   },
