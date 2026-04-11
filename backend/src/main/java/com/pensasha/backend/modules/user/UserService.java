@@ -38,56 +38,43 @@ public class UserService {
     /* ===================== CREATE USER ===================== */
     @Transactional
     public GetUserDTO createUser(CreateUserDTO dto) {
-
+        // 1. Existence check
         if (userRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
-            throw new IllegalArgumentException(
-                    "User with this phone number already exists: " + dto.getPhoneNumber());
+            throw new IllegalArgumentException("User with this phone number already exists: " + dto.getPhoneNumber());
         }
 
-        // Create user entity
+        // 2. Create base user entity via factory
         User user = userFactory.createUser(dto);
 
-        // Persist user first so profiles can reference it
-        userRepository.save(user);
+        // --- NEW STEP: Save the user immediately to generate ID ---
+        // This ensures the ID exists before profiles try to reference it
+        user = userRepository.save(user);
 
-        // Assign roles from DTO (strings -> Role entities)
-        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
+        // 3. Process Roles and Profiles
+        if (dto.getRoles() != null) {
             for (String roleName : dto.getRoles()) {
                 Role roleEntity = roleRepository.findByName(roleName.toUpperCase())
-                        .orElseThrow(() -> new IllegalArgumentException(
-                                "Invalid role name: " + roleName));
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid role name: " + roleName));
 
                 user.addRole(roleEntity);
-
-                // Create associated profile if needed
-                switch (roleEntity.getName().toUpperCase()) {
-                    case "TENANT" -> {
-                        TenantProfile tenantProfile = new TenantProfile();
-                        tenantProfile.setUser(user);
-                        tenantProfileRepository.save(tenantProfile);
-                        user.setTenantProfile(tenantProfile);
-                    }
-                    case "LANDLORD" -> {
-                        LandlordProfile landlordProfile = new LandlordProfile();
-                        landlordProfile.setUser(user);
-                        landlordProfileRepository.save(landlordProfile);
-                        user.setLandlordProfile(landlordProfile);
-                    }
-                    default -> log.warn("No profile mapping for role: {}", roleName);
-                }
+                // Now this will work because 'user' has an ID!
+                createProfileForRole(user, roleEntity.getName());
             }
         }
 
-        // Create credentials
+        // 4. Create Credentials
         UserCredentials credentials = new UserCredentials();
         credentials.setUser(user);
         credentials.setPassword(passwordEncoder.encode(dto.getPassword()));
         credentials.setEnabled(true);
         credentials.setLocked(false);
+
+        // 5. Final Persistence
+        // This save will now handle the Profile and Roles via cascading
+        userRepository.save(user);
         credentialsRepository.save(credentials);
 
-        log.info("Created new user: {} (roles: {})", user.getPhoneNumber(),
-                user.getRoles().stream().map(Role::getName).toList());
+        log.info("Created new user: {} with roles: {}", user.getPhoneNumber(), dto.getRoles());
 
         return userMapper.toDTO(user);
     }
@@ -230,5 +217,26 @@ public class UserService {
 
     public boolean userExistsByPublicId(String publicId) {
         return userRepository.existsByPublicId(publicId);
+    }
+
+    /**
+     * Helper method to keep the main createUser method clean
+     */
+    private void createProfileForRole(User user, String roleName) {
+        switch (roleName.toUpperCase()) {
+            case "TENANT" -> {
+                TenantProfile profile = new TenantProfile();
+                profile.setUser(user);
+                tenantProfileRepository.save(profile);
+                user.setTenantProfile(profile);
+            }
+            case "LANDLORD" -> {
+                LandlordProfile profile = new LandlordProfile();
+                profile.setUser(user);
+                landlordProfileRepository.save(profile);
+                user.setLandlordProfile(profile);
+            }
+            default -> log.debug("No specific profile required for role: {}", roleName);
+        }
     }
 }

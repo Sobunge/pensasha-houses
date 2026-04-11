@@ -40,7 +40,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain chain)
             throws ServletException, IOException {
 
-        // Skip CORS preflight requests
+        // 1. Skip CORS preflight requests
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             chain.doFilter(request, response);
             return;
@@ -48,8 +48,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // ================= SKIP LOGIN / REFRESH =================
-        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/refresh")) {
+        // 2. ================= SKIP ALL PUBLIC AUTH ENDPOINTS =================
+        // This ensures register, login, forgot-password, and reset-password 
+        // work even if an old expired token is still in the browser headers.
+        if (path.startsWith("/api/auth/")) {
             chain.doFilter(request, response);
             return;
         }
@@ -83,14 +85,18 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch (ExpiredJwtException e) {
+            // Only block and return 401 for PROTECTED routes.
+            // Since we skipped /api/auth/ above, this only hits for secured endpoints.
             logger.warn("Access token expired for request to {}: {}", request.getRequestURI(), e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Access token expired");
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Access token expired\"}");
             return;
 
         } catch (Exception e) {
             logger.error("JWT processing failed: {}", e.getMessage(), e);
-            // Let the request continue; some endpoints may not require auth
+            // On other errors, we let it fall through to Spring Security's 
+            // entry point rather than crashing the filter chain.
         }
 
         chain.doFilter(request, response);

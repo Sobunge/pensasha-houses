@@ -1,4 +1,4 @@
-// services/httpService.js
+// api/api.js
 import axios from "axios";
 
 // ================= TOKEN MANAGEMENT =================
@@ -63,7 +63,8 @@ api.interceptors.response.use(
     // SKIP AUTH ENDPOINTS (Don't intercept errors during login/refresh)
     const isAuthEndpoint =
       originalRequest.url?.includes("/auth/login") ||
-      originalRequest.url?.includes("/auth/refresh");
+      originalRequest.url?.includes("/auth/refresh") ||
+      originalRequest.url?.includes("/auth/register");
 
     if (status === 401 && !isAuthEndpoint) {
       // SCENARIO 1: We have a token, attempt refresh

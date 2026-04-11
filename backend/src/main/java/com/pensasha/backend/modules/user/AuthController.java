@@ -56,8 +56,13 @@ public class AuthController {
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60; // seconds
 
     /* ========================= REGISTER ========================= */
+    /* ========================= REGISTER ========================= */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody CreateUserDTO dto, BindingResult result) {
+    public ResponseEntity<?> register(@Valid @RequestBody CreateUserDTO dto,
+            BindingResult result,
+            HttpServletResponse response) {
+
+        // 1. Handle Validation Errors
         if (result.hasErrors()) {
             List<String> errors = result.getFieldErrors()
                     .stream()
@@ -66,13 +71,34 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("errors", errors));
         }
 
-        if (userService.userExists(dto.getPhoneNumber())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "User with this phone number already exists"));
-        }
+        try {
+            // 2. Create the User
+            // (The redundancy is removed; the Service handles the existence check)
+            GetUserDTO created = userService.createUser(dto);
 
-        GetUserDTO created = userService.createUser(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+            // 3. Auto-Login: Generate tokens for the new user
+            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService
+                    .loadUserByUsername(dto.getPhoneNumber());
+            Map<String, String> tokens = jwtUtils.generateTokens(userDetails);
+
+            // 4. Set Refresh Token in HttpOnly Cookie
+            setRefreshTokenCookie(response, tokens.get("refreshToken"));
+
+            // 5. Return everything the frontend needs to start the session
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "accessToken", tokens.get("accessToken"),
+                    "user", created,
+                    "principal", buildAuthPrincipal(userDetails)));
+
+        } catch (IllegalArgumentException e) {
+            // Catches the "User already exists" or "Invalid role" from the Service
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Registration failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An unexpected error occurred during registration"));
+        }
     }
 
     /* ========================= LOGIN ========================= */
@@ -118,17 +144,32 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request) {
         String refreshToken = extractRefreshToken(request);
-        if (refreshToken == null)
+        if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        String phoneNumber = jwtUtils.extractUsername(refreshToken);
-        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(phoneNumber);
+        try {
+            String phoneNumber = jwtUtils.extractUsername(refreshToken);
 
-        if (!jwtUtils.validateRefreshToken(refreshToken, userDetails))
+            // This is the line that was throwing the unhandled UsernameNotFoundException
+            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(phoneNumber);
+
+            if (!jwtUtils.validateRefreshToken(refreshToken, userDetails)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String newAccessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
+            return ResponseEntity.ok(new LoginResponseDTO(newAccessToken, buildAuthPrincipal(userDetails)));
+
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException e) {
+            // If the user isn't found, return 401 instead of crashing with a 500
+            log.warn("Refresh failed: User not found for phone number extracted from token.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        String newAccessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
-        return ResponseEntity.ok(new LoginResponseDTO(newAccessToken, buildAuthPrincipal(userDetails)));
+        } catch (Exception e) {
+            // Catch-all for other JWT parsing issues
+            log.error("Refresh failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     /* ========================= LOGOUT ========================= */

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Stack,
@@ -14,6 +15,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 
+// Icons
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -22,15 +24,15 @@ import EmailIcon from "@mui/icons-material/Email";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-import api from "../../../api/api";
+import api, { setAccessToken } from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
+import { useAuth } from "../AuthContext";
 
 /* ---------------- Helpers ---------------- */
 const normalizePhone = (phone) => {
   let digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) digits = "254" + digits.substring(1);
-  if (digits.startsWith("254")) return "+" + digits;
-  return "+254" + digits;
+  return digits.startsWith("254") ? "+" + digits : "+254" + digits;
 };
 
 const validateRequired = (value, fieldName) => {
@@ -60,6 +62,10 @@ const validatePassword = (value) => {
 
 /* ---------------- Registration Form ---------------- */
 export default function RegistrationForm({ onSuccess, switchToLogin }) {
+  const navigate = useNavigate();
+  const { notify } = useNotification();
+  const { loginAs } = useAuth(); // Destructure the correct function from your context
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -69,28 +75,21 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
     role: "",
   });
 
-  const [touched, setTouched] = useState({
-    firstName: false,
-    lastName: false,
-    phoneNumber: false,
-    email: false,
-    password: false,
-    role: false,
-  });
-
+  const [touched, setTouched] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { notify } = useNotification();
 
   /* ---------------- Validation ---------------- */
-  const firstNameError = validateRequired(formData.firstName, "First name");
-  const lastNameError = validateRequired(formData.lastName, "Last name");
-  const phoneError = validatePhoneNumber(formData.phoneNumber);
-  const emailError = validateEmail(formData.email);
-  const passwordError = validatePassword(formData.password);
-  const roleError = validateRequired(formData.role, "Role");
+  const errors = {
+    firstName: validateRequired(formData.firstName, "First name"),
+    lastName: validateRequired(formData.lastName, "Last name"),
+    phoneNumber: validatePhoneNumber(formData.phoneNumber),
+    email: validateEmail(formData.email),
+    password: validatePassword(formData.password),
+    role: validateRequired(formData.role, "Role"),
+  };
 
-  const hasErrors = firstNameError || lastNameError || phoneError || emailError || passwordError || roleError;
+  const hasErrors = Object.values(errors).some((err) => err !== null);
 
   /* ---------------- Handlers ---------------- */
   const handleChange = (e) => {
@@ -105,14 +104,8 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
     e.preventDefault();
 
     if (hasErrors) {
-      setTouched({
-        firstName: true,
-        lastName: true,
-        phoneNumber: true,
-        email: true,
-        password: true,
-        role: true,
-      });
+      const allTouched = Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+      setTouched(allTouched);
       return;
     }
 
@@ -127,28 +120,38 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
         roles: [formData.role],
       };
 
-      await api.post("/auth/register", payload);
+      // 1. Register through API
+      const response = await api.post("/auth/register", payload);
       
-      notify("Registration successful! Please login to continue.", "success", 3000);
+      // 2. Extract session data
+      const { accessToken, principal } = response.data;
+
+      // 3. Update API header state (api.js)
+      setAccessToken(accessToken); 
       
-      // 1. Trigger optional success callback
+      // 4. Update Global Auth Context
+      // loginAs sets the user state, roles, and activeRole in sessionStorage
+      if (loginAs) {
+        loginAs(principal); 
+      }
+
+      notify("Account created successfully! Welcome.", "success", 3000);
+      
       onSuccess?.();
       
-      // 2. Automatically switch the modal view to Login
-      if (switchToLogin) {
-        switchToLogin();
-      }
+      // 5. Navigate to dashboard 
+      // Now ProtectedRoute will see user is authenticated
+      navigate("/dashboard");
       
     } catch (err) {
-      const errorMsg = err.response?.data?.error || err.response?.data?.message || "Registration failed.";
-      notify(errorMsg, "error", 3500);
+      notify(err.message || "Registration failed.", "error", 4000);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
         <PersonAddIcon sx={{ color: "#000" }} />
       </Avatar>
@@ -158,52 +161,39 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
       </Typography>
 
       <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
-
-        {/* Names Row */}
         <Box sx={{ display: "flex", gap: 1, width: "100%" }}>
           <TextField
             fullWidth
             label="First Name"
-            placeholder="First Name"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             onBlur={handleBlur("firstName")}
             size="small"
             required
-            error={touched.firstName && !!firstNameError}
-            helperText={touched.firstName ? firstNameError : ""}
+            error={touched.firstName && !!errors.firstName}
+            helperText={touched.firstName && errors.firstName}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PersonIcon fontSize="small" />
-                </InputAdornment>
-              ),
+              startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small" /></InputAdornment>,
             }}
           />
           <TextField
             fullWidth
             label="Last Name"
-            placeholder="Last Name"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
             onBlur={handleBlur("lastName")}
             size="small"
             required
-            error={touched.lastName && !!lastNameError}
-            helperText={touched.lastName ? lastNameError : ""}
+            error={touched.lastName && !!errors.lastName}
+            helperText={touched.lastName && errors.lastName}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PersonIcon fontSize="small" />
-                </InputAdornment>
-              ),
+              startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small" /></InputAdornment>,
             }}
           />
         </Box>
 
-        {/* Phone */}
         <TextField
           fullWidth
           label="Phone Number"
@@ -214,8 +204,8 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           size="small"
           required
           placeholder="7XXXXXXXX"
-          error={touched.phoneNumber && !!phoneError}
-          helperText={touched.phoneNumber ? phoneError : ""}
+          error={touched.phoneNumber && !!errors.phoneNumber}
+          helperText={touched.phoneNumber && errors.phoneNumber}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -226,11 +216,9 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           }}
         />
 
-        {/* Email */}
         <TextField
           fullWidth
           label="Email Address"
-          placeholder="Email Address"
           name="email"
           type="email"
           value={formData.email}
@@ -238,38 +226,27 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           onBlur={handleBlur("email")}
           size="small"
           required
-          error={touched.email && !!emailError}
-          helperText={touched.email ? emailError : ""}
+          error={touched.email && !!errors.email}
+          helperText={touched.email && errors.email}
           InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <EmailIcon fontSize="small" />
-              </InputAdornment>
-            ),
+            startAdornment: <InputAdornment position="start"><EmailIcon fontSize="small" /></InputAdornment>,
           }}
         />
 
-        {/* Password */}
         <TextField
           fullWidth
           label="Password"
-          placeholder="Password"
           name="password"
           type={showPassword ? "text" : "password"}
           value={formData.password}
           onChange={handleChange}
           onBlur={handleBlur("password")}
           size="small"
-          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
           required
-          error={touched.password && !!passwordError}
-          helperText={touched.password ? passwordError : ""}
+          error={touched.password && !!errors.password}
+          helperText={touched.password && errors.password}
           InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon fontSize="small" />
-              </InputAdornment>
-            ),
+            startAdornment: <InputAdornment position="start"><LockIcon fontSize="small" /></InputAdornment>,
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
@@ -280,7 +257,6 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           }}
         />
 
-        {/* Role Select */}
         <TextField
           select
           label="Role"
@@ -290,9 +266,8 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           onBlur={handleBlur("role")}
           size="small"
           required
-          error={touched.role && !!roleError}
-          helperText={touched.role ? roleError : ""}
-          InputLabelProps={{ shrink: true }}
+          error={touched.role && !!errors.role}
+          helperText={touched.role && errors.role}
           SelectProps={{
             displayEmpty: true,
             renderValue: (selected) => {
@@ -314,16 +289,12 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PersonAddIcon />}
           sx={{ 
-            mt: 1, 
-            py: 1.2, 
-            fontWeight: 700, 
-            textTransform: "none", 
-            bgcolor: "#f8b500", 
-            color: "#000",
+            mt: 1, py: 1.2, fontWeight: 700, textTransform: "none", 
+            bgcolor: "#f8b500", color: "#000",
             "&:hover": { bgcolor: "#e0a400" } 
           }}
         >
-          {loading ? "Creating Account..." : "Register"}
+          {loading ? "Processing..." : "Register"}
         </Button>
 
         <Divider sx={{ my: 1 }} />
