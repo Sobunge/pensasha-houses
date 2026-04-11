@@ -9,6 +9,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 
 // Pages
 import LandingPage from "./pages/LandingPage/LandingPage";
+import PropertiesPage from "./pages/PropertiesPage/PropertiesPage";
 import UnitsPage from "./pages/UnitPage/UnitsPage";
 import UnitPage from "./pages/UnitPage/UnitPage";
 import ForgotPasswordPage from "./pages/Auth/ForgotPassword/ForgotPasswordPage";
@@ -55,6 +56,7 @@ function App() {
             
             {/* Optional shared pages if needed */}
             <Route path="profile" element={<UserProfilePage />} />
+            <Route path="my-properties" element={<PropertiesPage />} />
             <Route path="management/inventory/units" element={<UnitsPage />} />
             <Route path="management/inventory/units/:id" element={<UnitPage />} />
             <Route path="properties/:id" element={<PropertyDetails />} />

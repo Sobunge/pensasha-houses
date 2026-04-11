@@ -18,105 +18,57 @@ import StorageIcon from "@mui/icons-material/Storage";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import SearchIcon from "@mui/icons-material/Search";
 
-// ======================= CORE =======================
-export const coreMenuItems = [
+// ======================= CORE (Always Visible) =======================
+const coreMenuItems = [
   { label: "Dashboard", link: "/dashboard", icon: <DashboardIcon /> },
   { label: "Profile", link: "/dashboard/profile", icon: <PersonIcon /> },
 ];
 
-// ======================= PERMISSION-BASED MENU =======================
-export const permissionMenuItems = [
-  {
-    label: "Browse Units",
-    link: "/dashboard/browse-units",
-    icon: <SearchIcon />,
-    permissions: ["PROPERTY_VIEW"],
-  },
-  {
-    label: "My Rental Units",
-    link: "/dashboard/my-units",
-    icon: <ApartmentIcon />,
-    permissions: ["PROPERTY_VIEW"],
-  },
-  {
-    label: "Announcements",
-    link: "/dashboard/announcements",
-    icon: <AnnouncementIcon />,
-    permissions: ["ANNOUNCEMENT_VIEW"],
-  },
-  {
-    label: "Messages",
-    link: "/dashboard/messages",
-    icon: <MessageIcon />,
-    permissions: ["MESSAGE_VIEW"],
-  },
-  {
-    label: "Maintenance Requests",
-    link: "/dashboard/maintenance-requests",
-    icon: <BuildIcon />,
-    permissions: ["MAINTENANCE_VIEW", "MAINTENANCE_CREATE"],
-  },
-  {
-    label: "Documents",
-    link: "/dashboard/documents",
-    icon: <DescriptionIcon />,
-    permissions: ["DOCUMENT_VIEW"],
-  },
-  {
-    label: "Rent Payments",
-    link: "/dashboard/rent-payments",
-    icon: <PaymentIcon />,
-    permissions: ["RENT_VIEW", "RENT_PAY"],
-  },
-  {
-    label: "Tenants",
-    link: "/dashboard/tenants",
-    icon: <PeopleAltIcon />,
-    permissions: ["TENANT_VIEW"],
-  },
-  {
-    label: "Caretakers",
-    link: "/dashboard/caretakers",
-    icon: <SupportAgentIcon />,
-    permissions: ["CARETAKER_VIEW"],
-  },
-  {
-    label: "Reports",
-    link: "/dashboard/reports",
-    icon: <AssessmentIcon />,
-    permissions: ["REPORT_VIEW"],
-  },
-  {
-    label: "Admin: Users",
-    link: "/dashboard/users",
-    icon: <AdminPanelSettingsIcon />,
-    permissions: ["USER_VIEW"],
-  },
-  {
-    label: "Roles & Permissions",
-    link: "/dashboard/roles",
-    icon: <SecurityIcon />,
-    permissions: ["ROLE_VIEW"],
-  },
-  {
-    label: "System Settings",
-    link: "/dashboard/settings",
-    icon: <SettingsIcon />,
-    permissions: ["SYSTEM_CONFIG_VIEW"],
-  },
-  {
-    label: "System Logs",
-    link: "/dashboard/logs",
-    icon: <StorageIcon />,
-    permissions: ["SYSTEM_CONFIG_VIEW"],
-  },
-];
+// ======================= ROLE-BASED MENUS =======================
+const menuDefinitions = {
+  TENANT: [
+    { label: "Browse Units", link: "/dashboard/browse-units", icon: <SearchIcon /> },
+    { label: "My Rental Units", link: "/dashboard/my-units", icon: <ApartmentIcon /> },
+    { label: "Rent Payments", link: "/dashboard/rent-payments", icon: <PaymentIcon /> },
+    { label: "Maintenance", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Documents", link: "/dashboard/documents", icon: <DescriptionIcon /> },
+    { label: "Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
+  ],
 
-export const getMenuItems = (userPermissions = []) => {
-  const has = (perm) => userPermissions.includes(perm);
+  LANDLORD: [
+    { label: "My Properties", link: "/dashboard/my-properties", icon: <ApartmentIcon /> },
+    { label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },  ],
+
+  CARETAKER: [
+    { label: "Property Units", link: "/dashboard/my-units", icon: <ApartmentIcon /> },
+    { label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
+    { label: "Maintenance Tasks", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
+    { label: "Messages", link: "/dashboard/messages", icon: <MessageIcon /> },
+    { label: "Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
+  ],
+
+  ADMIN: [
+    { label: "Overview Reports", link: "/dashboard/reports", icon: <AssessmentIcon /> },
+    { label: "User Management", link: "/dashboard/users", icon: <AdminPanelSettingsIcon /> },
+    { label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
+    { label: "Caretakers", link: "/dashboard/caretakers", icon: <SupportAgentIcon /> },
+    { label: "Roles & Security", link: "/dashboard/roles", icon: <SecurityIcon /> },
+    { label: "System Settings", link: "/dashboard/settings", icon: <SettingsIcon /> },
+    { label: "System Logs", link: "/dashboard/logs", icon: <StorageIcon /> },
+  ],
+};
+
+/**
+ * Returns the menu items for the current active role selected in the switcher.
+ * Falls back to TENANT if no role is provided.
+ */
+export const getMenuItems = (activeRole = "TENANT") => {
+  // Normalize role name to match keys in menuDefinitions
+  const roleKey = activeRole?.toUpperCase();
+  const roleSpecificMenu = menuDefinitions[roleKey] || [];
 
   return [
     ...coreMenuItems,
-    ...permissionMenuItems.filter(item => !item.permission || has(item.permission))
+    ...roleSpecificMenu,
   ];
 };
