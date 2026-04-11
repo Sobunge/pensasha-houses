@@ -16,10 +16,15 @@ public class UserServiceHelper {
 
     /**
      * Copy fields common to all users during creation.
-     * Converts role names (String) → Role entities.
+     * Converts role names (String) -> Role entities.
      */
     public void applyCreateAttributes(User user, CreateUserDTO dto) {
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
         user.setPhoneNumber(dto.getPhoneNumber());
+        
+        // --- FIX: Map the email field from the DTO ---
+        user.setEmail(dto.getEmail());
 
         // Initialize roles set
         if (user.getRoles() == null) {
@@ -31,7 +36,8 @@ public class UserServiceHelper {
             Set<Role> roles = new HashSet<>();
 
             for (String roleName : dto.getRoles()) {
-                Role role = roleRepository.findByName(roleName)
+                // toUpperCase() ensures "tenant" matches "TENANT" in the DB
+                Role role = roleRepository.findByName(roleName.toUpperCase())
                         .orElseThrow(() -> new IllegalArgumentException(
                                 "Role not found: " + roleName));
                 roles.add(role);
@@ -39,15 +45,11 @@ public class UserServiceHelper {
 
             user.setRoles(roles);
         }
-
-        // Optional names
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
     }
 
     /**
      * Copy fields common to all users during update.
-     * Converts role names (String) → Role entities.
+     * Converts role names (String) -> Role entities.
      */
     public void applyUpdateAttributes(User user, UpdateUserDTO dto) {
         user.setFirstName(dto.getFirstName());
@@ -61,7 +63,7 @@ public class UserServiceHelper {
             Set<Role> roles = new HashSet<>();
 
             for (String roleName : dto.getRoles()) {
-                Role role = roleRepository.findByName(roleName)
+                Role role = roleRepository.findByName(roleName.toUpperCase())
                         .orElseThrow(() -> new IllegalArgumentException(
                                 "Role not found: " + roleName));
                 roles.add(role);

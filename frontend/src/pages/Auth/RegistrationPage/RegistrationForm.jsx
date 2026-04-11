@@ -122,27 +122,27 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
 
       // 1. Register through API
       const response = await api.post("/auth/register", payload);
-      
+
       // 2. Extract session data
       const { accessToken, principal } = response.data;
 
       // 3. Update API header state (api.js)
-      setAccessToken(accessToken); 
-      
+      setAccessToken(accessToken);
+
       // 4. Update Global Auth Context
       // loginAs sets the user state, roles, and activeRole in sessionStorage
       if (loginAs) {
-        loginAs(principal); 
+        loginAs(principal);
       }
 
       notify("Account created successfully! Welcome.", "success", 3000);
-      
+
       onSuccess?.();
-      
+
       // 5. Navigate to dashboard 
       // Now ProtectedRoute will see user is authenticated
       navigate("/dashboard");
-      
+
     } catch (err) {
       notify(err.message || "Registration failed.", "error", 4000);
     } finally {
@@ -165,6 +165,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           <TextField
             fullWidth
             label="First Name"
+            placeholder="First Name"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
@@ -180,6 +181,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           <TextField
             fullWidth
             label="Last Name"
+            placeholder="Last Name"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
@@ -219,6 +221,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
         <TextField
           fullWidth
           label="Email Address"
+          placeholder="Email Address"
           name="email"
           type="email"
           value={formData.email}
@@ -236,6 +239,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
         <TextField
           fullWidth
           label="Password"
+          placeholder="Password"
           name="password"
           type={showPassword ? "text" : "password"}
           value={formData.password}
@@ -268,6 +272,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           error={touched.role && !!errors.role}
           helperText={touched.role && errors.role}
+          InputLabelProps={{ shrink: true }}
           SelectProps={{
             displayEmpty: true,
             renderValue: (selected) => {
@@ -288,10 +293,10 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           fullWidth
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PersonAddIcon />}
-          sx={{ 
-            mt: 1, py: 1.2, fontWeight: 700, textTransform: "none", 
+          sx={{
+            mt: 1, py: 1.2, fontWeight: 700, textTransform: "none",
             bgcolor: "#f8b500", color: "#000",
-            "&:hover": { bgcolor: "#e0a400" } 
+            "&:hover": { bgcolor: "#e0a400" }
           }}
         >
           {loading ? "Processing..." : "Register"}
@@ -301,10 +306,10 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
 
         <Typography variant="body2" align="center">
           Already have an account?{" "}
-          <MuiLink 
-            component="button" 
+          <MuiLink
+            component="button"
             type="button"
-            onClick={switchToLogin} 
+            onClick={switchToLogin}
             sx={{ cursor: "pointer", textDecoration: "none", fontWeight: 700, color: "#f8b500" }}
           >
             Sign In
