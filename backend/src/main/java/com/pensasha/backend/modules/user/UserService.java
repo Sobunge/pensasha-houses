@@ -43,6 +43,10 @@ public class UserService {
             throw new IllegalArgumentException("User with this phone number already exists: " + dto.getPhoneNumber());
         }
 
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("User with this email already exists: " + dto.getEmail());
+        }
+
         // 2. Create base user entity via factory
         User user = userFactory.createUser(dto);
 

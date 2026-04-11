@@ -64,7 +64,7 @@ const validatePassword = (value) => {
 export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const navigate = useNavigate();
   const { notify } = useNotification();
-  const { loginAs } = useAuth(); // Destructure the correct function from your context
+  const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -104,7 +104,10 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
     e.preventDefault();
 
     if (hasErrors) {
-      const allTouched = Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+      const allTouched = Object.keys(formData).reduce(
+        (acc, key) => ({ ...acc, [key]: true }),
+        {}
+      );
       setTouched(allTouched);
       return;
     }
@@ -122,36 +125,48 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
 
       // 1. Register through API
       const response = await api.post("/auth/register", payload);
-
-      // 2. Extract session data
       const { accessToken, principal } = response.data;
 
-      // 3. Update API header state (api.js)
+      // 2. Update API header state
       setAccessToken(accessToken);
 
-      // 4. Update Global Auth Context
-      // loginAs sets the user state, roles, and activeRole in sessionStorage
+      // 3. Update Global Auth Context
       if (loginAs) {
         loginAs(principal);
       }
 
       notify("Account created successfully! Welcome.", "success", 3000);
 
-      onSuccess?.();
+      // 4. Cleanup Modal / Parent state
+      if (onSuccess) onSuccess();
 
-      // 5. Navigate to dashboard 
-      // Now ProtectedRoute will see user is authenticated
-      navigate("/dashboard");
-
+      /* ---------------- SMART NAVIGATION ---------------- */
+      if (redirectAfterAuth === "rent-request") {
+        // Stay on page: PropertyDetails.jsx will see user is now logged in
+        // and trigger the request dialog.
+      } else if (redirectAfterAuth) {
+        navigate(redirectAfterAuth, { replace: true });
+        setRedirectAfterAuth(null);
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     } catch (err) {
-      notify(err.message || "Registration failed.", "error", 4000);
+      console.error("Registration error:", err);
+      const message =
+        err?.response?.data?.message || err.message || "Registration failed.";
+      notify(message, "error", 4000);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      noValidate
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
         <PersonAddIcon sx={{ color: "#000" }} />
       </Avatar>
@@ -175,7 +190,11 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             error={touched.firstName && !!errors.firstName}
             helperText={touched.firstName && errors.firstName}
             InputProps={{
-              startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small" /></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon fontSize="small" />
+                </InputAdornment>
+              ),
             }}
           />
           <TextField
@@ -191,7 +210,11 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             error={touched.lastName && !!errors.lastName}
             helperText={touched.lastName && errors.lastName}
             InputProps={{
-              startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small" /></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon fontSize="small" />
+                </InputAdornment>
+              ),
             }}
           />
         </Box>
@@ -232,7 +255,11 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           error={touched.email && !!errors.email}
           helperText={touched.email && errors.email}
           InputProps={{
-            startAdornment: <InputAdornment position="start"><EmailIcon fontSize="small" /></InputAdornment>,
+            startAdornment: (
+              <InputAdornment position="start">
+                <EmailIcon fontSize="small" />
+              </InputAdornment>
+            ),
           }}
         />
 
@@ -246,15 +273,28 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           onChange={handleChange}
           onBlur={handleBlur("password")}
           size="small"
+          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" } }}
           required
           error={touched.password && !!errors.password}
           helperText={touched.password && errors.password}
           InputProps={{
-            startAdornment: <InputAdornment position="start"><LockIcon fontSize="small" /></InputAdornment>,
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockIcon fontSize="small" />
+              </InputAdornment>
+            ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
-                  {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                  size="small"
+                >
+                  {showPassword ? (
+                    <VisibilityOffIcon fontSize="small" />
+                  ) : (
+                    <VisibilityIcon fontSize="small" />
+                  )}
                 </IconButton>
               </InputAdornment>
             ),
@@ -276,12 +316,19 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           SelectProps={{
             displayEmpty: true,
             renderValue: (selected) => {
-              if (!selected) return <Typography sx={{ color: "text.secondary", fontSize: "0.9rem" }}>Select Role</Typography>;
+              if (!selected)
+                return (
+                  <Typography sx={{ color: "text.secondary", fontSize: "0.9rem" }}>
+                    Select Role
+                  </Typography>
+                );
               return selected.charAt(0) + selected.slice(1).toLowerCase();
             },
           }}
         >
-          <MenuItem value="" disabled>Select Role</MenuItem>
+          <MenuItem value="" disabled>
+            Select Role
+          </MenuItem>
           <MenuItem value="TENANT">Tenant</MenuItem>
           <MenuItem value="LANDLORD">Landlord</MenuItem>
         </TextField>
@@ -292,11 +339,21 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           size="large"
           fullWidth
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PersonAddIcon />}
+          startIcon={
+            loading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <PersonAddIcon />
+            )
+          }
           sx={{
-            mt: 1, py: 1.2, fontWeight: 700, textTransform: "none",
-            bgcolor: "#f8b500", color: "#000",
-            "&:hover": { bgcolor: "#e0a400" }
+            mt: 1,
+            py: 1.2,
+            fontWeight: 700,
+            textTransform: "none",
+            bgcolor: "#f8b500",
+            color: "#000",
+            "&:hover": { bgcolor: "#e0a400" },
           }}
         >
           {loading ? "Processing..." : "Register"}
@@ -310,7 +367,12 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             component="button"
             type="button"
             onClick={switchToLogin}
-            sx={{ cursor: "pointer", textDecoration: "none", fontWeight: 700, color: "#f8b500" }}
+            sx={{
+              cursor: "pointer",
+              textDecoration: "none",
+              fontWeight: 700,
+              color: "#f8b500",
+            }}
           >
             Sign In
           </MuiLink>

@@ -1,4 +1,3 @@
-// src/components/Auth/LoginPage/LoginForm.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -54,7 +53,8 @@ export default function LoginForm({ switchToSignup, onClose }) {
   const [loading, setLoading] = useState(false);
 
   const { notify } = useNotification();
-  const { loginAs } = useAuth();
+  // Destructure redirect states from useAuth
+  const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
   const navigate = useNavigate();
 
   const phoneError = validatePhoneNumber(formData.phoneNumber);
@@ -95,17 +95,10 @@ export default function LoginForm({ switchToSignup, onClose }) {
         throw new Error("Invalid login response");
       }
 
-      // 1. Set token globally for all API calls
       setAccessToken(accessToken);
 
-      // 2. Normalize roles & permissions
-      const roles = Array.isArray(principal.roles)
-        ? principal.roles
-        : [principal.role];
-
-      const permissions = Array.isArray(principal.permissions)
-        ? principal.permissions
-        : [];
+      const roles = Array.isArray(principal.roles) ? principal.roles : [principal.role];
+      const permissions = Array.isArray(principal.permissions) ? principal.permissions : [];
 
       const user = {
         id: principal.id,
@@ -116,26 +109,35 @@ export default function LoginForm({ switchToSignup, onClose }) {
         accessToken,
       };
 
-      // 3. Save user in session & AuthContext
       sessionStorage.setItem("user", JSON.stringify(user));
       loginAs(user);
       notify("Login successful!", "success");
 
-      // 4. Cleanup Modal & Reset Window Scroll
-      // We reset the window scroll because the landing page might be scrolled down,
-      // and we want the dashboard to start fresh at the top.
+      // Cleanup Modal & Reset Scroll
       if (onClose) onClose();
       window.scrollTo(0, 0);
 
-      // 5. Navigate to unified dashboard (replace prevents back-button loop)
-      navigate("/dashboard", { replace: true });
+      /* ---------------- SMART NAVIGATION ---------------- */
+      // If the user was trying to rent a specific property, we DON'T navigate away.
+      // We let PropertyDetails.jsx open the dialog.
+      if (redirectAfterAuth === "rent-request") {
+        // Do nothing, let the PropertyDetails useEffect handle it.
+        // We don't clear the intent here yet; PropertyDetails will clear it.
+      } else if (redirectAfterAuth) {
+        // If there was a different specific page they were trying to reach
+        navigate(redirectAfterAuth, { replace: true });
+        setRedirectAfterAuth(null);
+      } else {
+        // Standard login: go to dashboard
+        navigate("/dashboard", { replace: true });
+      }
+
     } catch (err) {
       console.error("Login error:", err);
       const message =
         err?.response?.data?.message ||
         err?.message ||
         "Unable to login. Please try again.";
-
       notify(message, "error");
     } finally {
       setLoading(false);
@@ -194,7 +196,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
           onBlur={handleBlur("password")}
           required
           size="small"
-          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
+          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" } }}
           placeholder="Enter your password"
           error={showPasswordError}
           helperText={showPasswordError ? passwordError : ""}
@@ -221,9 +223,9 @@ export default function LoginForm({ switchToSignup, onClose }) {
       </Stack>
 
       <Box sx={{ width: "100%", textAlign: "right", mt: 1 }}>
-        <MuiLink 
-          component={RouterLink} 
-          to="/forgot-password" 
+        <MuiLink
+          component={RouterLink}
+          to="/forgot-password"
           onClick={onClose}
           sx={{ fontSize: "0.85rem", color: "primary.main", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
         >
