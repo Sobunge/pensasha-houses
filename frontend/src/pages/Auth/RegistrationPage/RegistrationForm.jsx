@@ -128,10 +128,20 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
       };
 
       await api.post("/auth/register", payload);
-      notify("Registration successful!", "success", 3000);
+      
+      notify("Registration successful! Please login to continue.", "success", 3000);
+      
+      // 1. Trigger optional success callback
       onSuccess?.();
+      
+      // 2. Automatically switch the modal view to Login
+      if (switchToLogin) {
+        switchToLogin();
+      }
+      
     } catch (err) {
-      notify(err.response?.data?.error || "Registration failed.", "error", 3500);
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || "Registration failed.";
+      notify(errorMsg, "error", 3500);
     } finally {
       setLoading(false);
     }
@@ -140,7 +150,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
-        <PersonAddIcon />
+        <PersonAddIcon sx={{ color: "#000" }} />
       </Avatar>
 
       <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
@@ -149,7 +159,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
 
       <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
 
-        {/* Names Row - Forced side-by-side */}
+        {/* Names Row */}
         <Box sx={{ display: "flex", gap: 1, width: "100%" }}>
           <TextField
             fullWidth
@@ -262,15 +272,15 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
+                  {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                 </IconButton>
               </InputAdornment>
             ),
           }}
         />
 
-        {/* Role */}
+        {/* Role Select */}
         <TextField
           select
           label="Role"
@@ -282,22 +292,16 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           error={touched.role && !!roleError}
           helperText={touched.role ? roleError : ""}
-          // This keeps the label "Role *" on the top border
           InputLabelProps={{ shrink: true }}
           SelectProps={{
             displayEmpty: true,
             renderValue: (selected) => {
-              if (!selected) {
-                return <Typography sx={{ color: "text.secondary", fontSize: "0.9rem" }}>Select Role</Typography>;
-              }
-              // Converts "TENANT" to "Tenant" for display
+              if (!selected) return <Typography sx={{ color: "text.secondary", fontSize: "0.9rem" }}>Select Role</Typography>;
               return selected.charAt(0) + selected.slice(1).toLowerCase();
             },
           }}
         >
-          <MenuItem value="" disabled>
-            Select Role
-          </MenuItem>
+          <MenuItem value="" disabled>Select Role</MenuItem>
           <MenuItem value="TENANT">Tenant</MenuItem>
           <MenuItem value="LANDLORD">Landlord</MenuItem>
         </TextField>
@@ -305,11 +309,19 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
         <Button
           type="submit"
           variant="contained"
-          size="small"
+          size="large"
           fullWidth
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} /> : <PersonAddIcon />}
-          sx={{ mt: 1, py: 1.2, fontWeight: 600, textTransform: "none", bgcolor: "#f8b500", "&:hover": { bgcolor: "#e0a400" } }}
+          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PersonAddIcon />}
+          sx={{ 
+            mt: 1, 
+            py: 1.2, 
+            fontWeight: 700, 
+            textTransform: "none", 
+            bgcolor: "#f8b500", 
+            color: "#000",
+            "&:hover": { bgcolor: "#e0a400" } 
+          }}
         >
           {loading ? "Creating Account..." : "Register"}
         </Button>
@@ -318,7 +330,12 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
 
         <Typography variant="body2" align="center">
           Already have an account?{" "}
-          <MuiLink component="button" onClick={switchToLogin} sx={{ cursor: "pointer", textDecoration: "none", fontWeight: 500 }}>
+          <MuiLink 
+            component="button" 
+            type="button"
+            onClick={switchToLogin} 
+            sx={{ cursor: "pointer", textDecoration: "none", fontWeight: 700, color: "#f8b500" }}
+          >
             Sign In
           </MuiLink>
         </Typography>
