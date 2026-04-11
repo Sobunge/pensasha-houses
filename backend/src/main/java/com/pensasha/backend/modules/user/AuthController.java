@@ -152,19 +152,23 @@ public class AuthController {
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         User user = userService.getUserEntityByPhoneNumber(request.getPhoneNumber());
 
-        if (user != null) {
-            // 1. DELETE existing tokens for this user so only the NEWEST link works
+        // 1. Check if user exists AND has an email address
+        if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+
+            // 2. DELETE existing tokens for this user so only the NEWEST link works
             tokenRepository.deleteByUser(user);
 
-            // 2. Create the new token
+            // 3. Create the new token
             String token = UUID.randomUUID().toString();
             tokenRepository.save(new PasswordResetToken(token, user));
 
             String resetLink = frontendUrl + "/reset-password/" + token;
 
+            // This is where the crash was happening because user.getEmail() was null
             emailService.sendResetEmail(user.getEmail(), resetLink);
         }
 
+        // Always return OK to prevent "User Enumeration" (security best practice)
         return ResponseEntity.ok("If an account is associated with this number, a reset link has been sent.");
     }
 

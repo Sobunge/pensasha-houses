@@ -25,7 +25,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import LoginIcon from "@mui/icons-material/Login";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import AuthModal from "../pages/Auth/AuthModal";
 
 const navItems = [
@@ -42,6 +42,16 @@ function Navbar() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isTiny = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // WATCHER: Automatically open AuthModal if redirected from Forgot/Reset password
+  useEffect(() => {
+    if (location.state?.openLogin) {
+      setAuthOpen(true);
+      // Clean up the state so refreshing doesn't re-trigger the modal
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   // Fix 1: Close drawer when window is resized to desktop size
   useEffect(() => {
@@ -49,7 +59,6 @@ function Navbar() {
   }, [isMobile, mobileOpen]);
 
   // Fix 2: Close drawer automatically whenever the URL changes
-  // This handles the "Forgot Password" toggle or clicking any link in the drawer
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
@@ -90,7 +99,7 @@ function Navbar() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "rgba(30, 30, 30, 0.95)", // High opacity for readability
+        bgcolor: "rgba(30, 30, 30, 0.95)",
         backdropFilter: "blur(12px)",
         px: 3,
         py: { xs: 2, md: 4 },

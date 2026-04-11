@@ -29,7 +29,6 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(true);
 
-  // --- VALIDATION STATES ---
   const [errors, setErrors] = useState({
     password: "",
     confirmPassword: "",
@@ -43,6 +42,7 @@ export default function ResetPasswordPage() {
       } catch (err) {
         const message = err?.response?.data || "This reset link is invalid or has expired.";
         notify(message, "error");
+        // Redirect to home without opening the modal if the token is bad
         navigate("/", { replace: true });
       }
     };
@@ -51,7 +51,6 @@ export default function ResetPasswordPage() {
     else navigate("/");
   }, [token, navigate, notify]);
 
-  // --- REAL-TIME VALIDATION LOGIC ---
   const validate = () => {
     let tempErrors = { password: "", confirmPassword: "" };
     let isValid = true;
@@ -72,8 +71,7 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validate()) return; // Stop if validation fails
+    if (!validate()) return;
 
     setLoading(true);
     try {
@@ -82,8 +80,11 @@ export default function ResetPasswordPage() {
         newPassword: password,
       });
 
-      notify("Password reset successful! Please login.", "success");
-      navigate("/", { replace: true });
+      notify("Password reset successful! Please login with your new password.", "success");
+      
+      // Navigate to home and trigger the AuthModal via location state
+      navigate("/", { replace: true, state: { openLogin: true } });
+      
     } catch (err) {
       const message = err?.response?.data || "Failed to reset password.";
       notify(message, "error");
@@ -151,12 +152,12 @@ export default function ResetPasswordPage() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: "" }); // Clear error on type
+                if (errors.password) setErrors({ ...errors, password: "" });
               }}
               error={Boolean(errors.password)}
               helperText={errors.password}
               required
-              sx={{ mb: 2, "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
+              sx={{ mb: 2 }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -186,7 +187,7 @@ export default function ResetPasswordPage() {
               error={Boolean(errors.confirmPassword)}
               helperText={errors.confirmPassword}
               required
-              sx={{ mb: 4, "& input::-ms-reveal, & input::-ms-clear": { display: "none" }, }}
+              sx={{ mb: 4 }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
