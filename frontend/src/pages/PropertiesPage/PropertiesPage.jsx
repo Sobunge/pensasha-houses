@@ -6,7 +6,6 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 // Components & Context
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
