@@ -10,9 +10,8 @@ import {
   Button,
 } from "@mui/material";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
-import HomeIcon from "@mui/icons-material/Home";
-import EventIcon from "@mui/icons-material/Event";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // Added for location
+
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/Auth/AuthContext";
@@ -21,8 +20,18 @@ const PropertyInfoCard = ({ property }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { id, name, unit, lease, rentStatus, rentAmount } = property;
-  const isPaid = rentStatus === "Paid";
+  // Updated destructuring to match your Backend PropertyDTO
+  const { 
+    id, 
+    name, 
+    location, 
+    description, 
+    units = [], // Array of units from your DTO
+  } = property;
+
+  // Calculate a base rent price or display range
+  const baseRent = units.length > 0 ? units[0].rentAmount : "0";
+  const unitCount = units.length;
 
   const handleNavigation = () => {
     if (!user) return;
@@ -34,7 +43,7 @@ const PropertyInfoCard = ({ property }) => {
     <Card
       elevation={0}
       sx={{
-        width: "100%", // Forces the card to occupy the full width of its parent container
+        width: "100%",
         borderRadius: 4,
         border: "1px solid",
         borderColor: "divider",
@@ -53,97 +62,71 @@ const PropertyInfoCard = ({ property }) => {
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: 1.5,
-          p: 2.5,
+          justifyContent: "space-between", // Added space for unit count chip
+          p: 2,
           bgcolor: "rgba(248, 181, 0, 0.04)",
           borderBottom: "1px solid",
           borderColor: "divider",
         }}
       >
-        <HomeWorkIcon sx={{ color: "#f8b500" }} />
-        <Typography variant="subtitle1" fontWeight={800} color="text.primary">
-          Property Details
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <HomeWorkIcon sx={{ color: "#f8b500" }} />
+            <Typography variant="subtitle2" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase' }}>
+              Property
+            </Typography>
+        </Box>
+        <Chip label={`${unitCount} Units`} size="small" sx={{ fontWeight: 700, bgcolor: '#fff' }} />
       </Box>
 
-      <CardContent sx={{ p: 4, flexGrow: 1 }}>
-        <Stack spacing={3}>
+      <CardContent sx={{ p: 3, flexGrow: 1 }}>
+        <Stack spacing={2.5}>
           {/* Property Name & Rent Status */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Typography variant="h5" fontWeight={900} sx={{ color: "#1a1a1a", letterSpacing: "-0.02em" }}>
+          <Box>
+            <Typography variant="h5" fontWeight={900} sx={{ color: "#1a1a1a", mb: 0.5 }}>
               {name}
             </Typography>
-            {rentStatus && (
-              <Chip
-                label={rentStatus}
-                size="small"
-                sx={{ 
-                  fontWeight: 800, 
-                  bgcolor: isPaid ? "rgba(76, 175, 80, 0.1)" : "rgba(248, 181, 0, 0.1)",
-                  color: isPaid ? "#2e7d32" : "#f8b500",
-                  border: "1px solid",
-                  borderColor: isPaid ? "rgba(76, 175, 80, 0.2)" : "rgba(248, 181, 0, 0.2)",
-                  fontSize: "0.7rem",
-                  px: 1
-                }}
-              />
-            )}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "text.secondary" }}>
+                <LocationOnIcon sx={{ fontSize: 16 }} />
+                <Typography variant="body2">{location}</Typography>
+            </Box>
           </Box>
 
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 4 }}>
-            {unit && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Box sx={{ bgcolor: "rgba(248, 181, 0, 0.1)", p: 0.8, borderRadius: 1.5, display: 'flex' }}>
-                  <HomeIcon sx={{ fontSize: 18, color: "#f8b500" }} />
-                </Box>
-                <Typography variant="body1" fontWeight={600} color="text.primary">
-                  Unit: {unit}
-                </Typography>
-              </Box>
-            )}
-
-            {lease && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Box sx={{ bgcolor: "rgba(248, 181, 0, 0.1)", p: 0.8, borderRadius: 1.5, display: 'flex' }}>
-                  <EventIcon sx={{ fontSize: 18, color: "#f8b500" }} />
-                </Box>
-                <Typography variant="body1" fontWeight={600} color="text.primary">
-                  Lease: {lease}
-                </Typography>
-              </Box>
-            )}
-          </Stack>
+          <Typography variant="body2" color="text.secondary" sx={{ 
+              display: '-webkit-box', 
+              WebkitLineClamp: 2, 
+              WebkitBoxOrient: 'vertical', 
+              overflow: 'hidden',
+              minHeight: '3em'
+          }}>
+            {description || "No description provided for this property."}
+          </Typography>
 
           <Divider sx={{ borderStyle: "dashed", opacity: 0.6 }} />
 
-          {/* Monthly Rent Display */}
+          {/* Price Display */}
           <Box sx={{ 
             display: "flex", 
             alignItems: "center", 
             justifyContent: "space-between",
             bgcolor: "rgba(0,0,0,0.02)",
-            p: 2.5,
+            p: 2,
             borderRadius: 3,
-            border: "1px solid rgba(0,0,0,0.03)"
           }}>
-            <Typography variant="subtitle2" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
-              Monthly Rent
+            <Typography variant="caption" fontWeight={800} color="text.secondary">
+              STARTING RENT
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", color: "#1a1a1a", gap: 0.5 }}>
-              <AttachMoneyIcon sx={{ fontSize: 22, color: "#f8b500" }} />
-              <Typography variant="h5" fontWeight={900}>
-                {rentAmount}
+            <Box sx={{ display: "flex", alignItems: "center", color: "#1a1a1a" }}>
+              <Typography variant="h6" fontWeight={900}>
+                KES {baseRent.toLocaleString()}
               </Typography>
             </Box>
           </Box>
         </Stack>
       </CardContent>
 
-      <Divider sx={{ borderStyle: "dashed", opacity: 0.6 }} />
-
-      {/* Action Button Area */}
-      <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
+      <Box sx={{ p: 3, pt: 0 }}>
         <Button
+          fullWidth
           variant="contained"
           endIcon={<ArrowForwardIcon />}
           onClick={handleNavigation}
@@ -151,22 +134,17 @@ const PropertyInfoCard = ({ property }) => {
             bgcolor: "#f8b500",
             color: "#000000",
             textTransform: "none",
-            fontWeight: 900,
-            fontSize: "0.95rem",
-            px: 6,
-            py: 1.5,
-            borderRadius: 3,
-            boxShadow: "0 6px 18px rgba(248, 181, 0, 0.25)",
-            "& .MuiButton-endIcon": { color: "#000000" },
+            fontWeight: 800,
+            py: 1.2,
+            borderRadius: 2.5,
+            boxShadow: "none",
             "&:hover": {
               bgcolor: "#eab000",
-              boxShadow: "0 8px 24px rgba(248, 181, 0, 0.35)",
-              transform: "scale(1.02)"
-            },
-            transition: "all 0.2s ease"
+              boxShadow: "0 4px 12px rgba(248, 181, 0, 0.2)",
+            }
           }}
         >
-          View Full Property Details
+          Manage Property
         </Button>
       </Box>
     </Card>

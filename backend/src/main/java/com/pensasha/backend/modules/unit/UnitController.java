@@ -1,116 +1,57 @@
 package com.pensasha.backend.modules.unit;
 
-import java.math.BigDecimal;
-import java.util.List;
-
+import com.pensasha.backend.modules.unit.dto.UnitDTO;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-/**
- * REST Controller for managing Unit entities.
- * Provides endpoints for CRUD operations, pagination, and custom queries.
- */
 @RestController
 @RequestMapping("/api/units")
-@Slf4j
 @AllArgsConstructor
 public class UnitController {
 
     private final UnitService unitService;
 
-    /**
-     * Adds a new unit.
-     */
     @PostMapping
     @PreAuthorize("hasAuthority('PROPERTY_CREATE') or hasRole('ADMIN')")
-    public ResponseEntity<Unit> addUnit(@RequestBody Unit unit) {
-        log.info("Received request to add new unit.");
-        Unit createdUnit = unitService.addUnit(unit);
-        return new ResponseEntity<>(createdUnit, HttpStatus.CREATED);
+    public ResponseEntity<UnitDTO> addUnit(@Valid @RequestBody UnitDTO unitDto) {
+        return new ResponseEntity<>(unitService.addUnit(unitDto), HttpStatus.CREATED);
     }
 
-    /**
-     * Retrieves a unit by its ID.
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-    public ResponseEntity<Unit> getUnitById(@PathVariable Long id) {
-        log.info("Fetching unit with ID: {}", id);
-        Unit unit = unitService.getUnitById(id);
-        return ResponseEntity.ok(unit);
+    public ResponseEntity<UnitDTO> getUnitById(@PathVariable Long id) {
+        return ResponseEntity.ok(unitService.getUnitById(id));
     }
 
-    /**
-     * Retrieves all units with pagination.
-     */
     @GetMapping
     @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-    public ResponseEntity<Page<Unit>> getAllUnits(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        log.info("Fetching all units. Page: {}, Size: {}", page, size);
-        Page<Unit> units = unitService.getAllUnits(page, size);
-        return ResponseEntity.ok(units);
+    public ResponseEntity<Page<UnitDTO>> getAllUnits(@PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(unitService.getAllUnits(pageable));
     }
 
-    /**
-     * Updates a unit by its ID.
-     */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-    public ResponseEntity<Unit> updateUnit(@PathVariable Long id, @RequestBody Unit unitDetails) {
-        log.info("Updating unit with ID: {}", id);
-        Unit updatedUnit = unitService.updateUnit(id, unitDetails);
-        return ResponseEntity.ok(updatedUnit);
+    @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')")
+    public ResponseEntity<UnitDTO> updateUnit(@PathVariable Long id, @Valid @RequestBody UnitDTO unitDto) {
+        return ResponseEntity.ok(unitService.updateUnit(id, unitDto));
     }
 
-    /**
-     * Deletes a unit by its ID.
-     */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('PROPERTY_DELETE') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUnit(@PathVariable Long id) {
-        log.info("Deleting unit with ID: {}", id);
         unitService.deleteUnit(id);
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Checks if a unit is available (not occupied).
-     */
-    @GetMapping("/{id}/availability")
-    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-    public ResponseEntity<Boolean> isUnitAvailable(@PathVariable Long id) {
-        log.info("Checking availability for unit with ID: {}", id);
-        boolean available = unitService.isUnitAvailable(id);
-        return ResponseEntity.ok(available);
-    }
-
-    /**
-     * Calculates the rent due for a unit.
-     */
-    @GetMapping("/{id}/rent-due")
-    @PreAuthorize("hasAuthority('RENT_VIEW') or hasRole('ADMIN')")
-    public ResponseEntity<BigDecimal> calculateRentDue(@PathVariable Long id) {
-        log.info("Calculating rent due for unit with ID: {}", id);
-        BigDecimal rentDue = unitService.calculateRentDue(id);
-        return ResponseEntity.ok(rentDue);
-    }
-
-    /**
-     * Retrieves all units associated with a specific tenant ID.
-     */
-    @GetMapping("/tenant/{tenantId}")
-    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-    public ResponseEntity<java.util.List<Unit>> getUnitsByTenantId(@PathVariable Long tenantId) {
-        log.info("Fetching units for tenant with ID: {}", tenantId);
-        List<Unit> units = unitService.getUnitsByTenantId(tenantId);
-        return ResponseEntity.ok(units);
+    @GetMapping("/property/{propertyId}")
+    public ResponseEntity<List<UnitDTO>> getUnitsByProperty(@PathVariable Long propertyId) {
+        return ResponseEntity.ok(unitService.getUnitsByProperty(propertyId));
     }
 }

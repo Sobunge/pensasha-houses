@@ -1,137 +1,63 @@
 package com.pensasha.backend.modules.unit;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.pensasha.backend.modules.unit.dto.UnitDTO;
+import com.pensasha.backend.modules.unit.mapper.UnitMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * Service class responsible for managing Unit entities.
- * Provides business logic for CRUD operations, pagination, filtering, and other
- * custom logic related to Units.
- */
 @Service
 @Slf4j
 @AllArgsConstructor
 public class UnitService {
 
-    // Injecting the UnitRepository to interact with the database.
     private final UnitRepository unitRepository;
+    private final UnitMapper unitMapper;
 
-    /**
-     * Adds a new unit to the database.
-     * 
-     * @param unit The unit entity to be added.
-     * @return The saved unit entity.
-     */
-    public Unit addUnit(Unit unit) {
-        log.info("Adding new unit: {}", unit);
-        return unitRepository.save(unit); // Save the unit in the repository and return the saved entity.
+    public UnitDTO addUnit(UnitDTO unitDto) {
+        log.info("Creating unit: {} for property: {}", unitDto.getUnitNumber(), unitDto.getPropertyId());
+        Unit unit = unitMapper.toEntity(unitDto);
+        return unitMapper.toDTO(unitRepository.save(unit));
     }
 
-    /**
-     * Retrieves a unit by its ID.
-     *
-     * @param id The ID of the unit to retrieve.
-     * @return The found unit entity.
-     * @throws ResourceNotFoundException if no unit is found with the given ID.
-     */
-    public Unit getUnitById(Long id) {
-        return unitRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Unit not found with ID: {}", id);
-                    return new ResourceNotFoundException("Unit not found with id: " + id);
-                });
+    public UnitDTO getUnitById(Long id) {
+        Unit unit = unitRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Unit not found with id: " + id));
+        return unitMapper.toDTO(unit);
     }
 
-    /**
-     * Retrieves all units with pagination support.
-     * 
-     * @param page The page number to retrieve.
-     * @param size The size (number of units per page).
-     * @return A paginated list of units.
-     */
-    public Page<Unit> getAllUnits(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size); // Create Pageable object for pagination.
-        return unitRepository.findAll(pageable); // Retrieve all units with pagination.
+    public Page<UnitDTO> getAllUnits(Pageable pageable) {
+        return unitRepository.findAll(pageable).map(unitMapper::toDTO);
     }
 
-    /**
-     * Updates an existing unit with new details.
-     * 
-     * @param id          The ID of the unit to update.
-     * @param unitDetails The updated unit details.
-     * @return The updated unit entity.
-     * @throws ResourceNotFoundException if no unit is found with the given ID.
-     */
     @Transactional
-    public Unit updateUnit(Long id, Unit unitDetails) {
-        Unit unit = getUnitById(id); // Retrieve the unit to update (throws exception if not found).
-
-        // Update the unit's fields with the new details.
-        unit.setUnitNumber(unitDetails.getUnitNumber());
-        unit.setRentAmount(unitDetails.getRentAmount());
-        unit.setStatus(unitDetails.getStatus());
-        unit.setProperty(unitDetails.getProperty());
-        unit.setTenant(unitDetails.getTenant());
-
-        log.info("Updating unit with ID: {}", id);
-        return unitRepository.save(unit); // Save and return the updated unit entity.
+    public UnitDTO updateUnit(Long id, UnitDTO unitDto) {
+        Unit existingUnit = unitRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Unit not found"));
+        
+        unitMapper.updateEntityFromDto(unitDto, existingUnit);
+        return unitMapper.toDTO(unitRepository.save(existingUnit));
     }
 
-    /**
-     * Deletes a unit from the database.
-     * 
-     * @param id The ID of the unit to delete.
-     * @throws ResourceNotFoundException if no unit is found with the given ID.
-     */
     @Transactional
     public void deleteUnit(Long id) {
-        Unit unit = getUnitById(id); // Retrieve the unit to delete (throws exception if not found).
-        log.info("Deleting unit with ID: {}", id);
-        unitRepository.delete(unit); // Delete the unit from the repository.
+        if (!unitRepository.existsById(id)) throw new ResourceNotFoundException("Unit not found");
+        unitRepository.deleteById(id);
     }
 
-    /**
-     * Checks if a unit is available (not occupied).
-     * 
-     * @param id The ID of the unit to check.
-     * @return true if the unit is available (not occupied), false otherwise.
-     * @throws ResourceNotFoundException if no unit is found with the given ID.
-     */
-    public boolean isUnitAvailable(Long id) {
-        Unit unit = getUnitById(id); // Retrieve the unit to check (throws exception if not found).
-        return unit.getStatus().equals(UnitStatus.VACANT); // Return true if the unit is not occupied.
+    public List<UnitDTO> getUnitsByProperty(Long propertyId) {
+        return unitRepository.findByPropertyId(propertyId).stream()
+                .map(unitMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Calculates the rent due for a unit.
-     * 
-     * @param id The ID of the unit to calculate the rent for.
-     * @return The rent amount due for the unit.
-     * @throws ResourceNotFoundException if no unit is found with the given ID.
-     */
     public BigDecimal calculateRentDue(Long id) {
-        Unit unit = getUnitById(id); // Retrieve the unit to calculate rent for (throws exception if not found).
-        return unit.getRentAmount(); // Return the rent amount of the unit.
-    }
-
-    /**
-     * Retrieves all units associated with a specific tenant ID.
-     * 
-     * @param id The ID of the tenant.
-     * @return A list of Unit entities associated with the given tenant ID.
-     */
-    public List<Unit> getUnitsByTenantId(Long id) {
-        return unitRepository.findByTenantId(id);
+        return getUnitById(id).getRentAmount();
     }
 }

@@ -1,37 +1,31 @@
 package com.pensasha.backend.modules.unit.dto;
 
 import com.pensasha.backend.modules.unit.UnitStatus;
-
-import jakarta.validation.constraints.*;  // Importing validation annotations from Jakarta API
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;  // Importing Lombok annotations for generating boilerplate code
+import lombok.NoArgsConstructor;
+import java.math.BigDecimal; // Use BigDecimal for financial precision
 
-// DTO class used to represent a unit with validation constraints
-@Data  // Lombok annotation to generate getters, setters, toString, equals, and hashCode methods
-@NoArgsConstructor  // Lombok annotation to generate a no-argument constructor
-@AllArgsConstructor  // Lombok annotation to generate an all-arguments constructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UnitDTO {
 
     private Long id;
 
-    // The unit number, required to be a non-blank string
-    @NotBlank(message = "Unit number is required")  // Ensures that the unit number is not blank
+    @NotBlank(message = "Unit number is required")
     private String unitNumber;
 
-    // The rent amount for the unit, required to be a positive number
-    @NotNull(message = "Rent amount is required")  // Ensures that the rent amount is not null
-    @Positive(message = "Rent amount must be a positive number")  // Ensures the rent amount is positive
-    private Double rentAmount;
+    @NotNull(message = "Rent amount is required")
+    @Positive(message = "Rent amount must be a positive number")
+    private BigDecimal rentAmount;
 
-    // Occupancy status of the unit, required to be not null (true or false)
-    @NotNull(message = "Occupancy status is required")  // Ensures that the occupancy status is not null
+    @NotNull(message = "Occupancy status is required")
     private UnitStatus status;
 
-    // The property ID to which the unit belongs, required to be not null
-    @NotNull(message = "Property ID is required")  // Ensures that the property ID is not null
+    @NotNull(message = "Property ID is required")
     private Long propertyId;
 
-    // The tenant ID, if applicable, representing the tenant renting this unit (can be null)
     private Long tenantId;
 }

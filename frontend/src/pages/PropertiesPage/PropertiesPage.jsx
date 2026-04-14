@@ -2,41 +2,44 @@
 import React, { useMemo, useState } from "react";
 import { 
   Box, Typography, Button, Grid, Container, Stack, 
-  useMediaQuery, useTheme, IconButton, Pagination 
+  useMediaQuery, useTheme, Pagination, CircularProgress 
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 // Components & Context
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
+import AddPropertyDialog from "../../pages/PropertiesPage/AddPropertyDialog";
 import { useAuth } from "../Auth/AuthContext";
+import { useProperties } from "../../components/hooks/useProperties";
 
 function PropertiesPage() {
-  const { activeRole } = useAuth();
+  const { activeRole, user } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // --- Pagination State ---
+  // --- UI State ---
   const [page, setPage] = useState(1);
-  const itemsPerPage = 4; // 🔥 Strictly 4 properties per page
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const itemsPerPage = 4;
 
-  const properties = [
-    { id: 1, name: "Sunrise Apartments", unit: "A-203", lease: "Jan 2024 – Dec 2024", rentAmount: "Ksh 12,000", rentStatus: "Pending" },
-    { id: 2, name: "Pensasha Towers", unit: "B-105", lease: "Feb 2024 – Jan 2025", rentAmount: "Ksh 15,000", rentStatus: "Paid" },
-    { id: 3, name: "Lakeview Residences", unit: "C-402", lease: "Mar 2024 – Feb 2025", rentAmount: "Ksh 18,000", rentStatus: "Pending" },
-    { id: 4, name: "Garden Court", unit: "D-301", lease: "Apr 2024 – Mar 2025", rentAmount: "Ksh 14,000", rentStatus: "Paid" },
-    { id: 5, name: "Sunset Heights", unit: "E-102", lease: "May 2024 – Apr 2025", rentAmount: "Ksh 13,500", rentStatus: "Pending" },
-    { id: 6, name: "Victoria Court", unit: "F-501", lease: "Jun 2024 – May 2025", rentAmount: "Ksh 16,000", rentStatus: "Paid" },
-  ];
-
-  // Pagination Logic
-  const pageCount = Math.ceil(properties.length / itemsPerPage);
-  const currentItems = properties.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  // --- Data Fetching via Hook ---
+  // Added 'refresh' to trigger a re-fetch after a new property is created
+  const { properties, totalPages, loading, error, refresh } = useProperties(
+    activeRole, 
+    user?.id, 
+    page, 
+    itemsPerPage
+  );
 
   const handlePageChange = (event, value) => {
     setPage(value);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleAddSuccess = () => {
+    setIsDialogOpen(false);
+    refresh(); // Refresh the data without reloading the entire page
   };
 
   const getStatusColor = (status) => {
@@ -50,24 +53,17 @@ function PropertiesPage() {
   const roleContent = useMemo(() => {
     const role = activeRole?.toUpperCase();
     switch (role) {
-      case 'ADMIN': return { title: "Global Portfolio", sub: "Full system oversight of all registered units." };
-      case 'LANDLORD': return { title: "My Properties", sub: "Manage your assets and track occupancy status." };
-      case 'CARETAKER': return { title: "Assigned Units", sub: "Properties under your direct daily management." };
-      default: return { title: "My Rental Units", sub: "Overview of your current lease and payments." };
+      case 'ADMIN': return { title: "Global Portfolio", sub: "Full system oversight." };
+      case 'LANDLORD': return { title: "My Properties", sub: "Manage your assets." };
+      case 'CARETAKER': return { title: "Assigned Units", sub: "Managed properties." };
+      default: return { title: "My Rental Units", sub: "Overview of your lease." };
     }
   }, [activeRole]);
 
-  const canAddProperty = ['ADMIN', 'LANDLORD', 'CARETAKER'].includes(activeRole?.toUpperCase());
+  const canAddProperty = ['ADMIN', 'LANDLORD'].includes(activeRole?.toUpperCase());
 
   return (
-    <Box 
-      sx={{ 
-        minHeight: "85vh", 
-        display: "flex", 
-        flexDirection: "column", 
-        bgcolor: "#fcfcfc" 
-      }}
-    >
+    <Box sx={{ minHeight: "85vh", display: "flex", flexDirection: "column", bgcolor: "#fcfcfc" }}>
       <Container maxWidth="xl" sx={{ py: { xs: 3, md: 6 }, flexGrow: 1 }}>
         
         {/* HEADER SECTION */}
@@ -84,33 +80,50 @@ function PropertiesPage() {
           </Box>
 
           {canAddProperty && (
-            isMobile ? (
-              <IconButton sx={{ bgcolor: "#f8b500", color: "#111", '&:hover': { bgcolor: "#e0a400" } }}>
-                <AddIcon />
-              </IconButton>
-            ) : (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                sx={{ bgcolor: "#111", color: "#fff", fontWeight: 800, borderRadius: 2, px: 3, py: 1.2, textTransform: 'none', '&:hover': { bgcolor: "#333" } }}
-              >
-                Add Property
-              </Button>
-            )
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setIsDialogOpen(true)}
+              sx={{ 
+                bgcolor: "#111", 
+                color: "#fff", 
+                fontWeight: 800, 
+                borderRadius: 2, 
+                px: 3, 
+                py: 1.2, 
+                textTransform: 'none', 
+                '&:hover': { bgcolor: "#333" } 
+              }}
+            >
+              Add Property
+            </Button>
           )}
         </Stack>
 
         {/* CONTENT AREA */}
-        {properties.length === 0 ? (
+        {loading ? (
+          <Box sx={{ textAlign: "center", py: 10 }}>
+            <CircularProgress sx={{ color: "#f8b500" }} />
+            <Typography sx={{ mt: 2, fontWeight: 600 }}>Loading properties...</Typography>
+          </Box>
+        ) : error ? (
+          <Box sx={{ textAlign: "center", py: 10 }}>
+            <Typography color="error" variant="h6">{error}</Typography>
+            <Button onClick={() => refresh()} sx={{ mt: 2 }}>Retry</Button>
+          </Box>
+        ) : properties.length === 0 ? (
           <Box sx={{ textAlign: "center", py: 10 }}>
             <HomeWorkOutlinedIcon sx={{ fontSize: 70, color: "#f8b500", mb: 2, opacity: 0.8 }} />
             <Typography variant="h6" fontWeight={800}>No properties found</Typography>
           </Box>
         ) : (
-          <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
-            {currentItems.map((property) => (
+          <Grid container spacing={{ xs: 2, md: 3 }}>
+            {properties.map((property) => (
               <Grid item xs={12} sm={6} lg={3} key={property.id} sx={{ display: "flex", justifyContent: "center" }}>
-                <PropertyInfoCard property={property} statusColor={getStatusColor(property.rentStatus)} />
+                <PropertyInfoCard 
+                    property={property} 
+                    statusColor={getStatusColor(property.rentStatus || "pending")} 
+                />
               </Grid>
             ))}
           </Grid>
@@ -118,20 +131,27 @@ function PropertiesPage() {
       </Container>
 
       {/* PAGINATION SECTION */}
-      {pageCount > 1 && (
+      {totalPages > 1 && (
         <Box sx={{ py: 4, display: "flex", justifyContent: "center", borderTop: "1px solid #eee", bgcolor: "#fff" }}>
           <Pagination 
-            count={pageCount} 
+            count={totalPages} 
             page={page} 
             onChange={handlePageChange}
             sx={{
-              '& .MuiPaginationItem-root': { fontWeight: 700 },
               '& .Mui-selected': { bgcolor: "#f8b500 !important", color: "#111" },
-              '& .MuiPaginationItem-root:hover': { bgcolor: "rgba(248, 181, 0, 0.1)" }
+              '& .MuiPaginationItem-root': { fontWeight: 700 }
             }}
           />
         </Box>
       )}
+
+      {/* ADD PROPERTY DIALOG COMPONENT */}
+      <AddPropertyDialog 
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSuccess={handleAddSuccess}
+        userId={user?.id}
+      />
     </Box>
   );
 }
