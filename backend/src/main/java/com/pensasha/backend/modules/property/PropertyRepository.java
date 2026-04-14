@@ -3,21 +3,29 @@ package com.pensasha.backend.modules.property;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.Optional;
 
-/**
- * Repository interface for the Property entity.
- * Provides methods to perform CRUD operations and custom queries for Property entities in the database.
- */
 public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     /**
-     * Retrieves a page of properties associated with a specific landlord.
-     * 
-     * @param landlordId The ID of the landlord whose properties are to be retrieved.
-     * @param pageable Pagination information (e.g., page number, page size).
-     * @return A Page of properties that belong to the landlord with the given ID.
+     * Finds properties by the User ID associated with the Landlord Profile.
+     * This is useful if your JWT/Security context provides the User ID.
      */
-    Page<Property> findByLandlord_User_IdNumber(String idNumber, Pageable pageable);
+    Page<Property> findByLandlordUserId(Long userId, Pageable pageable);
 
+    /**
+     * Finds properties by the Landlord Profile's own ID.
+     * Use this if you are using the specific Profile ID.
+     */
+    Page<Property> findByLandlordId(Long landlordId, Pageable pageable);
 
+    /**
+     * Check if a property name already exists (since your entity has unique = true)
+     */
+    boolean existsByNameIgnoreCase(String name);
+
+    /**
+     * Find a property by name
+     */
+    Optional<Property> findByName(String name);
 }

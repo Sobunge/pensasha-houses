@@ -1,14 +1,13 @@
 package com.pensasha.backend.modules.property;
 
 import com.pensasha.backend.modules.property.dto.PropertyDTO;
-import com.pensasha.backend.modules.property.mapper.PropertyMapper;
+import com.pensasha.backend.modules.property.dto.createPropertyDTO;
 import com.pensasha.backend.utils.ValidationUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.CollectionModel;
@@ -26,188 +25,98 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/properties") // Base URL for property-related endpoints
-@RequiredArgsConstructor // Automatically injects dependencies via constructor
+@RequestMapping("/api/properties")
+@RequiredArgsConstructor
 public class PropertyController {
 
-        private final PropertyService propertyService; // Service to handle property-related operations
-        private final PropertyMapper propertyMapper;
+    private final PropertyService propertyService;
 
-        // Add a new property
-        @PostMapping
-        @PreAuthorize("hasAuthority('PROPERTY_CREATE') or hasRole('ADMIN')")
-        public ResponseEntity<?> addProperty(
-                        @Valid @RequestBody PropertyDTO propertyDTO, // Validates the input PropertyDTO
-                        BindingResult bindingResult, @RequestParam(value = "page", defaultValue = "0") int page,
-                        @RequestParam(value = "size", defaultValue = "10") int size) { // Collects validation errors if
-                                                                                       // any
-
-                // If there are validation errors, return a 400 response with error details
-                if (bindingResult.hasErrors()) {
-                        return ResponseEntity.badRequest()
-                                        .body(Map.of("errors", ValidationUtil.getValidationErrors(bindingResult)));
-                }
-
-                // Add the property via the service and map it to PropertyDTO
-                Property property = propertyService.addProperty(propertyDTO);
-                PropertyDTO responseDTO = propertyMapper.toDTO(property);
-
-                // Create a HATEOAS response with links to the property and all properties
-                EntityModel<PropertyDTO> propertyModel = EntityModel.of(responseDTO,
-                                linkTo(methodOn(PropertyController.class).getProperty(property.getId())).withSelfRel(),
-                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size))
-                                                .withRel("all-properties"));
-
-                // Return 201 (Created) with the property details and links
-                return ResponseEntity.status(HttpStatus.CREATED).body(propertyModel);
+    @PostMapping
+    @PreAuthorize("hasAuthority('PROPERTY_CREATE') or hasRole('ADMIN')")
+    public ResponseEntity<?> addProperty(@Valid @RequestBody createPropertyDTO createDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("errors", ValidationUtil.getValidationErrors(bindingResult)));
         }
 
-        // Update an existing property
-        @PutMapping("/{id}")
-        @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')") // Only users with update permission or
-                                                                             // admin can update
-        public ResponseEntity<?> updateProperty(
-                        @PathVariable Long id, // Property ID to update
-                        @Valid @RequestBody PropertyDTO propertyDTO, // Validates the input PropertyDTO
-                        BindingResult bindingResult, @RequestParam(value = "page", defaultValue = "0") int page,
-                        @RequestParam(value = "size", defaultValue = "10") int size) { // Collects validation errors if
-                                                                                       // any
+        PropertyDTO responseDTO = propertyService.addProperty(createDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toModel(responseDTO));
+    }
 
-                // If there are validation errors, return a 400 response with error details
-                if (bindingResult.hasErrors()) {
-                        return ResponseEntity.badRequest()
-                                        .body(Map.of("errors", ValidationUtil.getValidationErrors(bindingResult)));
-                }
-
-                // Update the property using the service and map it to PropertyDTO
-                Property updatedProperty = propertyService.updateProperty(id, propertyDTO);
-                PropertyDTO updatedPropertyDTO = propertyMapper.toDTO(updatedProperty);
-
-                // Create a HATEOAS response with links to the updated property and all
-                // properties
-                EntityModel<PropertyDTO> propertyModel = EntityModel.of(updatedPropertyDTO,
-                                linkTo(methodOn(PropertyController.class).getProperty(id)).withSelfRel(),
-                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size))
-                                                .withRel("all-properties"));
-
-                // Return 200 (OK) with the updated property details and links
-                return ResponseEntity.ok(propertyModel);
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')")
+    public ResponseEntity<?> updateProperty(@PathVariable Long id, @Valid @RequestBody PropertyDTO propertyDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("errors", ValidationUtil.getValidationErrors(bindingResult)));
         }
 
-        // Get a property by its ID
-        @GetMapping("/{id}")
-        @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-        public ResponseEntity<EntityModel<PropertyDTO>> getProperty(@PathVariable Long id) {
-                // Fetch the property using the service
-                return propertyService.getProperty(id)
-                                .map(propertyDTO -> {
-                                        // Map the property to PropertyDTO and create HATEOAS response with links
-                                        EntityModel<PropertyDTO> responseDTO = EntityModel.of(propertyDTO,
-                                                        linkTo(methodOn(PropertyController.class).getProperty(id))
-                                                                        .withSelfRel(),
-                                                        linkTo(methodOn(PropertyController.class).getAllProperties(0,
-                                                                        10))
-                                                                        .withRel("all-properties"));
-                                        return ResponseEntity.ok(responseDTO);
-                                })
-                                .orElseGet(() -> ResponseEntity.notFound().build()); // Return 404 if property not found
+        PropertyDTO updated = propertyService.updateProperty(id, propertyDTO);
+        return ResponseEntity.ok(toModel(updated));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
+    public ResponseEntity<EntityModel<PropertyDTO>> getProperty(@PathVariable Long id) {
+        PropertyDTO dto = propertyService.getProperty(id);
+        return ResponseEntity.ok(toModel(dto));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
+    public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getAllProperties(
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        Page<PropertyDTO> propertyPage = propertyService.getAllProperties(pageable);
+
+        if (propertyPage.isEmpty()) {
+            return ResponseEntity.noContent().build();
         }
 
-        // Get all properties
-        @GetMapping
-        @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-        public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getAllProperties(
-                        @RequestParam(value = "page", defaultValue = "0") int page,
-                        @RequestParam(value = "size", defaultValue = "10") int size) {
+        // Explicitly type the list to help the compiler infer types for CollectionModel
+        List<EntityModel<PropertyDTO>> propertyModels = propertyPage.getContent().stream()
+                .map(this::toModel)
+                .collect(Collectors.toList());
 
-                // Fetch paginated properties from the service/repository
-                Page<Property> propertyPage = propertyService.getAllProperties(PageRequest.of(page, size));
+        CollectionModel<EntityModel<PropertyDTO>> collectionModel = CollectionModel.of(propertyModels,
+                linkTo(methodOn(PropertyController.class).getAllProperties(pageable)).withSelfRel());
 
-                // If no properties exist, return a 204 (No Content) response
-                if (propertyPage.isEmpty()) {
-                        return ResponseEntity.noContent().build();
-                }
+        return ResponseEntity.ok(collectionModel);
+    }
 
-                // Map each property to PropertyDTO and create HATEOAS response with links
-                List<EntityModel<PropertyDTO>> propertyDTOs = propertyPage.stream()
-                                .map(property -> EntityModel.of(propertyMapper.toDTO(property),
-                                                linkTo(methodOn(PropertyController.class).getProperty(property.getId()))
-                                                                .withSelfRel(),
-                                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size))
-                                                                .withRel("all-properties")))
-                                .collect(Collectors.toList());
+    @GetMapping("/landlord/{id}")
+    @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
+    public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getPropertiesByLandlord(
+            @PathVariable Long id, @PageableDefault(size = 10) Pageable pageable) {
 
-                // Create a HATEOAS response with a list of properties and a link to the
-                // properties collection
-                CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
-                                linkTo(methodOn(PropertyController.class).getAllProperties(page, size)).withSelfRel());
+        Page<PropertyDTO> properties = propertyService.getPropertiesForLandlord(id, pageable);
 
-                // Add pagination links for next and previous pages if applicable
-                if (propertyPage.hasNext()) {
-                        responseDTO.add(linkTo(methodOn(PropertyController.class)
-                                        .getAllProperties(page + 1, size)).withRel("next"));
-                }
-                if (propertyPage.hasPrevious()) {
-                        responseDTO.add(linkTo(methodOn(PropertyController.class)
-                                        .getAllProperties(page - 1, size)).withRel("previous"));
-                }
-
-                return ResponseEntity.ok(responseDTO); // Return 200 (OK) with properties list
+        if (properties.isEmpty()) {
+            return ResponseEntity.noContent().build();
         }
 
-        // Gettting all properties of a landlord
-        @GetMapping("/landlord/{id}")
-        @PreAuthorize("hasAuthority('PROPERTY_VIEW') or hasRole('ADMIN')")
-        public ResponseEntity<CollectionModel<EntityModel<PropertyDTO>>> getPropertiesByLandlord(
-                        @PathVariable Long id, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        List<EntityModel<PropertyDTO>> propertyModels = properties.getContent().stream()
+                .map(this::toModel)
+                .collect(Collectors.toList());
 
-                Page<Property> properties = propertyService.getPropertiesForLandlord(id, pageable);
+        return ResponseEntity.ok(CollectionModel.of(propertyModels,
+                linkTo(methodOn(PropertyController.class).getPropertiesByLandlord(id, pageable)).withSelfRel()));
+    }
 
-                if (properties.isEmpty()) {
-                        return ResponseEntity.noContent().build();
-                }
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PROPERTY_DELETE') or hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteProperty(@PathVariable Long id) {
+        propertyService.deleteProperty(id);
+        return ResponseEntity.noContent().build();
+    }
 
-                List<EntityModel<PropertyDTO>> propertyDTOs = properties.getContent().stream()
-                                .map(property -> EntityModel.of(propertyMapper.toDTO(property),
-                                                linkTo(methodOn(PropertyController.class).getProperty(property.getId()))
-                                                                .withSelfRel(),
-                                                linkTo(methodOn(PropertyController.class).getAllProperties(0, 10))
-                                                                .withRel("all-properties")))
-                                .collect(Collectors.toList());
-
-                CollectionModel<EntityModel<PropertyDTO>> responseDTO = CollectionModel.of(propertyDTOs,
-                                linkTo(methodOn(PropertyController.class).getPropertiesByLandlord(id, pageable))
-                                                .withSelfRel());
-
-                // Add pagination links for next and previous pages if applicable
-                if (properties.hasNext()) {
-                        Pageable nextPageable = properties.nextPageable();
-                        responseDTO.add(linkTo(methodOn(PropertyController.class)
-                                        .getPropertiesByLandlord(id, nextPageable)).withRel("next"));
-                }
-
-                if (properties.hasPrevious()) {
-                        Pageable prevPageable = properties.previousPageable();
-                        responseDTO.add(linkTo(methodOn(PropertyController.class)
-                                        .getPropertiesByLandlord(id, prevPageable)).withRel("previous"));
-                }
-
-                return ResponseEntity.ok(responseDTO);
-        }
-
-        // Delete a property by ID
-        @DeleteMapping("/{id}")
-        @PreAuthorize("hasAuthority('PROPERTY_DELETE') or hasRole('ADMIN')") // Only users with delete permission or
-                                                                             // admin can delete
-        public ResponseEntity<?> deleteProperty(@PathVariable Long id) {
-                return propertyService.getProperty(id)
-                                .map(propertyDTO -> {
-                                        // Delete the property and return a 204 (No Content) response
-                                        propertyService.deleteProperty(id);
-                                        return ResponseEntity.noContent().build();
-                                })
-                                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                                .body(Map.of("error", "Property not found"))); // Return 404 if property
-                                                                                               // not found
-        }
+    /**
+     * Helper method to wrap DTO into EntityModel with HATEOAS links.
+     * This avoids repeating link logic and solves type inference issues.
+     */
+    private EntityModel<PropertyDTO> toModel(PropertyDTO dto) {
+        return EntityModel.of(dto,
+                linkTo(methodOn(PropertyController.class).getProperty(dto.getId())).withSelfRel(),
+                linkTo(methodOn(PropertyController.class).getAllProperties(null)).withRel("all-properties"));
+    }
 }

@@ -2,7 +2,8 @@ package com.pensasha.backend.modules.property;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -19,7 +20,8 @@ import com.pensasha.backend.modules.user.landlord.LandlordProfile;
  */
 @Entity
 @Table(name = "properties")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Property {
@@ -56,7 +58,7 @@ public class Property {
     private LandlordProfile landlord;
 
     /** Caretaker assigned to manage this property. One-to-one relationship. */
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caretaker_id")
     private CaretakerProfile caretaker;
 

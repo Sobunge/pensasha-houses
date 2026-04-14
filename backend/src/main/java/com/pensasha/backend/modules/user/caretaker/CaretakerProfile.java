@@ -40,8 +40,7 @@ public class CaretakerProfile {
      * The property assigned to this caretaker.
      * Multiple caretakers can be assigned to the same property if needed.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "property_id")
+    @OneToOne(mappedBy = "caretaker")
     private Property assignedProperty;
 
     /* ===================== HELPER METHODS ===================== */

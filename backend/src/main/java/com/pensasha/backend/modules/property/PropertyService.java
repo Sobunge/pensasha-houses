@@ -1,24 +1,16 @@
 package com.pensasha.backend.modules.property;
 
-import java.util.HashSet;
-import java.util.Optional;
-
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.property.dto.PropertyDTO;
+import com.pensasha.backend.modules.property.dto.createPropertyDTO;
 import com.pensasha.backend.modules.property.mapper.PropertyMapper;
-import com.pensasha.backend.modules.user.caretaker.CaretakerProfile;
-import com.pensasha.backend.modules.user.caretaker.CaretakerProfileRepository;
-import com.pensasha.backend.modules.user.landlord.LandlordProfile;
-import com.pensasha.backend.modules.user.landlord.LandlordProfileRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,119 +18,74 @@ import jakarta.transaction.Transactional;
 public class PropertyService {
 
     private final PropertyRepository propertyRepository;
-    private final LandlordProfileRepository landlordProfileRepository;
-    private final CaretakerProfileRepository caretakerProfileRepository;
     private final PropertyMapper propertyMapper;
 
+    /**
+     * Creates a new property.
+     * Uses fromCreateDTO to handle the specific creation fields and unit IDs.
+     */
     @Transactional
-    public Property addProperty(PropertyDTO propertyDTO) {
-        Property property = new Property();
-
-        // Fetch landlord profile
-        LandlordProfile landlord = landlordProfileRepository.findById(propertyDTO.getLandLordId())
-                .orElseThrow(() -> {
-                    log.error("Landlord with ID {} not found", propertyDTO.getLandLordId());
-                    return new RuntimeException("Landlord with ID " + propertyDTO.getLandLordId() + " not found");
-                });
-        property.setLandlord(landlord);
-
-        // Fetch caretaker profile if provided
-        if (propertyDTO.getCareTakerId() != null) {
-            CaretakerProfile caretaker = caretakerProfileRepository.findById(propertyDTO.getCareTakerId())
-                    .orElseThrow(() -> {
-                        log.error("Caretaker with ID {} not found", propertyDTO.getCareTakerId());
-                        return new RuntimeException("Caretaker with ID " + propertyDTO.getCareTakerId() + " not found");
-                    });
-            property.setCaretaker(caretaker);
+    public PropertyDTO addProperty(createPropertyDTO createDTO) {
+        // Prevent duplicate names
+        if (propertyRepository.existsByNameIgnoreCase(createDTO.getName())) {
+            throw new IllegalArgumentException("Property name '" + createDTO.getName() + "' already exists.");
         }
 
-        // Populate remaining fields
-        property.setName(propertyDTO.getName());
-        property.setDescription(propertyDTO.getDescription());
-        property.setLocation(propertyDTO.getLocation());
-        property.setNumOfUnits(propertyDTO.getNumOfUnits());
-        property.setAmenities(propertyDTO.getAmenities());
-        property.setUnits(new HashSet<>());
-
+        Property property = propertyMapper.fromCreateDTO(createDTO);
         Property saved = propertyRepository.save(property);
-        log.info("Property with ID {} successfully added", saved.getId());
-        return saved;
+        
+        log.info("Property '{}' created with ID: {}", saved.getName(), saved.getId());
+        return propertyMapper.toDTO(saved);
     }
 
+    /**
+     * Updates an existing property using the MapStruct update target pattern.
+     * This automatically handles relationship updates and ignores nulls in the DTO.
+     */
     @Transactional
-    public Property updateProperty(Long propertyId, PropertyDTO propertyDTO) {
-        // Fetch existing property or throw an exception if not found
+    public PropertyDTO updateProperty(Long propertyId, PropertyDTO dto) {
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> {
-                    log.error("Property with ID {} not found", propertyId);
-                    return new RuntimeException("Property with ID " + propertyId + " not found");
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with ID: " + propertyId));
 
-        // Update basic fields if provided
-        Optional.ofNullable(propertyDTO.getName()).ifPresent(property::setName);
-        Optional.ofNullable(propertyDTO.getDescription()).ifPresent(property::setDescription);
-        Optional.ofNullable(propertyDTO.getLocation()).ifPresent(property::setLocation);
-        if (propertyDTO.getNumOfUnits() > 0) {
-            property.setNumOfUnits(propertyDTO.getNumOfUnits());
-        }
-        Optional.ofNullable(propertyDTO.getAmenities()).ifPresent(property::setAmenities);
-
-        // Update landlord if a new ID is provided and differs from current
-        if (propertyDTO.getLandLordId() != null &&
-                (property.getLandlord() == null
-                        || !propertyDTO.getLandLordId().equals(property.getLandlord().getId()))) {
-
-            LandlordProfile landlord = landlordProfileRepository.findById(propertyDTO.getLandLordId())
-                    .orElseThrow(() -> new RuntimeException(
-                            "Landlord with ID " + propertyDTO.getLandLordId() + " not found"));
-            property.setLandlord(landlord);
+        // Uniqueness check if name is being changed
+        if (dto.getName() != null && !dto.getName().equalsIgnoreCase(property.getName())) {
+            if (propertyRepository.existsByNameIgnoreCase(dto.getName())) {
+                throw new IllegalArgumentException("Property name '" + dto.getName() + "' is already taken.");
+            }
         }
 
-        // Update caretaker if a new ID is provided and differs from current
-        if (propertyDTO.getCareTakerId() != null &&
-                (property.getCaretaker() == null
-                        || !propertyDTO.getCareTakerId().equals(property.getCaretaker().getId()))) {
+        // MapStruct updates the existing entity, including Landlord and Caretaker lookups
+        propertyMapper.updateEntityFromDto(dto, property);
 
-            CaretakerProfile caretaker = caretakerProfileRepository.findById(propertyDTO.getCareTakerId())
-                    .orElseThrow(() -> new RuntimeException(
-                            "Caretaker with ID " + propertyDTO.getCareTakerId() + " not found"));
-            property.setCaretaker(caretaker);
-        }
-
-        // Save changes
-        Property saved = propertyRepository.save(property);
-        log.info("Property with ID {} successfully updated", propertyId);
-        return saved;
+        log.info("Property ID: {} updated successfully", propertyId);
+        return propertyMapper.toDTO(property); 
     }
 
-    public Optional<PropertyDTO> getProperty(Long propertyId) {
-        Optional<PropertyDTO> dto = propertyRepository.findById(propertyId)
+    @Transactional(readOnly = true)
+    public PropertyDTO getProperty(Long propertyId) {
+        return propertyRepository.findById(propertyId)
+                .map(propertyMapper::toDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with ID: " + propertyId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PropertyDTO> getAllProperties(Pageable pageable) {
+        return propertyRepository.findAll(pageable)
                 .map(propertyMapper::toDTO);
-
-        dto.ifPresentOrElse(
-                d -> log.info("Fetched property with ID {}", propertyId),
-                () -> log.warn("Property with ID {} not found", propertyId));
-
-        return dto;
     }
 
-    public Page<Property> getAllProperties(Pageable pageable) {
-        log.info("Fetching all properties");
-        return propertyRepository.findAll(pageable);
+    @Transactional(readOnly = true)
+    public Page<PropertyDTO> getPropertiesForLandlord(Long landlordId, Pageable pageable) {
+        return propertyRepository.findByLandlordUserId(landlordId, pageable)
+                .map(propertyMapper::toDTO);
     }
 
+    @Transactional
     public void deleteProperty(Long propertyId) {
         if (!propertyRepository.existsById(propertyId)) {
-            log.error("Property with ID {} not found, cannot delete", propertyId);
-            throw new ResourceNotFoundException("Property with ID " + propertyId + " not found.");
+            throw new ResourceNotFoundException("Property not found with ID: " + propertyId);
         }
         propertyRepository.deleteById(propertyId);
-        log.info("Property with ID {} successfully deleted", propertyId);
+        log.info("Property ID: {} deleted", propertyId);
     }
-
-    public Page<Property> getPropertiesForLandlord(Long landlordId, Pageable pageable) {
-        log.info("Fetching properties for landlord with ID {}", landlordId);
-        return propertyRepository.findByLandlord_User_IdNumber(landlordId.toString(), pageable);
-    }
-
 }
