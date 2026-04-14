@@ -56,7 +56,6 @@ public class AuthController {
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60; // seconds
 
     /* ========================= REGISTER ========================= */
-    /* ========================= REGISTER ========================= */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody CreateUserDTO dto,
             BindingResult result,
@@ -73,7 +72,6 @@ public class AuthController {
 
         try {
             // 2. Create the User
-            // (The redundancy is removed; the Service handles the existence check)
             GetUserDTO created = userService.createUser(dto);
 
             // 3. Auto-Login: Generate tokens for the new user
