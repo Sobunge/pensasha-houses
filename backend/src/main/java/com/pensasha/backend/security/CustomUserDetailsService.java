@@ -5,9 +5,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.pensasha.backend.auth.userCredentials.UserCredentials;
+import com.pensasha.backend.auth.userCredentials.UserCredentialsRepository;
 import com.pensasha.backend.modules.user.CustomUserDetails;
-import com.pensasha.backend.modules.user.UserCredentials;
-import com.pensasha.backend.modules.user.UserCredentialsRepository;
 
 import lombok.RequiredArgsConstructor;
 

@@ -87,6 +87,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private CaretakerProfile caretakerProfile;
 
+    @Column(nullable = false)
+    private int tokenVersion = 0;
+
     /* ===================== AUDIT ===================== */
     @CreationTimestamp
     @Column(updatable = false)
@@ -115,7 +118,7 @@ public class User {
         }
         return permissions;
     }
-    
+
     public boolean hasPermission(String permissionName) {
         return this.roles.stream()
                 .flatMap(r -> r.getPermissions().stream())

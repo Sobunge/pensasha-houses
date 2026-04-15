@@ -8,10 +8,10 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.pensasha.backend.auth.userCredentials.UserCredentials;
 import com.pensasha.backend.modules.user.CustomUserDetails;
 import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.User;
-import com.pensasha.backend.modules.user.UserCredentials;
 
 class JWTUtilsTest {
 

@@ -1,246 +1,145 @@
 package com.pensasha.backend.modules.user;
 
-import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.user.dto.*;
 import com.pensasha.backend.modules.user.landlord.LandlordProfile;
 import com.pensasha.backend.modules.user.landlord.LandlordProfileRepository;
 import com.pensasha.backend.modules.user.mapper.UserMapper;
 import com.pensasha.backend.modules.user.tenant.TenantProfile;
 import com.pensasha.backend.modules.user.tenant.TenantProfileRepository;
+import com.pensasha.backend.security.PasswordResetService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final TenantProfileRepository tenantProfileRepository;
-    private final LandlordProfileRepository landlordProfileRepository;
-    private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-    private final UserCredentialsRepository credentialsRepository;
+    private final RoleRepository roleRepository;
+    private final TenantProfileRepository tenantRepo;
+    private final LandlordProfileRepository landlordRepo;
+
     private final UserFactory userFactory;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final PasswordResetService passwordResetService;
 
-    /* ===================== CREATE USER ===================== */
+    /* ========================= CREATE USER ========================= */
     @Transactional
-    public GetUserDTO createUser(CreateUserDTO dto) {
-        // 1. Existence check
-        if (userRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
-            throw new IllegalArgumentException("User with this phone number already exists: " + dto.getPhoneNumber());
-        }
+    public User createUser(CreateUserDTO dto) {
 
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("User with this email already exists: " + dto.getEmail());
-        }
+        validateUser(dto);
 
-        // 2. Create base user entity via factory
-        User user = userFactory.createUser(dto);
+        // 1. Create and persist user
+        User user = userRepository.save(userFactory.createUser(dto));
 
-        // --- NEW STEP: Save the user immediately to generate ID ---
-        // This ensures the ID exists before profiles try to reference it
-        user = userRepository.save(user);
+        // 2. Assign roles + profiles (may modify relationships)
+        assignRolesAndProfiles(user, dto.getRoles());
 
-        // 3. Process Roles and Profiles
-        if (dto.getRoles() != null) {
-            for (String roleName : dto.getRoles()) {
-                Role roleEntity = roleRepository.findByName(roleName.toUpperCase())
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid role name: " + roleName));
+        // 3. Ensure Hibernate synchronizes relationships before mapping
+        userRepository.flush();
 
-                user.addRole(roleEntity);
-                // Now this will work because 'user' has an ID!
-                createProfileForRole(user, roleEntity.getName());
-            }
-        }
+        log.info("User created: {}", user.getPhoneNumber());
 
-        // 4. Create Credentials
-        UserCredentials credentials = new UserCredentials();
-        credentials.setUser(user);
-        credentials.setPassword(passwordEncoder.encode(dto.getPassword()));
-        credentials.setEnabled(true);
-        credentials.setLocked(false);
-
-        // 5. Final Persistence
-        // This save will now handle the Profile and Roles via cascading
-        userRepository.save(user);
-        credentialsRepository.save(credentials);
-
-        log.info("Created new user: {} with roles: {}", user.getPhoneNumber(), dto.getRoles());
-
-        return userMapper.toDTO(user);
+        // 4. Return DTO from managed entity (no security layer involvement here)
+        return user;
     }
 
-    /* ===================== UPDATE USER PROFILE ===================== */
+    /* ========================= UPDATE USER ========================= */
     @Transactional
     public GetUserDTO updateUser(Long id, UpdateUserDTO dto) {
-        User user = getUserEntityById(id);
 
-        // Update basic fields via mapper
+        User user = getUserEntity(id);
+
         userMapper.updateEntity(user, dto);
 
-        // Update roles if provided (DTO has Set<String> role names)
-        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
-            Set<Role> newRoles = dto.getRoles().stream()
-                    .map(roleName -> roleRepository.findByName(roleName)
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                    "Role not found: " + roleName)))
+        if (dto.getRoles() != null) {
+            Set<Role> roles = dto.getRoles().stream()
+                    .map(r -> roleRepository.findByName(r.toUpperCase())
+                            .orElseThrow(() -> new IllegalArgumentException("Role not found")))
                     .collect(Collectors.toSet());
 
-            user.setRoles(newRoles);
+            user.setRoles(roles);
         }
 
-        userRepository.save(user);
-        log.info("Updated user profile: {} with roles: {}", id, user.getRoles());
         return userMapper.toDTO(user);
     }
 
-    /* ===================== UPDATE PASSWORD ===================== */
+    /* ========================= READ ========================= */
 
-    @Transactional
-    public void updatePassword(Long userId, ResetPasswordDTO dto) {
-        UserCredentials credentials = credentialsRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Credentials not found for user ID: " + userId));
-
-        if (!passwordEncoder.matches(dto.getCurrentPassword(), credentials.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect");
-        }
-
-        if (!dto.getNewPassword().equals(dto.getConfirmNewPassword())) {
-            throw new IllegalArgumentException("New password and confirmation do not match");
-        }
-
-        credentials.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        credentialsRepository.save(credentials);
-
-        log.info("Password updated for user: {}", userId);
+    public GetUserDTO getUser(Long id) {
+        return userMapper.toDTO(getUserEntity(id));
     }
 
-    /* =================== RESET PASSWORD ====================== */
-    @Transactional
-    public void resetPassword(String token, String newPassword) {
-        // 1. Find the token safely (avoid .get() which crashes if token is missing)
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Invalid or non-existent reset token."));
-
-        // 2. SAFETY CHECK: Ensure token isn't expired
-        if (resetToken.getExpiryDate().isBefore(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC))) {
-            // Clean up the expired token while we're at it
-            passwordResetTokenRepository.delete(resetToken);
-            throw new IllegalStateException("This reset link has expired.");
-        }
-
-        // 3. Find Credentials by User ID
-        UserCredentials credentials = credentialsRepository.findById(resetToken.getUser().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for this user"));
-
-        // 4. Update and Save
-        credentials.setPassword(passwordEncoder.encode(newPassword));
-        credentialsRepository.save(credentials);
-
-        // 5. CRITICAL: Delete the token after successful use
-        passwordResetTokenRepository.delete(resetToken);
-
-        log.info("Password successfully reset for User ID: {}", resetToken.getUser().getId());
+    public Page<GetUserDTO> getAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(userMapper::toDTO);
     }
 
-    /* ===================== READ USERS ===================== */
-
-    public GetUserDTO getUserById(Long id) {
-        return userMapper.toDTO(getUserEntityById(id));
-    }
-
-    public User getUserEntityById(Long id) {
+    public User getUserEntity(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public User getUserEntityByPhoneNumber(String phoneNumber) {
-        return userRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "User not found with phone number: " + phoneNumber));
-    }
-
-    public GetUserDTO getUserByPublicId(String publicId) {
-        return userMapper.toDTO(getUserEntityByPublicId(publicId));
-    }
-
-    public User getUserEntityByPublicId(String publicId) {
-        return userRepository.findByPublicId(publicId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with publicId: " + publicId));
-    }
-
-    public Page<GetUserDTO> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable)
-                .map(userMapper::toDTO);
-    }
-
-    public Page<GetUserDTO> getUsersByRole(Role role, Pageable pageable) {
-        return userRepository.findAllByRolesContaining(role, pageable)
-                .map(userMapper::toDTO);
-    }
-
-    /* ===================== DELETE USER ===================== */
-
-    @Transactional
-    public void deleteUser(Long id) {
-        User user = getUserEntityById(id);
-
-        // Delete credentials first
-        credentialsRepository.deleteByUser(user);
-
-        // Delete user (cascades to profiles automatically)
-        userRepository.delete(user);
-
-        log.warn("Deleted user: {}", id);
-    }
-
-    /* ===================== CHECK EXISTENCE ===================== */
-
-    public boolean userExists(String phoneNumber) {
-        return userRepository.existsByPhoneNumber(phoneNumber);
-    }
-
-    public boolean userExistsById(Long id) {
+    public Boolean userExistsById(Long id) {
         return userRepository.existsById(id);
     }
 
-    public boolean userExistsByPublicId(String publicId) {
-        return userRepository.existsByPublicId(publicId);
+    /* ========================= DELETE ========================= */
+    @Transactional
+    public void deleteUser(Long id) {
+        userRepository.delete(getUserEntity(id));
     }
 
-    /**
-     * Helper method to keep the main createUser method clean
-     */
-    private void createProfileForRole(User user, String roleName) {
-        switch (roleName.toUpperCase()) {
-            case "TENANT" -> {
-                TenantProfile profile = new TenantProfile();
-                profile.setUser(user);
-                tenantProfileRepository.save(profile);
-                user.setTenantProfile(profile);
+    /* ========================= PASSWORD DELEGATION ========================= */
+    public void updatePassword(Long userId, ResetPasswordDTO dto) {
+        passwordResetService.changePassword(userId, dto);
+    }
+
+    /* ========================= HELPERS ========================= */
+
+    private void validateUser(CreateUserDTO dto) {
+        if (userRepository.existsByPhoneNumber(dto.getPhoneNumber()))
+            throw new IllegalArgumentException("Phone already exists");
+
+        if (userRepository.existsByEmail(dto.getEmail()))
+            throw new IllegalArgumentException("Email already exists");
+    }
+
+    private void assignRolesAndProfiles(User user, Set<String> roles) {
+
+        if (roles == null)
+            return;
+
+        for (String roleName : roles) {
+
+            Role role = roleRepository.findByName(roleName.toUpperCase())
+                    .orElseThrow();
+
+            user.addRole(role);
+
+            switch (roleName.toUpperCase()) {
+
+                case "TENANT" -> {
+                    TenantProfile p = new TenantProfile();
+                    p.setUser(user);
+                    tenantRepo.save(p);
+                    user.setTenantProfile(p);
+                }
+
+                case "LANDLORD" -> {
+                    LandlordProfile p = new LandlordProfile();
+                    p.setUser(user);
+                    landlordRepo.save(p);
+                    user.setLandlordProfile(p);
+                }
             }
-            case "LANDLORD" -> {
-                LandlordProfile profile = new LandlordProfile();
-                profile.setUser(user);
-                landlordProfileRepository.save(profile);
-                user.setLandlordProfile(profile);
-            }
-            default -> log.debug("No specific profile required for role: {}", roleName);
         }
     }
 }

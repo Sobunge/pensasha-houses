@@ -9,6 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.pensasha.backend.auth.userCredentials.UserCredentials;
+
 /**
  * Custom UserDetails implementation for Spring Security using entity-based
  * roles and permissions.

@@ -72,7 +72,7 @@ public class AnnouncementController {
             }
 
             // Create a lightweight reference without hitting the database again
-            user = userService.getUserEntityById(userId);
+            user = userService.getUserEntity(userId);
         }
 
         AnnouncementDTO response = announcementService.createAnnouncement(dto, user);

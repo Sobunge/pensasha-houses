@@ -1,6 +1,8 @@
-package com.pensasha.backend.modules.user;
+package com.pensasha.backend.auth.userCredentials;
 
 import java.time.LocalDateTime;
+
+import com.pensasha.backend.modules.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

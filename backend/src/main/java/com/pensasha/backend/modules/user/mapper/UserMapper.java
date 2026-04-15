@@ -50,6 +50,7 @@ public interface UserMapper {
     @Mapping(target = "tenantProfile", ignore = true)
     @Mapping(target = "landlordProfile", ignore = true)
     @Mapping(target = "caretakerProfile", ignore = true)
+    @Mapping(target = "tokenVersion", ignore = true)
 
     void updateEntity(@MappingTarget User user, UpdateUserDTO dto);
 

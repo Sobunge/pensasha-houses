@@ -27,7 +27,7 @@ public class JWTUtils {
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
     private static final long CLOCK_SKEW_MS = 120_000; // 2 minutes
 
-    public JWTUtils(@Value("${jwt.secret}") String secretKey) {
+    public JWTUtils(@Value("${JWT_SECRET}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
