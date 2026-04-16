@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.user;
 
+import com.pensasha.backend.exceptions.DuplicateResourceException;
 import com.pensasha.backend.modules.user.dto.*;
 import com.pensasha.backend.modules.user.landlord.LandlordProfile;
 import com.pensasha.backend.modules.user.landlord.LandlordProfileRepository;
@@ -106,10 +107,10 @@ public class UserService {
 
     private void validateUser(CreateUserDTO dto) {
         if (userRepository.existsByPhoneNumber(dto.getPhoneNumber()))
-            throw new IllegalArgumentException("Phone already exists");
+            throw new DuplicateResourceException("This Phone Number is already registered");
 
         if (userRepository.existsByEmail(dto.getEmail()))
-            throw new IllegalArgumentException("Email already exists");
+            throw new DuplicateResourceException("This Email is already registered");
     }
 
     private void assignRolesAndProfiles(User user, Set<String> roles) {

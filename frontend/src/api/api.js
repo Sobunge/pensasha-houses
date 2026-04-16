@@ -104,8 +104,8 @@ api.interceptors.response.use(
     return Promise.reject({
       code: status,
       message:
-        error.response.data?.error ||
         error.response.data?.message ||
+        error.response.data?.error ||
         "Request failed",
     });
   }

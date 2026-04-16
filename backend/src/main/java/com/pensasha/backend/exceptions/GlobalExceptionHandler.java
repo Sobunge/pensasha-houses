@@ -26,7 +26,8 @@ public class GlobalExceptionHandler {
 
     /* ===================== VALIDATION ERRORS ===================== */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
         List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -39,7 +40,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex,
+            HttpServletRequest request) {
         List<String> errors = ex.getConstraintViolations()
                 .stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
@@ -52,7 +54,8 @@ public class GlobalExceptionHandler {
 
     /* ===================== NOT FOUND ===================== */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex,
+            HttpServletRequest request) {
         return buildResponse(HttpStatus.NOT_FOUND, "Resource not found", ex.getMessage(), request);
     }
 
@@ -63,13 +66,29 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SecurityException.class)
-    public ResponseEntity<Map<String, Object>> handleSecurityException(SecurityException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleSecurityException(SecurityException ex,
+            HttpServletRequest request) {
         log.error("Forbidden: {}", ex.getMessage());
         return buildResponse(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), request);
     }
 
+    /* ===================== DUPLICATE / CONFLICT ===================== */
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicate(
+            DuplicateResourceException ex,
+            HttpServletRequest request) {
+
+        log.warn("Conflict: {}", ex.getMessage());
+
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                "Conflict",
+                ex.getMessage(),
+                request);
+    }
+
     /* ===================== BAD REQUEST ===================== */
-    @ExceptionHandler({BadRequestException.class, IllegalArgumentException.class})
+    @ExceptionHandler({ BadRequestException.class, IllegalArgumentException.class })
     public ResponseEntity<Map<String, Object>> handleBadRequest(Exception ex, HttpServletRequest request) {
         log.error("Bad request: {}", ex.getMessage());
         return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request);
@@ -79,11 +98,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex, HttpServletRequest request) {
         log.error("Unhandled exception: ", ex);
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "An unexpected error occurred", request);
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "An unexpected error occurred",
+                request);
     }
 
     /* ===================== HELPER ===================== */
-    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String error, String message, HttpServletRequest request) {
+    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String error, String message,
+            HttpServletRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
@@ -92,4 +113,5 @@ public class GlobalExceptionHandler {
         body.put("path", request.getRequestURI());
         return new ResponseEntity<>(body, status);
     }
+
 }
