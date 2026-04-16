@@ -19,28 +19,20 @@ public class RefreshTokenService {
     private static final long REFRESH_TOKEN_EXPIRY_DAYS = 7;
 
     /* ========================= CREATE ========================= */
-    @Transactional
-    public String create(User user) {
+@Transactional
+public String create(User user) {
 
-        // 1. Remove existing token (1 session per user rule)
-        refreshTokenRepository.deleteByUser(user);
+    RefreshToken token = refreshTokenRepository.findByUser(user)
+            .orElse(new RefreshToken());
 
-        // 2. Generate secure random token
-        String tokenValue = UUID.randomUUID().toString();
+    String tokenValue = UUID.randomUUID().toString();
 
-        // 3. Create entity
-        RefreshToken token = new RefreshToken();
-        token.setToken(tokenValue);
-        token.setUser(user);
-        token.setExpiryDate(
-                LocalDateTime.now(ZoneOffset.UTC).plusDays(REFRESH_TOKEN_EXPIRY_DAYS)
-        );
+    token.setToken(tokenValue);
+    token.setUser(user);
+    token.setExpiryDate(LocalDateTime.now(ZoneOffset.UTC).plusDays(REFRESH_TOKEN_EXPIRY_DAYS));
 
-        // 4. Save to DB
-        refreshTokenRepository.save(token);
-
-        return tokenValue;
-    }
+    return refreshTokenRepository.save(token).getToken();
+}
 
     /* ========================= FIND ========================= */
     @Transactional(readOnly = true)
