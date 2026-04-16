@@ -131,8 +131,6 @@ public class AuthService {
 
         String refreshToken = extractRefreshToken(request);
 
-        System.out.println("Logging out, refresh token: " + refreshToken);
-
         if (refreshToken != null) {
             refreshTokenService.deleteByToken(refreshToken);
         }
