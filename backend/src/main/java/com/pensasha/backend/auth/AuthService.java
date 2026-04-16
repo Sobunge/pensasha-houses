@@ -29,132 +29,147 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthService {
 
-        private final AuthenticationManager authenticationManager;
-        private final JWTUtils jwtUtils;
-        private final UserMapper userMapper;
-        private final CustomUserDetailsService userDetailsService;
-        private final UserService userService;
-        private final RefreshTokenService refreshTokenService;
-        private final AuthPrincipalFactory authPrincipalFactory;
-        private final UserCredentialsService userCredentialsService;
+    private final AuthenticationManager authenticationManager;
+    private final JWTUtils jwtUtils;
+    private final UserMapper userMapper;
+    private final CustomUserDetailsService userDetailsService;
+    private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
+    private final AuthPrincipalFactory authPrincipalFactory;
+    private final UserCredentialsService userCredentialsService;
 
-        private static final long REFRESH_EXPIRY = 7 * 24 * 60 * 60; // seconds
+    private static final long REFRESH_EXPIRY = 7 * 24 * 60 * 60; // seconds
 
-        /* ========================= REGISTER ========================= */
-        public Map<String, Object> register(CreateUserDTO dto, HttpServletResponse response) {
+    /* ========================= REGISTER ========================= */
+    public Map<String, Object> register(CreateUserDTO dto, HttpServletResponse response) {
 
-                // 1. Create user
-                User user = userService.createUser(dto);
+        User user = userService.createUser(dto);
 
-                // 2. Create credentials (IMPORTANT)
-                UserCredentials credentials = userCredentialsService.create(user, dto.getPassword());
+        UserCredentials credentials =
+                userCredentialsService.create(user, dto.getPassword());
 
-                // 3. Build security principal
-                CustomUserDetails userDetails = new CustomUserDetails(credentials);
+        CustomUserDetails userDetails = new CustomUserDetails(credentials);
 
-                // 4. Tokens
-                String accessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
+        String accessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
 
-                String refreshToken = refreshTokenService.create(user);
+        String refreshToken = refreshTokenService.create(user);
 
-                setRefreshCookie(response, refreshToken);
+        setRefreshCookie(response, refreshToken);
 
-                return Map.of(
-                                "accessToken", accessToken,
-                                "user", userMapper.toDTO(user),
-                                "principal", authPrincipalFactory.create(user));
+        return Map.of(
+                "accessToken", accessToken,
+                "user", userMapper.toDTO(user),
+                "principal", authPrincipalFactory.create(user)
+        );
+    }
+
+    /* ========================= LOGIN ========================= */
+    public Map<String, Object> login(LoginRequestDTO dto, HttpServletResponse response) {
+
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        dto.getPhoneNumber(),
+                        dto.getPassword()
+                )
+        );
+
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+
+        String accessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
+
+        // multi-session: create new refresh token, DO NOT overwrite others
+        String refreshToken =
+                refreshTokenService.create(userDetails.getUser());
+
+        setRefreshCookie(response, refreshToken);
+
+        return Map.of(
+                "accessToken", accessToken,
+                "principal", authPrincipalFactory.create(userDetails.getUser())
+        );
+    }
+
+    /* ========================= REFRESH ========================= */
+    public LoginResponseDTO refresh(HttpServletRequest request, HttpServletResponse response) {
+
+        String refreshToken = extractRefreshToken(request);
+
+        if (refreshToken == null) {
+            throw new IllegalStateException("Missing refresh token");
         }
 
-        /* ========================= LOGIN ========================= */
-        public Map<String, Object> login(LoginRequestDTO dto, HttpServletResponse response) {
+        RefreshToken token =
+                refreshTokenService.findByToken(refreshToken);
 
-                Authentication auth = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(
-                                                dto.getPhoneNumber(),
-                                                dto.getPassword()));
-
-                CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-
-                String accessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
-
-                String refreshToken = refreshTokenService.create(userDetails.getUser());
-
-                setRefreshCookie(response, refreshToken);
-
-                return Map.of(
-                                "accessToken", accessToken,
-                                "principal", authPrincipalFactory.create(userDetails.getUser()));
+        if (token.isExpired()) {
+            refreshTokenService.deleteByToken(refreshToken);
+            throw new IllegalStateException("Refresh token expired");
         }
 
-        /* ========================= REFRESH TOKEN ========================= */
-        public LoginResponseDTO refresh(HttpServletRequest request) {
+        User user = token.getUser();
 
-                String refreshToken = extractRefreshToken(request);
+        // 🔥 ROTATION (CRITICAL SECURITY IMPROVEMENT)
+        refreshTokenService.deleteByToken(refreshToken);
+        String newRefreshToken = refreshTokenService.create(user);
 
-                if (refreshToken == null) {
-                        throw new IllegalStateException("Missing refresh token");
-                }
+        CustomUserDetails userDetails =
+                (CustomUserDetails) userDetailsService.loadUserByUsername(user.getPhoneNumber());
 
-                RefreshToken token = refreshTokenService.findByToken(refreshToken);
+        String newAccessToken =
+                jwtUtils.generateTokens(userDetails).get("accessToken");
 
-                if (token.isExpired()) {
-                        refreshTokenService.delete(token);
-                        throw new IllegalStateException("Refresh token expired");
-                }
+        setRefreshCookie(response, newRefreshToken);
 
-                User user = token.getUser();
+        return new LoginResponseDTO(
+                newAccessToken,
+                authPrincipalFactory.create(user)
+        );
+    }
 
-                CustomUserDetails userDetails = (CustomUserDetails) userDetailsService
-                                .loadUserByUsername(user.getPhoneNumber());
+    /* ========================= LOGOUT ========================= */
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
 
-                String newAccessToken = jwtUtils.generateTokens(userDetails).get("accessToken");
+        String refreshToken = extractRefreshToken(request);
 
-                return new LoginResponseDTO(
-                                newAccessToken,
-                                authPrincipalFactory.create(user));
+        System.out.println("Logging out, refresh token: " + refreshToken);
+
+        if (refreshToken != null) {
+            refreshTokenService.deleteByToken(refreshToken);
         }
 
-        /* ========================= LOGOUT ========================= */
-        public void logout(HttpServletRequest request, HttpServletResponse response) {
+        // clear cookie
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .build();
 
-                String refreshToken = extractRefreshToken(request);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 
-                if (refreshToken != null) {
-                        refreshTokenService.deleteByToken(refreshToken);
-                }
+    /* ========================= HELPERS ========================= */
+    private void setRefreshCookie(HttpServletResponse response, String token) {
 
-                ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
-                                .httpOnly(true)
-                                .secure(true)
-                                .path("/api/auth/refresh")
-                                .maxAge(0)
-                                .build();
+    ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
+            .httpOnly(true)
+            .secure(false) // set false in local dev if needed and true in prod
+            .path("/")
+            .sameSite("lax") // 🔥 critical for cross-origin and none in prod
+            .maxAge(REFRESH_EXPIRY)
+            .build();
 
-                response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        }
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+}
 
-        /* ========================= HELPERS ========================= */
+    private String extractRefreshToken(HttpServletRequest request) {
 
-        private void setRefreshCookie(HttpServletResponse response, String token) {
-                ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
-                                .httpOnly(true)
-                                .secure(true)
-                                .path("/api/auth/refresh")
-                                .maxAge(REFRESH_EXPIRY)
-                                .build();
+        if (request.getCookies() == null) return null;
 
-                response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        }
-
-        private String extractRefreshToken(HttpServletRequest request) {
-
-                if (request.getCookies() == null)
-                        return null;
-
-                return Arrays.stream(request.getCookies())
-                                .filter(c -> "refreshToken".equals(c.getName()))
-                                .map(c -> c.getValue())
-                                .findFirst()
-                                .orElse(null);
-        }
+        return Arrays.stream(request.getCookies())
+                .filter(c -> "refreshToken".equals(c.getName()))
+                .map(c -> c.getValue())
+                .findFirst()
+                .orElse(null);
+    }
 }

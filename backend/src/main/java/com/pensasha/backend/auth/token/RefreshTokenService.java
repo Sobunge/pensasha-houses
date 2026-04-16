@@ -15,45 +15,45 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    // 7 days validity (same as your AuthService cookie expiry concept)
     private static final long REFRESH_TOKEN_EXPIRY_DAYS = 7;
 
-    /* ========================= CREATE ========================= */
-@Transactional
-public String create(User user) {
+    /* ========================= CREATE SESSION ========================= */
+    @Transactional
+    public String create(User user) {
 
-    RefreshToken token = refreshTokenRepository.findByUser(user)
-            .orElse(new RefreshToken());
+        String tokenValue = UUID.randomUUID().toString();
 
-    String tokenValue = UUID.randomUUID().toString();
+        RefreshToken token = new RefreshToken();
+        token.setToken(tokenValue);
+        token.setUser(user);
+        token.setExpiryDate(
+                LocalDateTime.now(ZoneOffset.UTC)
+                        .plusDays(REFRESH_TOKEN_EXPIRY_DAYS));
 
-    token.setToken(tokenValue);
-    token.setUser(user);
-    token.setExpiryDate(LocalDateTime.now(ZoneOffset.UTC).plusDays(REFRESH_TOKEN_EXPIRY_DAYS));
+        refreshTokenRepository.save(token);
 
-    return refreshTokenRepository.save(token).getToken();
-}
+        return tokenValue;
+    }
 
-    /* ========================= FIND ========================= */
+    /* ========================= FIND BY TOKEN ========================= */
     @Transactional(readOnly = true)
     public RefreshToken findByToken(String token) {
-
         return refreshTokenRepository.findByToken(token)
-                .orElseThrow(() ->
-                        new IllegalStateException("Invalid refresh token"));
+                .orElseThrow(() -> new IllegalStateException("Invalid refresh token"));
     }
 
-    /* ========================= DELETE (by entity) ========================= */
-    @Transactional
-    public void delete(RefreshToken token) {
-        refreshTokenRepository.delete(token);
-    }
-
-    /* ========================= DELETE (by string token) ========================= */
+    /* ========================= DELETE SINGLE SESSION ========================= */
     @Transactional
     public void deleteByToken(String token) {
-        refreshTokenRepository.findByToken(token)
-                .ifPresent(refreshTokenRepository::delete);
+        refreshTokenRepository.deleteByToken(token);
+    }
+
+    /*
+     * ========================= DELETE ALL USER SESSIONS =========================
+     */
+    @Transactional
+    public void deleteAllByUser(User user) {
+        refreshTokenRepository.deleteAllByUser(user);
     }
 
     /* ========================= VALIDATION ========================= */

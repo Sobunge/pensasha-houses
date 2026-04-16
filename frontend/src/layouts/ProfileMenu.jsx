@@ -13,6 +13,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import { useNotification } from "../components/NotificationProvider";
 import { useAuth } from "../pages/Auth/AuthContext";
+import api from "../api/api"; // ✅ use your axios instance
 
 function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -23,7 +24,6 @@ function ProfileMenu() {
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
-  // ✅ Unified profile route
   const profileLink = "/dashboard/profile";
 
   const hoverStyle = {
@@ -32,21 +32,32 @@ function ProfileMenu() {
     "& .MuiListItemIcon-root": { color: "#111" },
   };
 
-  const handleLogout = () => {
+  // 🔥 CORRECT LOGOUT FLOW
+  const handleLogout = async () => {
+    handleClose();
+
     try {
-      handleClose();
+      // 1. Invalidate session on backend (delete refresh token + clear cookie)
+      await api.post("/auth/logout");
+
+      // 2. Clear frontend auth state
       logout();
+
       notify("You have logged out successfully!", "success");
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
-      notify("Logout failed. Please try again.", "error");
+
+      // fallback to avoid broken state
+      logout();
+
+      notify("Logout failed. You have been logged out locally.", "warning");
+      navigate("/");
     }
   };
 
   return (
     <>
-      {/* Profile Icon Button */}
       <IconButton
         color="inherit"
         onClick={handleOpen}
@@ -55,7 +66,6 @@ function ProfileMenu() {
         <AccountCircleIcon sx={{ fontSize: 28, color: "#111" }} />
       </IconButton>
 
-      {/* Dropdown Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -71,7 +81,7 @@ function ProfileMenu() {
           },
         }}
       >
-        {/* My Profile */}
+        {/* Profile */}
         <MenuItem
           component={RouterLink}
           to={profileLink}

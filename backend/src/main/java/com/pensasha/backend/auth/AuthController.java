@@ -23,62 +23,72 @@ public class AuthController {
     private final AuthService authService;
     private final PasswordResetService passwordResetService;
 
-    /*
-     * ========================= REGISTER =========================
-     * Creates user + issues tokens
-     */
+    /* ========================= REGISTER ========================= */
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(
             @Valid @RequestBody CreateUserDTO dto,
             HttpServletResponse response) {
+
         return ResponseEntity.ok(authService.register(dto, response));
     }
 
-    /*
-     * ========================= LOGIN =========================
-     * Authenticates user and issues tokens
-     */
+    /* ========================= LOGIN ========================= */
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
             @Valid @RequestBody LoginRequestDTO dto,
             HttpServletResponse response) {
+
         return ResponseEntity.ok(authService.login(dto, response));
     }
 
     /* ========================= REFRESH TOKEN ========================= */
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDTO> refresh(HttpServletRequest request) {
-        return ResponseEntity.ok(authService.refresh(request));
+    public ResponseEntity<LoginResponseDTO> refresh(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        return ResponseEntity.ok(authService.refresh(request, response));
     }
 
-    /* ========================= LOGOUT ========================= */
+    /* ========================= LOGOUT (single session) ========================= */
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request,
+    public ResponseEntity<Map<String, String>> logout(
+            HttpServletRequest request,
             HttpServletResponse response) {
 
         authService.logout(request, response);
 
-        return ResponseEntity.ok("Logged out successfully");
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
     /* ========================= FORGOT PASSWORD ========================= */
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<String> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
         passwordResetService.requestReset(request.getPhoneNumber());
+
         return ResponseEntity.ok("If account exists, reset link has been sent");
     }
 
     /* ========================= RESET PASSWORD ========================= */
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
-        passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+    public ResponseEntity<String> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        passwordResetService.resetPassword(
+                request.getToken(),
+                request.getNewPassword());
+
         return ResponseEntity.ok("Password updated successfully");
     }
 
     /* ========================= VERIFY RESET TOKEN ========================= */
     @GetMapping("/verify-reset-token")
     public ResponseEntity<String> verifyToken(@RequestParam String token) {
+
         passwordResetService.verifyToken(token);
+
         return ResponseEntity.ok("Token valid");
     }
 }

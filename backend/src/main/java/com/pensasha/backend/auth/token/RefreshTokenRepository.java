@@ -1,16 +1,19 @@
 package com.pensasha.backend.auth.token;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pensasha.backend.modules.user.User;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
     Optional<RefreshToken> findByToken(String token);
 
-    Optional<RefreshToken> findByUser(User user);
+    List<RefreshToken> findAllByUser(User user);
 
-    void deleteByUser(User user);
+    void deleteByToken(String token);
+
+    void deleteAllByUser(User user);
 }
