@@ -64,7 +64,7 @@ function UserSidebar({ mobileOpen, onClose }) {
       {/* Role Indicator: Shows the user which dashboard mode they are currently in */}
       <Box sx={{ px: 3, mb: 2 }}>
         <Chip 
-          label={`${activeRole} MODE`} 
+          label={`${activeRole?.replace("ROLE_", "")} MODE`}
           size="small" 
           sx={{ 
             bgcolor: "rgba(248, 181, 0, 0.1)", 

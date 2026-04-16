@@ -3,6 +3,12 @@ import { setLogoutHandler } from "../../api/api";
 
 export const AuthContext = createContext();
 
+/* ===================== ROLE NORMALIZER ===================== */
+const normalizeRole = (role) => {
+  if (!role) return null;
+  return role.startsWith("ROLE_") ? role : `ROLE_${role}`;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedUser = sessionStorage.getItem("user");
@@ -26,10 +32,12 @@ export const AuthProvider = ({ children }) => {
   const loginAs = (userObj) => {
     setUser(userObj);
 
-    const roleList = userObj?.roles || [];
+    const roleList = (userObj?.roles || []).map(normalizeRole);
+
     setRoles(roleList);
 
     const defaultRole = roleList[0] || null;
+
     setActiveRole(defaultRole);
 
     sessionStorage.setItem("user", JSON.stringify(userObj));
@@ -41,8 +49,10 @@ export const AuthProvider = ({ children }) => {
    * SWITCH ROLE
    */
   const switchRole = (role) => {
-    setActiveRole(role);
-    sessionStorage.setItem("activeRole", role);
+    const normalizedRole = normalizeRole(role);
+
+    setActiveRole(normalizedRole);
+    sessionStorage.setItem("activeRole", normalizedRole);
   };
 
   /**
