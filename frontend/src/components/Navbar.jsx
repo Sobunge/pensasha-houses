@@ -238,7 +238,6 @@ function Navbar() {
           backgroundColor: "rgba(11, 15, 23, 0.75)",
           backdropFilter: "blur(16px)",
           flexShrink: 0,
-          position: "relative",
           "&::after": {
             content: '""',
             position: "absolute",
