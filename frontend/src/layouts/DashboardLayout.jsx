@@ -14,58 +14,39 @@ function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const mainRef = useRef(null);
 
-  /* ===================== NAVIGATION SCROLL RESET ===================== */
-  /**
-   * Resets the scroll position of the internal main container 
-   * every time the URL path changes.
-   */
   useEffect(() => {
     if (mainRef.current) {
-      mainRef.current.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: "instant", // Use "smooth" if you want a sliding effect
-      });
+      mainRef.current.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }
   }, [pathname]);
 
-  /* ===================== ACCESSIBILITY & FOCUS ===================== */
-  /**
-   * Returns focus to the main content area when the mobile 
-   * sidebar is closed for better keyboard/screen-reader flow.
-   */
   useEffect(() => {
     if (!mobileOpen && mainRef.current) {
       mainRef.current.focus();
     }
   }, [mobileOpen]);
 
-  // Prevent rendering if user session is being restored or is missing
   if (!user) return null;
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", overflow: "hidden" }}>
-      {/* Sidebar - Positioned absolute/fixed on mobile, relative on desktop */}
+    <Box sx={{ display: "flex", minHeight: "100vh", overflow: "hidden", bgcolor: "#0B0F17" }}>
       <UserSidebar 
         mobileOpen={mobileOpen} 
         onClose={() => setMobileOpen(false)} 
       />
 
-      {/* Main Content Wrapper */}
       <Box
         sx={{
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          minWidth: 0, // Critical for preventing flexbox children from breaking layout
-          bgcolor: "#f7f7f7",
-          height: "100vh", // Lock height to viewport
+          minWidth: 0,
+          bgcolor: "#0E1420", // Deep navy-slate portal background
+          height: "100vh",
         }}
       >
-        {/* Navbar - Usually fixed height */}
         <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
 
-        {/* Scrollable Main Body */}
         <Box
           ref={mainRef}
           component="main"
@@ -74,27 +55,25 @@ function DashboardLayout() {
           sx={{
             flexGrow: 1,
             mt: `${NAVBAR_HEIGHT}px`,
-            overflowY: "auto", // The actual internal scrollbar
+            overflowY: "auto",
             overflowX: "hidden",
             p: { xs: 2, md: 3 },
-            outline: "none", // Removes focus ring when focusing via effect
+            outline: "none",
             display: "flex",
             flexDirection: "column",
           }}
         >
-          {/* Centered Content Container */}
           <Box 
             sx={{ 
               maxWidth: 1200, 
               mx: "auto", 
               width: "100%",
-              flexGrow: 1, // Ensures content pushes footer down if short
+              flexGrow: 1,
             }}
           >
             <Outlet />
           </Box>
 
-          {/* Footer - Sits at the bottom of the scrollable area */}
           <UserFooter />
         </Box>
       </Box>
