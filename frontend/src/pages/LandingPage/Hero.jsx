@@ -53,7 +53,7 @@ function Hero() {
   return (
     <Box
       sx={{
-        minHeight: { xs: "85vh", md: "93vh" },
+        minHeight: { xs: "85vh", md: "100vh" },
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
