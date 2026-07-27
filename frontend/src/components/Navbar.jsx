@@ -40,6 +40,7 @@ const navItems = [
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [authTab, setAuthTab] = useState(0); // 0 = Login, 1 = Register
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -50,6 +51,7 @@ function Navbar() {
   // WATCHER: Automatically open AuthModal if redirected from Forgot/Reset password
   useEffect(() => {
     if (location.state?.openLogin) {
+      setAuthTab(0);
       setAuthOpen(true);
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -65,8 +67,9 @@ function Navbar() {
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
-  const handleAuthOpen = () => {
+  const handleAuthOpen = (tabIndex = 0) => {
     setMobileOpen(false);
+    setAuthTab(tabIndex);
     setAuthOpen(true);
   };
 
@@ -189,7 +192,7 @@ function Navbar() {
             <ListItemButton
               component={item.requiresAuth ? "div" : RouterLink}
               to={item.requiresAuth ? undefined : item.link}
-              onClick={item.requiresAuth ? handleAuthOpen : undefined}
+              onClick={item.requiresAuth ? () => handleAuthOpen(0) : undefined}
               sx={getDrawerItemStyles(item.link)}
             >
               <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#D4AF37" : "#94A3B8" }}>
@@ -205,7 +208,7 @@ function Navbar() {
 
       <ListItem disablePadding>
         <ListItemButton
-          onClick={handleAuthOpen}
+          onClick={() => handleAuthOpen(0)}
           sx={{
             py: 1.5,
             borderRadius: 2,
@@ -275,7 +278,7 @@ function Navbar() {
                     key={item.label}
                     component={item.requiresAuth ? "button" : RouterLink}
                     to={item.requiresAuth ? undefined : item.link}
-                    onClick={item.requiresAuth ? handleAuthOpen : undefined}
+                    onClick={item.requiresAuth ? () => handleAuthOpen(0) : undefined}
                     startIcon={item.icon}
                     sx={getButtonStyles(item.link)}
                   >
@@ -293,7 +296,7 @@ function Navbar() {
                 {/* Login & Register Link Group */}
                 <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
                   <Button
-                    onClick={handleAuthOpen}
+                    onClick={() => handleAuthOpen(0)}
                     startIcon={<LoginOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />}
                     sx={authLinkStyles}
                   >
@@ -301,7 +304,7 @@ function Navbar() {
                   </Button>
 
                   <Button
-                    onClick={handleAuthOpen}
+                    onClick={() => handleAuthOpen(1)}
                     startIcon={<PersonAddOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />}
                     sx={authLinkStyles}
                   >
@@ -337,7 +340,7 @@ function Navbar() {
         </Slide>
       </Drawer>
 
-      <AuthModal open={authOpen} onClose={handleAuthClose} />
+      <AuthModal open={authOpen} onClose={handleAuthClose} initialTab={authTab} />
     </>
   );
 }

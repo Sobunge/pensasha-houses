@@ -8,20 +8,19 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LoginForm from "../Auth/LoginPage/LoginForm";
 import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 
-export default function AuthModal({ open, onClose }) {
-  const [activeTab, setActiveTab] = useState(0);
+export default function AuthModal({ open, onClose, initialTab = 0 }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
 
-  // Reset to Login tab whenever the modal is opened fresh
+  // FIX: Set activeTab to initialTab (not hardcoded 0) whenever modal opens or initialTab changes
   useEffect(() => {
-    if (open) setActiveTab(0);
-  }, [open]);
+    if (open) {
+      setActiveTab(initialTab);
+    }
+  }, [open, initialTab]);
 
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
 
-  /* Note: RegistrationForm calls notify() and switchToLogin() internally 
-     on success. handleRegisterSuccess acts as an extra hook if needed.
-  */
   const handleRegisterSuccess = () => {
     switchToLogin();
   };
