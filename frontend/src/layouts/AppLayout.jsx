@@ -1,3 +1,4 @@
+// src/layouts/AppLayout.jsx
 import React from "react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
@@ -11,27 +12,24 @@ function AppLayout() {
         display: "flex", 
         flexDirection: "column", 
         minHeight: "100vh", 
-        bgcolor: "background.default" 
+        bgcolor: "background.default", 
+        color: "text.primary" 
       }}
     >
-      {/* 1. FIXED NAVBAR */}
       <Navbar />
 
-      {/* 2. MAIN CONTENT AREA */}
       <Box 
         component="main" 
         sx={{ 
           flex: 1, 
           display: "flex", 
           flexDirection: "column",
-          // This pt (padding-top) prevents content from hiding under the fixed Navbar
           pt: { xs: "56px", md: "64px" },
         }}
       >
         <Outlet />
       </Box>
 
-      {/* 3. FOOTER */}
       <MainFooter />
     </Box>
   );
