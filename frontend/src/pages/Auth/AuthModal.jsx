@@ -11,19 +11,12 @@ import RegistrationForm from "../Auth/RegistrationPage/RegistrationForm";
 export default function AuthModal({ open, onClose, initialTab = 0 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
 
-  // FIX: Set activeTab to initialTab (not hardcoded 0) whenever modal opens or initialTab changes
   useEffect(() => {
-    if (open) {
-      setActiveTab(initialTab);
-    }
+    if (open) setActiveTab(initialTab);
   }, [open, initialTab]);
 
   const switchToLogin = () => setActiveTab(0);
   const switchToSignup = () => setActiveTab(1);
-
-  const handleRegisterSuccess = () => {
-    switchToLogin();
-  };
 
   return (
     <Dialog 
@@ -32,17 +25,27 @@ export default function AuthModal({ open, onClose, initialTab = 0 }) {
       maxWidth="xs" 
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 2, overflow: "hidden" }
+        sx: { 
+          borderRadius: "24px",
+          bgcolor: "#FFFFFF",
+          color: "#0F172A",
+          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+          overflow: "hidden",
+          maxHeight: "90vh", // Keeps dialog within screen viewport
+        }
       }}
     >
+      {/* Top Navigation Bar */}
       <Box 
         sx={{ 
           display: "flex", 
           alignItems: "center", 
           justifyContent: "space-between", 
-          borderBottom: 1, 
-          borderColor: "divider",
-          bgcolor: "#fcfcfc" 
+          borderBottom: "1px solid #E2E8F0",
+          bgcolor: "#FFFFFF",
+          pt: 0.5,
+          px: 1,
+          zIndex: 10
         }}
       >
         <Tabs 
@@ -51,30 +54,46 @@ export default function AuthModal({ open, onClose, initialTab = 0 }) {
           variant="fullWidth" 
           sx={{ 
             flex: 1,
-            "& .MuiTab-root": { py: 2, fontWeight: 600, textTransform: "none" },
-            "& .Mui-selected": { color: "#f8b500" },
-            "& .MuiTabs-indicator": { backgroundColor: "#f8b500" }
+            "& .MuiTab-root": { 
+              py: 1.5, 
+              fontWeight: 600, 
+              textTransform: "none",
+              color: "#64748B",
+              "&.Mui-selected": { color: "#D4AF37" }
+            },
+            "& .MuiTabs-indicator": { backgroundColor: "#D4AF37", height: 3, borderRadius: "3px 3px 0 0" }
           }}
         >
           <Tab icon={<LoginIcon fontSize="small" />} iconPosition="start" label="Login" />
           <Tab icon={<PersonAddIcon fontSize="small" />} iconPosition="start" label="Sign Up" />
         </Tabs>
-        <IconButton onClick={onClose} sx={{ mr: 1 }}>
+        
+        <IconButton 
+          onClick={onClose} 
+          sx={{ color: "#64748B", "&:hover": { color: "#0F172A", bgcolor: "#F1F5F9" } }}
+        >
           <CloseIcon fontSize="small" />
         </IconButton>
       </Box>
 
-      <DialogContent sx={{ mt: 1, pb: 4 }}>
+      {/* Content Area with Hidden Scrollbar */}
+      <DialogContent 
+        sx={{ 
+          bgcolor: "#FFFFFF", 
+          pt: 3, 
+          pb: 3, 
+          px: { xs: 2.5, sm: 3 },
+          overflowY: "auto",
+          /* Hide scrollbar for Chrome, Safari, Opera, Edge, Firefox */
+          "&::-webkit-scrollbar": { display: "none" },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
         {activeTab === 0 ? (
-          <LoginForm 
-            onClose={onClose} 
-            switchToSignup={switchToSignup} 
-          />
+          <LoginForm onClose={onClose} switchToSignup={switchToSignup} />
         ) : (
-          <RegistrationForm 
-            onSuccess={handleRegisterSuccess} 
-            switchToLogin={switchToLogin} 
-          />
+          <RegistrationForm onSuccess={switchToLogin} switchToLogin={switchToLogin} />
         )}
       </DialogContent>
     </Dialog>

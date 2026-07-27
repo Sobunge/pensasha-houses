@@ -1,10 +1,10 @@
+// src/components/Auth/LoginPage/LoginForm.jsx
 import React, { useState } from "react";
 import {
   Box,
   Button,
   TextField,
   Typography,
-  Avatar,
   Divider,
   Stack,
   Link as MuiLink,
@@ -14,8 +14,7 @@ import {
 } from "@mui/material";
 
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import PhoneIcon from "@mui/icons-material/Phone";
-import LockIcon from "@mui/icons-material/Lock";
+import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
@@ -45,7 +44,47 @@ const validatePassword = (value) => {
   return null;
 };
 
-/* ---------------- Component ---------------- */
+/* ---------------- Premium High-Contrast Input Styles ---------------- */
+const premiumInputStyles = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    backgroundColor: "#FAFAFA",
+    color: "#0F172A",
+    fontSize: "0.95rem",
+    fontWeight: 500,
+    "& fieldset": {
+      borderColor: "#CBD5E1", // Visible, high-contrast border
+      borderWidth: "1.5px",
+    },
+    "&:hover fieldset": {
+      borderColor: "#94A3B8",
+    },
+    "&.Mui-focused": {
+      backgroundColor: "#FFFFFF",
+      "& fieldset": {
+        borderColor: "#D4AF37",
+        borderWidth: "2px",
+      },
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: "#475569",
+    fontWeight: 600,
+    fontSize: "0.9rem",
+    "&.Mui-focused": {
+      color: "#D4AF37",
+    },
+  },
+  "& input::placeholder": {
+    color: "#94A3B8",
+    opacity: 1,
+  },
+  "& .MuiFormHelperText-root": {
+    color: "#DC2626",
+    fontWeight: 500,
+  },
+};
+
 export default function LoginForm({ switchToSignup, onClose }) {
   const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
   const [touched, setTouched] = useState({ phoneNumber: false, password: false });
@@ -53,7 +92,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
   const [loading, setLoading] = useState(false);
 
   const { notify } = useNotification();
-  // Destructure redirect states from useAuth
   const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
   const navigate = useNavigate();
 
@@ -63,7 +101,6 @@ export default function LoginForm({ switchToSignup, onClose }) {
   const showPhoneError = touched.phoneNumber && Boolean(phoneError);
   const showPasswordError = touched.password && Boolean(passwordError);
 
-  /* ---------------- Handlers ---------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -113,22 +150,13 @@ export default function LoginForm({ switchToSignup, onClose }) {
       loginAs(user);
       notify("Login successful!", "success");
 
-      // Cleanup Modal & Reset Scroll
       if (onClose) onClose();
       window.scrollTo(0, 0);
 
-      /* ---------------- SMART NAVIGATION ---------------- */
-      // If the user was trying to rent a specific property, we DON'T navigate away.
-      // We let PropertyDetails.jsx open the dialog.
-      if (redirectAfterAuth === "rent-request") {
-        // Do nothing, let the PropertyDetails useEffect handle it.
-        // We don't clear the intent here yet; PropertyDetails will clear it.
-      } else if (redirectAfterAuth) {
-        // If there was a different specific page they were trying to reach
+      if (redirectAfterAuth && redirectAfterAuth !== "rent-request") {
         navigate(redirectAfterAuth, { replace: true });
         setRedirectAfterAuth(null);
-      } else {
-        // Standard login: go to dashboard
+      } else if (redirectAfterAuth !== "rent-request") {
         navigate("/dashboard", { replace: true });
       }
 
@@ -144,25 +172,39 @@ export default function LoginForm({ switchToSignup, onClose }) {
     }
   };
 
-  /* ---------------- UI ---------------- */
   return (
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      noValidate
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
     >
-      <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
-        <LockOutlinedIcon />
-      </Avatar>
-
-      <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+      {/* Header */}
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 800,
+          color: "#0F172A",
+          letterSpacing: "-0.02em",
+          mb: 0.5,
+          textAlign: "center",
+        }}
+      >
         Welcome Back
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
+      <Typography 
+        variant="body2" 
+        sx={{ color: "#64748B", mb: 2.5, textAlign: "center" }}
+      >
         Login with your phone number
       </Typography>
 
+      {/* Inputs */}
       <Stack spacing={2} sx={{ width: "100%" }}>
         <TextField
           fullWidth
@@ -176,11 +218,14 @@ export default function LoginForm({ switchToSignup, onClose }) {
           placeholder="7XXXXXXXX"
           error={showPhoneError}
           helperText={showPhoneError ? phoneError : ""}
+          sx={premiumInputStyles}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PhoneIcon fontSize="small" sx={{ mr: 0.5 }} />
-                <Typography sx={{ fontWeight: 500 }}>+254</Typography>
+                <PhoneOutlinedIcon sx={{ color: "#475569", mr: 0.5, fontSize: "1.1rem" }} />
+                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.9rem" }}>
+                  +254
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -196,14 +241,17 @@ export default function LoginForm({ switchToSignup, onClose }) {
           onBlur={handleBlur("password")}
           required
           size="small"
-          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" } }}
           placeholder="Enter your password"
           error={showPasswordError}
           helperText={showPasswordError ? passwordError : ""}
+          sx={{
+            ...premiumInputStyles,
+            "& input::-ms-reveal, & input::-ms-clear": { display: "none" },
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon fontSize="small" />
+                <LockOutlinedIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
               </InputAdornment>
             ),
             endAdornment: (
@@ -213,8 +261,13 @@ export default function LoginForm({ switchToSignup, onClose }) {
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                   size="small"
+                  sx={{ color: "#64748B" }}
                 >
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  {showPassword ? (
+                    <VisibilityOffIcon fontSize="small" />
+                  ) : (
+                    <VisibilityIcon fontSize="small" />
+                  )}
                 </IconButton>
               </InputAdornment>
             ),
@@ -222,47 +275,73 @@ export default function LoginForm({ switchToSignup, onClose }) {
         />
       </Stack>
 
+      {/* Forgot Password */}
       <Box sx={{ width: "100%", textAlign: "right", mt: 1 }}>
         <MuiLink
           component={RouterLink}
           to="/forgot-password"
           onClick={onClose}
-          sx={{ fontSize: "0.85rem", color: "primary.main", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+          sx={{
+            fontSize: "0.85rem",
+            color: "#D4AF37",
+            textDecoration: "none",
+            fontWeight: 700,
+            "&:hover": { textDecoration: "underline" },
+          }}
         >
           Forgot password?
         </MuiLink>
       </Box>
 
-      <Stack spacing={1.5} sx={{ width: "100%", mt: 2 }}>
+      {/* Submit Button & Switch Link */}
+      <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
         <Button
           fullWidth
           type="submit"
           variant="contained"
+          size="large"
           disabled={loading}
           startIcon={
-            loading ? <CircularProgress size={20} color="inherit" /> : <LockOutlinedIcon />
+            loading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <LockOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />
+            )
           }
           sx={{
-            py: 1.2,
-            fontWeight: 600,
+            py: 1.4,
+            borderRadius: "50px",
+            fontWeight: 700,
+            fontSize: "0.95rem",
             textTransform: "none",
-            bgcolor: "#f8b500",
-            color: "#111",
-            "&:hover": { bgcolor: "#e0a400" },
+            bgcolor: "#D4AF37",
+            color: "#000000",
+            boxShadow: "0 4px 14px rgba(212, 175, 55, 0.35)",
+            transition: "all 0.2s ease-in-out",
+            "&:hover": {
+              bgcolor: "#B5922B",
+              boxShadow: "0 6px 18px rgba(181, 146, 43, 0.45)",
+            },
           }}
         >
           {loading ? "Logging in..." : "Login"}
         </Button>
 
-        <Divider sx={{ my: 1 }} />
+        <Divider sx={{ borderColor: "#F1F5F9", my: 0.5 }} />
 
-        <Typography variant="body2" textAlign="center">
+        <Typography variant="body2" textAlign="center" sx={{ color: "#64748B" }}>
           Don’t have an account?{" "}
           <MuiLink
             component="button"
             type="button"
             onClick={switchToSignup}
-            sx={{ fontWeight: 600, color: "#f8b500", textDecoration: "none" }}
+            sx={{
+              fontWeight: 700,
+              color: "#D4AF37",
+              textDecoration: "none",
+              ml: 0.5,
+              "&:hover": { textDecoration: "underline" },
+            }}
           >
             Sign Up
           </MuiLink>
