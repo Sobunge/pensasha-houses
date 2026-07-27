@@ -111,7 +111,7 @@ function Navbar() {
     };
   };
 
-  // Auth Link Styling (Matches regular nav links but with hover gold accents)
+  // Auth Link Styling
   const authLinkStyles = {
     color: "#CBD5E1",
     textTransform: "none",
@@ -237,8 +237,19 @@ function Navbar() {
         sx={{
           backgroundColor: "rgba(11, 15, 23, 0.75)",
           backdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-          flexShrink: 0
+          flexShrink: 0,
+          position: "relative",
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "1px",
+            background:
+              "linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.6) 50%, rgba(212, 175, 55, 0) 100%)",
+            pointerEvents: "none",
+          },
         }}
       >
         <Container maxWidth="lg">
@@ -286,14 +297,12 @@ function Navbar() {
                   </Button>
                 ))}
 
-                {/* Vertical Divider separating main nav from auth links */}
                 <Divider 
                   orientation="vertical" 
                   flexItem 
                   sx={{ borderColor: "rgba(255, 255, 255, 0.12)", my: 2, mx: 0.5 }} 
                 />
 
-                {/* Login & Register Link Group */}
                 <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
                   <Button
                     onClick={() => handleAuthOpen(0)}
