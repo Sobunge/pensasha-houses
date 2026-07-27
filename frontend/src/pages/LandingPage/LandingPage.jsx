@@ -7,29 +7,46 @@ import HowItWorks from "./HowItWorks";
 import FinalCTA from "./FinalCTA";
 import Footer from "./Footer";
 import AuthModal from "../Auth/AuthModal";
+import ScrollReveal from "./ScrollReveal"; // Adjust path if located elsewhere
 
 function LandingPage() {
   const [authOpen, setAuthOpen] = useState(false);
   const howItWorksRef = useRef(null);
 
   return (
-    <>
+    <main className="w-full min-h-screen scroll-smooth overflow-x-hidden">
+      {/* Hero handles its own initial load animations */}
       <Hero />
 
-      <FeaturedListings />
-      <HotDeals />
-      <Categories />
+      {/* Main Sections wrapped in ScrollReveal for seamless entry */}
+      <ScrollReveal>
+        <FeaturedListings />
+      </ScrollReveal>
 
-      {/* How It Works */}
-      <div ref={howItWorksRef}>
-        <HowItWorks />
+      <ScrollReveal>
+        <HotDeals />
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <Categories />
+      </ScrollReveal>
+
+      {/* How It Works with Ref for smooth scrolling navigation */}
+      <div ref={howItWorksRef} className="scroll-mt-12">
+        <ScrollReveal>
+          <HowItWorks />
+        </ScrollReveal>
       </div>
 
-      <FinalCTA handleAuthOpen={() => setAuthOpen(true)} />
+      <ScrollReveal>
+        <FinalCTA handleAuthOpen={() => setAuthOpen(true)} />
+      </ScrollReveal>
+
       <Footer howItWorksRef={howItWorksRef} />
 
+      {/* Authentication Modal */}
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-    </>
+    </main>
   );
 }
 
