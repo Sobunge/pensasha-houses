@@ -25,6 +25,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
+import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import LoginIcon from "@mui/icons-material/Login";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import AuthModal from "../pages/Auth/AuthModal";
@@ -81,9 +83,16 @@ function Navbar() {
       position: "relative",
       px: 1.5,
       transition: "all 0.2s ease-in-out",
+      "& .MuiButton-startIcon": {
+        color: isActive ? "#D4AF37" : "#94A3B8",
+        transition: "color 0.2s ease-in-out",
+      },
       "&:hover": {
         color: "#D4AF37",
         backgroundColor: "transparent",
+        "& .MuiButton-startIcon": {
+          color: "#D4AF37",
+        },
       },
       "&::after": isActive ? {
         content: '""',
@@ -97,6 +106,27 @@ function Navbar() {
         boxShadow: "0 0 8px rgba(212, 175, 55, 0.6)",
       } : {},
     };
+  };
+
+  // Auth Link Styling (Matches regular nav links but with hover gold accents)
+  const authLinkStyles = {
+    color: "#CBD5E1",
+    textTransform: "none",
+    fontWeight: 500,
+    fontSize: "0.95rem",
+    px: 1.5,
+    transition: "all 0.2s ease-in-out",
+    "& .MuiButton-startIcon": {
+      color: "#94A3B8",
+      transition: "color 0.2s ease-in-out",
+    },
+    "&:hover": {
+      color: "#D4AF37",
+      backgroundColor: "transparent",
+      "& .MuiButton-startIcon": {
+        color: "#D4AF37",
+      },
+    },
   };
 
   // Mobile Drawer Styling
@@ -190,7 +220,7 @@ function Navbar() {
           <ListItemIcon sx={{ minWidth: 35 }}>
             <LoginIcon sx={{ color: "#0B0F17", fontSize: "1.2rem" }} />
           </ListItemIcon>
-          <ListItemText primary="Login / Sign Up" disableTypography sx={{ fontWeight: 600 }} />
+          <ListItemText primary="Login / Register" disableTypography sx={{ fontWeight: 600 }} />
         </ListItemButton>
       </ListItem>
     </Box>
@@ -239,41 +269,45 @@ function Navbar() {
 
             {/* Desktop Navigation */}
             {!isMobile ? (
-              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {navItems.map((item) => (
                   <Button
                     key={item.label}
                     component={item.requiresAuth ? "button" : RouterLink}
                     to={item.requiresAuth ? undefined : item.link}
                     onClick={item.requiresAuth ? handleAuthOpen : undefined}
+                    startIcon={item.icon}
                     sx={getButtonStyles(item.link)}
                   >
                     {item.label}
                   </Button>
                 ))}
 
-                <Button
-                  variant="contained"
-                  onClick={handleAuthOpen}
-                  sx={{
-                    ml: 1.5,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
-                    borderRadius: "8px",
-                    px: 3,
-                    py: 1,
-                    backgroundColor: "#D4AF37",
-                    color: "#0B0F17",
-                    boxShadow: "0 4px 14px rgba(212, 175, 55, 0.2)",
-                    "&:hover": {
-                      backgroundColor: "#B5922B",
-                      boxShadow: "0 6px 20px rgba(212, 175, 55, 0.3)",
-                    },
-                  }}
-                >
-                  Login
-                </Button>
+                {/* Vertical Divider separating main nav from auth links */}
+                <Divider 
+                  orientation="vertical" 
+                  flexItem 
+                  sx={{ borderColor: "rgba(255, 255, 255, 0.12)", my: 2, mx: 0.5 }} 
+                />
+
+                {/* Login & Register Link Group */}
+                <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                  <Button
+                    onClick={handleAuthOpen}
+                    startIcon={<LoginOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />}
+                    sx={authLinkStyles}
+                  >
+                    Login
+                  </Button>
+
+                  <Button
+                    onClick={handleAuthOpen}
+                    startIcon={<PersonAddOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />}
+                    sx={authLinkStyles}
+                  >
+                    Register
+                  </Button>
+                </Box>
               </Box>
             ) : (
               <IconButton
