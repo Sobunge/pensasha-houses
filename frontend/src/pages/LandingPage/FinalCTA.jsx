@@ -29,9 +29,6 @@ const FinalCTA = ({ handleAuthOpen }) => {
             px: { xs: 4, md: 8 },
             py: { xs: 7, md: 9 },
 
-            background:
-              "linear-gradient(180deg, #FFFFFF 0%, #FCFAF5 100%)",
-
             border: "1px solid rgba(212,175,55,0.18)",
 
             boxShadow: "0 24px 60px rgba(15,23,42,0.08)",

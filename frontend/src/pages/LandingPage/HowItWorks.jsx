@@ -46,10 +46,10 @@ function HowItWorks() {
       sx={{
         backgroundColor: '#0F172A', // Navy/slate dark background
         backgroundImage: `
-          linear-gradient(180deg, #F8FAFC 0%, #0F172A 20px, #0F172A calc(100% - 20px), #F8FAFC 100%),
+          linear-gradient(180deg, #FFFFFF 0%, #0F172A 20px, #0F172A calc(100% - 20px), #FFFFFF 100%),
           radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.15) 0%, transparent 60%)
         `,
-        py: { xs: 6, md: 8 }, // Compact padding for vertical space
+        py: { xs: 6, md: 8 },
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -82,7 +82,7 @@ function HowItWorks() {
           </Typography>
         </Box>
 
-        {/* Steps Grid: Stacks vertically on mobile (xs=12), fits 3-in-a-row horizontally on desktop (md=4) */}
+        {/* Steps Grid */}
         <Grid container spacing={3} justifyContent="center">
           {steps.map((step) => (
             <Grid item xs={12} md={4} key={step.id}>
@@ -109,13 +109,11 @@ function HowItWorks() {
                   },
                 }}
               >
-                {/* Responsive Stack: Vertical on Mobile, Compact Horizontal Row on Large Screens */}
                 <Stack
                   direction={{ xs: 'column', lg: 'row' }}
                   alignItems={{ xs: 'flex-start', lg: 'flex-start' }}
                   spacing={2}
                 >
-                  {/* Icon & Step Badge Header */}
                   <Stack
                     direction="row"
                     alignItems="center"
@@ -140,7 +138,6 @@ function HowItWorks() {
                       {step.icon}
                     </Box>
 
-                    {/* Step number visible on mobile header */}
                     <Chip
                       label={step.id}
                       size="small"
@@ -155,7 +152,6 @@ function HowItWorks() {
                     />
                   </Stack>
 
-                  {/* Text Content Area */}
                   <CardContent sx={{ p: '0 !important', flexGrow: 1 }}>
                     <Stack
                       direction="row"
@@ -174,7 +170,6 @@ function HowItWorks() {
                         {step.title}
                       </Typography>
 
-                      {/* Step number aligned on desktop inline header */}
                       <Chip
                         label={step.id}
                         size="small"

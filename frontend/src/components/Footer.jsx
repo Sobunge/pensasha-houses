@@ -47,12 +47,13 @@ export default function Footer({ howItWorksRef }) {
       component="footer"
       sx={{
         backgroundColor: 'rgba(11, 15, 23, 0.95)',
-        backgroundImage: 'linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(11, 15, 23, 0.98) 100%)',
+         backgroundImage: `
+          linear-gradient(180deg, #F8FAFC 0%, #0F172A 20px, #0F172A calc(100% - 20px))
+        `,
         backdropFilter: 'blur(8px)',
         color: '#F8FAFC',
         pt: { xs: 8, md: 10 },
         pb: { xs: 4, md: 6 },
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         position: 'relative',
         width: '100%',
       }}
