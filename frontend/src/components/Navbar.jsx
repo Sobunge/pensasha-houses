@@ -1,3 +1,4 @@
+// src/components/Navbar.jsx
 import React, { useState, useEffect } from "react";
 import {
   AppBar,
@@ -21,17 +22,17 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import HomeIcon from "@mui/icons-material/Home";
-import SearchIcon from "@mui/icons-material/Search";
-import AddBoxIcon from "@mui/icons-material/AddBox";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import LoginIcon from "@mui/icons-material/Login";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import AuthModal from "../pages/Auth/AuthModal";
 
 const navItems = [
-  { label: "Home", link: "/", icon: <HomeIcon /> },
-  { label: "Browse Properties", link: "/properties", icon: <SearchIcon /> },
-  { label: "List a Property", icon: <AddBoxIcon />, requiresAuth: true },
+  { label: "Home", link: "/", icon: <HomeOutlinedIcon /> },
+  { label: "Browse Properties", link: "/properties", icon: <SearchOutlinedIcon /> },
+  { label: "List a Property", icon: <AddBoxOutlinedIcon />, requiresAuth: true },
 ];
 
 function Navbar() {
@@ -48,62 +49,89 @@ function Navbar() {
   useEffect(() => {
     if (location.state?.openLogin) {
       setAuthOpen(true);
-      // Clean up the state so refreshing doesn't re-trigger the modal
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location, navigate]);
 
-  // Fix 1: Close drawer when window is resized to desktop size
   useEffect(() => {
     if (!isMobile && mobileOpen) setMobileOpen(false);
   }, [isMobile, mobileOpen]);
 
-  // Fix 2: Close drawer automatically whenever the URL changes
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
-  // Fix 3: Ensure drawer closes when Auth Modal opens
   const handleAuthOpen = () => {
     setMobileOpen(false);
     setAuthOpen(true);
   };
-  
+
   const handleAuthClose = () => setAuthOpen(false);
 
-  const getButtonStyles = (link) => ({
-    color: location.pathname === link ? "#F8B500" : "#fff",
-    textTransform: "none",
-    fontWeight: location.pathname === link ? 600 : 500,
-    "&:hover": { color: "#F8B500" },
-  });
+  // Desktop Navigation Link Styling
+  const getButtonStyles = (link) => {
+    const isActive = location.pathname === link;
+    return {
+      color: isActive ? "#D4AF37" : "#CBD5E1",
+      textTransform: "none",
+      fontWeight: isActive ? 600 : 500,
+      fontSize: "0.95rem",
+      position: "relative",
+      px: 1.5,
+      transition: "all 0.2s ease-in-out",
+      "&:hover": {
+        color: "#D4AF37",
+        backgroundColor: "transparent",
+      },
+      "&::after": isActive ? {
+        content: '""',
+        position: "absolute",
+        bottom: 4,
+        left: "12%",
+        width: "76%",
+        height: "2px",
+        backgroundColor: "#D4AF37",
+        borderRadius: "2px",
+        boxShadow: "0 0 8px rgba(212, 175, 55, 0.6)",
+      } : {},
+    };
+  };
 
-  const getDrawerItemStyles = (link) => ({
-    px: 3,
-    py: 1.5,
-    mb: 1,
-    borderRadius: 2,
-    backgroundColor: location.pathname === link ? "rgba(248,181,0,0.15)" : "transparent",
-    color: location.pathname === link ? "#F8B500" : "#fff",
-    fontWeight: location.pathname === link ? 600 : 500,
-    transition: "all 0.3s ease",
-    "&:hover": { backgroundColor: "rgba(248,181,0,0.12)", transform: "translateX(2px)" },
-  });
+  // Mobile Drawer Styling
+  const getDrawerItemStyles = (link) => {
+    const isActive = location.pathname === link;
+    return {
+      px: 2.5,
+      py: 1.5,
+      mb: 1,
+      borderRadius: 2,
+      backgroundColor: isActive ? "rgba(212, 175, 55, 0.12)" : "transparent",
+      color: isActive ? "#D4AF37" : "#94A3B8",
+      fontWeight: isActive ? 600 : 500,
+      transition: "all 0.2s ease",
+      "&:hover": {
+        backgroundColor: "rgba(212, 175, 55, 0.08)",
+        color: "#F8FAFC",
+        transform: "translateX(4px)"
+      },
+    };
+  };
 
   const drawerContent = (
     <Box
       sx={{
-        width: 280,
+        width: 300,
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "rgba(30, 30, 30, 0.95)",
-        backdropFilter: "blur(12px)",
+        bgcolor: "rgba(11, 15, 23, 0.96)",
+        backdropFilter: "blur(20px)",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.08)",
         px: 3,
-        py: { xs: 2, md: 4 },
-        boxShadow: "0 16px 48px rgba(0,0,0,0.4)",
+        py: { xs: 3, md: 4 },
+        boxShadow: "-10px 0 30px rgba(0, 0, 0, 0.5)",
         color: "#fff",
       }}
     >
@@ -111,19 +139,19 @@ function Navbar() {
         <Box
           component={RouterLink}
           to="/"
-          sx={{ display: "flex", alignItems: "center", gap: 1, textDecoration: "none" }}
+          sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none" }}
         >
           <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#F8B500" }}>
-            Pensasha
+          <Typography variant="h6" sx={{ fontFamily: '"Playfair Display", serif', fontWeight: 600, color: "#fff" }}>
+            Pensasha <Box component="span" sx={{ color: "#D4AF37", fontWeight: 400 }}>Houses</Box>
           </Typography>
         </Box>
-        <IconButton onClick={() => setMobileOpen(false)} sx={{ color: "#fff" }}>
+        <IconButton onClick={() => setMobileOpen(false)} sx={{ color: "#94A3B8", "&:hover": { color: "#fff" } }}>
           <CloseIcon />
         </IconButton>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", mb: 3 }} />
+      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", mb: 3 }} />
 
       <List sx={{ flexGrow: 1 }}>
         {navItems.map((item) => (
@@ -134,16 +162,16 @@ function Navbar() {
               onClick={item.requiresAuth ? handleAuthOpen : undefined}
               sx={getDrawerItemStyles(item.link)}
             >
-              <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#F8B500" : "#fff" }}>
+              <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#D4AF37" : "#94A3B8" }}>
                 {item.icon}
               </ListItemIcon>
-              <ListItemText primary={item.label} />
+              <ListItemText primary={item.label} disableTypography sx={{ fontSize: "0.95rem" }} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", mb: 3 }} />
+      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", mb: 3 }} />
 
       <ListItem disablePadding>
         <ListItemButton
@@ -151,17 +179,18 @@ function Navbar() {
           sx={{
             py: 1.5,
             borderRadius: 2,
-            backgroundColor: "#F8B500",
+            backgroundColor: "#D4AF37",
             justifyContent: "center",
-            fontWeight: 700,
-            color: "#111",
-            "&:hover": { backgroundColor: "#e0a400" },
+            fontWeight: 600,
+            color: "#0B0F17",
+            boxShadow: "0 4px 14px rgba(212, 175, 55, 0.25)",
+            "&:hover": { backgroundColor: "#B5922B" },
           }}
         >
           <ListItemIcon sx={{ minWidth: 35 }}>
-            <LoginIcon sx={{ color: "#111" }} />
+            <LoginIcon sx={{ color: "#0B0F17", fontSize: "1.2rem" }} />
           </ListItemIcon>
-          <ListItemText primary="Login / Sign Up" />
+          <ListItemText primary="Login / Sign Up" disableTypography sx={{ fontWeight: 600 }} />
         </ListItemButton>
       </ListItem>
     </Box>
@@ -169,75 +198,88 @@ function Navbar() {
 
   return (
     <>
-      <AppBar 
-        position="fixed" 
-        elevation={0} 
-        sx={{ 
-          backgroundColor: "rgba(42, 42, 42, 0.9)", 
-          backdropFilter: "blur(8px)",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
-          flexShrink: 0 
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          backgroundColor: "rgba(11, 15, 23, 0.75)",
+          backdropFilter: "blur(16px)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          flexShrink: 0
         }}
       >
         <Container maxWidth="lg">
-          <Toolbar 
-            disableGutters 
-            sx={{ 
-              justifyContent: "space-between", 
-              minHeight: { xs: 56, md: 64 } 
+          <Toolbar
+            disableGutters
+            sx={{
+              justifyContent: "space-between",
+              minHeight: { xs: 60, md: 72 }
             }}
           >
-            <Box 
-              component={RouterLink} 
-              to="/" 
+            {/* Logo */}
+            <Box
+              component={RouterLink}
+              to="/"
               sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none" }}
             >
-              <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: { xs: 28, md: 32 } }} />
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 700, 
-                  color: "#fff", 
-                  letterSpacing: "-0.5px",
-                  fontSize: { xs: "1.1rem", md: "1.25rem" }
+              <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: { xs: 28, md: 34 } }} />
+              <Typography
+                variant="h6"
+                sx={{
+                  fontFamily: '"Playfair Display", Georgia, serif',
+                  fontWeight: 600,
+                  color: "#FFFFFF",
+                  letterSpacing: "-0.02em",
+                  fontSize: { xs: "1.15rem", md: "1.35rem" }
                 }}
               >
-                Pensasha{!isTiny && " Houses"}
+                Pensasha{!isTiny && <Box component="span" sx={{ color: "#D4AF37", fontWeight: 400 }}> Houses</Box>}
               </Typography>
             </Box>
 
+            {/* Desktop Navigation */}
             {!isMobile ? (
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                 {navItems.map((item) => (
                   <Button
                     key={item.label}
                     component={item.requiresAuth ? "button" : RouterLink}
                     to={item.requiresAuth ? undefined : item.link}
                     onClick={item.requiresAuth ? handleAuthOpen : undefined}
-                    startIcon={item.icon}
                     sx={getButtonStyles(item.link)}
                   >
                     {item.label}
                   </Button>
                 ))}
+
                 <Button
                   variant="contained"
                   onClick={handleAuthOpen}
                   sx={{
-                    ml: 1,
+                    ml: 1.5,
                     textTransform: "none",
                     fontWeight: 600,
+                    fontSize: "0.9rem",
                     borderRadius: "8px",
-                    backgroundColor: "#F8B500",
-                    color: "#111",
-                    "&:hover": { backgroundColor: "#e0a400" },
+                    px: 3,
+                    py: 1,
+                    backgroundColor: "#D4AF37",
+                    color: "#0B0F17",
+                    boxShadow: "0 4px 14px rgba(212, 175, 55, 0.2)",
+                    "&:hover": {
+                      backgroundColor: "#B5922B",
+                      boxShadow: "0 6px 20px rgba(212, 175, 55, 0.3)",
+                    },
                   }}
                 >
                   Login
                 </Button>
               </Box>
             ) : (
-              <IconButton color="inherit" onClick={handleDrawerToggle} sx={{ p: 1 }}>
+              <IconButton
+                onClick={handleDrawerToggle}
+                sx={{ color: "#F8FAFC", p: 1 }}
+              >
                 <MenuIcon fontSize="medium" />
               </IconButton>
             )}
@@ -248,7 +290,7 @@ function Navbar() {
       <Backdrop
         open={mobileOpen}
         onClick={() => setMobileOpen(false)}
-        sx={{ zIndex: theme.zIndex.drawer - 1, backgroundColor: "rgba(0,0,0,0.5)" }}
+        sx={{ zIndex: theme.zIndex.drawer - 1, backgroundColor: "rgba(0, 0, 0, 0.7)" }}
       />
       <Drawer
         anchor="right"
