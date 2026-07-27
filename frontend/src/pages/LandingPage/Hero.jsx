@@ -1,114 +1,254 @@
-import { Box, Container, Stack, Typography, Button } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+// src/pages/LandingPage/Hero.jsx
+import React, { useState } from "react";
+import {
+  Box,
+  Container,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+  MenuItem,
+  InputAdornment,
+  Chip,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import backgroundImage from "../../assets/background.jpg";
 
-const COLORS = { primary: "#F8B500", primaryDark: "#c59000", dark: "#111" };
+const PROPERTY_TYPES = [
+  { value: "all", label: "All Types" },
+  { value: "apartment", label: "Apartment" },
+  { value: "house", label: "Stand-alone House" },
+  { value: "studio", label: "Studio / Bedsitter" },
+  { value: "commercial", label: "Commercial Space" },
+];
+
+const PRICE_RANGES = [
+  { value: "all", label: "Any Price" },
+  { value: "0-20000", label: "Under KES 20,000" },
+  { value: "20000-50000", label: "KES 20,000 - 50,000" },
+  { value: "50000-100000", label: "KES 50,000 - 100,000" },
+  { value: "100000+", label: "KES 100,000+" },
+];
 
 function Hero() {
+  const navigate = useNavigate();
+  const [locationQuery, setLocationQuery] = useState("");
+  const [propertyType, setPropertyType] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
+
+  const handleSearch = () => {
+    // Navigate to listings page with filter query params
+    const params = new URLSearchParams();
+    if (locationQuery) params.append("location", locationQuery);
+    if (propertyType !== "all") params.append("type", propertyType);
+    if (priceRange !== "all") params.append("price", priceRange);
+
+    navigate(`/properties?${params.toString()}`);
+  };
+
   return (
     <Box
       sx={{
-        /* 1. HEIGHT: We use minHeight: "85vh" to make it feel full-screen 
-           while leaving a "peek" of the content below to encourage scrolling.
-        */
-        minHeight: "92vh", 
-        
-        /* 2. CENTERING: Flexbox handles the vertical and horizontal 
-           alignment of your text and buttons.
-        */
+        minHeight: { xs: "85vh", md: "93vh" },
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        textAlign: "center",
-
-        /* 3. BACKGROUND: Clean integration using the imported image.
-        */
-        backgroundImage: `url(${backgroundImage})`,
+        position: "relative",
+        backgroundImage: `linear-gradient(to bottom, rgba(11, 15, 23, 0.45) 0%, rgba(11, 15, 23, 0.85) 100%), radial-gradient(circle, rgba(11,15,23,0.2) 0%, rgba(11,15,23,0.8) 100%), url(${backgroundImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        position: "relative",
         color: "#fff",
-
-        /* NOTE: No 'mt' (margin-top) needed here anymore! 
-           AppLayout.jsx handles the 64px offset.
-        */
+        py: { xs: 8, md: 10 },
       }}
     >
-      {/* Overlay: Darks the photo so text is readable */}
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: "rgba(0,0,0,0.55)",
-          zIndex: 0,
-        }}
-      />
-
-      {/* Hero Content */}
-      <Container maxWidth="md" sx={{ position: "relative", zIndex: 1 }}>
-        <Stack spacing={3} alignItems="center">
-          {/* Main Heading */}
-          <Typography
-            variant="h2"
+      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+        <Stack spacing={4} alignItems="center" textAlign="center">
+          
+          {/* Subtle Tagline Badge */}
+          <Chip
+            label="REFINED LIVING & PROPERTY MANAGEMENT"
             sx={{
-              fontWeight: 700,
-              fontSize: { xs: "2.2rem", md: "3.5rem" },
-              lineHeight: 1.2,
-              textShadow: "0 3px 12px rgba(0,0,0,0.6)",
+              backgroundColor: "rgba(212, 175, 55, 0.12)",
+              color: "#D4AF37",
+              border: "1px solid rgba(212, 175, 55, 0.3)",
+              fontWeight: 600,
+              fontSize: "0.75rem",
+              letterSpacing: "0.1em",
+              px: 1,
+              py: 0.5,
+              backdropFilter: "blur(8px)",
+            }}
+          />
+
+          {/* Main Headline */}
+          <Typography
+            variant="h1"
+            sx={{
+              fontFamily: '"Playfair Display", Georgia, serif',
+              fontWeight: 600,
+              fontSize: { xs: "2.4rem", sm: "3.5rem", md: "4.2rem" },
+              lineHeight: 1.15,
+              letterSpacing: "-0.02em",
+              maxWidth: 900,
+              textShadow: "0 4px 20px rgba(0,0,0,0.5)",
             }}
           >
-            Discover Your Next Home
+            Discover Extraordinary Living
           </Typography>
 
           {/* Subtitle */}
-          <Box sx={{ px: { xs: 2, md: 3 }, py: 1.5 }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                maxWidth: 600,
-                fontSize: { xs: "1.05rem", md: "1.25rem" },
-                fontWeight: 500,
-                color: "rgba(255, 255, 255, 0.9)",
-                lineHeight: 1.6,
-                textShadow: "0 2px 6px rgba(0,0,0,0.5)",
-              }}
-            >
-              Pensasha connects tenants with their dream homes, helps landlords find
-              the right clients, and simplifies property management — all in one
-              seamless platform.
-            </Typography>
-          </Box>
-
-          {/* CTA Button */}
-          <Button
-            component={RouterLink}
-            to="/properties"
-            startIcon={<SearchIcon />}
-            variant="contained"
+          <Typography
+            variant="body1"
             sx={{
-              backgroundColor: COLORS.primary,
-              color: COLORS.dark,
-              fontWeight: 700,
-              px: 5,
-              py: 1.8,
-              borderRadius: 2,
-              textTransform: "none",
-              fontSize: "1.1rem",
-              transition: "0.3s ease",
-              "&:hover": { 
-                backgroundColor: COLORS.primaryDark,
-                transform: "translateY(-2px)",
-                boxShadow: "0 6px 25px rgba(248,181,0,0.4)",
-              },
+              maxWidth: 680,
+              fontSize: { xs: "1rem", md: "1.15rem" },
+              color: "#94A3B8",
+              lineHeight: 1.6,
+              fontWeight: 400,
             }}
           >
-            Browse Properties
-          </Button>
+            Pensasha connects clients with exceptional properties, simplifies management 
+            for landlords, and delivers an uncompromised experience.
+          </Typography>
+
+          {/* Floating Glassmorphic Search Bar Widget */}
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: 1000,
+              mt: { xs: 2, md: 3 },
+              p: { xs: 2, md: 2.5 },
+              backgroundColor: "rgba(15, 23, 42, 0.65)",
+              backdropFilter: "blur(20px)",
+              borderRadius: "16px",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)",
+            }}
+          >
+            <Stack
+              direction={{ xs: "column", md: "row" }}
+              spacing={2}
+              alignItems="center"
+            >
+              {/* Location Input */}
+              <TextField
+                fullWidth
+                placeholder="Location (e.g. Kisumu, Westlands)"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LocationOnOutlinedIcon sx={{ color: "#D4AF37" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={fieldStyles}
+              />
+
+              {/* Property Type Dropdown */}
+              <TextField
+                select
+                fullWidth
+                value={propertyType}
+                onChange={(e) => setPropertyType(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <HomeOutlinedIcon sx={{ color: "#D4AF37" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={fieldStyles}
+              >
+                {PROPERTY_TYPES.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              {/* Price Range Dropdown */}
+              <TextField
+                select
+                fullWidth
+                value={priceRange}
+                onChange={(e) => setPriceRange(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AttachMoneyOutlinedIcon sx={{ color: "#D4AF37" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={fieldStyles}
+              >
+                {PRICE_RANGES.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              {/* Search CTA Button */}
+              <Button
+                variant="contained"
+                onClick={handleSearch}
+                startIcon={<SearchIcon />}
+                sx={{
+                  width: { xs: "100%", md: "auto" },
+                  minWidth: 160,
+                  height: 54,
+                  px: 4,
+                  backgroundColor: "#D4AF37",
+                  color: "#0B0F17",
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                  borderRadius: "10px",
+                  textTransform: "none",
+                  whiteSpace: "nowrap",
+                  boxShadow: "0 4px 14px rgba(212, 175, 55, 0.3)",
+                  "&:hover": {
+                    backgroundColor: "#B5922B",
+                    boxShadow: "0 6px 20px rgba(212, 175, 55, 0.4)",
+                  },
+                }}
+              >
+                Search
+              </Button>
+            </Stack>
+          </Box>
+
         </Stack>
       </Container>
     </Box>
   );
 }
+
+// Reusable custom styling for Hero input fields inside dark glass background
+const fieldStyles = {
+  "& .MuiOutlinedInput-root": {
+    color: "#F8FAFC",
+    height: 54,
+    borderRadius: "10px",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    "& fieldset": {
+      borderColor: "rgba(255, 255, 255, 0.12)",
+    },
+    "&:hover fieldset": {
+      borderColor: "rgba(212, 175, 55, 0.4)",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#D4AF37",
+    },
+  },
+  "& .MuiSelect-icon": {
+    color: "#94A3B8",
+  },
+};
 
 export default Hero;
