@@ -5,7 +5,6 @@ import HotDeals from "./HotDeals";
 import Categories from "./Categories";
 import HowItWorks from "./HowItWorks";
 import FinalCTA from "./FinalCTA";
-import Footer from "./Footer";
 import AuthModal from "../Auth/AuthModal";
 import ScrollReveal from "./ScrollReveal"; // Adjust path if located elsewhere
 
@@ -41,8 +40,6 @@ function LandingPage() {
       <ScrollReveal>
         <FinalCTA handleAuthOpen={() => setAuthOpen(true)} />
       </ScrollReveal>
-
-      <Footer howItWorksRef={howItWorksRef} />
 
       {/* Authentication Modal */}
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />

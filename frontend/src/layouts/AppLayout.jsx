@@ -3,7 +3,7 @@ import React from "react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import MainFooter from "../components/MainFooter";
+import Footer from "../components/Footer";
 
 function AppLayout() {
   return (
@@ -30,7 +30,7 @@ function AppLayout() {
         <Outlet />
       </Box>
 
-      <MainFooter />
+      <Footer howItWorksRef="{howItWorksRef}"/>
     </Box>
   );
 }
