@@ -10,10 +10,7 @@ import { useAuth } from "../pages/Auth/AuthContext";
 const RoleSwitcherDashboard = () => {
   const { user } = useAuth();
 
-  // Ensure roles is always an array of strings
   const roles = Array.isArray(user?.roles) ? user.roles.filter(r => typeof r === "string") : [];
-
-  // Filter only the dashboards we support
   const roleTabs = roles.filter((r) =>
     ["TENANT", "LANDLORD", "CARETAKER", "ADMIN"].includes(r.toUpperCase())
   );
@@ -43,31 +40,43 @@ const RoleSwitcherDashboard = () => {
 
   if (roleTabs.length === 0)
     return (
-      <Typography variant="body1" align="center">
+      <Typography variant="body1" align="center" sx={{ color: "text.secondary", mt: 4 }}>
         You do not have access to any dashboards.
       </Typography>
     );
 
   return (
     <Box>
-      {/* Role Selector Tabs */}
+      {/* Role Selector Tabs with Glassmorphism Container */}
       {roleTabs.length > 1 && (
-        <Tabs
-          value={activeTab}
-          onChange={(_, value) => setActiveTab(value)}
-          centered
-          sx={{ mb: 3 }}
+        <Box 
+          sx={{ 
+            mb: 4, 
+            display: "flex", 
+            justifyContent: "center",
+          }}
         >
-          {roleTabs.map((role) => {
-            // Ensure label is a string and safe for MUI
-            const label =
-              typeof role === "string"
-                ? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()
-                : "Unknown";
+          <Tabs
+            value={activeTab}
+            onChange={(_, value) => setActiveTab(value)}
+            centered
+            sx={{
+              bgcolor: "rgba(255, 255, 255, 0.03)",
+              borderRadius: "12px",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              p: 0.5,
+            }}
+          >
+            {roleTabs.map((role) => {
+              const label =
+                typeof role === "string"
+                  ? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()
+                  : "Unknown";
 
-            return <Tab key={role} label={label} />;
-          })}
-        </Tabs>
+              return <Tab key={role} label={label} />;
+            })}
+          </Tabs>
+        </Box>
       )}
 
       {/* Render selected dashboard */}
