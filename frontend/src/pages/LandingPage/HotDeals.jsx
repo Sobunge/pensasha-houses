@@ -9,14 +9,15 @@ function HotDeals() {
   return (
     <Box
       sx={{
-        backgroundColor: "#0F172A", // Deep obsidian/slate base for strong visual contrast
-        backgroundImage: "radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 75%)",
-        py: { xs: 8, md: 10 },
-        borderTop: "1px solid rgba(212, 175, 55, 0.3)", // Subtle gold border definition
-        borderBottom: "1px solid rgba(212, 175, 55, 0.3)",
+        backgroundColor: "#0F172A",
+        // Blends smoothly from #F8FAFC at the top edge down into dark slate, and back out at the bottom
+        backgroundImage: `
+          linear-gradient(180deg, #F8FAFC 0%, #0F172A 20px, #0F172A calc(100% - 20px), #F8FAFC 100%),
+          radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.15) 0%, transparent 60%)
+        `,
+        py: { xs: 10, md: 14 },
         position: "relative",
         textAlign: 'center',
-        boxShadow: "inset 0 10px 20px -10px rgba(0,0,0,0.5)",
       }}
     >
       <Container maxWidth="md">

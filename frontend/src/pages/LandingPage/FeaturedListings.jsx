@@ -71,9 +71,10 @@ const FeaturedListings = () => {
     <Box 
       sx={{ 
         backgroundColor: "#F8FAFC", 
+        // Smooth gradient transition from Hero (#0B0F17) into #F8FAFC
+        backgroundImage: "linear-gradient(180deg, #0B0F17 0%, #F8FAFC 20px)",
         py: { xs: 8, md: 12 }, 
         position: "relative",
-        borderTop: "1px solid #E2E8F0"
       }}
     >
       <Container maxWidth="lg">
