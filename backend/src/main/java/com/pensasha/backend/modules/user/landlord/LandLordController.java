@@ -33,7 +33,7 @@ public class LandLordController {
             @RequestParam(defaultValue = "10") int size) {
 
         log.info("API call: Get paginated landlords - page: {}, size: {}", page, size);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("idNumber").ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(GetLandLordDTO::getIdNumber).ascending());
 
         Page<GetLandLordDTO> landlordPage = landlordService.getAllLandlords(pageable);
 
