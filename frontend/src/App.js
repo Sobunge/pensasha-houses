@@ -1,6 +1,8 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import theme from "./theme/theme"; // Import your luxury MUI theme here
 import ScrollToTop from "./config/ScrollToTop";
 
 // Layouts
@@ -28,45 +30,49 @@ import ProtectedRoute from "./pages/Auth/ProtectedRoute";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* ===== Public Routes ===== */}
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-            <Route path="/properties" element={<ListingsPage />} />
-            <Route path="/properties/:id" element={<PropertyDetails />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
+    <ThemeProvider theme={theme}>
+      {/* CssBaseline resets browser defaults & applies background.default (#0B0F17) globally */}
+      <CssBaseline />
+      <AuthProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            {/* ===== Public Routes ===== */}
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+              <Route path="/properties" element={<ListingsPage />} />
+              <Route path="/properties/:id" element={<PropertyDetails />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
 
-          {/* ===== Protected Dashboard (All Roles) ===== */}
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            {/* Main Dashboard (dynamic based on permissions) */}
-            <Route index element={<MainDashboard />} />
-            
-            {/* Optional shared pages if needed */}
-            <Route path="profile" element={<UserProfilePage />} />
-            <Route path="my-properties" element={<PropertiesPage />} />
-            <Route path="management/inventory/units" element={<UnitsPage />} />
-            <Route path="management/inventory/units/:id" element={<UnitPage />} />
-            <Route path="properties/:id" element={<PropertyDetails />} />
+            {/* ===== Protected Dashboard (All Roles) ===== */}
+            <Route
+              path="/dashboard/*"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              {/* Main Dashboard (dynamic based on permissions) */}
+              <Route index element={<MainDashboard />} />
+              
+              {/* Optional shared pages if needed */}
+              <Route path="profile" element={<UserProfilePage />} />
+              <Route path="my-properties" element={<PropertiesPage />} />
+              <Route path="management/inventory/units" element={<UnitsPage />} />
+              <Route path="management/inventory/units/:id" element={<UnitPage />} />
+              <Route path="properties/:id" element={<PropertyDetails />} />
 
-            {/* Fallback for unknown dashboard routes */}
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </Router>
-    </AuthProvider>
+              {/* Fallback for unknown dashboard routes */}
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
