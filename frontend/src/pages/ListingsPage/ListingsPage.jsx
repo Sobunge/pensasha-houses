@@ -24,7 +24,7 @@ const ListingsPage = () => {
   const toggleDrawer = (open) => () => setDrawerOpen(open);
 
   /**
-   * Mock properties (replace with API later)
+   * Mock properties
    */
   const properties = useMemo(() => Array.from({ length: 20 }, (_, i) => ({
     id: i + 1,
@@ -75,38 +75,79 @@ const ListingsPage = () => {
   return (
     <Box
       sx={{
-        /* 1. REMOVED mt: Layout handles this now. */
         px: { xs: 2, md: 4 },
-        py: 4, 
-        bgcolor: "#f8f9fa",
+        /* Account for fixed Navbar height (60px mobile / 72px desktop) + spacing */
+        pt: { xs: "80px", md: "100px" },
+        pb: { xs: 6, md: 8 },
+        bgcolor: "#F8FAFC",
         minHeight: "100vh",
       }}
     >
-      {/* Page header */}
-      <Box sx={{ textAlign: "center", mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, color: "#111" }}>
+      {/* Page Header */}
+      <Box sx={{ textAlign: "center", mb: 5 }}>
+        <Typography
+          variant="overline"
+          sx={{
+            color: "#B5922B",
+            fontWeight: 700,
+            letterSpacing: "0.15em",
+            fontSize: "0.8rem",
+          }}
+        >
+          DISCOVER RESIDENCES
+        </Typography>
+
+        <Typography
+          variant="h3"
+          sx={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontWeight: 600,
+            color: "#0F172A",
+            fontSize: { xs: "1.8rem", md: "2.5rem" },
+            mt: 0.5,
+            mb: 1.5,
+          }}
+        >
           Explore Available Listings
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+
+        <Typography variant="body1" sx={{ color: "#64748B", maxWidth: 600, mx: "auto", mb: 2 }}>
           Find your next home — browse apartments, villas, and studios across Kenya.
         </Typography>
-        <Divider sx={{ width: 60, mx: "auto", borderBottomWidth: 3, borderColor: "#F8B500" }} />
+
+        <Divider
+          sx={{
+            width: 60,
+            mx: "auto",
+            borderBottomWidth: 3,
+            borderColor: "#D4AF37",
+            borderRadius: "2px",
+          }}
+        />
       </Box>
 
-      {/* Mobile filter button */}
+      {/* Mobile Filter Button */}
       {isTabletOrMobile && (
-        <Box sx={{ textAlign: "center", mb: 3 }}>
+        <Box sx={{ textAlign: "center", mb: 4 }}>
           <Button
             variant="contained"
             startIcon={<FilterAltOutlinedIcon />}
             onClick={toggleDrawer(true)}
             sx={{
-              bgcolor: "#F8B500",
-              color: "#111",
-              fontWeight: 700,
-              borderRadius: 2,
-              px: 3,
-              "&:hover": { bgcolor: "#e0a400" },
+              bgcolor: "#0F172A",
+              color: "#FFFFFF",
+              fontWeight: 600,
+              borderRadius: "10px",
+              border: "1px solid #D4AF37",
+              px: 3.5,
+              py: 1,
+              textTransform: "none",
+              boxShadow: "0 4px 14px rgba(15, 23, 42, 0.15)",
+              "&:hover": {
+                bgcolor: "#B5922B",
+                borderColor: "#B5922B",
+                color: "#FFFFFF",
+              },
             }}
           >
             Show Filters
@@ -114,7 +155,7 @@ const ListingsPage = () => {
         </Box>
       )}
 
-      {/* Main content */}
+      {/* Main Content Layout */}
       <Box
         sx={{
           display: { xs: "block", md: "flex" },
@@ -122,24 +163,20 @@ const ListingsPage = () => {
           gap: 4,
         }}
       >
-        {/* Sidebar (desktop) */}
+        {/* Sidebar (Desktop) */}
         {!isTabletOrMobile && (
           <Box
             sx={{
               flex: "0 0 300px",
               position: "sticky",
-              /* 2. SIMPLIFIED STICKY: 
-                 Since the main container is already padded by 64px, 
-                 'top: 20px' here means the sidebar stays 20px below the Navbar.
-              */
-              top: 84, // 64px (navbar) + 20px gap
+              top: 92, // 72px (fixed navbar height) + 20px padding gap
             }}
           >
             <SidebarFilter onFilter={handleFilterChange} />
           </Box>
         )}
 
-        {/* Listings */}
+        {/* Listings Grid & Pagination */}
         <Box sx={{ flex: 1 }}>
           <PropertyGrid properties={displayedProperties} />
 
@@ -149,10 +186,19 @@ const ListingsPage = () => {
               page={page}
               onChange={handlePageChange}
               sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "#0F172A",
+                  fontWeight: 600,
+                  borderRadius: "8px",
+                  "&:hover": {
+                    backgroundColor: "rgba(212, 175, 55, 0.15)",
+                  },
+                },
                 "& .Mui-selected": {
-                  bgcolor: "#F8B500 !important",
-                  color: "#111",
+                  bgcolor: "#B5922B !important",
+                  color: "#FFFFFF !important",
                   fontWeight: 700,
+                  boxShadow: "0 4px 10px rgba(181, 146, 43, 0.3)",
                 },
               }}
             />
@@ -160,15 +206,29 @@ const ListingsPage = () => {
         </Box>
       </Box>
 
-      {/* Filter drawer (mobile) */}
+      {/* Filter Drawer (Mobile) */}
       <Drawer
         anchor="left"
         open={drawerOpen}
         onClose={toggleDrawer(false)}
-        PaperProps={{ sx: { width: "85vw", maxWidth: 320, p: 2 } }}
+        PaperProps={{
+          sx: {
+            width: "85vw",
+            maxWidth: 320,
+            p: 2.5,
+            backgroundColor: "#FFFFFF",
+            borderRight: "1px solid #D4AF37",
+          },
+        }}
       >
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-          <IconButton onClick={toggleDrawer(false)}>
+          <IconButton 
+            onClick={toggleDrawer(false)}
+            sx={{
+              color: "#0F172A",
+              "&:hover": { color: "#B5922B" },
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </Box>
