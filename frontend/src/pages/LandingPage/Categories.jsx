@@ -120,12 +120,12 @@ function Categories() {
                 onClick={() => instanceRef.current?.prev()}
                 sx={{
                   color: '#0F172A',
-                  border: '1px solid #E2E8F0',
+                  border: '1px solid #D4AF37',
                   backgroundColor: '#FFFFFF',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                   '&:hover': {
                     backgroundColor: '#F1F5F9',
-                    borderColor: '#D4AF37',
+                    borderColor: '#B5922B',
                     color: '#B5922B',
                   },
                 }}
@@ -136,12 +136,12 @@ function Categories() {
                 onClick={() => instanceRef.current?.next()}
                 sx={{
                   color: '#0F172A',
-                  border: '1px solid #E2E8F0',
+                  border: '1px solid #D4AF37',
                   backgroundColor: '#FFFFFF',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                   '&:hover': {
                     backgroundColor: '#F1F5F9',
-                    borderColor: '#D4AF37',
+                    borderColor: '#B5922B',
                     color: '#B5922B',
                   },
                 }}
@@ -169,14 +169,14 @@ function Categories() {
                   height: 160,
                   backgroundColor: '#FFFFFF',
                   borderRadius: '16px',
-                  border: '1px solid #E2E8F0',
-                  boxShadow: '0 10px 30px -5px rgba(15, 23, 42, 0.04)',
+                  border: '1px solid #D4AF37', // Gold Border
+                  boxShadow: '0 10px 30px -5px rgba(212, 175, 55, 0.1)',
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                   cursor: 'pointer',
                   '&:hover': {
                     transform: 'translateY(-6px)',
-                    borderColor: 'rgba(212, 175, 55, 0.6)',
-                    boxShadow: '0 20px 35px -10px rgba(15, 23, 42, 0.12)',
+                    border: '1.5px solid #B5922B', // Darker Gold on Hover
+                    boxShadow: '0 12px 30px rgba(212, 175, 55, 0.25)',
                     '& .category-icon': {
                       color: '#B5922B',
                       transform: 'scale(1.12)',
