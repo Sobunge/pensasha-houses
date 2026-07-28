@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Slider,
