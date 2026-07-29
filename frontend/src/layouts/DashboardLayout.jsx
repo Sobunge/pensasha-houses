@@ -1,6 +1,6 @@
 // src/layouts/DashboardLayout.jsx
 import React, { useState, useRef, useEffect } from "react";
-import { Box } from "@mui/material";
+import { Box} from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import UsersNavbar from "../components/UsersNavbar";
 import UserSidebar from "../components/UserSidebar";
@@ -29,7 +29,17 @@ function DashboardLayout() {
   if (!user) return null;
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", overflow: "hidden", bgcolor: "#0B0F17" }}>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        overflow: "hidden",
+        // Luxurious Alabaster Canvas (not stark flat white)
+        bgcolor: "#F8FAFC", 
+        color: "#0F172A",
+      }}
+    >
+      {/* Sidebar - Pro Tip: A deep slate sidebar (#0F172A) here instantly gives it an executive feel */}
       <UserSidebar 
         mobileOpen={mobileOpen} 
         onClose={() => setMobileOpen(false)} 
@@ -41,7 +51,7 @@ function DashboardLayout() {
           display: "flex",
           flexDirection: "column",
           minWidth: 0,
-          bgcolor: "#0E1420", // Deep navy-slate portal background
+          bgcolor: "#F8FAFC", 
           height: "100vh",
         }}
       >
@@ -51,13 +61,14 @@ function DashboardLayout() {
           ref={mainRef}
           component="main"
           role="main"
+          id="mainContent"
           tabIndex={-1}
           sx={{
             flexGrow: 1,
             mt: `${NAVBAR_HEIGHT}px`,
             overflowY: "auto",
             overflowX: "hidden",
-            p: { xs: 2, md: 3 },
+            p: { xs: 2.5, md: 1 },
             outline: "none",
             display: "flex",
             flexDirection: "column",
