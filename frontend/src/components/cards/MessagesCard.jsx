@@ -25,87 +25,183 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
 
   const handleNavigate = (path) => {
     navigate(path);
-    if (onClose) onClose(); // Close modal/popover if handler is passed
+    if (onClose) onClose();
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header with Close Button */}
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <MailOutlineIcon sx={{ color: "#f8b500", mr: 1 }} />
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, flexGrow: 1 }}>
+    <Box
+      sx={{
+        p: 2.5,
+        width: compact ? { xs: 300, sm: 360 } : "100%",
+        bgcolor: "#FFFFFF",
+      }}
+    >
+      {/* --- Header --- */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: "8px",
+            bgcolor: "rgba(212, 175, 55, 0.12)",
+            color: "#D4AF37",
+            mr: 1.5,
+          }}
+        >
+          <MailOutlineIcon sx={{ fontSize: 18 }} />
+        </Box>
+
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 700, color: "#0F172A", flexGrow: 1, letterSpacing: "-0.2px" }}
+        >
           Messages
         </Typography>
+
         {onClose && (
-          <IconButton size="small" onClick={onClose}>
+          <IconButton
+            size="small"
+            onClick={onClose}
+            sx={{
+              color: "#64748B",
+              "&:hover": { bgcolor: "#F1F5F9", color: "#0F172A" },
+            }}
+          >
             <CloseIcon fontSize="small" />
           </IconButton>
         )}
       </Box>
 
-      {/* Divider after header */}
-      <Divider sx={{ my: 2 }} />
+      <Divider sx={{ mb: 2, borderColor: "#E2E8F0" }} />
 
-      {/* Message List */}
-      <Stack spacing={compact ? 1.5 : 2}>
-        {displayMessages.map((msg) => (
-          <Box
-            key={msg.id}
-            onClick={() => handleNavigate(`/${role}/messages/${msg.id}`)}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              p: 1,
-              borderRadius: 2,
-              cursor: "pointer",
-              bgcolor: msg.unread ? "#fffbe6" : "#f7f7f7",
-              "&:hover": { bgcolor: "#fff3cd" },
-            }}
-          >
-            {/* Avatar */}
-            <Avatar sx={{ bgcolor: "#f8b500", width: 36, height: 36 }}>
-              {msg.sender[0]}
-            </Avatar>
-
-            {/* Message Content */}
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: msg.unread ? 600 : 500 }}
-                noWrap
+      {/* --- Message List --- */}
+      <Stack spacing={1}>
+        {displayMessages.length === 0 ? (
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
+            No messages available.
+          </Typography>
+        ) : (
+          displayMessages.map((msg) => (
+            <Box
+              key={msg.id}
+              onClick={() => handleNavigate(`/${role}/messages/${msg.id}`)}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                p: 1.25,
+                borderRadius: "12px",
+                cursor: "pointer",
+                transition: "all 0.2s ease-in-out",
+                // Subtle dark text & light warm tint for unread items
+                bgcolor: msg.unread ? "rgba(212, 175, 55, 0.05)" : "transparent",
+                border: "1px solid",
+                borderColor: msg.unread ? "rgba(212, 175, 55, 0.25)" : "transparent",
+                "&:hover": {
+                  bgcolor: "rgba(212, 175, 55, 0.10)",
+                  borderColor: "rgba(212, 175, 55, 0.4)",
+                  transform: "translateX(2px)",
+                },
+              }}
+            >
+              {/* Avatar with initial or image */}
+              <Avatar
+                sx={{
+                  bgcolor: msg.unread ? "#0F172A" : "#64748B",
+                  color: msg.unread ? "#D4AF37" : "#FFFFFF",
+                  width: 38,
+                  height: 38,
+                  fontSize: "0.875rem",
+                  fontWeight: 700,
+                  border: msg.unread ? "1.5px solid #D4AF37" : "none",
+                }}
               >
-                {msg.sender}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" noWrap>
-                {msg.lastMessage}
-              </Typography>
+                {msg.sender ? msg.sender[0].toUpperCase() : "U"}
+              </Avatar>
+
+              {/* Message Details */}
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      fontWeight: msg.unread ? 700 : 500,
+                      color: "#0F172A",
+                      fontSize: "0.875rem",
+                    }}
+                    noWrap
+                  >
+                    {msg.sender}
+                  </Typography>
+
+                  {/* Unread Glow Dot */}
+                  {msg.unread && (
+                    <Box
+                      sx={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
+                        bgcolor: "#D4AF37",
+                        boxShadow: "0 0 6px rgba(212, 175, 55, 0.8)",
+                      }}
+                    />
+                  )}
+                </Box>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: msg.unread ? "#334155" : "#64748B",
+                    fontSize: "0.78rem",
+                    fontWeight: msg.unread ? 500 : 400,
+                  }}
+                  noWrap
+                >
+                  {msg.lastMessage}
+                </Typography>
+              </Box>
+
+              {/* Timestamp (Expanded View) */}
+              {!compact && (
+                <Typography variant="caption" sx={{ color: "#94A3B8", fontSize: "0.7rem" }}>
+                  {msg.time || "10:00 AM"}
+                </Typography>
+              )}
             </Box>
+          ))
+        )}
 
-            {/* Timestamp */}
-            {!compact && (
-              <Typography variant="caption" color="text.secondary">
-                {msg.time || "10:00 AM"}
-              </Typography>
-            )}
-          </Box>
-        ))}
-
-        {/* View All Button */}
+        {/* --- View All Footer Button --- */}
         {compact && (
-          <>
-            <Divider sx={{ my: 1 }} />
+          <Box sx={{ pt: 1 }}>
             <Button
               fullWidth
               variant="contained"
               size="small"
-              sx={{ bgcolor: "#f8b500", "&:hover": { bgcolor: "#c59000" } }}
-              endIcon={<ArrowForwardIcon />}
               onClick={() => handleNavigate(`/${role}/messages`)}
+              endIcon={<ArrowForwardIcon fontSize="small" />}
+              sx={{
+                bgcolor: "#0F172A",
+                color: "#FFFFFF",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "10px",
+                py: 1,
+                fontSize: "0.8125rem",
+                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+                "&:hover": {
+                  bgcolor: "#D4AF37",
+                  color: "#0F172A",
+                  boxShadow: "0 4px 12px rgba(212, 175, 55, 0.3)",
+                },
+              }}
             >
-              View All
+              View All Messages
             </Button>
-          </>
+          </Box>
         )}
       </Stack>
     </Box>
