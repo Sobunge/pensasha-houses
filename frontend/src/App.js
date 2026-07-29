@@ -1,9 +1,8 @@
-// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import theme from "./theme/theme"; // Import your luxury MUI theme here
-import ScrollToTop from "./config/ScrollToTop";
+import ScrollToTop from "./config/ScrollToTop"; // Route change scroll resets
 
 // Layouts
 import AppLayout from "./layouts/AppLayout";
@@ -36,6 +35,7 @@ function App() {
       <AuthProvider>
         <Router>
           <ScrollToTop />
+
           <Routes>
             {/* ===== Public Routes ===== */}
             <Route element={<AppLayout />}>

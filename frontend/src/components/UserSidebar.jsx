@@ -4,8 +4,6 @@ import {
   Box,
   Drawer,
   List,
-  useMediaQuery,
-  useTheme,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -21,17 +19,13 @@ import { DRAWER_WIDTH } from "../layouts/constants";
 import { getMenuItems } from "../config/menuItems";
 
 function UserSidebar({ mobileOpen, onClose }) {
-  const theme = useTheme();
-  const isTiny = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
-  const { user, activeRole } = useAuth(); // Pull activeRole from switcher logic
+  const { user, activeRole } = useAuth();
 
-  // Get menu items based on the active role from the switcher
   const menuItems = useMemo(() => {
     return getMenuItems(activeRole || user?.role);
   }, [activeRole, user]);
 
-  // Determine active route
   const isMenuItemActive = (item) => {
     const path = location.pathname;
     if (path === item.link) return true;
@@ -39,9 +33,9 @@ function UserSidebar({ mobileOpen, onClose }) {
     return false;
   };
 
-  // Accessibility: focus main content when drawer closes
+  // Fixed Accessibility logic: only focus main when closing AFTER it was already open
   useEffect(() => {
-    if (!mobileOpen) {
+    if (mobileOpen === false) {
       const main = document.getElementById("mainContent");
       if (main) main.focus();
     }
@@ -51,15 +45,24 @@ function UserSidebar({ mobileOpen, onClose }) {
     <Box
       sx={{
         height: "100%",
-        // Deep Obsidian Slate background for luxury contrast anchor
         bgcolor: "#0F172A",
         color: "#F8FAFC",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* Brand Header (Preserved exact logo markup) */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 1.5, p: 3 }}>
+      {/* Brand Header */}
+      {/* Brand Header */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 1.5,
+          p: 3,
+          flexShrink: 0
+        }}
+      >
         <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
         <Typography
           variant="h6"
@@ -72,23 +75,21 @@ function UserSidebar({ mobileOpen, onClose }) {
           }}
         >
           Pensasha
-          {!isTiny && (
-            <Box component="span" sx={{ color: "#D4AF37", fontWeight: 400 }}>
-              {" "}
-              Houses
-            </Box>
-          )}
+          <Box component="span" sx={{ color: "#D4AF37", fontWeight: 400 }}>
+            {" "}
+            Houses
+          </Box>
         </Typography>
       </Box>
 
-      {/* Role Indicator Chip (Styled for dark canvas) */}
-      <Box sx={{ px: 3, mb: 2 }}>
+      {/* Role Indicator Chip */}
+      <Box sx={{ px: 3, mb: 2, flexShrink: 0 }}>
         <Chip
           label={`${activeRole?.replace("ROLE_", "")} MODE`}
           size="small"
           sx={{
-            bgcolor: "rgba(212, 175, 55, 0.15)", // Soft Champagne Gold tint
-            color: "#D4AF37", // Bright gold text for dark contrast
+            bgcolor: "rgba(212, 175, 55, 0.15)",
+            color: "#D4AF37",
             fontWeight: 800,
             fontSize: "0.65rem",
             borderRadius: "6px",
@@ -98,11 +99,11 @@ function UserSidebar({ mobileOpen, onClose }) {
         />
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", mx: 2 }} />
+      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", mx: 2, flexShrink: 0 }} />
 
       {/* Navigation Menu */}
-      <Box sx={{ flexGrow: 1, pt: 2, overflow: "hidden" }}>
-        <SimpleBar style={{ height: "100%" }} autoHide>
+      <Box sx={{ flexGrow: 1, minHeight: 0, pt: 2 }}>
+        <SimpleBar style={{ maxHeight: "100%" }} autoHide>
           <List sx={{ px: 2 }}>
             {menuItems.map((item) => {
               const active = isMenuItemActive(item);
@@ -127,18 +128,17 @@ function UserSidebar({ mobileOpen, onClose }) {
                         color: "#D4AF37",
                       },
                     },
-                    // Active State Left Gold Indicator Bar
                     "&::before": active
                       ? {
-                          content: '""',
-                          position: "absolute",
-                          left: 0,
-                          top: "15%",
-                          height: "70%",
-                          width: "4px",
-                          bgcolor: "#D4AF37",
-                          borderRadius: "0 4px 4px 0",
-                        }
+                        content: '""',
+                        position: "absolute",
+                        left: 0,
+                        top: "15%",
+                        height: "70%",
+                        width: "4px",
+                        bgcolor: "#D4AF37",
+                        borderRadius: "0 4px 4px 0",
+                      }
                       : {},
                   }}
                 >
@@ -167,10 +167,10 @@ function UserSidebar({ mobileOpen, onClose }) {
         </SimpleBar>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />
+      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", flexShrink: 0 }} />
 
       {/* Footer */}
-      <Box sx={{ p: 2, textAlign: "center" }}>
+      <Box sx={{ p: 2, textAlign: "center", flexShrink: 0 }}>
         <Typography
           variant="caption"
           sx={{
@@ -196,10 +196,13 @@ function UserSidebar({ mobileOpen, onClose }) {
         ModalProps={{ keepMounted: true, disableEnforceFocus: true }}
         sx={{
           display: { xs: "block", md: "none" },
+          // Ensure mobile drawer sits on top of TopAppBar
+          zIndex: (theme) => theme.zIndex.drawer + 2,
           "& .MuiDrawer-paper": {
             width: DRAWER_WIDTH,
             bgcolor: "#0F172A",
             borderRight: "none",
+            boxSizing: "border-box",
           },
         }}
       >
@@ -217,6 +220,7 @@ function UserSidebar({ mobileOpen, onClose }) {
             bgcolor: "#0F172A",
             borderRight: "none",
             boxShadow: "4px 0 24px rgba(15, 23, 42, 0.08)",
+            boxSizing: "border-box",
           },
         }}
       >

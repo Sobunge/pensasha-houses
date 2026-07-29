@@ -1,10 +1,11 @@
 // src/layouts/DashboardLayout.jsx
 import React, { useState, useRef, useEffect } from "react";
-import { Box} from "@mui/material";
+import { Box } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import UsersNavbar from "../components/UsersNavbar";
 import UserSidebar from "../components/UserSidebar";
 import UserFooter from "../components/UserFooter";
+import ScrollToTopButton from "../components/ScrollToTopButton"; // <--- 1. Import component
 import { useAuth } from "../pages/Auth/AuthContext";
 import { NAVBAR_HEIGHT } from "../layouts/constants";
 
@@ -34,15 +35,14 @@ function DashboardLayout() {
         display: "flex",
         minHeight: "100vh",
         overflow: "hidden",
-        // Luxurious Alabaster Canvas (not stark flat white)
-        bgcolor: "#F8FAFC", 
+        bgcolor: "#F8FAFC",
         color: "#0F172A",
       }}
     >
-      {/* Sidebar - Pro Tip: A deep slate sidebar (#0F172A) here instantly gives it an executive feel */}
-      <UserSidebar 
-        mobileOpen={mobileOpen} 
-        onClose={() => setMobileOpen(false)} 
+      {/* Sidebar */}
+      <UserSidebar
+        mobileOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
       />
 
       <Box
@@ -51,7 +51,7 @@ function DashboardLayout() {
           display: "flex",
           flexDirection: "column",
           minWidth: 0,
-          bgcolor: "#F8FAFC", 
+          bgcolor: "#F8FAFC",
           height: "100vh",
         }}
       >
@@ -61,7 +61,7 @@ function DashboardLayout() {
           ref={mainRef}
           component="main"
           role="main"
-          id="mainContent"
+          id="mainContent" // <--- Already defined as "mainContent"
           tabIndex={-1}
           sx={{
             flexGrow: 1,
@@ -72,12 +72,13 @@ function DashboardLayout() {
             outline: "none",
             display: "flex",
             flexDirection: "column",
+            position: "relative", // Ensures relative positioning scope
           }}
         >
-          <Box 
-            sx={{ 
-              maxWidth: 1200, 
-              mx: "auto", 
+          <Box
+            sx={{
+              maxWidth: 1200,
+              mx: "auto",
               width: "100%",
               flexGrow: 1,
             }}
@@ -86,6 +87,9 @@ function DashboardLayout() {
           </Box>
 
           <UserFooter />
+
+          {/* 2. Pass containerId="mainContent" */}
+          <ScrollToTopButton containerId="mainContent" />
         </Box>
       </Box>
     </Box>
