@@ -1,6 +1,6 @@
 // src/pages/ListingsPage/PropertyDetails.jsx
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -15,6 +15,7 @@ import {
   Breadcrumbs,
   Link,
   useMediaQuery,
+  Paper,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -22,10 +23,10 @@ import {
   Place as PlaceIcon,
   Bed as BedIcon,
   Bathtub as BathtubIcon,
-  AttachMoney as AttachMoneyIcon,
   Send as SendIcon,
   CheckCircle as CheckCircleIcon,
   ChevronRight as ChevronRightIcon,
+  LocalOffer as PriceTagIcon,
 } from "@mui/icons-material";
 
 import PropertyGallery from "./PropertyGallery";
@@ -101,106 +102,199 @@ export default function PropertyDetails() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         aria-label="breadcrumb"
-        separator={<ChevronRightIcon fontSize="small" />}
-        sx={{ mb: 3, fontSize: { xs: "0.85rem", md: "1rem" }, color: "text.secondary" }}
+        separator={<ChevronRightIcon fontSize="small" sx={{ color: theme.palette.text.secondary }} />}
+        sx={{ mb: 3, fontSize: { xs: "0.85rem", md: "0.95rem" } }}
       >
         <Link
-          href="/"
+          component={RouterLink}
+          to="/"
           underline="hover"
-          sx={{ display: "flex", alignItems: "center", color: "#555" }}
+          sx={{ display: "flex", alignItems: "center", color: theme.palette.text.secondary, fontWeight: 500 }}
         >
           <HomeIcon sx={{ mr: 0.5, fontSize: 18 }} /> Home
         </Link>
-        <Link href="/properties" underline="hover" sx={{ color: "#555" }}>
-          Listings
+        <Link
+          component={RouterLink}
+          to="/properties"
+          underline="hover"
+          sx={{ color: theme.palette.text.secondary, fontWeight: 500 }}
+        >
+          Properties
         </Link>
-        <Typography color="text.primary" sx={{ fontWeight: 500 }}>
+        <Typography color="text.primary" sx={{ fontWeight: 700 }}>
           {property.title}
         </Typography>
       </Breadcrumbs>
 
-      {/* Property Card */}
+      {/* Property Main Card */}
       <Card
-        elevation={4}
+        elevation={0}
         sx={{
-          borderRadius: 3,
+          borderRadius: "16px",
           overflow: "hidden",
-          transition: "0.3s ease",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-          "&:hover": {
-            boxShadow: "0 8px 28px rgba(0,0,0,0.15)",
-            transform: "translateY(-3px)",
-          },
+          bgcolor: "#FFFFFF",
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow: "0 4px 20px rgba(15, 23, 42, 0.06)",
         }}
       >
         <CardMedia
           component="img"
           image={property.image}
           alt={property.title}
-          sx={{ height: { xs: 240, sm: 340, md: 420 }, objectFit: "cover", borderBottom: "4px solid #f8b500" }}
+          sx={{
+            height: { xs: 260, sm: 360, md: 440 },
+            objectFit: "cover",
+            borderBottom: "3px solid #FDE68A",
+          }}
         />
 
         <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
-          <Typography variant={isMobile ? "h5" : "h4"} fontWeight={700} gutterBottom>
-            {property.title}
-          </Typography>
-
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1, color: "text.secondary" }}>
-            <PlaceIcon sx={{ mr: 0.5, fontSize: 20 }} />
-            <Typography variant="body1">{property.location}</Typography>
-          </Box>
-
-          <Grid container spacing={2} sx={{ my: 2 }}>
-            <Grid item xs={12} sm="auto">
-              <Typography>
-                <BedIcon sx={{ mr: 0.5 }} /> {property.beds} Beds
+          {/* Header & Location */}
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: { sm: "flex-start" }, gap: 2, mb: 2 }}>
+            <Box>
+              <Typography
+                variant={isMobile ? "h5" : "h4"}
+                sx={{ fontWeight: 800, color: theme.palette.text.primary, letterSpacing: "-0.02em", mb: 0.5 }}
+              >
+                {property.title}
               </Typography>
-            </Grid>
-            <Grid item xs={12} sm="auto">
-              <Typography>
-                <BathtubIcon sx={{ mr: 0.5 }} /> {property.baths} Baths
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm="auto">
-              <Typography>
-                <HomeIcon sx={{ mr: 0.5 }} /> {property.type}
-              </Typography>
-            </Grid>
-          </Grid>
 
-          <Box sx={{ textAlign: { xs: "center", sm: "left" }, mb: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", color: theme.palette.text.secondary }}>
+                <PlaceIcon sx={{ mr: 0.5, fontSize: 20, color: "#D97706" }} />
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  {property.location}
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Price Tag */}
             <Chip
-              icon={<AttachMoneyIcon />}
-              label={`Ksh ${property.price.toLocaleString()} / month`}
-              color="warning"
-              sx={{ fontWeight: 700, fontSize: "1rem", px: 1.5, py: 1, boxShadow: "0 3px 8px rgba(248,181,0,0.4)" }}
+              icon={<PriceTagIcon sx={{ color: "#D97706 !important" }} />}
+              label={`Ksh ${property.price.toLocaleString()} / mo`}
+              sx={{
+                fontWeight: 800,
+                fontSize: "1.05rem",
+                px: 1.5,
+                py: 2.5,
+                bgcolor: "#FEF3C7",
+                color: "#D97706",
+                border: "1.5px solid #FDE68A",
+                borderRadius: "12px",
+                alignSelf: { xs: "flex-start", sm: "auto" },
+              }}
             />
           </Box>
 
-          <Divider sx={{ my: { xs: 2, md: 3 } }} />
+          {/* Quick Specs Pill Grid */}
+          <Grid container spacing={1.5} sx={{ my: 2 }}>
+            <Grid item xs={4} sm="auto">
+              <Paper
+                elevation={0}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  px: 2,
+                  py: 1,
+                  borderRadius: "10px",
+                  bgcolor: "#F8FAFC",
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <BedIcon sx={{ color: "#0F172A", fontSize: 20 }} />
+                <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                  {property.beds} Beds
+                </Typography>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={4} sm="auto">
+              <Paper
+                elevation={0}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  px: 2,
+                  py: 1,
+                  borderRadius: "10px",
+                  bgcolor: "#F8FAFC",
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <BathtubIcon sx={{ color: "#0F172A", fontSize: 20 }} />
+                <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                  {property.baths} Baths
+                </Typography>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={4} sm="auto">
+              <Paper
+                elevation={0}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  px: 2,
+                  py: 1,
+                  borderRadius: "10px",
+                  bgcolor: "#F8FAFC",
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <HomeIcon sx={{ color: "#0F172A", fontSize: 20 }} />
+                <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                  {property.type}
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: { xs: 3, md: 4 } }} />
+
+          {/* Gallery Component */}
           <PropertyGallery gallery={property.gallery} />
 
-          <Typography sx={{ mt: { xs: 3, md: 4 }, mb: { xs: 2, md: 3 }, color: "text.secondary", lineHeight: 1.7 }}>
+          {/* Description */}
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: theme.palette.text.primary, mt: { xs: 3, md: 4 }, mb: 1 }}
+          >
+            About this property
+          </Typography>
+          <Typography
+            sx={{
+              color: theme.palette.text.secondary,
+              lineHeight: 1.7,
+              fontSize: "1rem",
+              mb: 4,
+            }}
+          >
             {property.description}
           </Typography>
 
+          {/* Amenities Section */}
           <Box sx={{ mb: 4 }}>
-            <Typography variant={isMobile ? "h6" : "h5"} fontWeight={600} mb={1.5}>
-              Amenities
+            <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.text.primary, mb: 2 }}>
+              Amenities & Features
             </Typography>
             <Grid container spacing={1.5}>
-              {property.amenities.map((a, i) => (
+              {property.amenities.map((amenity, i) => (
                 <Grid item key={i} xs={6} sm="auto">
                   <Chip
-                    icon={<CheckCircleIcon sx={{ color: "#f8b500" }} />}
-                    label={a}
-                    variant="outlined"
+                    icon={<CheckCircleIcon sx={{ color: "#D97706 !important" }} />}
+                    label={amenity}
                     sx={{
-                      borderColor: "#f8b500",
+                      bgcolor: "#F8FAFC",
+                      borderColor: "#FDE68A",
+                      borderWidth: "1px",
+                      borderStyle: "solid",
                       borderRadius: "8px",
-                      color: "#333",
-                      fontWeight: 500,
-                      boxShadow: "0 2px 6px rgba(248,181,0,0.2)",
+                      color: theme.palette.text.primary,
+                      fontWeight: 600,
+                      px: 0.5,
+                      py: 2,
                     }}
                   />
                 </Grid>
@@ -208,27 +302,28 @@ export default function PropertyDetails() {
             </Grid>
           </Box>
 
-          {/* Request Button */}
-          <Box sx={{ textAlign: isMobile ? "center" : "left", py: 1 }}>
+          <Divider sx={{ my: 3 }} />
+
+          {/* Primary Action */}
+          <Box sx={{ textAlign: isMobile ? "center" : "left", pt: 1 }}>
             <Button
               variant="contained"
               size="large"
               onClick={handleRequestClick}
               startIcon={<SendIcon />}
               sx={{
-                background: "linear-gradient(45deg, #f8b500, #ffc62c)",
-                color: "#111",
+                bgcolor: "#D97706",
+                color: "#FFFFFF",
                 fontWeight: 700,
-                borderRadius: 2,
-                px: 5,
-                py: 1.5,
                 fontSize: "1rem",
-                transition: "0.3s",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+                borderRadius: "10px",
+                px: 4.5,
+                py: 1.5,
+                textTransform: "none",
+                boxShadow: "0 4px 14px rgba(217, 119, 6, 0.3)",
                 "&:hover": {
-                  background: "linear-gradient(45deg, #ffc62c, #f8b500)",
-                  transform: "scale(1.05)",
-                  boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+                  bgcolor: "#B45309",
+                  boxShadow: "0 6px 18px rgba(217, 119, 6, 0.4)",
                 },
               }}
             >

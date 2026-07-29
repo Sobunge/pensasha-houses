@@ -16,7 +16,7 @@ import UnitsPage from "./pages/UnitPage/UnitsPage";
 import UnitPage from "./pages/UnitPage/UnitPage";
 import ForgotPasswordPage from "./pages/Auth/ForgotPassword/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/Auth/ForgotPassword/ResetPasswordPage";
-import ListingsPage from "./pages/ListingsPage/ListingsPage";
+import ListingsPage from "./pages/ListingsPage/BrowseListings";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 import PropertyDetails from "./pages/ListingsPage/PropertyDetails";
 import NotFound from "./pages/NotFoundPage/NotFound";

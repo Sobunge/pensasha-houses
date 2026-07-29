@@ -251,7 +251,7 @@ function Navbar() {
           },
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="xl">
           <Toolbar
             disableGutters
             sx={{
