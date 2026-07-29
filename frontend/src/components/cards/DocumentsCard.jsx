@@ -1,3 +1,4 @@
+// src/components/DocumentsCard.jsx
 import React from "react";
 import {
   Card,
@@ -9,8 +10,8 @@ import {
   CircularProgress,
   Stack,
 } from "@mui/material";
-import DescriptionIcon from "@mui/icons-material/Description";
-import FolderSharedIcon from "@mui/icons-material/FolderShared"; 
+import DescriptionIcon from "@mui/icons-material/DescriptionOutlined";
+import FolderSharedIcon from "@mui/icons-material/FolderSharedOutlined";
 import { useNavigate } from "react-router-dom";
 import { useDocumentCount } from "../../components/hooks/useDocumentCount";
 
@@ -23,16 +24,17 @@ function DocumentsCard({ userId }) {
       elevation={0}
       sx={{
         flex: { xs: "1 1 100%", md: "1 1 45%", lg: "0 1 400px" },
-        minWidth: { xs: "100%", sm: "320px" }, // Maintains standard width across all cards
-        borderRadius: 4,
-        border: "1px solid",
-        borderColor: "divider",
+        minWidth: { xs: "100%", sm: "320px" },
+        borderRadius: "16px",
+        border: "1px solid #E2E8F0",
+        bgcolor: "#FFFFFF",
         display: "flex",
         flexDirection: "column",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        "&:hover": { 
-          boxShadow: "0 12px 40px rgba(0,0,0,0.08)", 
-          transform: "translateY(-5px)" 
+        "&:hover": {
+          boxShadow: "0px 12px 32px rgba(15, 23, 42, 0.08)",
+          transform: "translateY(-4px)",
+          borderColor: "rgba(212, 175, 55, 0.4)",
         },
       }}
     >
@@ -43,13 +45,33 @@ function DocumentsCard({ userId }) {
           alignItems: "center",
           gap: 1.5,
           p: 2,
-          bgcolor: "rgba(248, 181, 0, 0.04)",
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          bgcolor: "rgba(212, 175, 55, 0.04)",
+          borderBottom: "1px solid #E2E8F0",
         }}
       >
-        <DescriptionIcon sx={{ color: "#f8b500" }} />
-        <Typography variant="subtitle1" fontWeight={800} color="text.primary">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: "8px",
+            bgcolor: "rgba(212, 175, 55, 0.12)",
+            color: "#D4AF37",
+          }}
+        >
+          <DescriptionIcon sx={{ fontSize: 18 }} />
+        </Box>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 700,
+            color: "#0F172A",
+            fontSize: "1rem",
+            letterSpacing: "-0.2px",
+          }}
+        >
           Documents
         </Typography>
       </Box>
@@ -68,35 +90,59 @@ function DocumentsCard({ userId }) {
       >
         {loading ? (
           <Stack alignItems="center" spacing={1.5}>
-            <CircularProgress size={28} sx={{ color: "#f8b500" }} />
-            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+            <CircularProgress size={28} sx={{ color: "#D4AF37" }} />
+            <Typography
+              variant="body2"
+              sx={{ color: "#64748B", fontWeight: 500 }}
+            >
               Syncing files...
             </Typography>
           </Stack>
         ) : error ? (
-          <Typography variant="body2" color="error.main" fontWeight={600}>
+          <Typography
+            variant="body2"
+            sx={{ color: "#EF4444", fontWeight: 600 }}
+          >
             Connection failed. Please retry.
           </Typography>
         ) : (
           <Box textAlign="center">
-            <Typography variant="h3" fontWeight={900} sx={{ color: "#1a1a1a", lineHeight: 1 }}>
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 800,
+                color: "#0F172A",
+                lineHeight: 1,
+                fontSize: { xs: "2.5rem", sm: "3rem" },
+              }}
+            >
               {docCount || 0}
             </Typography>
-            <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ mt: 1, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 1.5,
+                color: "#64748B",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.8px",
+                fontSize: "0.75rem",
+              }}
+            >
               Available Document{docCount !== 1 ? "s" : ""}
             </Typography>
           </Box>
         )}
       </CardContent>
 
-      <Divider sx={{ borderStyle: "dashed", opacity: 0.6 }} />
+      <Divider sx={{ borderStyle: "dashed", borderColor: "#E2E8F0" }} />
 
       {/* Footer Action - Responsive Aligned */}
       <Box
         sx={{
           p: 2,
           display: "flex",
-          justifyContent: { xs: "center", sm: "flex-end" }, // Centers button for easier tapping on mobile
+          justifyContent: { xs: "center", sm: "flex-end" },
         }}
       >
         <Button
@@ -105,28 +151,35 @@ function DocumentsCard({ userId }) {
           onClick={() => navigate("/tenant/documents")}
           disabled={loading || error}
           sx={{
-            bgcolor: "#f8b500",
-            color: "#000000",
+            bgcolor: "#0F172A",
+            color: "#FFFFFF",
             textTransform: "none",
-            fontWeight: 900,
-            fontSize: { xs: "0.825rem", sm: "0.875rem" }, // Slightly smaller font on mobile
+            fontWeight: 700,
+            fontSize: { xs: "0.8125rem", sm: "0.875rem" },
             px: { xs: 2, sm: 3 },
             py: 1.2,
-            borderRadius: 2.5,
-            width: { xs: "100%", sm: "auto" }, // Expands to full width on small screens
-            boxShadow: "0 4px 12px 0 rgba(248, 181, 0, 0.25)",
+            borderRadius: "10px",
+            width: { xs: "100%", sm: "auto" },
+            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
             "& .MuiButton-startIcon": {
-              color: "#000000",
+              color: "#D4AF37",
             },
-            "&:hover": { 
-              bgcolor: "#eab000", 
-              boxShadow: "0 6px 16px rgba(248, 181, 0, 0.4)",
-              transform: "translateY(-1px)",
+            "&:hover": {
+              bgcolor: "#D4AF37",
+              color: "#0F172A",
+              boxShadow: "0 6px 16px rgba(212, 175, 55, 0.3)",
+              "& .MuiButton-startIcon": {
+                color: "#0F172A",
+              },
             },
             "&.Mui-disabled": {
-              bgcolor: "action.disabledBackground"
+              bgcolor: "#F1F5F9",
+              color: "#94A3B8",
+              "& .MuiButton-startIcon": {
+                color: "#94A3B8",
+              },
             },
-            transition: "all 0.2s ease-in-out"
+            transition: "all 0.2s ease-in-out",
           }}
         >
           View Document Vault
