@@ -25,6 +25,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
+import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import LoginIcon from "@mui/icons-material/Login";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import AuthModal from "../pages/Auth/AuthModal";
@@ -38,6 +40,7 @@ const navItems = [
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [authTab, setAuthTab] = useState(0); // 0 = Login, 1 = Register
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -48,6 +51,7 @@ function Navbar() {
   // WATCHER: Automatically open AuthModal if redirected from Forgot/Reset password
   useEffect(() => {
     if (location.state?.openLogin) {
+      setAuthTab(0);
       setAuthOpen(true);
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -63,8 +67,9 @@ function Navbar() {
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
-  const handleAuthOpen = () => {
+  const handleAuthOpen = (tabIndex = 0) => {
     setMobileOpen(false);
+    setAuthTab(tabIndex);
     setAuthOpen(true);
   };
 
@@ -81,9 +86,16 @@ function Navbar() {
       position: "relative",
       px: 1.5,
       transition: "all 0.2s ease-in-out",
+      "& .MuiButton-startIcon": {
+        color: isActive ? "#D4AF37" : "#94A3B8",
+        transition: "color 0.2s ease-in-out",
+      },
       "&:hover": {
         color: "#D4AF37",
         backgroundColor: "transparent",
+        "& .MuiButton-startIcon": {
+          color: "#D4AF37",
+        },
       },
       "&::after": isActive ? {
         content: '""',
@@ -97,6 +109,27 @@ function Navbar() {
         boxShadow: "0 0 8px rgba(212, 175, 55, 0.6)",
       } : {},
     };
+  };
+
+  // Auth Link Styling
+  const authLinkStyles = {
+    color: "#CBD5E1",
+    textTransform: "none",
+    fontWeight: 500,
+    fontSize: "0.95rem",
+    px: 1.5,
+    transition: "all 0.2s ease-in-out",
+    "& .MuiButton-startIcon": {
+      color: "#94A3B8",
+      transition: "color 0.2s ease-in-out",
+    },
+    "&:hover": {
+      color: "#D4AF37",
+      backgroundColor: "transparent",
+      "& .MuiButton-startIcon": {
+        color: "#D4AF37",
+      },
+    },
   };
 
   // Mobile Drawer Styling
@@ -159,7 +192,7 @@ function Navbar() {
             <ListItemButton
               component={item.requiresAuth ? "div" : RouterLink}
               to={item.requiresAuth ? undefined : item.link}
-              onClick={item.requiresAuth ? handleAuthOpen : undefined}
+              onClick={item.requiresAuth ? () => handleAuthOpen(0) : undefined}
               sx={getDrawerItemStyles(item.link)}
             >
               <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#D4AF37" : "#94A3B8" }}>
@@ -175,7 +208,7 @@ function Navbar() {
 
       <ListItem disablePadding>
         <ListItemButton
-          onClick={handleAuthOpen}
+          onClick={() => handleAuthOpen(0)}
           sx={{
             py: 1.5,
             borderRadius: 2,
@@ -190,7 +223,7 @@ function Navbar() {
           <ListItemIcon sx={{ minWidth: 35 }}>
             <LoginIcon sx={{ color: "#0B0F17", fontSize: "1.2rem" }} />
           </ListItemIcon>
-          <ListItemText primary="Login / Sign Up" disableTypography sx={{ fontWeight: 600 }} />
+          <ListItemText primary="Login / Register" disableTypography sx={{ fontWeight: 600 }} />
         </ListItemButton>
       </ListItem>
     </Box>
@@ -204,11 +237,21 @@ function Navbar() {
         sx={{
           backgroundColor: "rgba(11, 15, 23, 0.75)",
           backdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-          flexShrink: 0
+          flexShrink: 0,
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "1px",
+            background:
+              "linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.6) 50%, rgba(212, 175, 55, 0) 100%)",
+            pointerEvents: "none",
+          },
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="xl">
           <Toolbar
             disableGutters
             sx={{
@@ -239,41 +282,43 @@ function Navbar() {
 
             {/* Desktop Navigation */}
             {!isMobile ? (
-              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {navItems.map((item) => (
                   <Button
                     key={item.label}
                     component={item.requiresAuth ? "button" : RouterLink}
                     to={item.requiresAuth ? undefined : item.link}
-                    onClick={item.requiresAuth ? handleAuthOpen : undefined}
+                    onClick={item.requiresAuth ? () => handleAuthOpen(0) : undefined}
+                    startIcon={item.icon}
                     sx={getButtonStyles(item.link)}
                   >
                     {item.label}
                   </Button>
                 ))}
 
-                <Button
-                  variant="contained"
-                  onClick={handleAuthOpen}
-                  sx={{
-                    ml: 1.5,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
-                    borderRadius: "8px",
-                    px: 3,
-                    py: 1,
-                    backgroundColor: "#D4AF37",
-                    color: "#0B0F17",
-                    boxShadow: "0 4px 14px rgba(212, 175, 55, 0.2)",
-                    "&:hover": {
-                      backgroundColor: "#B5922B",
-                      boxShadow: "0 6px 20px rgba(212, 175, 55, 0.3)",
-                    },
-                  }}
-                >
-                  Login
-                </Button>
+                <Divider 
+                  orientation="vertical" 
+                  flexItem 
+                  sx={{ borderColor: "rgba(255, 255, 255, 0.12)", my: 2, mx: 0.5 }} 
+                />
+
+                <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                  <Button
+                    onClick={() => handleAuthOpen(0)}
+                    startIcon={<LoginOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />}
+                    sx={authLinkStyles}
+                  >
+                    Login
+                  </Button>
+
+                  <Button
+                    onClick={() => handleAuthOpen(1)}
+                    startIcon={<PersonAddOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />}
+                    sx={authLinkStyles}
+                  >
+                    Register
+                  </Button>
+                </Box>
               </Box>
             ) : (
               <IconButton
@@ -303,7 +348,7 @@ function Navbar() {
         </Slide>
       </Drawer>
 
-      <AuthModal open={authOpen} onClose={handleAuthClose} />
+      <AuthModal open={authOpen} onClose={handleAuthClose} initialTab={authTab} />
     </>
   );
 }

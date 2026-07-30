@@ -1,3 +1,4 @@
+// src/components/Auth/RegistrationPage/RegistrationForm.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -8,14 +9,12 @@ import {
   Typography,
   Link as MuiLink,
   MenuItem,
-  Avatar,
   Divider,
   InputAdornment,
   IconButton,
   CircularProgress,
 } from "@mui/material";
 
-// Icons
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -60,7 +59,47 @@ const validatePassword = (value) => {
   return null;
 };
 
-/* ---------------- Registration Form ---------------- */
+/* ---------------- Premium High-Contrast Input Styles ---------------- */
+const premiumInputStyles = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    backgroundColor: "#FAFAFA",
+    color: "#0F172A",
+    fontSize: "0.95rem",
+    fontWeight: 500,
+    "& fieldset": {
+      borderColor: "#CBD5E1", // Crisper, more visible border
+      borderWidth: "1.5px",
+    },
+    "&:hover fieldset": {
+      borderColor: "#94A3B8",
+    },
+    "&.Mui-focused": {
+      backgroundColor: "#FFFFFF",
+      "& fieldset": {
+        borderColor: "#D4AF37",
+        borderWidth: "2px",
+      },
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: "#475569",
+    fontWeight: 600,
+    fontSize: "0.9rem",
+    "&.Mui-focused": {
+      color: "#D4AF37",
+    },
+  },
+  "& input::placeholder": {
+    color: "#94A3B8",
+    opacity: 1,
+  },
+  "& .MuiFormHelperText-root": {
+    color: "#DC2626",
+    fontWeight: 500,
+  },
+};
+
 export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const navigate = useNavigate();
   const { notify } = useNotification();
@@ -79,7 +118,6 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  /* ---------------- Validation ---------------- */
   const errors = {
     firstName: validateRequired(formData.firstName, "First name"),
     lastName: validateRequired(formData.lastName, "Last name"),
@@ -91,7 +129,6 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
 
   const hasErrors = Object.values(errors).some((err) => err !== null);
 
-  /* ---------------- Handlers ---------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -123,31 +160,19 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
         roles: [formData.role],
       };
 
-      // 1. Register through API
       const response = await api.post("/auth/register", payload);
       const { accessToken, principal } = response.data;
 
-      // 2. Update API header state
       setAccessToken(accessToken);
-
-      // 3. Update Global Auth Context
-      if (loginAs) {
-        loginAs(principal);
-      }
+      if (loginAs) loginAs(principal);
 
       notify("Account created successfully! Welcome.", "success", 3000);
-
-      // 4. Cleanup Modal / Parent state
       if (onSuccess) onSuccess();
 
-      /* ---------------- SMART NAVIGATION ---------------- */
-      if (redirectAfterAuth === "rent-request") {
-        // Stay on page: PropertyDetails.jsx will see user is now logged in
-        // and trigger the request dialog.
-      } else if (redirectAfterAuth) {
+      if (redirectAfterAuth && redirectAfterAuth !== "rent-request") {
         navigate(redirectAfterAuth, { replace: true });
         setRedirectAfterAuth(null);
-      } else {
+      } else if (redirectAfterAuth !== "rent-request") {
         navigate("/dashboard", { replace: true });
       }
     } catch (err) {
@@ -167,16 +192,30 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
       noValidate
       sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      <Avatar sx={{ bgcolor: "#f8b500", width: 56, height: 56, mb: 1 }}>
-        <PersonAddIcon sx={{ color: "#000" }} />
-      </Avatar>
-
-      <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+      {/* Header */}
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 800,
+          color: "#0F172A",
+          letterSpacing: "-0.02em",
+          mb: 0.5,
+          textAlign: "center",
+        }}
+      >
         Create Your Account
       </Typography>
 
-      <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
-        <Box sx={{ display: "flex", gap: 1, width: "100%" }}>
+      <Typography 
+        variant="body2" 
+        sx={{ color: "#64748B", mb: 2.5, textAlign: "center" }}
+      >
+        Sign up to start searching or listing properties
+      </Typography>
+
+      <Stack spacing={2} sx={{ width: "100%" }}>
+        {/* Name Row */}
+        <Box sx={{ display: "flex", gap: 1.5, width: "100%" }}>
           <TextField
             fullWidth
             label="First Name"
@@ -189,10 +228,11 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             required
             error={touched.firstName && !!errors.firstName}
             helperText={touched.firstName && errors.firstName}
+            sx={premiumInputStyles}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <PersonIcon fontSize="small" />
+                  <PersonIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
                 </InputAdornment>
               ),
             }}
@@ -209,16 +249,18 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             required
             error={touched.lastName && !!errors.lastName}
             helperText={touched.lastName && errors.lastName}
+            sx={premiumInputStyles}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <PersonIcon fontSize="small" />
+                  <PersonIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
                 </InputAdornment>
               ),
             }}
           />
         </Box>
 
+        {/* Phone */}
         <TextField
           fullWidth
           label="Phone Number"
@@ -231,16 +273,20 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           placeholder="7XXXXXXXX"
           error={touched.phoneNumber && !!errors.phoneNumber}
           helperText={touched.phoneNumber && errors.phoneNumber}
+          sx={premiumInputStyles}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PhoneIcon fontSize="small" sx={{ mr: 0.5 }} />
-                <Typography sx={{ fontWeight: 500 }}>+254</Typography>
+                <PhoneIcon sx={{ color: "#475569", mr: 0.5, fontSize: "1.1rem" }} />
+                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.9rem" }}>
+                  +254
+                </Typography>
               </InputAdornment>
             ),
           }}
         />
 
+        {/* Email */}
         <TextField
           fullWidth
           label="Email Address"
@@ -254,15 +300,17 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           error={touched.email && !!errors.email}
           helperText={touched.email && errors.email}
+          sx={premiumInputStyles}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <EmailIcon fontSize="small" />
+                <EmailIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
               </InputAdornment>
             ),
           }}
         />
 
+        {/* Password */}
         <TextField
           fullWidth
           label="Password"
@@ -273,22 +321,27 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           onChange={handleChange}
           onBlur={handleBlur("password")}
           size="small"
-          sx={{ "& input::-ms-reveal, & input::-ms-clear": { display: "none" } }}
           required
           error={touched.password && !!errors.password}
           helperText={touched.password && errors.password}
+          sx={{
+            ...premiumInputStyles,
+            "& input::-ms-reveal, & input::-ms-clear": { display: "none" },
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon fontSize="small" />
+                <LockIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
+                  type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                   size="small"
+                  sx={{ color: "#64748B" }}
                 >
                   {showPassword ? (
                     <VisibilityOffIcon fontSize="small" />
@@ -301,8 +354,10 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           }}
         />
 
+        {/* Select Role */}
         <TextField
           select
+          fullWidth
           label="Role"
           name="role"
           value={formData.role}
@@ -312,13 +367,14 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           error={touched.role && !!errors.role}
           helperText={touched.role && errors.role}
+          sx={premiumInputStyles}
           InputLabelProps={{ shrink: true }}
           SelectProps={{
             displayEmpty: true,
             renderValue: (selected) => {
               if (!selected)
                 return (
-                  <Typography sx={{ color: "text.secondary", fontSize: "0.9rem" }}>
+                  <Typography sx={{ color: "#94A3B8", fontSize: "0.9rem" }}>
                     Select Role
                   </Typography>
                 );
@@ -333,6 +389,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           <MenuItem value="LANDLORD">Landlord</MenuItem>
         </TextField>
 
+        {/* Submit Button */}
         <Button
           type="submit"
           variant="contained"
@@ -343,35 +400,44 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             loading ? (
               <CircularProgress size={20} color="inherit" />
             ) : (
-              <PersonAddIcon />
+              <PersonAddIcon sx={{ fontSize: "1.1rem !important" }} />
             )
           }
           sx={{
             mt: 1,
-            py: 1.2,
+            py: 1.4,
+            borderRadius: "50px",
             fontWeight: 700,
+            fontSize: "0.95rem",
             textTransform: "none",
-            bgcolor: "#f8b500",
-            color: "#000",
-            "&:hover": { bgcolor: "#e0a400" },
+            bgcolor: "#D4AF37",
+            color: "#000000",
+            boxShadow: "0 4px 14px rgba(212, 175, 55, 0.35)",
+            transition: "all 0.2s ease-in-out",
+            "&:hover": {
+              bgcolor: "#B5922B",
+              boxShadow: "0 6px 18px rgba(181, 146, 43, 0.45)",
+            },
           }}
         >
           {loading ? "Processing..." : "Register"}
         </Button>
 
-        <Divider sx={{ my: 1 }} />
+        <Divider sx={{ borderColor: "#F1F5F9", my: 0.5 }} />
 
-        <Typography variant="body2" align="center">
+        {/* Switch Link */}
+        <Typography variant="body2" textAlign="center" sx={{ color: "#64748B" }}>
           Already have an account?{" "}
           <MuiLink
             component="button"
             type="button"
             onClick={switchToLogin}
             sx={{
-              cursor: "pointer",
-              textDecoration: "none",
               fontWeight: 700,
-              color: "#f8b500",
+              color: "#D4AF37",
+              textDecoration: "none",
+              ml: 0.5,
+              "&:hover": { textDecoration: "underline" },
             }}
           >
             Sign In

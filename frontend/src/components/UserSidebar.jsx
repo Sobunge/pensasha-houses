@@ -20,14 +20,12 @@ import { getMenuItems } from "../config/menuItems";
 
 function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
-  const { user, activeRole } = useAuth(); // 🔥 Pull activeRole from your switcher logic
+  const { user, activeRole } = useAuth();
 
-  // 🔥 Get menu items based on the active role from the switcher
   const menuItems = useMemo(() => {
     return getMenuItems(activeRole || user?.role);
   }, [activeRole, user]);
 
-  // Determine active route
   const isMenuItemActive = (item) => {
     const path = location.pathname;
     if (path === item.link) return true;
@@ -35,9 +33,9 @@ function UserSidebar({ mobileOpen, onClose }) {
     return false;
   };
 
-  // Accessibility: focus main content when drawer closes
+  // Fixed Accessibility logic: only focus main when closing AFTER it was already open
   useEffect(() => {
-    if (!mobileOpen) {
+    if (mobileOpen === false) {
       const main = document.getElementById("mainContent");
       if (main) main.focus();
     }
@@ -47,41 +45,65 @@ function UserSidebar({ mobileOpen, onClose }) {
     <Box
       sx={{
         height: "100%",
-        bgcolor: "#111",
-        color: "#fff",
+        bgcolor: "#0F172A",
+        color: "#F8FAFC",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* Header */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 1.5, p: 3 }}>
+      {/* Brand Header */}
+      {/* Brand Header */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 1.5,
+          p: 3,
+          flexShrink: 0
+        }}
+      >
         <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
-        <Typography variant="h6" fontWeight={900} sx={{ letterSpacing: "-0.5px", textTransform: 'uppercase' }}>
-          Pensasha Houses
+        <Typography
+          variant="h6"
+          sx={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontWeight: 600,
+            color: "#FFFFFF",
+            letterSpacing: "-0.02em",
+            fontSize: { xs: "1.15rem", md: "1.35rem" },
+          }}
+        >
+          Pensasha
+          <Box component="span" sx={{ color: "#D4AF37", fontWeight: 400 }}>
+            {" "}
+            Houses
+          </Box>
         </Typography>
       </Box>
 
-      {/* Role Indicator: Shows the user which dashboard mode they are currently in */}
-      <Box sx={{ px: 3, mb: 2 }}>
-        <Chip 
+      {/* Role Indicator Chip */}
+      <Box sx={{ px: 3, mb: 2, flexShrink: 0 }}>
+        <Chip
           label={`${activeRole?.replace("ROLE_", "")} MODE`}
-          size="small" 
-          sx={{ 
-            bgcolor: "rgba(248, 181, 0, 0.1)", 
-            color: "#f8b500", 
-            fontWeight: 900, 
-            fontSize: '0.65rem',
-            borderRadius: '4px',
-            border: '1px solid rgba(248, 181, 0, 0.2)'
-          }} 
+          size="small"
+          sx={{
+            bgcolor: "rgba(212, 175, 55, 0.15)",
+            color: "#D4AF37",
+            fontWeight: 800,
+            fontSize: "0.65rem",
+            borderRadius: "6px",
+            border: "1px solid rgba(212, 175, 55, 0.3)",
+            letterSpacing: "0.05em",
+          }}
         />
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.05)", mx: 2 }} />
+      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", mx: 2, flexShrink: 0 }} />
 
-      {/* Menu */}
-      <Box sx={{ flexGrow: 1, pt: 2, overflow: "hidden" }}>
-        <SimpleBar style={{ height: "100%" }} autoHide>
+      {/* Navigation Menu */}
+      <Box sx={{ flexGrow: 1, minHeight: 0, pt: 2 }}>
+        <SimpleBar style={{ maxHeight: "100%" }} autoHide>
           <List sx={{ px: 2 }}>
             {menuItems.map((item) => {
               const active = isMenuItemActive(item);
@@ -93,33 +115,49 @@ function UserSidebar({ mobileOpen, onClose }) {
                   to={item.link}
                   onClick={onClose}
                   sx={{
-                    borderRadius: 2,
-                    mb: 0.5,
-                    color: active ? "#f8b500" : "#aaa",
-                    backgroundColor: active ? "rgba(248, 181, 0, 0.08)" : "transparent",
+                    borderRadius: "10px",
+                    mb: 0.75,
+                    position: "relative",
+                    color: active ? "#D4AF37" : "#94A3B8",
+                    backgroundColor: active ? "rgba(212, 175, 55, 0.12)" : "transparent",
                     transition: "all 0.2s ease-in-out",
                     "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.05)",
-                      color: "#f8b500",
-                      "& .MuiListItemIcon-root": { color: "#f8b500" },
+                      backgroundColor: active ? "rgba(212, 175, 55, 0.18)" : "rgba(255, 255, 255, 0.05)",
+                      color: active ? "#D4AF37" : "#F8FAFC",
+                      "& .MuiListItemIcon-root": {
+                        color: "#D4AF37",
+                      },
                     },
+                    "&::before": active
+                      ? {
+                        content: '""',
+                        position: "absolute",
+                        left: 0,
+                        top: "15%",
+                        height: "70%",
+                        width: "4px",
+                        bgcolor: "#D4AF37",
+                        borderRadius: "0 4px 4px 0",
+                      }
+                      : {},
                   }}
                 >
                   <ListItemIcon
                     sx={{
-                      minWidth: 35,
-                      color: active ? "#f8b500" : "inherit",
+                      minWidth: 36,
+                      color: active ? "#D4AF37" : "#64748B",
+                      transition: "color 0.2s ease-in-out",
                     }}
                   >
-                    {/* Ensure icons are consistently sized */}
                     {React.cloneElement(item.icon, { sx: { fontSize: 20 } })}
                   </ListItemIcon>
 
                   <ListItemText
                     primary={item.label}
                     primaryTypographyProps={{
-                      fontWeight: active ? 800 : 600,
-                      fontSize: "0.825rem",
+                      fontWeight: active ? 700 : 500,
+                      fontSize: "0.85rem",
+                      letterSpacing: "0.01em",
                     }}
                   />
                 </ListItemButton>
@@ -129,11 +167,19 @@ function UserSidebar({ mobileOpen, onClose }) {
         </SimpleBar>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", flexShrink: 0 }} />
 
       {/* Footer */}
-      <Box sx={{ p: 2, textAlign: "center" }}>
-        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.3)", fontWeight: 700 }}>
+      <Box sx={{ p: 2, textAlign: "center", flexShrink: 0 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "#64748B",
+            fontWeight: 700,
+            letterSpacing: "0.05em",
+            fontSize: "0.7rem",
+          }}
+        >
           © {new Date().getFullYear()} PENSASHA HOUSES
         </Typography>
       </Box>
@@ -150,10 +196,13 @@ function UserSidebar({ mobileOpen, onClose }) {
         ModalProps={{ keepMounted: true, disableEnforceFocus: true }}
         sx={{
           display: { xs: "block", md: "none" },
+          // Ensure mobile drawer sits on top of TopAppBar
+          zIndex: (theme) => theme.zIndex.drawer + 2,
           "& .MuiDrawer-paper": {
             width: DRAWER_WIDTH,
-            bgcolor: "#111",
+            bgcolor: "#0F172A",
             borderRight: "none",
+            boxSizing: "border-box",
           },
         }}
       >
@@ -168,8 +217,10 @@ function UserSidebar({ mobileOpen, onClose }) {
           display: { xs: "none", md: "block" },
           "& .MuiDrawer-paper": {
             width: DRAWER_WIDTH,
-            bgcolor: "#111",
-            borderRight: "1px solid rgba(255,255,255,0.05)",
+            bgcolor: "#0F172A",
+            borderRight: "none",
+            boxShadow: "4px 0 24px rgba(15, 23, 42, 0.08)",
+            boxSizing: "border-box",
           },
         }}
       >

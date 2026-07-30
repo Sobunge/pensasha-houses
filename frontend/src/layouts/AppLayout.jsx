@@ -1,9 +1,8 @@
-// src/layouts/AppLayout.jsx
 import React from "react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import MainFooter from "../components/MainFooter";
+import Footer from "../components/Footer";
 
 function AppLayout() {
   return (
@@ -24,13 +23,13 @@ function AppLayout() {
           flex: 1, 
           display: "flex", 
           flexDirection: "column",
-          pt: { xs: "56px", md: "64px" },
+          // Removed top padding so sticky/fixed transparent navbar overlays page heroes cleanly
         }}
       >
         <Outlet />
       </Box>
 
-      <MainFooter />
+      <Footer />
     </Box>
   );
 }

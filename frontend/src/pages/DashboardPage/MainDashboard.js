@@ -8,6 +8,7 @@ import {
   Stack,
   ToggleButtonGroup,
   ToggleButton,
+  useTheme,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Auth/AuthContext";
@@ -26,12 +27,12 @@ const dashboardMap = {
 };
 
 const MainDashboard = () => {
+  const theme = useTheme();
   const { user, activeRole, setActiveRole } = useAuth();
 
   if (!user) return null;
 
-  const ActiveDashboard =
-    dashboardMap[activeRole] || TenantDashboard;
+  const ActiveDashboard = dashboardMap[activeRole] || TenantDashboard;
 
   const handleRoleChange = (event, nextRole) => {
     if (!nextRole) return;
@@ -43,23 +44,22 @@ const MainDashboard = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: "#fafafa", minHeight: "100vh" }}>
-
+    <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, bgcolor: "#F8FAFC", minHeight: "100vh" }}>
       {/* HERO / HEADER */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <Card
           elevation={0}
           sx={{
             mb: 4,
-            p: { xs: 2, sm: 3 },
-            borderRadius: 4,
-            border: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
+            p: { xs: 2.5, sm: 3 },
+            borderRadius: "16px",
+            border: `1px solid ${theme.palette.divider}`,
+            bgcolor: "#FFFFFF",
+            boxShadow: "0 4px 20px rgba(15, 23, 42, 0.04)",
           }}
         >
           <Stack
@@ -72,36 +72,52 @@ const MainDashboard = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
               <Avatar
                 sx={{
-                  bgcolor: "#f8b500",
-                  color: "#000",
-                  width: { xs: 50, sm: 60 },
-                  height: { xs: 50, sm: 60 },
+                  bgcolor: "#0F172A",
+                  color: "#D97706",
+                  border: "2px solid #FDE68A",
+                  width: { xs: 52, sm: 60 },
+                  height: { xs: 52, sm: 60 },
                   fontWeight: 800,
-                  fontSize: "1.2rem",
-                  boxShadow: "0 4px 12px rgba(248, 181, 0, 0.3)",
+                  fontSize: "1.3rem",
+                  boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
                 }}
               >
-                {user.name?.[0] || "U"}
+                {user.name?.[0]?.toUpperCase() || "U"}
               </Avatar>
 
               <Box>
                 <Typography
                   variant="h5"
-                  sx={{ fontWeight: 900, color: "#1a1a1a", lineHeight: 1.2 }}
+                  sx={{
+                    fontWeight: 800,
+                    color: "#0F172A",
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.02em",
+                  }}
                 >
                   Welcome back{user?.name ? `, ${user.name}` : ""} 👋
                 </Typography>
 
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 0.5, fontWeight: 500 }}
-                >
-                  Managing as{" "}
-                  <span style={{ color: "#f8b500", fontWeight: 800 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontWeight: 500 }}>
+                    Managing as
+                  </Typography>
+                  <Box
+                    sx={{
+                      bgcolor: "#FEF3C7",
+                      color: "#B45309",
+                      px: 1.2,
+                      py: 0.25,
+                      borderRadius: "6px",
+                      fontSize: "0.775rem",
+                      fontWeight: 800,
+                      letterSpacing: "0.03em",
+                      border: "1px solid #FDE68A",
+                    }}
+                  >
                     {activeRole?.replace("ROLE_", "")}
-                  </span>
-                </Typography>
+                  </Box>
+                </Box>
               </Box>
             </Box>
 
@@ -113,25 +129,27 @@ const MainDashboard = () => {
                 onChange={handleRoleChange}
                 size="small"
                 sx={{
-                  bgcolor: "rgba(0,0,0,0.03)",
+                  bgcolor: "#F1F5F9",
                   p: 0.5,
-                  borderRadius: 3,
-                  border: "none",
+                  borderRadius: "12px",
+                  border: "1px solid #E2E8F0",
                   width: { xs: "100%", md: "auto" },
                   "& .MuiToggleButtonGroup-grouped": {
                     border: 0,
-                    borderRadius: 2.5,
-                    mx: 0.2,
+                    borderRadius: "8px",
+                    mx: 0.3,
+                    transition: "all 0.2s ease",
                     "&.Mui-selected": {
-                      bgcolor: "background.paper",
-                      color: "#000",
-                      fontWeight: 800,
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      "&:hover": { bgcolor: "background.paper" },
+                      bgcolor: "#0F172A",
+                      color: "#FFFFFF",
+                      fontWeight: 700,
+                      boxShadow: "0 2px 8px rgba(15, 23, 42, 0.18)",
+                      "&:hover": { bgcolor: "#1E293B" },
                     },
                     "&:not(.Mui-selected)": {
-                      color: "text.secondary",
+                      color: "#64748B",
                       fontWeight: 600,
+                      "&:hover": { bgcolor: "rgba(15, 23, 42, 0.04)", color: "#0F172A" },
                     },
                   },
                 }}
@@ -141,9 +159,10 @@ const MainDashboard = () => {
                     key={role}
                     value={role}
                     sx={{
-                      px: 3,
-                      py: 1,
+                      px: 2.5,
+                      py: 0.85,
                       textTransform: "none",
+                      fontSize: "0.875rem",
                       flexGrow: { xs: 1, md: 0 },
                     }}
                   >
@@ -160,9 +179,9 @@ const MainDashboard = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeRole}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
+          exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
           <ActiveDashboard />

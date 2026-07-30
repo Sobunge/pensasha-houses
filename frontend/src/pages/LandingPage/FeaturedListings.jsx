@@ -71,9 +71,9 @@ const FeaturedListings = () => {
     <Box 
       sx={{ 
         backgroundColor: "#F8FAFC", 
+        backgroundImage: "linear-gradient(180deg, #0B0F17 0%, #F8FAFC 20px)",
         py: { xs: 8, md: 12 }, 
         position: "relative",
-        borderTop: "1px solid #E2E8F0"
       }}
     >
       <Container maxWidth="lg">
@@ -118,12 +118,12 @@ const FeaturedListings = () => {
                 onClick={() => instanceRef.current?.prev()}
                 sx={{
                   color: "#0F172A",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid #D4AF37",
                   backgroundColor: "#FFFFFF",
                   boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                   "&:hover": {
                     backgroundColor: "#F1F5F9",
-                    borderColor: "#D4AF37",
+                    borderColor: "#B5922B",
                     color: "#B5922B",
                   },
                 }}
@@ -134,12 +134,12 @@ const FeaturedListings = () => {
                 onClick={() => instanceRef.current?.next()}
                 sx={{
                   color: "#0F172A",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid #D4AF37",
                   backgroundColor: "#FFFFFF",
                   boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                   "&:hover": {
                     backgroundColor: "#F1F5F9",
-                    borderColor: "#D4AF37",
+                    borderColor: "#B5922B",
                     color: "#B5922B",
                   },
                 }}
@@ -161,14 +161,14 @@ const FeaturedListings = () => {
                   flexDirection: "column",
                   backgroundColor: "#FFFFFF",
                   borderRadius: "16px",
-                  border: "1px solid #E2E8F0",
-                  boxShadow: "0 10px 30px -5px rgba(15, 23, 42, 0.05)",
+                  border: "1px solid #D4AF37", // Crisp Gold Border
+                  boxShadow: "0 10px 30px -5px rgba(212, 175, 55, 0.1)",
                   transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
                   overflow: "hidden",
                   "&:hover": {
                     transform: "translateY(-6px)",
-                    borderColor: "rgba(212, 175, 55, 0.5)",
-                    boxShadow: "0 20px 40px -10px rgba(15, 23, 42, 0.12)",
+                    border: "1.5px solid #B5922B", // Darker Gold on Hover
+                    boxShadow: "0 12px 30px rgba(212, 175, 55, 0.25)",
                     "& .card-image": {
                       transform: "scale(1.06)",
                     },
@@ -192,7 +192,7 @@ const FeaturedListings = () => {
                       transition: "transform 0.5s ease",
                     }}
                   />
-                  {/* Floating Price Chip */}
+                  {/* Floating Price Chip with Subtle Gold Border Accent */}
                   <Chip
                     label={
                       <Typography variant="body2" sx={{ fontWeight: 700, color: "#0F172A" }}>
@@ -210,7 +210,7 @@ const FeaturedListings = () => {
                       borderRadius: "8px",
                       px: 0.5,
                       boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-                      border: "1px solid rgba(226, 232, 240, 0.8)",
+                      border: "1px solid rgba(212, 175, 55, 0.5)",
                     }}
                   />
                 </Box>
@@ -270,7 +270,7 @@ const FeaturedListings = () => {
                       endIcon={<ArrowForwardIcon />}
                       sx={{
                         color: "#0F172A",
-                        borderColor: "#E2E8F0",
+                        borderColor: "#D4AF37",
                         borderRadius: "10px",
                         py: 1,
                         textTransform: "none",
@@ -278,7 +278,7 @@ const FeaturedListings = () => {
                         fontSize: "0.9rem",
                         transition: "all 0.2s ease",
                         "&:hover": {
-                          borderColor: "#0F172A",
+                          borderColor: "#B5922B",
                           backgroundColor: "#0F172A",
                           color: "#FFFFFF",
                         },

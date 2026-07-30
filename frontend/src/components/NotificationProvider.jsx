@@ -1,3 +1,4 @@
+// src/context/NotificationContext.jsx (or src/components/NotificationProvider.jsx)
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { Snackbar, Alert, Slide, Button, useTheme } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -15,7 +16,14 @@ export const NotificationProvider = ({ children }) => {
   const [queue, setQueue] = useState([]);
 
   const notify = useCallback(
-    (message, severity = "info", duration = 4000, position = { vertical: "top", horizontal: "center" }, action = null, actionLabel = null) => {
+    (
+      message,
+      severity = "info",
+      duration = 4000,
+      position = { vertical: "top", horizontal: "center" },
+      action = null,
+      actionLabel = null
+    ) => {
       // Deduplicate
       setQueue((prev) => {
         if (prev.some((n) => n.message === message && n.severity === severity)) return prev;
@@ -33,17 +41,25 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const severityIcons = {
-    success: <CheckCircleIcon />,
-    error: <ErrorIcon />,
-    warning: <WarningIcon />,
-    info: <InfoIcon />,
+    success: <CheckCircleIcon sx={{ fontSize: 22 }} />,
+    error: <ErrorIcon sx={{ fontSize: 22 }} />,
+    warning: <WarningIcon sx={{ fontSize: 22 }} />,
+    info: <InfoIcon sx={{ fontSize: 22 }} />,
   };
 
+  // Modern Theme Color Mapping (Slate & Gold Aesthetic)
   const severityColors = {
-    success: "#4CAF50",
-    error: "#F44336",
-    warning: "#FF9800",
-    info: "#2196F3",
+    success: "#10B981", // Soft Emerald
+    error: "#EF4444",   // Soft Red
+    warning: "#D97706", // Brand Warm Gold/Mustard
+    info: "#0F172A",    // Deep Dark Slate
+  };
+
+  const severityBorders = {
+    success: "#A7F3D0",
+    error: "#FECACA",
+    warning: "#FDE68A",
+    info: "#CBD5E1",
   };
 
   const current = queue[0] || null;
@@ -60,6 +76,7 @@ export const NotificationProvider = ({ children }) => {
           onClose={() => handleClose(current.id)}
           anchorOrigin={current.position}
           TransitionComponent={SlideDown}
+          sx={{ top: { xs: 16, sm: 24 } }}
         >
           <Alert
             role="alert"
@@ -67,26 +84,35 @@ export const NotificationProvider = ({ children }) => {
             severity={current.severity}
             icon={severityIcons[current.severity]}
             sx={{
-              bgcolor: theme.palette.mode === "dark" ? "#222" : "#fff",
-              border: `2px solid ${severityColors[current.severity]}`,
-              borderRadius: 3,
-              width: { xs: "90%", sm: "400px" },
-              boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+              bgcolor: theme.palette.mode === "dark" ? "#1E293B" : "#FFFFFF",
+              border: `1.5px solid ${severityBorders[current.severity]}`,
+              borderRadius: "12px",
+              width: { xs: "90vw", sm: "420px" },
+              boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.04)",
               display: "flex",
               alignItems: "center",
-              "& .MuiAlert-icon": { color: severityColors[current.severity] },
+              py: 1,
+              px: 2,
+              "& .MuiAlert-icon": {
+                color: `${severityColors[current.severity]} !important`,
+                mr: 1.5,
+              },
               "& .MuiAlert-message": {
                 flex: 1,
-                textAlign: "center",
-                fontSize: "0.95rem",
-                color: severityColors[current.severity],
+                textAlign: "left",
+                fontSize: "0.925rem",
+                color: theme.palette.mode === "dark" ? "#F8FAFC" : "#0F172A",
                 fontWeight: 600,
+                lineHeight: 1.4,
+              },
+              "& .MuiAlert-action": {
+                pt: 0,
+                alignItems: "center",
               },
             }}
             action={
               current.action ? (
                 <Button
-                  color="inherit"
                   size="small"
                   onClick={() => {
                     try {
@@ -96,10 +122,23 @@ export const NotificationProvider = ({ children }) => {
                     }
                     handleClose(current.id);
                   }}
+                  sx={{
+                    color: "#D97706",
+                    fontWeight: 700,
+                    fontSize: "0.825rem",
+                    textTransform: "none",
+                    borderRadius: "6px",
+                    px: 1.5,
+                    py: 0.5,
+                    bgcolor: "#FEF3C7",
+                    "&:hover": {
+                      bgcolor: "#FDE68A",
+                    },
+                  }}
                 >
-                  {current.actionLabel || "ACTION"}
+                  {current.actionLabel || "Action"}
                 </Button>
-              ) : null
+              ) : undefined
             }
           >
             {current.message}
