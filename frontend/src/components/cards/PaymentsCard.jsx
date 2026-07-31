@@ -51,15 +51,16 @@ function PaymentsCard({ payments = [], compact = false, onClose }) {
           ? { xs: 300, sm: 360 }
           : { xs: "100%", sm: "320px" },
         borderRadius: "16px",
-        border: "1px solid #E2E8F0",
+        border: "1.5px solid #D4AF37", // Gold border applied
+        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)", // Enhanced shadow applied
         bgcolor: "#FFFFFF",
         display: "flex",
         flexDirection: "column",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          boxShadow: "0px 12px 32px rgba(15, 23, 42, 0.08)",
+          boxShadow: "0 14px 36px rgba(15, 23, 42, 0.12)",
           transform: "translateY(-4px)",
-          borderColor: "rgba(212, 175, 55, 0.4)",
+          borderColor: "#B5922B",
         },
       }}
     >
