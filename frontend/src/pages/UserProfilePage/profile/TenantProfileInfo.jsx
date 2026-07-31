@@ -1,3 +1,4 @@
+// src/components/Profile/TenantProfileInfo.jsx
 import React from "react";
 import {
   Box,
@@ -14,10 +15,11 @@ export default function TenantProfileInfo({ profile }) {
   return (
     <Box
       sx={{
-        bgcolor: "background.paper",
-        borderRadius: 3,
+        bgcolor: "#FFFFFF",
+        borderRadius: "16px",
         p: { xs: 2.5, sm: 3 },
-        boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+        border: "1px solid #E2E8F0",
+        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.05)",
       }}
     >
       <Stack spacing={3}>
@@ -26,10 +28,11 @@ export default function TenantProfileInfo({ profile }) {
           <Stack direction="row" spacing={2} alignItems="center">
             <Avatar
               sx={{
-                bgcolor: "rgba(76, 175, 80, 0.12)",
-                color: "#4caf50",
-                width: 40,
-                height: 40,
+                bgcolor: "rgba(212, 175, 55, 0.12)",
+                color: "#D4AF37",
+                width: 44,
+                height: 44,
+                border: "1px solid rgba(212, 175, 55, 0.3)",
               }}
             >
               <PhoneOutlinedIcon fontSize="small" />
@@ -39,34 +42,42 @@ export default function TenantProfileInfo({ profile }) {
               <Typography
                 variant="caption"
                 sx={{
-                  color: "text.secondary",
-                  fontWeight: 600,
-                  letterSpacing: 0.6,
+                  color: "#64748B",
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  fontSize: "0.7rem",
+                  textTransform: "uppercase",
                 }}
               >
                 EMERGENCY CONTACT
               </Typography>
               <Typography
                 variant="body1"
-                sx={{ fontWeight: 600, color: "text.primary" }}
+                sx={{
+                  fontWeight: 700,
+                  color: "#0F172A",
+                  fontSize: "0.95rem",
+                  mt: 0.2,
+                }}
               >
-                {profile.emergencyContact || "Not provided"}
+                {profile?.emergencyContact || "Not provided"}
               </Typography>
             </Box>
           </Stack>
         </Box>
 
-        <Divider />
+        <Divider sx={{ borderColor: "#E2E8F0" }} />
 
         {/* ===== Active Leases ===== */}
         <Box>
-          <Stack direction="row" spacing={2} alignItems="center" mb={1.5}>
+          <Stack direction="row" spacing={2} alignItems="center" mb={2}>
             <Avatar
               sx={{
-                bgcolor: "rgba(25, 118, 210, 0.12)",
-                color: "#1976d2",
-                width: 40,
-                height: 40,
+                bgcolor: "rgba(15, 23, 42, 0.06)",
+                color: "#0F172A",
+                width: 44,
+                height: 44,
+                border: "1px solid #E2E8F0",
               }}
             >
               <HomeWorkOutlinedIcon fontSize="small" />
@@ -76,43 +87,71 @@ export default function TenantProfileInfo({ profile }) {
               <Typography
                 variant="caption"
                 sx={{
-                  color: "text.secondary",
-                  fontWeight: 600,
-                  letterSpacing: 0.6,
+                  color: "#64748B",
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  fontSize: "0.7rem",
+                  textTransform: "uppercase",
                 }}
               >
                 ACTIVE LEASES
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{ color: "#64748B", fontSize: "0.825rem", mt: 0.2 }}
+              >
                 Properties currently occupied
               </Typography>
             </Box>
           </Stack>
 
-          {profile.leases && profile.leases.length > 0 ? (
-            <Stack direction="row" spacing={1} flexWrap="wrap">
+          {profile?.leases && profile.leases.length > 0 ? (
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
               {profile.leases.map((lease) => (
                 <Chip
                   key={lease.id}
-                  icon={<HomeWorkOutlinedIcon />}
+                  icon={<HomeWorkOutlinedIcon sx={{ color: "#D4AF37 !important", fontSize: "18px" }} />}
                   label={lease.propertyName ?? "Property"}
                   sx={{
                     mb: 1,
-                    borderRadius: 2,
-                    fontWeight: 600,
-                    bgcolor: "rgba(25,118,210,0.08)",
+                    py: 2.2,
+                    px: 0.5,
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    bgcolor: "#0F172A",
+                    color: "#FFFFFF",
+                    boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
+                    "&:hover": {
+                      bgcolor: "#1E293B",
+                    },
+                    transition: "all 0.2s ease",
                   }}
                 />
               ))}
             </Stack>
           ) : (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontStyle: "italic" }}
+            <Box
+              sx={{
+                py: 2.5,
+                px: 2,
+                borderRadius: "10px",
+                bgcolor: "#F8FAFC",
+                border: "1px dashed rgba(212, 175, 55, 0.4)",
+                textAlign: "center",
+              }}
             >
-              This tenant has no active leases
-            </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#64748B",
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                }}
+              >
+                This tenant has no active leases
+              </Typography>
+            </Box>
           )}
         </Box>
       </Stack>
