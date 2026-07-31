@@ -1,10 +1,15 @@
 // src/pages/Tenant/TenantDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Button, CircularProgress, Stack, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import PaymentIcon from "@mui/icons-material/Payment";
+import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 
 import PropertyInfoCard from "../../components/cards/PropertyInfoCard";
 import MaintenanceCard from "../../components/cards/MaintenanceCard";
@@ -16,7 +21,6 @@ import { useAuth } from "../Auth/AuthContext";
 
 function TenantDashboard() {
   const { user, loginAs } = useAuth();
-  const theme = useTheme();
   const [tenantUnits, setTenantUnits] = useState([]);
   const [loadingUnits, setLoadingUnits] = useState(true);
   const navigate = useNavigate();
@@ -51,8 +55,15 @@ function TenantDashboard() {
 
   if (!user || loadingUnits) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
-        <CircularProgress sx={{ color: "#D97706" }} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "50vh",
+        }}
+      >
+        <CircularProgress sx={{ color: "#D4AF37" }} size={40} />
       </Box>
     );
   }
@@ -61,142 +72,109 @@ function TenantDashboard() {
   const visibleUnits = tenantUnits.slice(0, 2);
 
   return (
-    <Box sx={{ maxWidth: "1200px", mx: "auto", px: { xs: 2, sm: 3 }, py: 2 }}>
-      {/* ===== Action Header ===== */}
-      <Stack
-        direction="column"
-        alignItems="center"
-        spacing={3}
+    <Box sx={{ maxWidth: "1280px", mx: "auto", px: { xs: 1.5, sm: 3 }, py: 1 }}>
+
+      {/* ===== 2. ACTION HEADER ===== */}
+      <Box
         sx={{
-          mb: 6,
-          pb: 4,
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          width: "100%",
-          textAlign: "center",
+          mb: 5,
+          pb: 3,
+          borderBottom: "1px solid #E2E8F0",
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "flex-start", sm: "center" },
+          justifyContent: "space-between",
+          gap: 2,
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={2}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            pl: 2,
+            borderLeft: "4px solid #D4AF37",
+          }}
+        >
+          <Typography
+            variant="h4"
             sx={{
-              mb: 1.5,
-              justifyContent: "center",
-              flexWrap: "wrap",
+              fontWeight: 800,
+              color: "#0F172A",
+              letterSpacing: "-0.03em",
+              fontSize: { xs: "1.5rem", sm: "1.875rem" },
             }}
           >
-            {/* Main Title */}
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 900,
-                color: "#0F172A",
-                letterSpacing: "-0.03em",
-                fontSize: { xs: "1.75rem", sm: "2.125rem" },
-              }}
-            >
-              Tenancy Overview
-            </Typography>
+            Tenancy Overview
+          </Typography>
 
-            {/* Status Badge */}
+          {/* Status Badge */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              px: 1.8,
+              py: 0.6,
+              borderRadius: "20px",
+              bgcolor: hasUnits ? "rgba(16, 185, 129, 0.08)" : "rgba(100, 116, 139, 0.08)",
+              border: "1px solid",
+              borderColor: hasUnits ? "rgba(16, 185, 129, 0.25)" : "#CBD5E1",
+            }}
+          >
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.2,
-                px: 2,
-                py: 1,
-                borderRadius: "12px",
-                bgcolor: hasUnits ? "#ECFDF5" : "#F1F5F9",
-                border: "1px solid",
-                borderColor: hasUnits ? "#A7F3D0" : "#CBD5E1",
-                boxShadow: hasUnits ? "0 4px 12px rgba(16, 185, 129, 0.1)" : "none",
+                width: 8,
+                height: 8,
+                bgcolor: hasUnits ? "#10B981" : "#64748B",
+                borderRadius: "50%",
+                position: "relative",
+                "&::after": hasUnits
+                  ? {
+                      content: '""',
+                      position: "absolute",
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "50%",
+                      bgcolor: "inherit",
+                      animation: "pulse 2s infinite ease-in-out",
+                      opacity: 0.5,
+                    }
+                  : {},
+                "@keyframes pulse": {
+                  "0%": { transform: "scale(1)", opacity: 0.5 },
+                  "100%": { transform: "scale(3)", opacity: 0 },
+                },
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                color: hasUnits ? "#047857" : "#475569",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                fontSize: "0.68rem",
               }}
             >
-              {/* Animated Pulsing Dot */}
-              <Box
-                sx={{
-                  width: 9,
-                  height: 9,
-                  bgcolor: hasUnits ? "#10B981" : "#64748B",
-                  borderRadius: "50%",
-                  position: "relative",
-                  "&::after": hasUnits
-                    ? {
-                        content: '""',
-                        position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: "50%",
-                        bgcolor: "inherit",
-                        animation: "pulse 2s infinite ease-in-out",
-                        opacity: 0.5,
-                      }
-                    : {},
-                  "@keyframes pulse": {
-                    "0%": { transform: "scale(1)", opacity: 0.5 },
-                    "100%": { transform: "scale(3.2)", opacity: 0 },
-                  },
-                }}
-              />
-
-              <Typography
-                variant="caption"
-                sx={{
-                  color: hasUnits ? "#047857" : "#475569",
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  fontSize: "0.7rem",
-                }}
-              >
-                {hasUnits ? "Active Tenant" : "No Active Lease"}
-              </Typography>
-            </Box>
-          </Stack>
-
-          <Typography variant="body1" sx={{ color: theme.palette.text.secondary, fontWeight: 500 }}>
-            {hasUnits ? (
-              <>
-                Managing <strong>{tenantUnits.length}</strong> active{" "}
-                {tenantUnits.length === 1 ? "lease" : "leases"}
-              </>
-            ) : (
-              "No active lease agreements found"
-            )}
-          </Typography>
+              {hasUnits ? "Active Tenant" : "No Active Lease"}
+            </Typography>
+          </Box>
         </Box>
 
-        {hasUnits && (
-          <Button
-            variant="contained"
-            startIcon={<PaymentIcon />}
-            sx={{
-              bgcolor: "#D97706",
-              color: "#FFFFFF",
-              fontWeight: 800,
-              textTransform: "none",
-              borderRadius: "12px",
-              px: 6,
-              py: 1.5,
-              fontSize: "1rem",
-              boxShadow: "0 4px 18px rgba(217, 119, 6, 0.35)",
-              "& .MuiButton-startIcon": { color: "#FFFFFF" },
-              "&:hover": {
-                bgcolor: "#B45309",
-                boxShadow: "0 6px 22px rgba(217, 119, 6, 0.45)",
-                transform: "translateY(-2px)",
-              },
-              transition: "all 0.25s ease",
-            }}
-          >
-            Pay Rent
-          </Button>
-        )}
-      </Stack>
+        <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 600 }}>
+          {hasUnits ? (
+            <>
+              Managing <strong>{tenantUnits.length}</strong> active{" "}
+              {tenantUnits.length === 1 ? "lease agreement" : "lease agreements"}
+            </>
+          ) : (
+            "No active lease agreements linked to your profile"
+          )}
+        </Typography>
+      </Box>
 
-      {/* Rental Units Section */}
+      {/* ===== 3. RENTAL UNITS SECTION ===== */}
       <Section title="Your Rental Units & Rent">
         {hasUnits ? (
           <Box sx={{ width: "100%" }}>
@@ -222,29 +200,32 @@ function TenantDashboard() {
                   endIcon={<ArrowForwardIcon />}
                   onClick={() => navigate("/tenant/properties")}
                   sx={{
-                    bgcolor: "#D97706",
+                    bgcolor: "#0F172A",
                     color: "#FFFFFF",
                     textTransform: "none",
-                    fontWeight: 800,
-                    px: 5,
-                    py: 1.5,
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 14px rgba(217, 119, 6, 0.3)",
+                    fontWeight: 700,
+                    px: 4,
+                    py: 1.2,
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 14px rgba(15, 23, 42, 0.15)",
+                    "& .MuiButton-endIcon": { color: "#D4AF37" },
                     "&:hover": {
-                      bgcolor: "#B45309",
-                      transform: "scale(1.02)",
+                      bgcolor: "#D4AF37",
+                      color: "#0F172A",
+                      "& .MuiButton-endIcon": { color: "#0F172A" },
+                      transform: "translateY(-2px)",
                     },
                     transition: "all 0.2s ease",
                   }}
                 >
-                  View all units
+                  View All Units ({tenantUnits.length})
                 </Button>
               </Box>
             )}
           </Box>
         ) : (
           <EmptyState
-            message="You are not currently linked to any rental unit. Browse available properties to get started."
+            message="You are not currently linked to any rental unit. Explore available units or reach out to property management."
             ctaText="Browse Available Units"
             ctaIcon={<SearchOutlinedIcon />}
             onClick={() => navigate("/tenant/browse-units")}
@@ -252,13 +233,13 @@ function TenantDashboard() {
         )}
       </Section>
 
-      {/* Maintenance & Announcements */}
+      {/* ===== 4. MAINTENANCE & ANNOUNCEMENTS ===== */}
       <Section title="Maintenance & Announcements">
         <MaintenanceCard tenantId={user.id} />
         <AnnouncementsCard userId={user.id} />
       </Section>
 
-      {/* Billing & Documents */}
+      {/* ===== 5. BILLING & DOCUMENTS ===== */}
       <Section title="Billing & Documents">
         <PaymentsCard />
         <DocumentsCard userId={user.id} />
@@ -268,22 +249,33 @@ function TenantDashboard() {
 }
 
 /* ---------------- Helper Components ---------------- */
+
 const Section = ({ title, children }) => (
-  <Box sx={{ mb: 7 }}>
-    <Typography
-      variant="overline"
-      sx={{
-        display: "block",
-        textAlign: "center",
-        letterSpacing: 2,
-        fontWeight: 800,
-        mb: 4,
-        color: "#64748B",
-        fontSize: "0.8rem",
-      }}
-    >
-      {title}
-    </Typography>
+  <Box sx={{ mb: 6 }}>
+    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mb: 3.5 }}>
+      <Typography
+        variant="overline"
+        sx={{
+          letterSpacing: 2.5,
+          fontWeight: 800,
+          color: "#475569",
+          fontSize: "0.78rem",
+          position: "relative",
+          "&::after": {
+            content: '""',
+            display: "block",
+            width: "36px",
+            height: "2px",
+            bgcolor: "#D4AF37",
+            mx: "auto",
+            mt: 0.5,
+            borderRadius: "2px",
+          },
+        }}
+      >
+        {title}
+      </Typography>
+    </Box>
     <Box
       sx={{
         display: "flex",
@@ -301,35 +293,71 @@ const EmptyState = ({ message, ctaText, ctaIcon, onClick }) => (
   <Box
     sx={{
       width: "100%",
-      maxWidth: 600,
+      maxWidth: 640,
       mx: "auto",
       textAlign: "center",
-      p: 5,
-      borderRadius: "16px",
-      bgcolor: "#F8FAFC",
-      border: "2px dashed #E2E8F0",
+      p: { xs: 4, sm: 5 },
+      borderRadius: "18px",
+      bgcolor: "#FFFFFF",
+      border: "1.5px solid #D4AF37",
+      boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
     }}
   >
-    <Typography variant="h6" sx={{ fontWeight: 800, color: "#0F172A", mb: 1 }}>
-      No Units Found
+    <Box
+      sx={{
+        width: 64,
+        height: 64,
+        borderRadius: "50%",
+        bgcolor: "rgba(212, 175, 55, 0.1)",
+        color: "#D4AF37",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        mb: 2.5,
+      }}
+    >
+      <HomeWorkOutlinedIcon sx={{ fontSize: 32 }} />
+    </Box>
+
+    <Typography
+      variant="h6"
+      sx={{ fontWeight: 800, color: "#0F172A", mb: 1, fontSize: "1.2rem" }}
+    >
+      No Rental Units Found
     </Typography>
-    <Typography variant="body2" sx={{ color: "#64748B", mb: 3.5 }}>
+
+    <Typography
+      variant="body2"
+      sx={{ color: "#64748B", mb: 3.5, maxWidth: 460, lineHeight: 1.6 }}
+    >
       {message}
     </Typography>
+
     <Button
       variant="contained"
       startIcon={ctaIcon}
       onClick={onClick}
       sx={{
-        bgcolor: "#D97706",
+        bgcolor: "#0F172A",
         color: "#FFFFFF",
-        fontWeight: 800,
+        fontWeight: 700,
         px: 4,
-        py: 1.2,
+        py: 1.3,
         borderRadius: "10px",
         textTransform: "none",
-        boxShadow: "0 4px 14px rgba(217, 119, 6, 0.3)",
-        "&:hover": { bgcolor: "#B45309" },
+        boxShadow: "0 4px 14px rgba(15, 23, 42, 0.2)",
+        "& .MuiButton-startIcon": { color: "#D4AF37" },
+        "&:hover": {
+          bgcolor: "#D4AF37",
+          color: "#0F172A",
+          boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
+          transform: "translateY(-2px)",
+          "& .MuiButton-startIcon": { color: "#0F172A" },
+        },
+        transition: "all 0.2s ease",
       }}
     >
       {ctaText}

@@ -42,7 +42,7 @@ const MainDashboard = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, bgcolor: "#F8FAFC", minHeight: "100vh" }}>
+    <Box sx={{ p: { xs: 2, sm: 3}, bgcolor: "#F8FAFC", minHeight: "100vh" }}>
       {/* HERO / HEADER */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
