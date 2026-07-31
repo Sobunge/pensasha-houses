@@ -8,7 +8,6 @@ import {
   Stack,
   ToggleButtonGroup,
   ToggleButton,
-  useTheme,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Auth/AuthContext";
@@ -27,7 +26,6 @@ const dashboardMap = {
 };
 
 const MainDashboard = () => {
-  const theme = useTheme();
   const { user, activeRole, setActiveRole } = useAuth();
 
   if (!user) return null;
