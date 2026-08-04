@@ -22,8 +22,11 @@ export const setLogoutHandler = (fn) => {
 // Helper for total session cleanup and redirect
 const handleAuthFailure = () => {
   setAccessToken(null);
-  if (logoutHandler) logoutHandler();
-  window.location.href = "/"; // Force redirect to home page
+  if (logoutHandler) {
+    logoutHandler();
+  } else {
+    window.location.href = "/"; // Fallback redirect if handler not attached
+  }
 };
 
 // ================= AXIOS INSTANCE =================
@@ -32,6 +35,21 @@ const api = axios.create({
   withCredentials: true,
   timeout: 10000,
 });
+
+// Queue management for handling concurrent requests during token refresh
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
 // ================= REQUEST INTERCEPTOR =================
 api.interceptors.request.use(
@@ -67,9 +85,22 @@ api.interceptors.response.use(
       originalRequest.url?.includes("/auth/register");
 
     if (status === 401 && !isAuthEndpoint) {
-      // SCENARIO 1: We have a token, attempt refresh
-      if (accessToken && !originalRequest._retry) {
+      if (!originalRequest._retry) {
         originalRequest._retry = true;
+
+        if (isRefreshing) {
+          // If a refresh is already in progress, queue this request
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              originalRequest.headers["Authorization"] = `Bearer ${token}`;
+              return api(originalRequest);
+            })
+            .catch((err) => Promise.reject(err));
+        }
+
+        isRefreshing = true;
 
         try {
           const refreshRes = await axios.post(
@@ -83,20 +114,22 @@ api.interceptors.response.use(
 
           const newToken = refreshRes.data.accessToken;
           setAccessToken(newToken);
-          
+          processQueue(null, newToken);
+
           originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
           return api(originalRequest); // Retry the original request
         } catch (refreshError) {
-          // Refresh failed (7-day token likely expired)
+          processQueue(refreshError, null);
           handleAuthFailure();
           return Promise.reject({
             code: "SESSION_EXPIRED",
             message: "Session expired. Please log in again.",
           });
+        } finally {
+          isRefreshing = false;
         }
-      } 
-      
-      // SCENARIO 2: No token at all or already retried
+      }
+
       handleAuthFailure();
     }
 
