@@ -1,17 +1,14 @@
 // api/api.js
 import axios from "axios";
 
-// ================= TOKEN MANAGEMENT =================
-let accessToken = sessionStorage.getItem("accessToken") || null;
+// ================= TOKEN MANAGEMENT (STRICTLY IN-MEMORY) =================
+let inMemoryAccessToken = null;
 
 export const setAccessToken = (token) => {
-  accessToken = token;
-  if (token) {
-    sessionStorage.setItem("accessToken", token);
-  } else {
-    sessionStorage.removeItem("accessToken");
-  }
+  inMemoryAccessToken = token;
 };
+
+export const getAccessToken = () => inMemoryAccessToken;
 
 // ================= LOGOUT HANDLER =================
 let logoutHandler = null;
@@ -19,13 +16,12 @@ export const setLogoutHandler = (fn) => {
   logoutHandler = fn;
 };
 
-// Helper for total session cleanup and redirect
 const handleAuthFailure = () => {
   setAccessToken(null);
   if (logoutHandler) {
     logoutHandler();
   } else {
-    window.location.href = "/"; // Fallback redirect if handler not attached
+    window.location.href = "/";
   }
 };
 
@@ -54,8 +50,8 @@ const processQueue = (error, token = null) => {
 // ================= REQUEST INTERCEPTOR =================
 api.interceptors.request.use(
   (config) => {
-    if (accessToken) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    if (inMemoryAccessToken) {
+      config.headers.set("Authorization", `Bearer ${inMemoryAccessToken}`);
     }
     return config;
   },
@@ -68,17 +64,16 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // NETWORK ERROR (e.g., Server down or no internet)
+    // Handle Network Errors / Server Unreachable cleanly
     if (!error.response) {
-      return Promise.reject({
-        code: "NETWORK_ERROR",
-        message: "Unable to reach server. Check your connection.",
-      });
+      error.code = "NETWORK_ERROR";
+      error.message = error.message || "Unable to reach server. Check your connection.";
+      return Promise.reject(error);
     }
 
     const status = error.response.status;
 
-    // SKIP AUTH ENDPOINTS (Don't intercept errors during login/refresh)
+    // Skip auth endpoints to avoid infinite refresh loops on failed logins/registers
     const isAuthEndpoint =
       originalRequest.url?.includes("/auth/login") ||
       originalRequest.url?.includes("/auth/refresh") ||
@@ -89,12 +84,11 @@ api.interceptors.response.use(
         originalRequest._retry = true;
 
         if (isRefreshing) {
-          // If a refresh is already in progress, queue this request
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
           })
             .then((token) => {
-              originalRequest.headers["Authorization"] = `Bearer ${token}`;
+              originalRequest.headers.set("Authorization", `Bearer ${token}`);
               return api(originalRequest);
             })
             .catch((err) => Promise.reject(err));
@@ -112,12 +106,14 @@ api.interceptors.response.use(
             }
           );
 
-          const newToken = refreshRes.data.accessToken;
+          const newToken = refreshRes.data?.accessToken;
+          if (!newToken) throw new Error("No access token in refresh response");
+
           setAccessToken(newToken);
           processQueue(null, newToken);
 
-          originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-          return api(originalRequest); // Retry the original request
+          originalRequest.headers.set("Authorization", `Bearer ${newToken}`);
+          return api(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
           handleAuthFailure();
@@ -133,28 +129,24 @@ api.interceptors.response.use(
       handleAuthFailure();
     }
 
-    // NORMAL ERRORS (400, 404, 500, etc.)
-    return Promise.reject({
-      code: status,
-      message:
-        error.response.data?.message ||
-        error.response.data?.error ||
-        "Request failed",
-    });
+    // Attach human-readable fallback message while preserving response context
+    error.message =
+      error.response.data?.message ||
+      error.response.data?.error ||
+      error.message ||
+      "Request failed";
+
+    return Promise.reject(error);
   }
 );
 
 // ================= LOGIN HELPER =================
-export const login = async (username, password) => {
-  try {
-    const res = await api.post("/auth/login", { username, password });
-    if (res.data?.accessToken) {
-      setAccessToken(res.data.accessToken);
-    }
-    return res.data;
-  } catch (err) {
-    throw err;
+export const login = async (credentials) => {
+  const res = await api.post("/auth/login", credentials);
+  if (res.data?.accessToken) {
+    setAccessToken(res.data.accessToken);
   }
+  return res.data;
 };
 
 export default api;
