@@ -36,6 +36,10 @@ import useDocuments from "../../../components/hooks/useDocuments";
 // Import DocumentGlobal and helper methods
 import DocumentGlobal from "../../DocumentPage/DocumentGlobal"; 
 
+// 2 MB Size Configuration
+const MAX_FILE_SIZE_MB = 2;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
   const theme = useTheme();
   const [selectedDocType, setSelectedDocType] = useState("");
@@ -73,6 +77,14 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
 
     if (!selectedDocType) {
       setErrorMessage("Please select a document type first.");
+      e.target.value = "";
+      return;
+    }
+
+    // Client-side 2 MB validation check
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setErrorMessage(`File size exceeds the maximum limit of ${MAX_FILE_SIZE_MB} MB.`);
+      e.target.value = "";
       return;
     }
 
@@ -87,6 +99,7 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
     } catch (err) {
       console.error("Upload failed:", err);
       setErrorMessage(err.message || "Failed to upload document. Please try again.");
+      e.target.value = "";
     }
   };
 
@@ -362,7 +375,7 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
                 transition: "all 0.2s ease",
               }}
             >
-              {uploading ? "Uploading..." : "Select a PDF to Upload"}
+              {uploading ? "Uploading..." : "Select a PDF to Upload (Max 2MB)"}
               <input
                 type="file"
                 hidden
