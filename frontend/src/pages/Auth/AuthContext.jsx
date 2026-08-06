@@ -11,25 +11,15 @@ const normalizeRole = (role) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = sessionStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
-  const [roles, setRoles] = useState(() => {
-    const savedRoles = sessionStorage.getItem("roles");
-    return savedRoles ? JSON.parse(savedRoles) : [];
-  });
-
-  const [activeRole, setActiveRole] = useState(() => {
-    return sessionStorage.getItem("activeRole") || null;
-  });
-
+  // Purely in-memory state initialization
+  const [user, setUser] = useState(null);
+  const [roles, setRoles] = useState([]);
+  const [activeRole, setActiveRole] = useState(null);
   const [redirectAfterAuth, setRedirectAfterAuth] = useState(null);
   const [loading, setLoading] = useState(true);
 
   /**
-   * LOGIN / SAVE SESSION DATA
+   * LOGIN / SET SESSION IN MEMORY ONLY
    */
   const loginAs = (userObj) => {
     setUser(userObj);
@@ -39,10 +29,6 @@ export const AuthProvider = ({ children }) => {
 
     const defaultRole = roleList[0] || null;
     setActiveRole(defaultRole);
-
-    sessionStorage.setItem("user", JSON.stringify(userObj));
-    sessionStorage.setItem("roles", JSON.stringify(roleList));
-    sessionStorage.setItem("activeRole", defaultRole || "");
   };
 
   /**
@@ -51,7 +37,6 @@ export const AuthProvider = ({ children }) => {
   const switchRole = (role) => {
     const normalizedRole = normalizeRole(role);
     setActiveRole(normalizedRole);
-    sessionStorage.setItem("activeRole", normalizedRole);
   };
 
   /**
@@ -59,14 +44,12 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = async () => {
     try {
-      // Optional: Inform Spring Boot to invalidate/clear the HttpOnly refresh cookie
       await api.post("/auth/logout").catch(() => {});
     } finally {
       setAccessToken(null);
       setUser(null);
       setRoles([]);
       setActiveRole(null);
-      sessionStorage.clear();
     }
   };
 
@@ -74,27 +57,39 @@ export const AuthProvider = ({ children }) => {
    * RESTORE IN-MEMORY SESSION ON PAGE RELOAD
    */
   useEffect(() => {
-    // Attach the API interceptor logout handler
     setLogoutHandler(logout);
 
     const restoreSession = async () => {
       try {
-        // Attempt to fetch a fresh Access Token using the HttpOnly cookie
         const res = await api.post("/auth/refresh");
+        
         if (res.data?.accessToken) {
           setAccessToken(res.data.accessToken);
 
-          // Update user info if returned in refresh payload
-          if (res.data?.user) {
-            loginAs(res.data.user);
+          // Maps your Spring Boot principal or user object into React memory
+          const principalData = res.data?.principal || res.data?.user;
+          if (principalData) {
+            const rolesList = Array.isArray(principalData.roles)
+              ? principalData.roles
+              : principalData.role
+              ? [principalData.role]
+              : [];
+
+            const userObj = {
+              id: principalData.id,
+              name: principalData.firstName || principalData.firstname || principalData.name,
+              roles: rolesList,
+              permissions: principalData.permissions || [],
+              defaultRoute: "/dashboard",
+            };
+
+            loginAs(userObj);
           }
         }
       } catch (err) {
-        // Refresh token expired or invalid: clear session state
         setUser(null);
         setRoles([]);
         setActiveRole(null);
-        sessionStorage.clear();
       } finally {
         setLoading(false);
       }
@@ -103,9 +98,8 @@ export const AuthProvider = ({ children }) => {
     restoreSession();
   }, []);
 
-  // Avoid rendering protected routes/UI until initial token restoration finishes
   if (loading) {
-    return null; // Or render your app-level loading spinner here
+    return null; // Prevents flashing protected routes before restoration completes
   }
 
   return (
