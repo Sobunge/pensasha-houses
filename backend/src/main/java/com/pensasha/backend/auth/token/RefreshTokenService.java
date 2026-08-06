@@ -21,6 +21,9 @@ public class RefreshTokenService {
     @Transactional
     public String create(User user) {
 
+        //Delete if a token exits
+        refreshTokenRepository.deleteAllByUser(user);
+
         String tokenValue = UUID.randomUUID().toString();
 
         RefreshToken token = new RefreshToken();

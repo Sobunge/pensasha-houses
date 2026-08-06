@@ -1,5 +1,5 @@
 // src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import api, { setAccessToken, setLogoutHandler } from "../../api/api";
 
 export const AuthContext = createContext();
@@ -11,37 +11,28 @@ const normalizeRole = (role) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  // Purely in-memory state initialization
   const [user, setUser] = useState(null);
   const [roles, setRoles] = useState([]);
   const [activeRole, setActiveRole] = useState(null);
   const [redirectAfterAuth, setRedirectAfterAuth] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /**
-   * LOGIN / SET SESSION IN MEMORY ONLY
-   */
+  // Guard to prevent concurrent /auth/refresh calls in React
+  const isRefreshingRef = useRef(false);
+
   const loginAs = (userObj) => {
     setUser(userObj);
-
     const roleList = (userObj?.roles || []).map(normalizeRole);
     setRoles(roleList);
-
     const defaultRole = roleList[0] || null;
     setActiveRole(defaultRole);
   };
 
-  /**
-   * SWITCH ROLE
-   */
   const switchRole = (role) => {
     const normalizedRole = normalizeRole(role);
     setActiveRole(normalizedRole);
   };
 
-  /**
-   * LOGOUT
-   */
   const logout = async () => {
     try {
       await api.post("/auth/logout").catch(() => {});
@@ -54,19 +45,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * RESTORE IN-MEMORY SESSION ON PAGE RELOAD
+   * RESTORE SESSION ON RELOAD (WITH CONCURRENCY LOCK)
    */
   useEffect(() => {
     setLogoutHandler(logout);
 
     const restoreSession = async () => {
+      // 🛑 Prevent duplicate parallel refresh requests on double render / Strict Mode
+      if (isRefreshingRef.current) return;
+      isRefreshingRef.current = true;
+
       try {
         const res = await api.post("/auth/refresh");
 
         if (res.data?.accessToken) {
           setAccessToken(res.data.accessToken);
 
-          // Maps your Spring Boot principal or user object into React memory
           const principalData = res.data?.principal || res.data?.user;
           if (principalData) {
             const rolesList = Array.isArray(principalData.roles)
@@ -90,12 +84,12 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (err) {
-        // Silently reset state if no active session exists (prevents unwanted toasts on reload)
         setUser(null);
         setRoles([]);
         setActiveRole(null);
       } finally {
         setLoading(false);
+        isRefreshingRef.current = false;
       }
     };
 
@@ -103,7 +97,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   if (loading) {
-    return null; // Prevents flashing protected routes before restoration completes
+    return null;
   }
 
   return (

@@ -97,18 +97,15 @@ public class AuthService {
 
                 RefreshToken token = refreshTokenService.findByToken(refreshToken);
 
-                // If missing, it's either bogus or already expired/deleted
+                // 1. Validate Token Exists
                 if (token == null) {
                         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token.");
                 }
 
-                // CHECK EXPIRATION: Delete from DB first, then return 401
-                if (token.isExpired()) {
+                // 2. Validate Expiration
+                if (refreshTokenService.isExpired(token)) {
                         refreshTokenService.deleteByToken(refreshToken);
-
-                        // Clear the bad cookie from the user's browser too!
                         clearRefreshCookie(response);
-
                         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token has expired.");
                 }
 
@@ -118,11 +115,8 @@ public class AuthService {
                         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found.");
                 }
 
-                // ROTATE TOKEN: Delete used token & save new one
-                refreshTokenService.deleteByToken(refreshToken);
-                String newRefreshToken = refreshTokenService.create(user);
-                setRefreshCookie(response, newRefreshToken);
-
+                // 3. DO NOT DELETE OR ROTATE REFRESH TOKEN HERE.
+                // Simply fetch UserDetails and issue a fresh Access Token for React memory.
                 CustomUserDetails userDetails = (CustomUserDetails) userDetailsService
                                 .loadUserByUsername(user.getPhoneNumber());
 
