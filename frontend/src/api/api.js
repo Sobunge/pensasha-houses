@@ -16,8 +16,26 @@ export const setLogoutHandler = (fn) => {
   logoutHandler = fn;
 };
 
-const handleAuthFailure = () => {
+/**
+ * Clears access token, dispatches a UI notification event, and triggers global logout.
+ */
+const handleAuthFailure = (
+  message = "Session has expired. Please log in.",
+  severity = "warning"
+) => {
   setAccessToken(null);
+
+  // Dispatch global event for NotificationProvider listener
+  window.dispatchEvent(
+    new CustomEvent("app-notification", {
+      detail: {
+        message,
+        severity,
+        duration: 5000,
+      },
+    })
+  );
+
   if (logoutHandler) {
     logoutHandler();
   } else {
@@ -67,7 +85,8 @@ api.interceptors.response.use(
     // Handle Network Errors / Server Unreachable cleanly
     if (!error.response) {
       error.code = "NETWORK_ERROR";
-      error.message = error.message || "Unable to reach server. Check your connection.";
+      error.message =
+        error.message || "Unable to reach server. Check your connection.";
       return Promise.reject(error);
     }
 
@@ -107,26 +126,39 @@ api.interceptors.response.use(
           );
 
           const newToken = refreshRes.data?.accessToken;
-          if (!newToken) throw new Error("No access token in refresh response");
+          if (!newToken)
+            throw new Error("No access token in refresh response");
 
           setAccessToken(newToken);
           processQueue(null, newToken);
 
-          originalRequest.headers.set("Authorization", `Bearer ${newToken}`);
+          originalRequest.headers.set(
+            "Authorization",
+            `Bearer ${newToken}`
+          );
           return api(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
-          handleAuthFailure();
+
+          // Triggers custom notification with updated message
+          handleAuthFailure(
+            "Session has expired. Please log in.",
+            "warning"
+          );
+
           return Promise.reject({
             code: "SESSION_EXPIRED",
-            message: "Session expired. Please log in again.",
+            message: "Session has expired. Please log in.",
           });
         } finally {
           isRefreshing = false;
         }
       }
 
-      handleAuthFailure();
+      handleAuthFailure(
+        "Session has expired. Please log in.",
+        "warning"
+      );
     }
 
     // Attach human-readable fallback message while preserving response context

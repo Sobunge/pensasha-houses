@@ -1,5 +1,5 @@
-// src/context/NotificationContext.jsx (or src/components/NotificationProvider.jsx)
-import React, { createContext, useContext, useState, useCallback } from "react";
+// src/components/NotificationProvider.jsx
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { Snackbar, Alert, Slide, Button, useTheme } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -24,7 +24,7 @@ export const NotificationProvider = ({ children }) => {
       action = null,
       actionLabel = null
     ) => {
-      // Deduplicate
+      // Deduplicate identical pending messages
       setQueue((prev) => {
         if (prev.some((n) => n.message === message && n.severity === severity)) return prev;
         return [
@@ -35,6 +35,21 @@ export const NotificationProvider = ({ children }) => {
     },
     []
   );
+
+  // Global listener for non-React contexts (e.g., Axios Interceptors in api.js)
+  useEffect(() => {
+    const handleGlobalNotification = (event) => {
+      const { message, severity, duration, position, action, actionLabel } = event.detail || {};
+      if (message) {
+        notify(message, severity || "warning", duration, position, action, actionLabel);
+      }
+    };
+
+    window.addEventListener("app-notification", handleGlobalNotification);
+    return () => {
+      window.removeEventListener("app-notification", handleGlobalNotification);
+    };
+  }, [notify]);
 
   const handleClose = (id) => {
     setQueue((prev) => prev.filter((n) => n.id !== id));
@@ -88,7 +103,8 @@ export const NotificationProvider = ({ children }) => {
               border: `1.5px solid ${severityBorders[current.severity]}`,
               borderRadius: "12px",
               width: { xs: "90vw", sm: "420px" },
-              boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.04)",
+              boxShadow:
+                "0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.04)",
               display: "flex",
               alignItems: "center",
               py: 1,

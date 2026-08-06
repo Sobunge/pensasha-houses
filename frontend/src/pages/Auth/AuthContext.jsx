@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
     const restoreSession = async () => {
       try {
         const res = await api.post("/auth/refresh");
-        
+
         if (res.data?.accessToken) {
           setAccessToken(res.data.accessToken);
 
@@ -77,7 +77,10 @@ export const AuthProvider = ({ children }) => {
 
             const userObj = {
               id: principalData.id,
-              name: principalData.firstName || principalData.firstname || principalData.name,
+              name:
+                principalData.firstName ||
+                principalData.firstname ||
+                principalData.name,
               roles: rolesList,
               permissions: principalData.permissions || [],
               defaultRoute: "/dashboard",
@@ -87,6 +90,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (err) {
+        // Silently reset state if no active session exists (prevents unwanted toasts on reload)
         setUser(null);
         setRoles([]);
         setActiveRole(null);
