@@ -13,11 +13,17 @@ import {
 import DescriptionIcon from "@mui/icons-material/DescriptionOutlined";
 import FolderSharedIcon from "@mui/icons-material/FolderSharedOutlined";
 import { useNavigate } from "react-router-dom";
-import { useDocumentCount } from "../../components/hooks/useDocumentCount";
+import { useDocumentCount } from "../hooks/useDocumentCount"; // Adjusted relative import
 
-function DocumentsCard({ userId }) {
+function DocumentsCard({ userId, activeRole = "TENANT" }) {
   const navigate = useNavigate();
-  const { count: docCount, loading, error } = useDocumentCount(userId);
+  const { count: docCount, loading, error } = useDocumentCount(userId, activeRole);
+
+  // Dynamically resolve route base path based on active role context
+  const getDocumentRoute = () => {
+    const rolePath = activeRole.toLowerCase().replace("role_", "");
+    return `/${rolePath}/documents`;
+  };
 
   return (
     <Card
@@ -26,8 +32,8 @@ function DocumentsCard({ userId }) {
         flex: { xs: "1 1 100%", md: "1 1 45%", lg: "0 1 400px" },
         minWidth: { xs: "100%", sm: "320px" },
         borderRadius: "16px",
-        border: "1.5px solid #D4AF37", // Gold border applied
-        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)", // Enhanced shadow applied
+        border: "1.5px solid #D4AF37", // Pensasha Gold
+        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
         bgcolor: "#FFFFFF",
         display: "flex",
         flexDirection: "column",
@@ -73,7 +79,7 @@ function DocumentsCard({ userId }) {
             letterSpacing: "-0.2px",
           }}
         >
-          Documents
+          Document Vault
         </Typography>
       </Box>
 
@@ -138,7 +144,7 @@ function DocumentsCard({ userId }) {
 
       <Divider sx={{ borderStyle: "dashed", borderColor: "#E2E8F0" }} />
 
-      {/* Footer Action - Responsive Aligned */}
+      {/* Footer Action */}
       <Box
         sx={{
           p: 2,
@@ -149,7 +155,7 @@ function DocumentsCard({ userId }) {
         <Button
           variant="contained"
           startIcon={<FolderSharedIcon />}
-          onClick={() => navigate("/tenant/documents")}
+          onClick={() => navigate(getDocumentRoute())}
           disabled={loading || error}
           sx={{
             bgcolor: "#0F172A",

@@ -1,5 +1,5 @@
 // src/pages/UserProfilePage/UserProfilePage.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Paper,
@@ -66,6 +66,26 @@ export default function UserProfilePage() {
 
     fetchUser();
   }, [userId, selfProfile, selfLoading]);
+
+  /* ---------------- Normalizing User Roles ---------------- */
+  const userRoles = useMemo(() => {
+    if (!profile?.roles || !Array.isArray(profile.roles)) return [];
+
+    return profile.roles
+      .map((r) => {
+        // Handle object notation if role is returned as { name: "TENANT" }
+        const roleStr = typeof r === "object" ? r.name || r.authority || "" : String(r);
+
+        // Strip "ROLE_" prefix if present
+        return roleStr.toUpperCase().replace(/^ROLE_/, "");
+      })
+      .filter((roleName) =>
+        // Exclude fine-grained permissions (keeps primary structural roles)
+        ["TENANT", "LANDLORD", "CARETAKER", "ADMIN", "AGENT"].includes(roleName)
+      );
+  }, [profile]);
+
+  const primaryRole = userRoles[0] || "";
 
   // Luxury Styled Button Theme
   const primaryThemeButton = {
@@ -150,8 +170,6 @@ export default function UserProfilePage() {
     );
   }
 
-  const primaryRole = profile.roles?.[0] || "";
-
   return (
     <Box
       sx={{
@@ -234,7 +252,7 @@ export default function UserProfilePage() {
             <BaseProfileInfo profile={profile} />
 
             {/* Multi-role dynamic sections */}
-            {profile.roles?.includes("TENANT") && (
+            {userRoles.includes("TENANT") && (
               <>
                 <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
                 <Typography
@@ -253,7 +271,7 @@ export default function UserProfilePage() {
               </>
             )}
 
-            {profile.roles?.includes("LANDLORD") && (
+            {userRoles.includes("LANDLORD") && (
               <>
                 <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
                 <Typography
@@ -272,7 +290,7 @@ export default function UserProfilePage() {
               </>
             )}
 
-            {profile.roles?.includes("CARETAKER") && (
+            {userRoles.includes("CARETAKER") && (
               <>
                 <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
                 <Typography

@@ -1,4 +1,3 @@
-// src/pages/profile/profile/ProfileDocuments.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -19,6 +18,10 @@ import {
   Stack,
   Divider,
   Skeleton,
+  Alert,
+  alpha,
+  useTheme,
+  CircularProgress
 } from "@mui/material";
 import {
   PictureAsPdf as PictureAsPdfIcon,
@@ -30,9 +33,17 @@ import {
 } from "@mui/icons-material";
 import useDocuments from "../../../components/hooks/useDocuments";
 
+// Import DocumentGlobal and helper methods
+import DocumentGlobal from "../../DocumentPage/DocumentGlobal"; 
+
 export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
-  const documentTypes = ["ID Copy", "Lease Agreement", "Passport", "Utility Bill"];
+  const theme = useTheme();
   const [selectedDocType, setSelectedDocType] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [actionLoadingId, setActionLoadingId] = useState(null);
+
+  // Dynamically derive allowed document types using role scope
+  const availableDocTypes = DocumentGlobal.getDocumentTypesByRole(role);
 
   const {
     documents,
@@ -44,44 +55,75 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
     downloadDocument,
   } = useDocuments();
 
-  // 1. Fetch documents immediately on mount
   useEffect(() => {
     fetchDocuments();
   }, [fetchDocuments]);
 
+  const handleCloseDialog = () => {
+    setErrorMessage("");
+    setSelectedDocType("");
+    setOpenDialog(false);
+  };
+
   const handleFileUpload = async (e) => {
+    setErrorMessage("");
     const file = e.target.files[0];
-    if (!file || !selectedDocType || !role) return;
+
+    if (!file) return;
+
+    if (!selectedDocType) {
+      setErrorMessage("Please select a document type first.");
+      return;
+    }
+
+    const activeRole = role || "USER";
+
     try {
-      await uploadDocument(file, selectedDocType, role);
+      await uploadDocument(file, selectedDocType, activeRole);
       setSelectedDocType("");
-      e.target.value = "";
-      // Refresh list after upload
-      fetchDocuments();
+      e.target.value = ""; 
+      await fetchDocuments();
+      handleCloseDialog();
     } catch (err) {
       console.error("Upload failed:", err);
+      setErrorMessage(err.message || "Failed to upload document. Please try again.");
     }
   };
 
-  // Ensure documents is always treated as an array to prevent .map crashes
+  const handleDelete = async (docId) => {
+    try {
+      setActionLoadingId(docId);
+      await deleteDocument(docId, role || "USER");
+      await fetchDocuments();
+    } catch (err) {
+      console.error("Delete failed:", err);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleDownload = async (doc) => {
+    try {
+      setActionLoadingId(doc.id);
+      await downloadDocument(doc, role || "USER");
+    } catch (err) {
+      console.error("Download failed:", err);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   const safeDocuments = Array.isArray(documents) ? documents : [];
+
+  const primaryAccent = theme.palette.primary.main;
+  const primaryHover = theme.palette.primary.dark;
 
   return (
     <Box>
       {loading ? (
         <Stack spacing={1.5}>
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={64}
-            sx={{ borderRadius: "12px", bgcolor: "#F1F5F9" }}
-          />
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={64}
-            sx={{ borderRadius: "12px", bgcolor: "#F1F5F9" }}
-          />
+          <Skeleton variant="rectangular" width="100%" height={64} sx={{ borderRadius: 3 }} />
+          <Skeleton variant="rectangular" width="100%" height={64} sx={{ borderRadius: 3 }} />
         </Stack>
       ) : safeDocuments.length === 0 ? (
         <Box
@@ -89,134 +131,157 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
             py: 5,
             px: 2,
             textAlign: "center",
-            border: "1.5px dashed rgba(212, 175, 55, 0.4)",
-            borderRadius: "14px",
-            bgcolor: "#F8FAFC",
+            border: `1.5px dashed ${alpha(primaryAccent, 0.4)}`,
+            borderRadius: 3.5,
+            bgcolor: alpha(primaryAccent, 0.02),
           }}
         >
-          <PictureAsPdfIcon sx={{ fontSize: 48, color: "#D4AF37", mb: 1, opacity: 0.8 }} />
-          <Typography fontWeight={700} sx={{ color: "#0F172A", fontSize: "0.95rem" }}>
+          <PictureAsPdfIcon
+            sx={{
+              fontSize: 48,
+              color: primaryAccent,
+              mb: 1,
+              opacity: 0.8,
+            }}
+          />
+          <Typography fontWeight={700} variant="body1" sx={{ color: "text.primary" }}>
             No Documents Uploaded
           </Typography>
-          <Typography variant="body2" sx={{ color: "#64748B", mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
             {role ? `Vault is empty for ${role.toLowerCase()} records.` : "Vault is empty."}
           </Typography>
         </Box>
       ) : (
         <List sx={{ p: 0, display: "flex", flexDirection: "column", gap: 1.5 }}>
-          {safeDocuments.map((doc) => (
-            <ListItem
-              key={doc.id}
-              sx={{
-                borderRadius: "12px",
-                bgcolor: "#FFFFFF",
-                border: "1px solid #E2E8F0",
-                p: 2,
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  borderColor: "#D4AF37",
-                  bgcolor: "rgba(212, 175, 55, 0.03)",
-                  boxShadow: "0 4px 12px rgba(212, 175, 55, 0.1)",
-                },
-              }}
-              secondaryAction={
-                <Stack direction="row" spacing={1}>
-                  <IconButton
-                    aria-label="download"
-                    size="small"
-                    onClick={() => downloadDocument(doc, role)}
+          {safeDocuments.map((doc) => {
+            const isProcessing = actionLoadingId === doc.id;
+            return (
+              <ListItem
+                key={doc.id}
+                sx={{
+                  borderRadius: 3,
+                  bgcolor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  p: 2,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: primaryAccent,
+                    bgcolor: alpha(primaryAccent, 0.04),
+                    boxShadow: `0 4px 12px ${alpha(primaryAccent, 0.12)}`,
+                  },
+                }}
+                secondaryAction={
+                  <Stack direction="row" spacing={1}>
+                    <IconButton
+                      aria-label="download"
+                      size="small"
+                      disabled={isProcessing}
+                      onClick={() => handleDownload(doc)}
+                      sx={{
+                        color: "text.primary",
+                        bgcolor: alpha(theme.palette.action.active, 0.05),
+                        "&:hover": {
+                          bgcolor: primaryAccent,
+                          color: "#FFFFFF",
+                        },
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      {isProcessing ? <CircularProgress size={16} /> : <DownloadIcon fontSize="small" />}
+                    </IconButton>
+                    <IconButton
+                      aria-label="delete"
+                      size="small"
+                      disabled={isProcessing}
+                      onClick={() => handleDelete(doc.id)}
+                      sx={{
+                        color: "error.main",
+                        bgcolor: alpha(theme.palette.error.main, 0.08),
+                        "&:hover": {
+                          bgcolor: "error.main",
+                          color: "error.contrastText",
+                        },
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                }
+              >
+                <ListItemIcon sx={{ minWidth: 44 }}>
+                  <Box
                     sx={{
-                      color: "#0F172A",
-                      bgcolor: "#F1F5F9",
-                      "&:hover": { bgcolor: "#D4AF37", color: "#0F172A" },
-                      transition: "all 0.2s ease",
+                      width: 36,
+                      height: 36,
+                      borderRadius: 2,
+                      bgcolor: alpha(primaryAccent, 0.12),
+                      color: primaryAccent,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    <DownloadIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    aria-label="delete"
-                    size="small"
-                    onClick={() => deleteDocument(doc.id, role)}
-                    sx={{
-                      color: "#EF4444",
-                      bgcolor: "#FEF2F2",
-                      "&:hover": { bgcolor: "#EF4444", color: "#FFFFFF" },
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    <DeleteOutlineIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
-              }
-            >
-              <ListItemIcon sx={{ minWidth: 44 }}>
-                <Box
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: "8px",
-                    bgcolor: "rgba(212, 175, 55, 0.12)",
-                    color: "#D4AF37",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    <PictureAsPdfIcon fontSize="small" />
+                  </Box>
+                </ListItemIcon>
+                <ListItemText
+                  primary={DocumentGlobal.getLabel(doc.documentType)}
+                  secondary={doc.fileName || "Uploaded File"}
+                  primaryTypographyProps={{
+                    fontWeight: 700,
+                    color: "text.primary",
+                    fontSize: "0.9rem",
                   }}
-                >
-                  <PictureAsPdfIcon fontSize="small" />
-                </Box>
-              </ListItemIcon>
-              <ListItemText
-                primary={doc.documentType}
-                secondary={doc.fileName || "Uploaded File"}
-                primaryTypographyProps={{
-                  fontWeight: 700,
-                  color: "#0F172A",
-                  fontSize: "0.9rem",
-                }}
-                secondaryTypographyProps={{
-                  color: "#64748B",
-                  fontSize: "0.8rem",
-                }}
-              />
-            </ListItem>
-          ))}
+                  secondaryTypographyProps={{
+                    color: "text.secondary",
+                    fontSize: "0.8rem",
+                  }}
+                />
+              </ListItem>
+            );
+          })}
         </List>
       )}
 
       {/* UPLOAD DIALOG */}
       <Dialog
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
+        onClose={handleCloseDialog}
         maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: "16px",
-            border: "1.5px solid #D4AF37",
-            boxShadow: "0 20px 40px rgba(15, 23, 42, 0.2)",
+            borderRadius: 4,
+            border: `1.5px solid ${primaryAccent}`,
+            boxShadow: theme.shadows[10],
+            bgcolor: "background.paper",
           },
         }}
       >
         <DialogTitle
           sx={{
             fontWeight: 800,
-            pr: 6,
-            color: "#0F172A",
-            borderBottom: "1px solid #E2E8F0",
+            textAlign: "center",
+            px: 6,
+            color: "text.primary",
+            borderBottom: "1px solid",
+            borderColor: "divider",
             py: 2.5,
+            position: "relative",
           }}
         >
           Upload Document {role ? `as ${role.toLowerCase()}` : ""}
           <IconButton
             aria-label="close"
-            onClick={() => setOpenDialog(false)}
+            onClick={handleCloseDialog}
             sx={{
               position: "absolute",
               right: 12,
               top: 12,
-              color: "#64748B",
-              "&:hover": { color: "#0F172A" },
+              color: "text.secondary",
+              "&:hover": { color: "text.primary" },
             }}
           >
             <CloseIcon />
@@ -225,37 +290,43 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
 
         <DialogContent sx={{ py: 3 }}>
           <Stack spacing={3} mt={1}>
+            {errorMessage && (
+              <Alert severity="error" onClose={() => setErrorMessage("")}>
+                {errorMessage}
+              </Alert>
+            )}
+
             <FormControl fullWidth>
               <Select
                 value={selectedDocType}
                 onChange={(e) => setSelectedDocType(e.target.value)}
                 displayEmpty
                 sx={{
-                  borderRadius: "10px",
+                  borderRadius: 2.5,
                   fontWeight: 600,
-                  color: "#0F172A",
+                  color: "text.primary",
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#CBD5E1",
+                    borderColor: "divider",
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#D4AF37",
+                    borderColor: primaryAccent,
                   },
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#D4AF37",
+                    borderColor: primaryAccent,
                   },
                 }}
               >
                 <MenuItem value="" disabled>
                   Select document type
                 </MenuItem>
-                {documentTypes.map((type) => (
+                {availableDocTypes.map((docTypeObj) => (
                   <MenuItem
-                    key={type}
-                    value={type}
-                    disabled={safeDocuments.some((d) => d.documentType === type)}
+                    key={docTypeObj.value}
+                    value={docTypeObj.value}
+                    disabled={safeDocuments.some((d) => d.documentType === docTypeObj.value)}
                     sx={{ fontWeight: 600, py: 1.2 }}
                   >
-                    {type}
+                    {docTypeObj.label}
                   </MenuItem>
                 ))}
               </Select>
@@ -264,53 +335,60 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
             <Button
               variant="contained"
               component="label"
-              startIcon={<UploadFileIcon />}
+              startIcon={
+                uploading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <UploadFileIcon sx={{ color: "#FFFFFF" }} />
+                )
+              }
               disabled={!selectedDocType || uploading}
               sx={{
-                bgcolor: "#0F172A",
+                bgcolor: primaryAccent,
                 color: "#FFFFFF",
                 fontWeight: 700,
                 py: 1.5,
-                borderRadius: "10px",
+                borderRadius: 2.5,
                 textTransform: "none",
-                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
-                "& .MuiButton-startIcon": { color: "#D4AF37" },
+                boxShadow: theme.shadows[2],
                 "&:hover": {
-                  bgcolor: "#D4AF37",
-                  color: "#0F172A",
-                  "& .MuiButton-startIcon": { color: "#0F172A" },
+                  bgcolor: primaryHover,
+                  color: "#FFFFFF",
                 },
                 "&.Mui-disabled": {
-                  bgcolor: "#E2E8F0",
-                  color: "#94A3B8",
+                  bgcolor: "action.disabledBackground",
+                  color: "action.disabled",
                 },
                 transition: "all 0.2s ease",
               }}
             >
               {uploading ? "Uploading..." : "Select a PDF to Upload"}
-              <input type="file" hidden accept="application/pdf" onChange={handleFileUpload} />
+              <input
+                type="file"
+                hidden
+                accept="application/pdf"
+                onClick={(e) => {
+                  e.target.value = null;
+                }}
+                onChange={handleFileUpload}
+              />
             </Button>
           </Stack>
         </DialogContent>
 
-        <Divider sx={{ borderColor: "#E2E8F0" }} />
+        <Divider sx={{ borderColor: "divider" }} />
 
         <DialogActions sx={{ px: 3, py: 2 }}>
           <Button
-            onClick={() => setOpenDialog(false)}
+            onClick={handleCloseDialog}
             variant="contained"
+            color="success"
             startIcon={<CheckCircleOutlineIcon />}
             sx={{
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
               fontWeight: 700,
               textTransform: "none",
-              borderRadius: "8px",
+              borderRadius: 2,
               px: 3,
-              "&:hover": {
-                bgcolor: "#0F172A",
-                color: "#FFFFFF",
-              },
               transition: "all 0.2s ease",
             }}
           >

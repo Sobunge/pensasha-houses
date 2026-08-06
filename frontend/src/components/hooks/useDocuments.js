@@ -27,17 +27,15 @@ export default function useDocuments() {
 
   /* ===================== FETCH DOCUMENTS ===================== */
   const fetchDocuments = useCallback(async () => {
-    // Removed role requirement here so list loads immediately based on JWT
     setLoading(true);
     setError(null);
 
     try {
       const res = await api.get("/documents/me");
-      // Force array format to prevent .map() crashes
       const data = Array.isArray(res.data) ? res.data : [];
       setDocuments(data);
     } catch (err) {
-      setDocuments([]); // Reset to empty on failure
+      setDocuments([]);
       const msg = extractServerMessage(err, "Failed to fetch documents");
       notify(msg, "error");
       setError(err);
@@ -49,7 +47,6 @@ export default function useDocuments() {
   /* ===================== UPLOAD ===================== */
   const uploadDocument = useCallback(
     async (file, documentType, role, userId = null) => {
-      // Role IS required for uploads to categorize the file correctly
       if (!file || !documentType || !role) return null;
 
       setUploading(true);
@@ -59,14 +56,18 @@ export default function useDocuments() {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("documentType", documentType);
-        formData.append("role", role);
+        
+        // Pass activeRole in FormData AND query params to satisfy both Spring @RequestParam bindings
+        formData.append("activeRole", role);
+        formData.append("role", role); 
+
         if (userId) formData.append("userId", userId);
 
         const res = await api.post("/documents", formData, {
+          params: { activeRole: role, role },
           headers: { "Content-Type": "multipart/form-data" },
         });
 
-        // Optimistically add the new document to the list
         setDocuments((prev) => [...prev, res.data]);
         notify("Document uploaded successfully", "success");
         return res.data;
@@ -90,8 +91,7 @@ export default function useDocuments() {
 
       try {
         await api.delete(`/documents/${id}`, {
-          // Sending context if needed, though JWT handles ownership
-          params: { role, userId },
+          params: { activeRole: role, role, userId },
         });
         
         setDocuments((prev) => prev.filter((doc) => doc.id !== id));
@@ -112,7 +112,7 @@ export default function useDocuments() {
 
       try {
         const res = await api.get(`/documents/download/${doc.id}`, {
-          params: { role, userId },
+          params: { activeRole: role, role, userId },
           responseType: "blob",
         });
 
@@ -123,7 +123,7 @@ export default function useDocuments() {
         document.body.appendChild(link);
         link.click();
         link.remove();
-        window.URL.revokeObjectURL(url); // Clean up memory
+        window.URL.revokeObjectURL(url);
 
         notify(`Download started`, "info");
       } catch (err) {
