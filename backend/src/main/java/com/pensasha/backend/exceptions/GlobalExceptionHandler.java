@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import org.apache.coyote.BadRequestException;
@@ -57,6 +58,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex,
             HttpServletRequest request) {
         return buildResponse(HttpStatus.NOT_FOUND, "Resource not found", ex.getMessage(), request);
+    }
+
+    /* ===================== RESPONSE STATUS EXCEPTION (RESPONSE_STATUS_EXCEPTION) ===================== */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex,
+            HttpServletRequest request) {
+        
+        // Logs a clean single-line warning in server terminal without printing full stack trace
+        log.warn("Response status exception [{}] at {}: {}", ex.getStatusCode(), request.getRequestURI(), ex.getReason());
+
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String reason = ex.getReason() != null ? ex.getReason() : status.getReasonPhrase();
+
+        return buildResponse(status, status.getReasonPhrase(), reason, request);
     }
 
     /* ===================== AUTH / JWT ===================== */
