@@ -51,6 +51,19 @@ public class UnitService {
         unitRepository.deleteById(id);
     }
 
+    public List<UnitDTO> getUnitsByUserId(Long userId) {
+        log.info("Fetching units for user ID: {}", userId);
+        List<Unit> units = unitRepository.findByTenantUserId(userId);
+        
+        if (units == null || units.isEmpty()) {
+            return List.of();
+        }
+
+        return units.stream()
+                .map(unitMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<UnitDTO> getUnitsByProperty(Long propertyId) {
         return unitRepository.findByPropertyId(propertyId).stream()
                 .map(unitMapper::toDTO)

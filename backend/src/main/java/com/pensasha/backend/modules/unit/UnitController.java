@@ -54,4 +54,9 @@ public class UnitController {
     public ResponseEntity<List<UnitDTO>> getUnitsByProperty(@PathVariable Long propertyId) {
         return ResponseEntity.ok(unitService.getUnitsByProperty(propertyId));
     }
+
+    @GetMapping("/tenant/{userId}")
+    public ResponseEntity<List<UnitDTO>> getUnitsByTenantUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(unitService.getUnitsByUserId(userId));
+    }
 }
