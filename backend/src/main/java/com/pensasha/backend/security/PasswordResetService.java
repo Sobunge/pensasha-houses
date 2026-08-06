@@ -91,8 +91,12 @@ public class PasswordResetService {
     @Transactional
     public void changePassword(Long userId, ResetPasswordDTO dto) {
 
+        if (!dto.getNewPassword().equals(dto.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("New password and confirmation do not match");
+        }
+
         UserCredentials credentials = credentialsRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("User credentials not found for ID: " + userId));
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), credentials.getPassword())) {
             throw new IllegalArgumentException("Invalid current password");

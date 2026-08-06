@@ -46,6 +46,5 @@ public class UpdateUserDTO {
     @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;
 
-    /** Optional roles update for multi-role support */
-    private Set<String> roles;
+
 }

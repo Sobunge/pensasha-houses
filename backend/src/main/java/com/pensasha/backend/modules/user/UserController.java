@@ -62,4 +62,18 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok(new ApiResponse("User deleted"));
     }
+
+    /* ========================= CHANGE PASSWORD ========================= */
+    @PutMapping("/me/changePassword")
+    public ResponseEntity<ApiResponse> changePassword(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody ResetPasswordDTO dto) {
+
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
+
+        userService.updatePassword(userDetails.getUser().getId(), dto);
+        return ResponseEntity.ok(new ApiResponse("Password updated successfully"));
+    }
 }

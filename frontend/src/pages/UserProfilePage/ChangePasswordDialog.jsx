@@ -64,12 +64,43 @@ export default function ChangePasswordDialog({ open, handleClose }) {
     if (success) handleClose();
   };
 
-  const inputStyles = {
+  const premiumInputStyles = {
     "& .MuiOutlinedInput-root": {
-      borderRadius: "10px",
-      "& fieldset": { borderColor: "#E2E8F0" },
-      "&:hover fieldset": { borderColor: "#D4AF37" },
-      "&.Mui-focused fieldset": { borderColor: "#D4AF37" },
+      borderRadius: "12px",
+      backgroundColor: "#FAFAFA",
+      color: "#0F172A",
+      fontSize: "0.95rem",
+      fontWeight: 500,
+      "& fieldset": {
+        borderColor: "#CBD5E1",
+        borderWidth: "1.5px",
+      },
+      "&:hover fieldset": {
+        borderColor: "#94A3B8",
+      },
+      "&.Mui-focused": {
+        backgroundColor: "#FFFFFF",
+        "& fieldset": {
+          borderColor: "#D4AF37",
+          borderWidth: "2px",
+        },
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: "#475569",
+      fontWeight: 600,
+      fontSize: "0.9rem",
+      "&.Mui-focused": {
+        color: "#D4AF37",
+      },
+    },
+    "& input::placeholder": {
+      color: "#94A3B8",
+      opacity: 1,
+    },
+    "& .MuiFormHelperText-root": {
+      color: "#DC2626",
+      fontWeight: 500,
     },
   };
 
@@ -88,7 +119,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
         },
       }}
     >
-      <DialogTitle sx={{ pb: 1, pt: 2, position: "relative" }}>
+      <DialogTitle sx={{ pb: 4, pt: 2, position: "relative" }}>
         <Box textAlign="center">
           <Typography variant="h6" fontWeight={800} sx={{ color: "#0F172A" }}>
             Change Password
@@ -116,6 +147,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
         <Stack spacing={2.5} mt={1}>
           {/* Current password */}
           <TextField
+            size="small"
             label="Current Password"
             name="currentPassword"
             placeholder="Enter current password"
@@ -125,7 +157,10 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             error={!!fieldErrors.currentPassword}
             helperText={fieldErrors.currentPassword}
             fullWidth
-            sx={inputStyles}
+            sx={{
+              ...premiumInputStyles,
+              "& input::-ms-reveal, & input::-ms-clear": { display: "none" },
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -146,6 +181,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
 
           {/* New password */}
           <TextField
+            size="small"
             label="New Password"
             name="newPassword"
             placeholder="Enter new password"
@@ -155,7 +191,10 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             error={!!fieldErrors.newPassword}
             helperText={fieldErrors.newPassword}
             fullWidth
-            sx={inputStyles}
+            sx={{
+              ...premiumInputStyles,
+              "& input::-ms-reveal, & input::-ms-clear": { display: "none" },
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -210,6 +249,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
 
           {/* Confirm password */}
           <TextField
+            size="small"
             label="Confirm New Password"
             name="confirmNewPassword"
             placeholder="Confirm new password"
@@ -219,7 +259,10 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             error={!!fieldErrors.confirmNewPassword}
             helperText={fieldErrors.confirmNewPassword}
             fullWidth
-            sx={inputStyles}
+            sx={{
+              ...premiumInputStyles,
+              "& input::-ms-reveal, & input::-ms-clear": { display: "none" },
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -258,6 +301,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
         </Button>
 
         <Button
+          size="small"
           onClick={handleSubmit}
           variant="contained"
           disabled={loading}
