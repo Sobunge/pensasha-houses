@@ -76,7 +76,6 @@ public class UserService {
     /* ========================= READ ========================= */
 
     public GetUserDTO getUser(Long id) {
-        System.out.println("User: " + getUserEntity(id));
         return userMapper.toDTO(getUserEntity(id));
     }
 
