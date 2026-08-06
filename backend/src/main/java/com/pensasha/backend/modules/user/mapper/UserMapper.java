@@ -51,6 +51,7 @@ public interface UserMapper {
     @Mapping(target = "landlordProfile", ignore = true)
     @Mapping(target = "caretakerProfile", ignore = true)
     @Mapping(target = "tokenVersion", ignore = true)
+    @Mapping(target = "permissionOverrides", ignore = true)
     void updateEntity(@MappingTarget User user, UpdateUserDTO dto);
 
     /* ===================== ROLE MAPPING ===================== */
