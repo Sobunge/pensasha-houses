@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Set;
-
 /**
  * DTO for updating user profile information.
  * Supports optional multi-role updates.

@@ -49,7 +49,7 @@ public class TenantController {
                 Pageable pageable = PageRequest.of(
                                 page,
                                 size,
-                                Sort.by(Sort.Direction.DESC, TenantDTO::getId));
+                                Sort.by(Sort.Direction.DESC, (TenantDTO tenantDTO) -> tenantDTO.getId()));
 
                 Page<TenantDTO> tenants = tenantService.getAllTenants(pageable);
                 return ResponseEntity.ok(tenants);

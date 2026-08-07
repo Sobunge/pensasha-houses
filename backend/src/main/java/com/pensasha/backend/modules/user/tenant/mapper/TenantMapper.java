@@ -56,7 +56,7 @@ public interface TenantMapper {
         }
         return tenantProfile.getLeases()
                 .stream()
-                .map(Lease::getId)
+                .map((Lease lease) -> lease.getId())
                 .collect(Collectors.toList());
     }
 
@@ -66,7 +66,7 @@ public interface TenantMapper {
         }
         return tenantProfile.getLeases()
                 .stream()
-                .map(Lease::getUnit)
+                .map((Lease lease) -> lease.getUnit())
                 .filter(unit -> unit != null)
                 .map(unit -> unit.getId())
                 .distinct()
@@ -82,7 +82,7 @@ public interface TenantMapper {
 
         return tenantProfile.getUser().getRoles()
                 .stream()
-                .map(Role::getName)
+                .map((Role role) -> role.getName())
                 .collect(Collectors.toSet());
     }
 
