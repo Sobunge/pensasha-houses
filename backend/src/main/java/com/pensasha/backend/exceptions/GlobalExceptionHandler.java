@@ -2,6 +2,7 @@ package com.pensasha.backend.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -167,6 +168,23 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("Data integrity violation on {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
+
+        String userMessage = "A record with this information already exists.";
+        
+        String causeMessage = ex.getMostSpecificCause().getMessage();
+        if (causeMessage != null && causeMessage.contains("Duplicate entry")) {
+            userMessage = "A user with this ID number, email, or phone number already exists.";
+        }
+
+        return buildResponse(HttpStatus.CONFLICT, "Conflict", userMessage, request);
+    }
+
     /* ===================== BAD REQUEST & PAYLOAD ===================== */
 
     @ExceptionHandler({ BadRequestException.class, IllegalArgumentException.class })
@@ -185,7 +203,7 @@ public class GlobalExceptionHandler {
     ) {
         log.warn("Payload size limit exceeded on {}", request.getRequestURI());
         return buildResponse(
-                HttpStatus.PAYLOAD_TOO_LARGE,
+                HttpStatus.CONTENT_TOO_LARGE,
                 "Payload Too Large",
                 "File size exceeds the maximum permitted upload limit",
                 request
