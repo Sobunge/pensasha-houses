@@ -89,9 +89,14 @@ export const NotificationProvider = ({ children }) => {
           open
           autoHideDuration={current.duration}
           onClose={() => handleClose(current.id)}
-          anchorOrigin={current.position}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
           TransitionComponent={SlideDown}
-          sx={{ top: { xs: 16, sm: 24 } }}
+          sx={{
+            top: { xs: 16, sm: 24 },
+            left: "50%",
+            right: "auto",
+            transform: "translateX(-50%)",
+          }}
         >
           <Alert
             role="alert"
@@ -102,7 +107,8 @@ export const NotificationProvider = ({ children }) => {
               bgcolor: theme.palette.mode === "dark" ? "#1E293B" : "#FFFFFF",
               border: `1.5px solid ${severityBorders[current.severity]}`,
               borderRadius: "12px",
-              width: { xs: "90vw", sm: "420px" },
+              width: { xs: "calc(100vw - 32px)", sm: "420px" },
+              maxWidth: "100%",
               boxShadow:
                 "0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.04)",
               display: "flex",
