@@ -1,6 +1,8 @@
+// src/components/Profile/ProfileHeader.jsx
 import React, { useState } from "react";
-import { Box, Avatar, Typography, Stack, Link } from "@mui/material";
+import { Box, Avatar, Typography, Stack, Button } from "@mui/material";
 import BadgeIcon from "@mui/icons-material/Badge";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import ChangeProfilePicDialog from "../ChangeProfilePicDialog";
 
 export default function ProfileHeader({ profile, onChange }) {
@@ -29,8 +31,8 @@ export default function ProfileHeader({ profile, onChange }) {
     <>
       <Stack
         direction={{ xs: "column", md: "row" }}
-        spacing={{ xs: 2, md: 4 }}
-        alignItems={{ xs: "center", md: "flex-start" }}
+        spacing={{ xs: 2.5, md: 4 }}
+        alignItems={{ xs: "center", md: "center" }}
         justifyContent={{ xs: "center", md: "flex-start" }}
       >
         {/* ===== Avatar Section ===== */}
@@ -39,39 +41,62 @@ export default function ProfileHeader({ profile, onChange }) {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            mb: { xs: 1, md: 0 },
+            position: "relative",
           }}
         >
-          <Avatar
-            src={avatarPreview}
+          <Box
             sx={{
-              width: { xs: 70, sm: 90, md: 100 },
-              height: { xs: 70, sm: 90, md: 100 },
-              fontSize: { xs: 28, sm: 36, md: 42 },
-              bgcolor: "#f8b500",
-              boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-              border: "3px solid #fff",
-              transition: "transform 0.3s ease",
-              "&:hover": { transform: "scale(1.05)" },
+              p: "3px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #D4AF37 0%, #0F172A 100%)",
+              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
             }}
           >
-            {!avatarPreview && avatarInitial}
-          </Avatar>
+            <Avatar
+              src={avatarPreview}
+              sx={{
+                width: { xs: 80, sm: 96, md: 104 },
+                height: { xs: 80, sm: 96, md: 104 },
+                fontSize: { xs: 30, sm: 38, md: 42 },
+                fontWeight: 800,
+                bgcolor: "#F8FAFC",
+                color: "#0F172A",
+                border: "3px solid #FFFFFF",
+                transition: "transform 0.3s ease",
+                "&:hover": { transform: "scale(1.03)" },
+              }}
+            >
+              {!avatarPreview && avatarInitial}
+            </Avatar>
+          </Box>
 
-          <Link
-            component="button"
-            variant="caption"
+          <Button
+            size="small"
+            startIcon={<PhotoCameraIcon sx={{ fontSize: "14px !important" }} />}
             onClick={() => setOpenChangePic(true)}
             sx={{
               mt: 1.5,
-              fontWeight: 600,
+              px: 1.5,
+              py: 0.4,
+              borderRadius: "20px",
+              bgcolor: "#FFFFFF",
+              color: "#0F172A",
+              border: "1px solid #E2E8F0",
+              fontWeight: 700,
               letterSpacing: 0.5,
-              textTransform: "uppercase",
-              fontSize: { xs: 11, sm: 12 },
+              fontSize: { xs: "0.7rem", sm: "0.75rem" },
+              textTransform: "none",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
+              "&:hover": {
+                bgcolor: "#D4AF37",
+                color: "#0F172A",
+                borderColor: "#D4AF37",
+              },
+              transition: "all 0.2s ease",
             }}
           >
             Change Photo
-          </Link>
+          </Button>
         </Box>
 
         {/* ===== Name + Role Section ===== */}
@@ -81,18 +106,19 @@ export default function ProfileHeader({ profile, onChange }) {
             display: "flex",
             flexDirection: "column",
             alignItems: { xs: "center", md: "flex-start" },
-            maxWidth: { xs: "90%", md: 500 }, // limits name width on desktop
+            maxWidth: { xs: "100%", md: 550 },
           }}
         >
           {fullName && (
             <Typography
               variant="h4"
               sx={{
-                fontWeight: 700,
+                fontWeight: 800,
+                color: "#0F172A",
                 lineHeight: 1.2,
-                letterSpacing: -0.5,
+                letterSpacing: "-0.5px",
                 wordBreak: "break-word",
-                fontSize: { xs: "1.4rem", sm: "1.6rem", md: "1.9rem" }, // controlled size
+                fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2.1rem" },
               }}
             >
               {fullName}
@@ -106,22 +132,22 @@ export default function ProfileHeader({ profile, onChange }) {
               spacing={1}
               mt={1.5}
               sx={{
-                bgcolor: "rgba(248,181,0,0.12)",
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 2,
-                flexWrap: "wrap",
+                bgcolor: "rgba(212, 175, 55, 0.12)",
+                border: "1px solid rgba(212, 175, 55, 0.3)",
+                px: 1.8,
+                py: 0.6,
+                borderRadius: "20px",
                 justifyContent: { xs: "center", md: "flex-start" },
               }}
             >
-              <BadgeIcon sx={{ color: "#f8b500", fontSize: 18 }} />
+              <BadgeIcon sx={{ color: "#D4AF37", fontSize: 18 }} />
               <Typography
                 variant="subtitle2"
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 800,
                   letterSpacing: 0.8,
-                  color: "text.secondary",
-                  fontSize: { xs: 11, sm: 12, md: 13 },
+                  color: "#0F172A",
+                  fontSize: { xs: "0.72rem", sm: "0.78rem" },
                 }}
               >
                 {profile.role.toUpperCase()}

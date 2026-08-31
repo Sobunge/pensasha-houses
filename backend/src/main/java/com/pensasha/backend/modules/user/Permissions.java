@@ -2,12 +2,15 @@ package com.pensasha.backend.modules.user;
 
 public enum Permissions {
 
-
-    // ===================== PROPERTY =====================
+    // ===================== PROPERTY & UNITS =====================
     PROPERTY_CREATE,
     PROPERTY_VIEW,
     PROPERTY_UPDATE,
     PROPERTY_DELETE,
+    UNIT_CREATE,
+    UNIT_VIEW,
+    UNIT_UPDATE,
+    UNIT_DELETE,
 
     // ===================== TENANT =====================
     TENANT_VIEW,
@@ -16,30 +19,12 @@ public enum Permissions {
     TENANT_DELETE,
     TENANT_APPROVE,
 
-    // ===================== RENT / PAYMENT =====================
-    RENT_PAY,
-    RENT_VIEW,
-    RENT_UPDATE, // replaces confirm payment (more flexible)
-
-    // ===================== INVOICE =====================
-    INVOICE_CREATE,
-    INVOICE_VIEW,
-    INVOICE_UPDATE,
-    INVOICE_DELETE,
-    INVOICE_GENERATE,
-
-    // ===================== MAINTENANCE =====================
-    MAINTENANCE_CREATE,
-    MAINTENANCE_VIEW,
-    MAINTENANCE_UPDATE,
-    MAINTENANCE_ASSIGN,
-    MAINTENANCE_DELETE,
-
     // ===================== CARETAKER =====================
     CARETAKER_CREATE,
     CARETAKER_VIEW,
     CARETAKER_UPDATE,
     CARETAKER_DELETE,
+    CARETAKER_ASSIGN, // Assign caretaker to specific property/unit
 
     // ===================== LANDLORD =====================
     LANDLORD_VIEW,
@@ -47,9 +32,36 @@ public enum Permissions {
     LANDLORD_UPDATE,
     LANDLORD_DELETE,
 
+    // ===================== RENT / PAYMENT / INVOICE =====================
+    RENT_PAY,
+    RENT_VIEW,
+    RENT_UPDATE,
+    INVOICE_CREATE,
+    INVOICE_VIEW,
+    INVOICE_UPDATE,
+    INVOICE_DELETE,
+    INVOICE_GENERATE,
+    RECEIPT_VIEW,      // Download/view rent payment receipts
+    RECEIPT_GENERATE,  // Generate payment receipts
+
+    // ===================== LEASE & AGREEMENTS =====================
+    LEASE_CREATE,
+    LEASE_VIEW,
+    LEASE_UPDATE,
+    LEASE_TERMINATE,
+
+    // ===================== MAINTENANCE =====================
+    MAINTENANCE_CREATE,
+    MAINTENANCE_VIEW,
+    MAINTENANCE_UPDATE,
+    MAINTENANCE_ASSIGN,
+    MAINTENANCE_CANCEL, // Tenant/Landlord cancels pending request
+    MAINTENANCE_DELETE,
+
     // ===================== DOCUMENT =====================
     DOCUMENT_CREATE,
     DOCUMENT_VIEW,
+    DOCUMENT_UPDATE, // Replace existing files/leases
     DOCUMENT_DELETE,
 
     // ===================== MESSAGE =====================
@@ -67,7 +79,7 @@ public enum Permissions {
     REPORT_VIEW,
     REPORT_GENERATE,
 
-    // ===================== ADMIN =====================
+    // ===================== USER & ROLE MANAGEMENT =====================
     USER_CREATE,
     USER_VIEW,
     USER_UPDATE,

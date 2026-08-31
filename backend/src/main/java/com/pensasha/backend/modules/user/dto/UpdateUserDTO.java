@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Set;
-
 /**
  * DTO for updating user profile information.
  * Supports optional multi-role updates.
@@ -46,6 +44,5 @@ public class UpdateUserDTO {
     @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;
 
-    /** Optional roles update for multi-role support */
-    private Set<String> roles;
+
 }

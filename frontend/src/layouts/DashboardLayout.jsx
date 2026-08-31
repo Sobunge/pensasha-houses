@@ -5,7 +5,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import UsersNavbar from "../components/UsersNavbar";
 import UserSidebar from "../components/UserSidebar";
 import UserFooter from "../components/UserFooter";
-import ScrollToTopButton from "../components/ScrollToTopButton"; // <--- 1. Import component
+import ScrollToTopButton from "../components/ScrollToTopButton";
 import { useAuth } from "../pages/Auth/AuthContext";
 import { NAVBAR_HEIGHT } from "../layouts/constants";
 
@@ -36,6 +36,9 @@ function DashboardLayout() {
         minHeight: "100vh",
         overflow: "hidden",
         bgcolor: "#F8FAFC",
+        // Subtle ambient light effect matching luxury theme
+        backgroundImage:
+          "radial-gradient(at 90% 10%, rgba(212, 175, 55, 0.03) 0px, transparent 50%), radial-gradient(at 10% 90%, rgba(15, 23, 42, 0.03) 0px, transparent 50%)",
         color: "#0F172A",
       }}
     >
@@ -45,42 +48,63 @@ function DashboardLayout() {
         onClose={() => setMobileOpen(false)}
       />
 
+      {/* Main Container */}
       <Box
         sx={{
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
           minWidth: 0,
-          bgcolor: "#F8FAFC",
           height: "100vh",
+          position: "relative",
         }}
       >
         <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
 
+        {/* Scrollable Viewport */}
         <Box
           ref={mainRef}
           component="main"
           role="main"
-          id="mainContent" // <--- Already defined as "mainContent"
+          id="mainContent"
           tabIndex={-1}
           sx={{
             flexGrow: 1,
             mt: `${NAVBAR_HEIGHT}px`,
             overflowY: "auto",
             overflowX: "hidden",
-            p: { xs: 2.5, md: 1 },
+            scrollBehavior: "smooth",
+            px: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 2.5, sm: 3.5 },
             outline: "none",
             display: "flex",
             flexDirection: "column",
-            position: "relative", // Ensures relative positioning scope
+            position: "relative",
+            // Custom scrollbar styling for extra polish
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "transparent",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "rgba(212, 175, 55, 0.25)",
+              borderRadius: "4px",
+              "&:hover": {
+                background: "rgba(212, 175, 55, 0.5)",
+              },
+            },
           }}
         >
+          {/* Main Content Area */}
           <Box
             sx={{
-              maxWidth: 1200,
+              maxWidth: 1280, // Slightly widened to allow luxurious breathing room
               mx: "auto",
               width: "100%",
               flexGrow: 1,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <Outlet />
@@ -88,7 +112,7 @@ function DashboardLayout() {
 
           <UserFooter />
 
-          {/* 2. Pass containerId="mainContent" */}
+          {/* Scroll to Top Button */}
           <ScrollToTopButton containerId="mainContent" />
         </Box>
       </Box>

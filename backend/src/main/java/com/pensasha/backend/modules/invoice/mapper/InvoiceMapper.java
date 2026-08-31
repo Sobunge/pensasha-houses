@@ -39,7 +39,7 @@ public interface InvoiceMapper {
     default List<Long> mapPaymentsToIds(List<Payment> payments) {
         if (payments == null) return List.of();
         return payments.stream()
-                .map(Payment::getId)
+                .map((Payment payment) -> payment.getId())
                 .collect(Collectors.toList());
     }
 }

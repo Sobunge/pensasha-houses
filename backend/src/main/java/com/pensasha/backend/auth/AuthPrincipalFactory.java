@@ -28,7 +28,7 @@ public class AuthPrincipalFactory {
     private Set<String> mapRoles(User user) {
         return user.getRoles()
                 .stream()
-                .map(Role::getName)
+                .map((Role role) -> role.getName())
                 .collect(Collectors.toUnmodifiableSet());
     }
 

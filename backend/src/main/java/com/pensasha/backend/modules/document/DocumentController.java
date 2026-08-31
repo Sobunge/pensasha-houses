@@ -31,18 +31,19 @@ public class DocumentController {
     @PreAuthorize("hasAuthority('DOCUMENT_UPLOAD') or hasRole('ADMIN')")
     public ResponseEntity<Document> uploadDocument(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("documentType") String documentType
+            @RequestParam("documentType") DocumentType documentType,
+            @RequestParam("activeRole") String activeRole
     ) throws IOException {
 
         User user = authUtils.getCurrentUser();
 
         Document savedDocument =
-                documentService.uploadDocument(file, documentType, user);
+                documentService.uploadDocument(file, documentType, activeRole, user);
 
         return ResponseEntity.status(201).body(savedDocument);
     }
 
-    /* ===================== READ (MY DOCUMENTS) ===================== */
+    /* ===================== READ (ALL MY DOCUMENTS) ===================== */
     @GetMapping("/me")
     @PreAuthorize("hasAuthority('DOCUMENT_VIEW') or hasRole('ADMIN')")
     public ResponseEntity<List<Document>> getMyDocuments() {
@@ -51,6 +52,21 @@ public class DocumentController {
 
         List<Document> documents =
                 documentService.getDocumentsForUser(user.getId());
+
+        return ResponseEntity.ok(documents);
+    }
+
+    /* ===================== READ (ROLE-FILTERED WORKSPACE) ===================== */
+    @GetMapping("/me/workspace")
+    @PreAuthorize("hasAuthority('DOCUMENT_VIEW') or hasRole('ADMIN')")
+    public ResponseEntity<List<Document>> getMyWorkspaceDocuments(
+            @RequestParam("activeRole") String activeRole
+    ) {
+
+        User user = authUtils.getCurrentUser();
+
+        List<Document> documents =
+                documentService.getVisibleDocumentsForActiveRole(user.getId(), activeRole);
 
         return ResponseEntity.ok(documents);
     }

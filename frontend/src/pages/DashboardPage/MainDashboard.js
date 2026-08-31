@@ -8,7 +8,6 @@ import {
   Stack,
   ToggleButtonGroup,
   ToggleButton,
-  useTheme,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Auth/AuthContext";
@@ -27,7 +26,6 @@ const dashboardMap = {
 };
 
 const MainDashboard = () => {
-  const theme = useTheme();
   const { user, activeRole, setActiveRole } = useAuth();
 
   if (!user) return null;
@@ -44,7 +42,7 @@ const MainDashboard = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, bgcolor: "#F8FAFC", minHeight: "100vh" }}>
+    <Box sx={{ p: { xs: 2, sm: 3}, bgcolor: "#F8FAFC", minHeight: "100vh" }}>
       {/* HERO / HEADER */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -52,16 +50,18 @@ const MainDashboard = () => {
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <Card
-          elevation={0}
-          sx={{
-            mb: 4,
-            p: { xs: 2.5, sm: 3 },
-            borderRadius: "16px",
-            border: `1px solid ${theme.palette.divider}`,
-            bgcolor: "#FFFFFF",
-            boxShadow: "0 4px 20px rgba(15, 23, 42, 0.04)",
-          }}
-        >
+  elevation={0}
+  sx={{
+    mb: 4,
+    p: { xs: 2.5, sm: 3 },
+    borderRadius: "16px",
+    bgcolor: "#FFFFFF",
+    // 1. Gold border
+    border: "1.5px solid #D4AF37",
+    // 2. Enhanced shadow for prominence
+    boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+  }}
+>
           <Stack
             direction={{ xs: "column", md: "row" }}
             justifyContent="space-between"
@@ -72,14 +72,14 @@ const MainDashboard = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
               <Avatar
                 sx={{
-                  bgcolor: "#0F172A",
-                  color: "#D97706",
-                  border: "2px solid #FDE68A",
+                  bgcolor: "#0F172A", // Deep Executive Slate
+                  color: "#D4AF37", // Pensasha Gold
+                  border: "2px solid rgba(212, 175, 55, 0.4)",
                   width: { xs: 52, sm: 60 },
                   height: { xs: 52, sm: 60 },
                   fontWeight: 800,
                   fontSize: "1.3rem",
-                  boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+                  boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
                 }}
               >
                 {user.name?.[0]?.toUpperCase() || "U"}
@@ -89,33 +89,35 @@ const MainDashboard = () => {
                 <Typography
                   variant="h5"
                   sx={{
-                    fontWeight: 800,
+                    fontFamily: '"Playfair Display", Georgia, serif',
+                    fontWeight: 700,
                     color: "#0F172A",
                     lineHeight: 1.2,
-                    letterSpacing: "-0.02em",
+                    letterSpacing: "-0.01em",
                   }}
                 >
                   Welcome back{user?.name ? `, ${user.name}` : ""} 👋
                 </Typography>
 
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontWeight: 500 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.75 }}>
+                  <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 500 }}>
                     Managing as
                   </Typography>
                   <Box
                     sx={{
-                      bgcolor: "#FEF3C7",
-                      color: "#B45309",
+                      bgcolor: "rgba(212, 175, 55, 0.12)",
+                      color: "#B5922B",
                       px: 1.2,
                       py: 0.25,
                       borderRadius: "6px",
-                      fontSize: "0.775rem",
+                      fontSize: "0.75rem",
                       fontWeight: 800,
-                      letterSpacing: "0.03em",
-                      border: "1px solid #FDE68A",
+                      letterSpacing: "0.05em",
+                      border: "1px solid rgba(212, 175, 55, 0.3)",
+                      textTransform: "uppercase",
                     }}
                   >
-                    {activeRole?.replace("ROLE_", "")}
+                    {activeRole?.replace("ROLE_", "")} MODE
                   </Box>
                 </Box>
               </Box>
@@ -140,8 +142,8 @@ const MainDashboard = () => {
                     mx: 0.3,
                     transition: "all 0.2s ease",
                     "&.Mui-selected": {
-                      bgcolor: "#0F172A",
-                      color: "#FFFFFF",
+                      bgcolor: "#0F172A", // Active role background
+                      color: "#D4AF37", // Active role text
                       fontWeight: 700,
                       boxShadow: "0 2px 8px rgba(15, 23, 42, 0.18)",
                       "&:hover": { bgcolor: "#1E293B" },
@@ -149,7 +151,7 @@ const MainDashboard = () => {
                     "&:not(.Mui-selected)": {
                       color: "#64748B",
                       fontWeight: 600,
-                      "&:hover": { bgcolor: "rgba(15, 23, 42, 0.04)", color: "#0F172A" },
+                      "&:hover": { bgcolor: "rgba(15, 23, 42, 0.05)", color: "#0F172A" },
                     },
                   },
                 }}
@@ -162,7 +164,7 @@ const MainDashboard = () => {
                       px: 2.5,
                       py: 0.85,
                       textTransform: "none",
-                      fontSize: "0.875rem",
+                      fontSize: "0.85rem",
                       flexGrow: { xs: 1, md: 0 },
                     }}
                   >

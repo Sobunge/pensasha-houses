@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -61,15 +60,6 @@ public class UserService {
 
         userMapper.updateEntity(user, dto);
 
-        if (dto.getRoles() != null) {
-            Set<Role> roles = dto.getRoles().stream()
-                    .map(r -> roleRepository.findByName(r.toUpperCase())
-                            .orElseThrow(() -> new IllegalArgumentException("Role not found")))
-                    .collect(Collectors.toSet());
-
-            user.setRoles(roles);
-        }
-
         return userMapper.toDTO(user);
     }
 
@@ -99,7 +89,11 @@ public class UserService {
     }
 
     /* ========================= PASSWORD DELEGATION ========================= */
+    @Transactional
     public void updatePassword(Long userId, ResetPasswordDTO dto) {
+        if (!dto.getNewPassword().equals(dto.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("New password and confirmation do not match");
+        }
         passwordResetService.changePassword(userId, dto);
     }
 

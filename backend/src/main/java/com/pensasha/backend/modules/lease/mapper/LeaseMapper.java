@@ -50,8 +50,8 @@ public interface LeaseMapper {
     default List<String> mapInvoiceUUIDsToStrings(List<Invoice> invoices) {
         if (invoices == null || invoices.isEmpty()) return List.of();
         return invoices.stream()
-                       .map(Invoice::getInvoiceNumber) // UUID
-                       .map(UUID::toString)             // convert to String
+                       .map((Invoice invoice) -> invoice.getInvoiceNumber()) // UUID
+                       .map((UUID uuid) -> uuid.toString())             // convert to String
                        .collect(Collectors.toList());
     }
 }

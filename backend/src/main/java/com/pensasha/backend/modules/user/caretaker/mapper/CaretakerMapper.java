@@ -38,7 +38,7 @@ public interface CaretakerMapper {
     @Named("rolesToStrings")
     default Set<String> rolesToStrings(Set<Role> roles) {
         if (roles == null || roles.isEmpty()) return Set.of();
-        return roles.stream().map(Role::getName).collect(Collectors.toSet());
+        return roles.stream().map((Role role) -> role.getName()).collect(Collectors.toSet());
     }
 
     default Set<String> mapPermissions(Set<Role> roles) {

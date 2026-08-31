@@ -1,5 +1,5 @@
 // src/components/Auth/LoginPage/LoginForm.jsx
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Button,
@@ -17,32 +17,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { Link as RouterLink } from "react-router-dom";
 
-import { useNotification } from "../../../components/NotificationProvider";
-import { useAuth } from "../AuthContext";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
-import api, { setAccessToken } from "../../../api/api";
-
-/* ---------------- Phone Helpers ---------------- */
-const normalizePhone = (value) => {
-  if (!value) return "";
-  let digits = value.replace(/\D/g, "");
-  if (digits.startsWith("0")) digits = digits.substring(1);
-  return "+254" + digits;
-};
-
-const validatePhoneNumber = (value) => {
-  if (!value) return "Phone number is required";
-  const digits = value.replace(/\D/g, "");
-  if (!/^(7|1)\d{8}$/.test(digits)) return "Enter a valid phone number";
-  return null;
-};
-
-const validatePassword = (value) => {
-  if (!value) return "Password is required";
-  if (value.length < 5) return "Password must be at least 5 characters";
-  return null;
-};
+import { useLoginForm } from "../../../components/hooks/useLoginForm";
 
 /* ---------------- Premium High-Contrast Input Styles ---------------- */
 const premiumInputStyles = {
@@ -53,7 +30,7 @@ const premiumInputStyles = {
     fontSize: "0.95rem",
     fontWeight: 500,
     "& fieldset": {
-      borderColor: "#CBD5E1", // Visible, high-contrast border
+      borderColor: "#CBD5E1",
       borderWidth: "1.5px",
     },
     "&:hover fieldset": {
@@ -86,91 +63,19 @@ const premiumInputStyles = {
 };
 
 export default function LoginForm({ switchToSignup, onClose }) {
-  const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
-  const [touched, setTouched] = useState({ phoneNumber: false, password: false });
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const { notify } = useNotification();
-  const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
-  const navigate = useNavigate();
-
-  const phoneError = validatePhoneNumber(formData.phoneNumber);
-  const passwordError = validatePassword(formData.password);
-
-  const showPhoneError = touched.phoneNumber && Boolean(phoneError);
-  const showPasswordError = touched.password && Boolean(passwordError);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleBlur = (field) => () =>
-    setTouched((prev) => ({ ...prev, [field]: true }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (phoneError || passwordError) {
-      setTouched({ phoneNumber: true, password: true });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const normalizedPhone = normalizePhone(formData.phoneNumber);
-
-      const { data } = await api.post("/auth/login", {
-        phoneNumber: normalizedPhone,
-        password: formData.password,
-      });
-
-      const { accessToken, principal } = data;
-
-      if (!accessToken || !principal) {
-        throw new Error("Invalid login response");
-      }
-
-      setAccessToken(accessToken);
-
-      const roles = Array.isArray(principal.roles) ? principal.roles : [principal.role];
-      const permissions = Array.isArray(principal.permissions) ? principal.permissions : [];
-
-      const user = {
-        id: principal.id,
-        name: principal.firstname,
-        roles,
-        permissions,
-        defaultRoute: "/dashboard",
-        accessToken,
-      };
-
-      sessionStorage.setItem("user", JSON.stringify(user));
-      loginAs(user);
-      notify("Login successful!", "success");
-
-      if (onClose) onClose();
-      window.scrollTo(0, 0);
-
-      if (redirectAfterAuth && redirectAfterAuth !== "rent-request") {
-        navigate(redirectAfterAuth, { replace: true });
-        setRedirectAfterAuth(null);
-      } else if (redirectAfterAuth !== "rent-request") {
-        navigate("/dashboard", { replace: true });
-      }
-
-    } catch (err) {
-      console.error("Login error:", err);
-      const message =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Unable to login. Please try again.";
-      notify(message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    formData,
+    showPassword,
+    loading,
+    showPhoneError,
+    phoneError,
+    showPasswordError,
+    passwordError,
+    handleChange,
+    handleBlur,
+    togglePasswordVisibility,
+    handleSubmit,
+  } = useLoginForm(onClose);
 
   return (
     <Box
@@ -197,8 +102,8 @@ export default function LoginForm({ switchToSignup, onClose }) {
         Welcome Back
       </Typography>
 
-      <Typography 
-        variant="body2" 
+      <Typography
+        variant="body2"
         sx={{ color: "#64748B", mb: 2.5, textAlign: "center" }}
       >
         Login with your phone number
@@ -222,8 +127,12 @@ export default function LoginForm({ switchToSignup, onClose }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PhoneOutlinedIcon sx={{ color: "#475569", mr: 0.5, fontSize: "1.1rem" }} />
-                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.9rem" }}>
+                <PhoneOutlinedIcon
+                  sx={{ color: "#475569", mr: 0.5, fontSize: "1.1rem" }}
+                />
+                <Typography
+                  sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.9rem" }}
+                >
                   +254
                 </Typography>
               </InputAdornment>
@@ -251,14 +160,16 @@ export default function LoginForm({ switchToSignup, onClose }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockOutlinedIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
+                <LockOutlinedIcon
+                  sx={{ color: "#475569", fontSize: "1.1rem" }}
+                />
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={togglePasswordVisibility}
                   edge="end"
                   size="small"
                   sx={{ color: "#64748B" }}
@@ -329,7 +240,11 @@ export default function LoginForm({ switchToSignup, onClose }) {
 
         <Divider sx={{ borderColor: "#F1F5F9", my: 0.5 }} />
 
-        <Typography variant="body2" textAlign="center" sx={{ color: "#64748B" }}>
+        <Typography
+          variant="body2"
+          textAlign="center"
+          sx={{ color: "#64748B" }}
+        >
           Don’t have an account?{" "}
           <MuiLink
             component="button"

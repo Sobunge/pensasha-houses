@@ -45,7 +45,7 @@ public class JWTUtils {
         // FIX: Role is entity → use getName()
         Set<String> roleNames = custom.getUser().getRoles()
                 .stream()
-                .map(Role::getName)
+                .map((Role role) -> role.getName())
                 .collect(Collectors.toSet());
 
         claims.put("roles", roleNames);
@@ -87,11 +87,11 @@ public class JWTUtils {
     }
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, (Claims claims) -> claims.getSubject());
     }
 
     public String extractJti(String token) {
-        return extractClaim(token, Claims::getId);
+        return extractClaim(token, (Claims claims) -> claims.getId());
     }
 
     public Long extractUserId(String token) {
@@ -109,7 +109,7 @@ public class JWTUtils {
             Object val = claims.get("roles");
             if (val instanceof Collection<?> collection) {
                 return collection.stream()
-                        .map(Object::toString)
+                        .map((Object object) -> object.toString())
                         .collect(Collectors.toSet());
             }
             return Set.of();
@@ -121,7 +121,7 @@ public class JWTUtils {
     }
 
     public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+        return extractClaim(token, (Claims claims) -> claims.getExpiration());
     }
 
     /* ===================== VALIDATION ===================== */

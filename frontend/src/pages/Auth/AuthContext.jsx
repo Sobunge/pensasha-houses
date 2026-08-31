@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { setLogoutHandler } from "../../api/api";
+// src/context/AuthContext.jsx
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import api, { setAccessToken, setLogoutHandler } from "../../api/api";
 
 export const AuthContext = createContext();
 
@@ -10,68 +11,94 @@ const normalizeRole = (role) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = sessionStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
-  const [roles, setRoles] = useState(() => {
-    const savedRoles = sessionStorage.getItem("roles");
-    return savedRoles ? JSON.parse(savedRoles) : [];
-  });
-
-  const [activeRole, setActiveRole] = useState(() => {
-    return sessionStorage.getItem("activeRole") || null;
-  });
-
+  const [user, setUser] = useState(null);
+  const [roles, setRoles] = useState([]);
+  const [activeRole, setActiveRole] = useState(null);
   const [redirectAfterAuth, setRedirectAfterAuth] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  /**
-   * LOGIN
-   */
+  // Guard to prevent concurrent /auth/refresh calls in React
+  const isRefreshingRef = useRef(false);
+
   const loginAs = (userObj) => {
     setUser(userObj);
-
     const roleList = (userObj?.roles || []).map(normalizeRole);
-
     setRoles(roleList);
-
     const defaultRole = roleList[0] || null;
-
     setActiveRole(defaultRole);
-
-    sessionStorage.setItem("user", JSON.stringify(userObj));
-    sessionStorage.setItem("roles", JSON.stringify(roleList));
-    sessionStorage.setItem("activeRole", defaultRole || "");
   };
 
-  /**
-   * SWITCH ROLE
-   */
   const switchRole = (role) => {
     const normalizedRole = normalizeRole(role);
-
     setActiveRole(normalizedRole);
-    sessionStorage.setItem("activeRole", normalizedRole);
+  };
+
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout").catch(() => {});
+    } finally {
+      setAccessToken(null);
+      setUser(null);
+      setRoles([]);
+      setActiveRole(null);
+    }
   };
 
   /**
-   * LOGOUT
-   */
-  const logout = () => {
-    setUser(null);
-    setRoles([]);
-    setActiveRole(null);
-
-    sessionStorage.clear();
-  };
-
-  /**
-   * Register logout handler with API
+   * RESTORE SESSION ON RELOAD (WITH CONCURRENCY LOCK)
    */
   useEffect(() => {
     setLogoutHandler(logout);
+
+    const restoreSession = async () => {
+      // 🛑 Prevent duplicate parallel refresh requests on double render / Strict Mode
+      if (isRefreshingRef.current) return;
+      isRefreshingRef.current = true;
+
+      try {
+        const res = await api.post("/auth/refresh");
+
+        if (res.data?.accessToken) {
+          setAccessToken(res.data.accessToken);
+
+          const principalData = res.data?.principal || res.data?.user;
+          if (principalData) {
+            const rolesList = Array.isArray(principalData.roles)
+              ? principalData.roles
+              : principalData.role
+              ? [principalData.role]
+              : [];
+
+            const userObj = {
+              id: principalData.id,
+              name:
+                principalData.firstName ||
+                principalData.firstname ||
+                principalData.name,
+              roles: rolesList,
+              permissions: principalData.permissions || [],
+              defaultRoute: "/dashboard",
+            };
+
+            loginAs(userObj);
+          }
+        }
+      } catch (err) {
+        setUser(null);
+        setRoles([]);
+        setActiveRole(null);
+      } finally {
+        setLoading(false);
+        isRefreshingRef.current = false;
+      }
+    };
+
+    restoreSession();
   }, []);
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider
@@ -84,6 +111,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         redirectAfterAuth,
         setRedirectAfterAuth,
+        loading,
       }}
     >
       {children}

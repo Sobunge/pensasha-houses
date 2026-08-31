@@ -51,7 +51,7 @@ public interface LandlordMapper {
         }
 
         return properties.stream()
-                .map(Property::getId)
+                .map((Property property) -> property.getId())
                 .collect(Collectors.toSet());
     }
 
@@ -63,7 +63,7 @@ public interface LandlordMapper {
         }
 
         return roles.stream()
-                .map(Role::getName) // ⚠️ or Role::name if it's an enum
+                .map((Role role) -> role.getName()) // ⚠️ or Role::name if it's an enum
                 .collect(Collectors.toSet());
     }
 

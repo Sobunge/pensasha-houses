@@ -28,8 +28,7 @@ public class User {
     private Long id;
 
     /**
-     * Public safe identifier exposed to frontend and JWT.
-     * Prevents ID enumeration attacks.
+     * Public identifier safe to expose externally.
      */
     @Column(nullable = false, unique = true, updatable = false, length = 50)
     private String publicId;
@@ -42,6 +41,7 @@ public class User {
     }
 
     /* ===================== IDENTITY ===================== */
+
     @Column(length = 50)
     private String firstName;
 
@@ -54,13 +54,14 @@ public class User {
     @Column(unique = true, length = 30)
     private String idNumber;
 
-    @Column(unique = true, nullable = false, length = 15)
+    @Column(nullable = false, unique = true, length = 15)
     private String phoneNumber;
 
     @Column(unique = true, length = 100)
     private String email;
 
     /* ===================== PROFILE ===================== */
+
     @Column(name = "profile_picture_url", length = 255)
     private String profilePictureUrl;
 
@@ -72,12 +73,28 @@ public class User {
     @Column(nullable = false)
     private ProfileCompletionStatus profileCompletionStatus = ProfileCompletionStatus.BASIC;
 
-    /* ===================== ROLES (Entity-based RBAC) ===================== */
+    /* ===================== ROLES ===================== */
+
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<Role> roles = new HashSet<>();
 
+    /* ===================== PERMISSION OVERRIDES ===================== */
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private Set<UserPermissionOverride> permissionOverrides = new HashSet<>();
+
     /* ===================== ROLE PROFILES ===================== */
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private TenantProfile tenantProfile;
 
@@ -87,10 +104,13 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private CaretakerProfile caretakerProfile;
 
+    /* ===================== SECURITY ===================== */
+
     @Column(nullable = false)
     private int tokenVersion = 0;
 
     /* ===================== AUDIT ===================== */
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -99,56 +119,90 @@ public class User {
     private LocalDateTime updatedAt;
 
     /* ===================== ROLE HELPERS ===================== */
+
     public void addRole(Role role) {
-        this.roles.add(role);
+        roles.add(role);
     }
 
     public void removeRole(Role role) {
-        this.roles.remove(role);
+        roles.remove(role);
     }
 
     public boolean hasRole(String roleName) {
-        return this.roles.stream().anyMatch(r -> r.getName().equalsIgnoreCase(roleName));
+        return roles.stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(roleName));
     }
 
+    /* ===================== PERMISSION HELPERS ===================== */
+
+    /**
+     * Returns the user's effective permissions.
+     * Effective permissions consist of:
+     * - Permissions inherited from assigned roles.
+     * - User-specific permission overrides.
+     */
     public Set<String> getPermissions() {
+
         Set<String> permissions = new HashSet<>();
-        for (Role role : roles) {
-            role.getPermissions().forEach(p -> permissions.add(p.getName()));
-        }
-        return permissions;
+
+        // Permissions inherited from roles
+        roles.forEach(role ->
+                role.getPermissions().forEach(permission ->
+                        permissions.add(permission.getName())
+                )
+        );
+
+        // Apply user-specific overrides
+        permissionOverrides.forEach(override -> {
+
+            String permission = override.getPermission().getName();
+
+            if (override.getEffect() == PermissionEffect.GRANT) {
+                permissions.add(permission);
+            } else {
+                permissions.remove(permission);
+            }
+        });
+
+        return Set.copyOf(permissions);
     }
 
     public boolean hasPermission(String permissionName) {
-        return this.roles.stream()
-                .flatMap(r -> r.getPermissions().stream())
-                .anyMatch(p -> p.getName().equalsIgnoreCase(permissionName));
+        return getPermissions().contains(permissionName);
     }
 
     /* ===================== PROFILE HELPERS ===================== */
+
     public void setTenantProfile(TenantProfile profile) {
-        this.tenantProfile = profile;
-        if (profile != null)
+        tenantProfile = profile;
+        if (profile != null) {
             profile.setUser(this);
+        }
     }
 
     public void setLandlordProfile(LandlordProfile profile) {
-        this.landlordProfile = profile;
-        if (profile != null)
+        landlordProfile = profile;
+        if (profile != null) {
             profile.setUser(this);
+        }
     }
 
     public void setCaretakerProfile(CaretakerProfile profile) {
-        this.caretakerProfile = profile;
-        if (profile != null)
+        caretakerProfile = profile;
+        if (profile != null) {
             profile.setUser(this);
+        }
     }
 
     /* ===================== FACTORY ===================== */
+
     public static User minimal(String phoneNumber, Role role) {
+
         User user = new User();
+
         user.setPhoneNumber(phoneNumber);
         user.addRole(role);
+
         return user;
     }
 }

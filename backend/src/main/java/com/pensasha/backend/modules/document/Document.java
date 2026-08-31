@@ -11,6 +11,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "documents")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "user")
@@ -22,8 +23,9 @@ public class Document {
     private UUID id;
 
     /* ===================== BUSINESS ===================== */
-    @Column(name = "document_type", nullable = false)
-    private String documentType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "document_type", nullable = false, length = 50)
+    private DocumentType documentType;
 
     /* ===================== FILE METADATA ===================== */
     @Column(name = "file_name", nullable = false)
@@ -45,13 +47,13 @@ public class Document {
 
     /* ===================== RELATIONSHIP ===================== */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
 
     /* ===================== CONSTRUCTOR ===================== */
     public Document(
-            String documentType,
+            DocumentType documentType,
             String fileName,
             String contentType,
             long fileSize,
@@ -69,5 +71,14 @@ public class Document {
         this.storageKey = storageKey;
         this.user = user;
         this.uploadedAt = LocalDateTime.now();
+    }
+
+    /* ===================== HELPER METHODS ===================== */
+    public DocumentScope getScope() {
+        return this.documentType != null ? this.documentType.getScope() : null;
+    }
+
+    public String getRequiredRole() {
+        return this.documentType != null ? this.documentType.getRequiredRole() : null;
     }
 }

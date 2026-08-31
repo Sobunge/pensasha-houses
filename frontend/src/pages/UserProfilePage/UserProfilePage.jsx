@@ -1,9 +1,19 @@
 // src/pages/UserProfilePage/UserProfilePage.jsx
-import React, { useState, useEffect } from "react";
-import { Box, Paper, Typography, Divider, Button, Stack, CircularProgress, Fade } from "@mui/material";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  Box,
+  Paper,
+  Typography,
+  Divider,
+  Button,
+  Stack,
+  CircularProgress,
+  Fade,
+  Skeleton,
+} from "@mui/material";
 import { useParams } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
+import EditIcon from "@mui/icons-material/EditOutlined";
+import UploadFileIcon from "@mui/icons-material/UploadFileOutlined";
 
 import DashboardHeader from "../../components/DashboardHeader";
 
@@ -57,28 +67,79 @@ export default function UserProfilePage() {
     fetchUser();
   }, [userId, selfProfile, selfLoading]);
 
+  /* ---------------- Normalizing User Roles ---------------- */
+  const userRoles = useMemo(() => {
+    if (!profile?.roles || !Array.isArray(profile.roles)) return [];
+
+    return profile.roles
+      .map((r) => {
+        // Handle object notation if role is returned as { name: "TENANT" }
+        const roleStr = typeof r === "object" ? r.name || r.authority || "" : String(r);
+
+        // Strip "ROLE_" prefix if present
+        return roleStr.toUpperCase().replace(/^ROLE_/, "");
+      })
+      .filter((roleName) =>
+        // Exclude fine-grained permissions (keeps primary structural roles)
+        ["TENANT", "LANDLORD", "CARETAKER", "ADMIN", "AGENT"].includes(roleName)
+      );
+  }, [profile]);
+
+  const primaryRole = userRoles[0] || "";
+
+  // Luxury Styled Button Theme
+  const primaryThemeButton = {
+    bgcolor: "#0F172A",
+    color: "#FFFFFF",
+    fontWeight: 700,
+    textTransform: "none",
+    borderRadius: "10px",
+    px: 3,
+    py: 1,
+    boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+    "& .MuiButton-startIcon": { color: "#D4AF37" },
+    "&:hover": {
+      bgcolor: "#D4AF37",
+      color: "#0F172A",
+      boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
+      transform: "translateY(-2px)",
+      "& .MuiButton-startIcon": { color: "#0F172A" },
+    },
+    transition: "all 0.2s ease",
+  };
+
+  // Card Container Styling
+  const cardPaperStyle = {
+    p: { xs: 2.5, sm: 4 },
+    borderRadius: "18px",
+    bgcolor: "#FFFFFF",
+    border: "1.5px solid #D4AF37",
+    boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+  };
+
   // Visual Loading State
   if (!profile && loading) {
     return (
       <Fade in timeout={800}>
-        <Box 
-          sx={{ 
-            display: "flex", 
-            flexDirection: "column", 
-            alignItems: "center", 
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
             justifyContent: "center",
             minHeight: "60vh",
-            gap: 2
+            gap: 2,
           }}
         >
-          <CircularProgress size={45} thickness={4} sx={{ color: "#f8b500" }} />
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: "text.secondary", 
-              fontWeight: 600, 
-              textTransform: "uppercase", 
-              letterSpacing: 1.5 
+          <CircularProgress size={45} thickness={4} sx={{ color: "#D4AF37" }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: "#64748B",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: 1.5,
+              fontSize: "0.75rem",
             }}
           >
             Retrieving Profile...
@@ -91,10 +152,10 @@ export default function UserProfilePage() {
   if (error) {
     return (
       <Box sx={{ p: 5, textAlign: "center" }}>
-        <Typography variant="h6" sx={{ color: "error.main", fontWeight: 700 }}>
+        <Typography variant="h6" sx={{ color: "#EF4444", fontWeight: 700 }}>
           Oops!
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "#64748B", mt: 1 }}>
           {error}
         </Typography>
       </Box>
@@ -103,34 +164,35 @@ export default function UserProfilePage() {
 
   if (!profile) {
     return (
-      <Typography variant="h6" sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
+      <Typography variant="h6" sx={{ p: 5, textAlign: "center", color: "#64748B" }}>
         Please log in to view this profile.
       </Typography>
     );
   }
 
-  const solidBlueButton = {
-    bgcolor: "#1976d2",
-    color: "#fff",
-    fontWeight: 600,
-    "&:hover": { bgcolor: "#1565c0" },
-  };
-
-  const primaryRole = profile.roles?.[0] || "";
-
   return (
-    <Box sx={{ pb: 3, px: 3, bgcolor: "#f5f5f5", display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box
+      sx={{
+        pb: 4,
+        px: { xs: 1.5, sm: 3 },
+        display: "flex",
+        flexDirection: "column",
+        gap: 3.5,
+        maxWidth: 1280,
+        mx: "auto",
+      }}
+    >
       {/* HEADER */}
       <DashboardHeader title="Profile" breadcrumbs={[{ label: "Profile" }]} />
 
-      {/* PROFILE HEADER */}
-      <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
+      {/* PROFILE HEADER CARD */}
+      <Paper elevation={0} sx={cardPaperStyle}>
         {loading ? (
-          <Stack direction="row" spacing={4} alignItems="center">
-            <Box sx={{ width: 110, height: 110, bgcolor: "grey.300", borderRadius: "50%" }} />
+          <Stack direction="row" spacing={3} alignItems="center">
+            <Skeleton variant="circular" width={100} height={100} sx={{ bgcolor: "#F1F5F9" }} />
             <Box sx={{ flex: 1 }}>
-              <Box sx={{ width: "50%", height: 40, bgcolor: "grey.300", mb: 1 }} />
-              <Box sx={{ width: "30%", height: 25, bgcolor: "grey.300" }} />
+              <Skeleton variant="text" width="40%" height={36} sx={{ bgcolor: "#F1F5F9" }} />
+              <Skeleton variant="text" width="25%" height={24} sx={{ bgcolor: "#F1F5F9" }} />
             </Box>
           </Stack>
         ) : (
@@ -138,88 +200,158 @@ export default function UserProfilePage() {
         )}
       </Paper>
 
-      {/* PERSONAL INFO */}
-      <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" fontWeight={600}>
-            Personal Information
-          </Typography>
+      {/* PERSONAL INFO CARD */}
+      <Paper elevation={0} sx={cardPaperStyle}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2.5}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              pl: 1.5,
+              borderLeft: "4px solid #D4AF37",
+            }}
+          >
+            <Typography
+              variant="h6"
+              fontWeight={800}
+              sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}
+            >
+              Personal Information
+            </Typography>
+          </Box>
+
           {!loading && !userId && (
             <Button
               variant="contained"
               startIcon={<EditIcon />}
               size="small"
               onClick={() => setOpenEditProfile(true)}
-              sx={solidBlueButton}
+              sx={primaryThemeButton}
             >
-              Edit
+              Edit Profile
             </Button>
           )}
         </Box>
-        <Divider sx={{ mb: 3 }} />
+
+        <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
 
         {loading ? (
           <Stack spacing={2}>
-            <Box sx={{ width: "80%", height: 25, bgcolor: "grey.300" }} />
-            <Box sx={{ width: "60%", height: 25, bgcolor: "grey.300" }} />
-            <Box sx={{ width: "90%", height: 25, bgcolor: "grey.300" }} />
+            <Skeleton variant="text" width="80%" height={28} sx={{ bgcolor: "#F1F5F9" }} />
+            <Skeleton variant="text" width="60%" height={28} sx={{ bgcolor: "#F1F5F9" }} />
+            <Skeleton variant="text" width="90%" height={28} sx={{ bgcolor: "#F1F5F9" }} />
           </Stack>
         ) : (
           <>
             <BaseProfileInfo profile={profile} />
-            <Divider sx={{ my: 3 }} />
 
-            {/* Multi-role sections */}
-            {profile.roles?.includes("TENANT") && (
+            {/* Multi-role dynamic sections */}
+            {userRoles.includes("TENANT") && (
               <>
-                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    mb: 2,
+                    fontWeight: 800,
+                    color: "#0F172A",
+                    pl: 1.5,
+                    borderLeft: "3px solid #D4AF37",
+                  }}
+                >
                   Tenant Info
                 </Typography>
                 <TenantProfileInfo profile={profile} />
-                <Divider sx={{ my: 3 }} />
               </>
             )}
-            {profile.roles?.includes("LANDLORD") && (
+
+            {userRoles.includes("LANDLORD") && (
               <>
-                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    mb: 2,
+                    fontWeight: 800,
+                    color: "#0F172A",
+                    pl: 1.5,
+                    borderLeft: "3px solid #D4AF37",
+                  }}
+                >
                   Landlord Info
                 </Typography>
                 <LandlordProfileInfo profile={profile} />
-                <Divider sx={{ my: 3 }} />
               </>
             )}
-            {profile.roles?.includes("CARETAKER") && (
+
+            {userRoles.includes("CARETAKER") && (
               <>
-                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    mb: 2,
+                    fontWeight: 800,
+                    color: "#0F172A",
+                    pl: 1.5,
+                    borderLeft: "3px solid #D4AF37",
+                  }}
+                >
                   Caretaker Info
                 </Typography>
                 <CaretakerProfileInfo profile={profile} />
-                <Divider sx={{ my: 3 }} />
               </>
             )}
           </>
         )}
       </Paper>
 
-      {/* DOCUMENTS */}
-      <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" fontWeight={600}>
-            Documents
-          </Typography>
+      {/* DOCUMENTS CARD */}
+      <Paper elevation={0} sx={cardPaperStyle}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2.5}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              pl: 1.5,
+              borderLeft: "4px solid #D4AF37",
+            }}
+          >
+            <Typography
+              variant="h6"
+              fontWeight={800}
+              sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}
+            >
+              Documents Vault
+            </Typography>
+          </Box>
+
           {!loading && !userId && (
             <Button
               variant="contained"
               startIcon={<UploadFileIcon />}
               size="small"
               onClick={() => setOpenManageDocs(true)}
-              sx={solidBlueButton}
+              sx={primaryThemeButton}
             >
-              Upload
+              Upload Document
             </Button>
           )}
         </Box>
-        <Divider sx={{ mb: 2 }} />
+
+        <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
 
         {!loading && (
           <ProfileDocuments
@@ -231,7 +363,7 @@ export default function UserProfilePage() {
         )}
       </Paper>
 
-      {/* DIALOGS */}
+      {/* MODAL DIALOGS */}
       {!loading && !userId && openEditProfile && (
         <EditProfileDialog
           open={openEditProfile}

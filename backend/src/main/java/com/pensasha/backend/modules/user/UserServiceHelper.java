@@ -57,19 +57,5 @@ public class UserServiceHelper {
         user.setLastName(dto.getLastName());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setEmail(dto.getEmail());
-
-        // Update roles safely
-        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
-            Set<Role> roles = new HashSet<>();
-
-            for (String roleName : dto.getRoles()) {
-                Role role = roleRepository.findByName(roleName.toUpperCase())
-                        .orElseThrow(() -> new IllegalArgumentException(
-                                "Role not found: " + roleName));
-                roles.add(role);
-            }
-
-            user.setRoles(roles);
-        }
     }
 }
