@@ -5,6 +5,7 @@ import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.dto.AuthPrincipalDTO;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,21 +15,27 @@ public class AuthPrincipalFactory {
     public AuthPrincipalDTO create(User user) {
 
         Set<String> roles = mapRoles(user);
+        Set<String> permissions = (user.getPermissions() != null) 
+                ? user.getPermissions() 
+                : Collections.emptySet();
 
         return new AuthPrincipalDTO(
                 user.getId(),
                 user.getPublicId(),
                 user.getFirstName(),
                 roles,
-                user.getPermissions(),
+                permissions,
                 resolveDefaultRoute(roles)
         );
     }
 
     private Set<String> mapRoles(User user) {
+        if (user.getRoles() == null) {
+            return Collections.emptySet();
+        }
         return user.getRoles()
                 .stream()
-                .map((Role role) -> role.getName())
+                .map(Role::getName)
                 .collect(Collectors.toUnmodifiableSet());
     }
 

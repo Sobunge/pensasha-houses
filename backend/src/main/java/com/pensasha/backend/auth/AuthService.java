@@ -15,7 +15,7 @@ import com.pensasha.backend.security.JWTUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -46,8 +46,8 @@ public class AuthService {
 
         /* ========================= REGISTER ========================= */
 
-        public AuthResponseDTO register(CreateUserDTO dto,
-                        HttpServletResponse response) {
+        @Transactional
+        public AuthResponseDTO register(CreateUserDTO dto, HttpServletResponse response) {
 
                 User user = userService.createUser(dto);
 
@@ -66,8 +66,8 @@ public class AuthService {
 
         /* ========================= LOGIN ========================= */
 
-        public AuthResponseDTO login(LoginRequestDTO dto,
-                        HttpServletResponse response) {
+        @Transactional // Standard write-enabled transaction required for refreshToken creation
+        public AuthResponseDTO login(LoginRequestDTO dto, HttpServletResponse response) {
 
                 Authentication authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
@@ -87,6 +87,7 @@ public class AuthService {
 
         /* ========================= REFRESH ========================= */
 
+        @Transactional // Write-enabled transaction required for token deletion when expired/invalid
         public AuthResponseDTO refresh(HttpServletRequest request, HttpServletResponse response) {
 
                 String refreshToken = extractRefreshToken(request);
@@ -115,14 +116,14 @@ public class AuthService {
                         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found.");
                 }
 
-                // 3. DO NOT DELETE OR ROTATE REFRESH TOKEN HERE.
-                // Simply fetch UserDetails and issue a fresh Access Token for React memory.
+                // 3. Load full UserDetails within open transaction
                 CustomUserDetails userDetails = (CustomUserDetails) userDetailsService
                                 .loadUserByUsername(user.getPhoneNumber());
 
                 String accessToken = generateAccessToken(userDetails);
 
-                return buildAuthResponse(accessToken, user);
+                // Pass the fully-managed user object from CustomUserDetails
+                return buildAuthResponse(accessToken, userDetails.getUser());
         }
 
         /* ========================= LOGOUT ========================= */
@@ -132,21 +133,18 @@ public class AuthService {
 
                 String refreshToken = extractRefreshToken(request);
 
-                // 1. Attempt DB deletion, but don't let a missing token crash the request
                 if (refreshToken != null && !refreshToken.isBlank()) {
                         try {
                                 refreshTokenService.deleteByToken(refreshToken);
                         } catch (Exception e) {
-                                // Log warning, but allow execution to proceed to cookie clearing
                                 log.warn("Refresh token deletion failed or token not found: {}", e.getMessage());
                         }
                 }
 
-                // 2. ALWAYS clear the browser cookie regardless of DB state
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                                 .httpOnly(true)
-                                .secure(false) // Remember to change to true in production (HTTPS)
-                                .sameSite("Lax") // Must match your login cookie setting!
+                                .secure(false) 
+                                .sameSite("Lax")
                                 .path("/")
                                 .maxAge(0)
                                 .build();
@@ -156,26 +154,20 @@ public class AuthService {
 
         /* ========================= PRIVATE HELPERS ========================= */
 
-        private AuthResponseDTO buildAuthResponse(String accessToken,
-                        User user) {
-
+        private AuthResponseDTO buildAuthResponse(String accessToken, User user) {
                 return new AuthResponseDTO(
                                 accessToken,
                                 authPrincipalFactory.create(user));
         }
 
         private String generateAccessToken(CustomUserDetails userDetails) {
-
-                return jwtUtils.generateTokens(userDetails)
-                                .get("accessToken");
+                return jwtUtils.generateTokens(userDetails).get("accessToken");
         }
 
-        private void setRefreshCookie(HttpServletResponse response,
-                        String refreshToken) {
-
+        private void setRefreshCookie(HttpServletResponse response, String refreshToken) {
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                                 .httpOnly(true)
-                                .secure(false) // true in production
+                                .secure(false)
                                 .sameSite("Lax")
                                 .path("/")
                                 .maxAge(REFRESH_EXPIRY)
@@ -185,7 +177,6 @@ public class AuthService {
         }
 
         private String extractRefreshToken(HttpServletRequest request) {
-
                 if (request.getCookies() == null) {
                         return null;
                 }
@@ -202,7 +193,7 @@ public class AuthService {
                                 .httpOnly(true)
                                 .secure(true)
                                 .path("/")
-                                .maxAge(0) // Immediately expires the cookie
+                                .maxAge(0)
                                 .sameSite("Lax")
                                 .build();
 
