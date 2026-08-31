@@ -20,52 +20,55 @@ import SearchIcon from "@mui/icons-material/Search";
 
 // ======================= CORE (Always Visible) =======================
 const coreMenuItems = [
-  { label: "Dashboard", link: "/dashboard", icon: <DashboardIcon /> },
-  { label: "Profile", link: "/dashboard/profile", icon: <PersonIcon /> },
+  { id: "dashboard", label: "Dashboard", link: "/dashboard", icon: <DashboardIcon /> },
+  { id: "profile", label: "Profile", link: "/dashboard/profile", icon: <PersonIcon /> },
 ];
 
 // ======================= ROLE-BASED MENUS =======================
 const menuDefinitions = {
   TENANT: [
-    { label: "Browse Units", link: "/dashboard/browse-units", icon: <SearchIcon /> },
-    { label: "My Rental Units", link: "/dashboard/my-units", icon: <ApartmentIcon /> },
-    { label: "Rent Payments", link: "/dashboard/rent-payments", icon: <PaymentIcon /> },
-    { label: "Maintenance", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
-    { label: "Documents", link: "/dashboard/documents", icon: <DescriptionIcon /> },
-    { label: "Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
+    { id: "browse-units", label: "Browse Units", link: "/dashboard/browse-units", icon: <SearchIcon /> },
+    { id: "my-units", label: "My Rental Units", link: "/dashboard/my-units", icon: <ApartmentIcon /> },
+    { id: "rent-payments", label: "Rent Payments", link: "/dashboard/rent-payments", icon: <PaymentIcon /> },
+    { id: "maintenance-tenant", label: "Maintenance", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
+    { id: "documents", label: "Documents", link: "/dashboard/documents", icon: <DescriptionIcon /> },
+    { id: "announcements-tenant", label: "Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
   ],
 
   LANDLORD: [
-    { label: "My Properties", link: "/dashboard/my-properties", icon: <ApartmentIcon /> },
-    { label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },  ],
+    { id: "my-properties", label: "My Properties", link: "/dashboard/my-properties", icon: <ApartmentIcon /> },
+    { id: "tenants-landlord", label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
+  ],
 
   CARETAKER: [
-    { label: "Property Units", link: "/dashboard/my-units", icon: <ApartmentIcon /> },
-    { label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
-    { label: "Maintenance Tasks", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
-    { label: "Messages", link: "/dashboard/messages", icon: <MessageIcon /> },
-    { label: "Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
+    { id: "property-units", label: "Property Units", link: "/dashboard/my-units", icon: <ApartmentIcon /> },
+    { id: "tenants-caretaker", label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
+    { id: "maintenance-caretaker", label: "Maintenance Tasks", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
+    { id: "messages", label: "Messages", link: "/dashboard/messages", icon: <MessageIcon /> },
+    { id: "announcements-caretaker", label: "Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
   ],
 
   ADMIN: [
-    { label: "Overview Reports", link: "/dashboard/reports", icon: <AssessmentIcon /> },
-    { label: "User Management", link: "/dashboard/users", icon: <AdminPanelSettingsIcon /> },
-    { label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
-    { label: "Caretakers", link: "/dashboard/caretakers", icon: <SupportAgentIcon /> },
-    { label: "Roles & Security", link: "/dashboard/roles", icon: <SecurityIcon /> },
-    { label: "System Settings", link: "/dashboard/settings", icon: <SettingsIcon /> },
-    { label: "System Logs", link: "/dashboard/logs", icon: <StorageIcon /> },
+    { id: "reports", label: "Overview Reports", link: "/dashboard/reports", icon: <AssessmentIcon /> },
+    { id: "users", label: "User Management", link: "/dashboard/users", icon: <AdminPanelSettingsIcon /> },
+    { id: "tenants-admin", label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
+    { id: "caretakers", label: "Caretakers", link: "/dashboard/caretakers", icon: <SupportAgentIcon /> },
+    { id: "roles", label: "Roles & Security", link: "/dashboard/roles", icon: <SecurityIcon /> },
+    { id: "settings", label: "System Settings", link: "/dashboard/settings", icon: <SettingsIcon /> },
+    { id: "logs", label: "System Logs", link: "/dashboard/logs", icon: <StorageIcon /> },
   ],
 };
 
 /**
  * Returns the menu items for the current active role selected in the switcher.
- * Falls back to TENANT if no role is provided.
+ * Strips 'ROLE_' prefix if present and falls back to TENANT if unmapped.
  */
 export const getMenuItems = (activeRole = "TENANT") => {
-  // Normalize role name to match keys in menuDefinitions
-  const roleKey = activeRole?.toUpperCase();
-  const roleSpecificMenu = menuDefinitions[roleKey] || [];
+  // Normalize string: strip "ROLE_" if Spring Security returns enum values like "ROLE_TENANT"
+  const normalizedRole = activeRole?.toUpperCase().replace(/^ROLE_/, "");
+  
+  // Use requested role, or fall back to TENANT if invalid/unmapped
+  const roleSpecificMenu = menuDefinitions[normalizedRole] || menuDefinitions.TENANT;
 
   return [
     ...coreMenuItems,
