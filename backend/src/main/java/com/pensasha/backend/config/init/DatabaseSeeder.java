@@ -6,14 +6,14 @@ import com.pensasha.backend.modules.user.Permissions;
 import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.RoleRepository;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DatabaseSeeder {
+public class DatabaseSeeder implements CommandLineRunner {
 
     private final RoleRepository roleRepo;
     private final PermissionRepository permRepo;
 
-    @PostConstruct
+    @Override
     @Transactional
-    public void seed() {
+    public void run(String... args) throws Exception {
         log.info("Starting database seeding process...");
 
         Map<String, Permission> permissionMap = seedPermissions();
@@ -52,7 +52,7 @@ public class DatabaseSeeder {
                     perm.setName(p.name());
                     return perm;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         if (!newPerms.isEmpty()) {
             permRepo.saveAll(newPerms);
@@ -154,8 +154,8 @@ public class DatabaseSeeder {
             Permissions.ANNOUNCEMENT_VIEW
         ));
 
-        // ADMIN (Full Access)
-        admin.setPermissions(Set.copyOf(permMap.values()));
+        // ✅ FIX: Use a mutable HashSet for ADMIN permissions
+        admin.setPermissions(new HashSet<>(permMap.values()));
 
         roleRepo.saveAll(List.of(tenant, landlord, caretaker, admin));
     }
@@ -169,7 +169,7 @@ public class DatabaseSeeder {
                     }
                     return perm;
                 })
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()); // Collectors.toSet() returns a mutable HashSet
     }
 
     private Role getOrCreate(String name) {
