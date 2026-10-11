@@ -20,12 +20,13 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useNavigate } from "react-router-dom";
 
-// Sample properties data matching the mockup (Set to [] to test empty state)
+// Sample properties data matching the mockup
 const propertyData = [
   { id: 1, name: "Sunrise Apartments", units: 12, occupied: 10, revenue: "Ksh 120,000" },
   { id: 2, name: "Pensasha Towers", units: 20, occupied: 18, revenue: "Ksh 35,000" },
   { id: 3, name: "Sunrise Houses", units: 12, occupied: 10, revenue: "Ksh 20,000" },
   { id: 4, name: "Pensasha Residency", units: 20, occupied: 17, revenue: "Ksh 20,000" },
+  { id: 5, name: "Grand Vista Suites", units: 15, occupied: 12, revenue: "Ksh 45,000" },
 ];
 
 function PropertyPerformanceCard() {
@@ -39,6 +40,9 @@ function PropertyPerformanceCard() {
   };
 
   const hasProperties = propertyData && propertyData.length > 0;
+  
+  // 🌟 Cap display at 4 properties maximum for dashboard overview
+  const displayedProperties = propertyData ? propertyData.slice(0, 4) : [];
 
   return (
     <Card
@@ -48,7 +52,7 @@ function PropertyPerformanceCard() {
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "100%",
+        height: "90%",
         width: "100%",
 
         // Pronounced Obsidian Depth Shadow
@@ -126,7 +130,8 @@ function PropertyPerformanceCard() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {propertyData.map((property) => {
+                {/* 🌟 Map only the sliced top 4 items */}
+                {displayedProperties.map((property) => {
                   const occupancyRate = Math.round(
                     (property.occupied / property.units) * 100
                   );
@@ -205,7 +210,7 @@ function PropertyPerformanceCard() {
               </TableBody>
             </Table>
           ) : (
-            /* 🌟 ELEGANT EMPTY STATE */
+            /* ELEGANT EMPTY STATE */
             <Box
               sx={{
                 flexGrow: 1,
@@ -214,6 +219,7 @@ function PropertyPerformanceCard() {
                 alignItems: "center",
                 justifyContent: "center",
                 px: 2,
+                py: 3,
                 textAlign: "center",
               }}
             >
@@ -222,7 +228,7 @@ function PropertyPerformanceCard() {
                   width: 56,
                   height: 56,
                   borderRadius: "16px",
-                  bgcolor: "rgba(212, 175, 55, 0.12)", // Light Champagne Gold tint
+                  bgcolor: "rgba(212, 175, 55, 0.12)",
                   color: "secondary.main",
                   display: "flex",
                   alignItems: "center",
@@ -274,10 +280,12 @@ function PropertyPerformanceCard() {
           )}
         </Box>
 
-        {/* FOOTER VIEW ALL ACTION (Rendered only when properties exist) */}
+        {/* FOOTER VIEW ALL ACTION (Includes count if > 4) */}
         {hasProperties && (
           <Box
             sx={{
+              mt: "auto",
+              pt: 1.5,
               borderTop: "1px solid #F1F5F9",
               display: "flex",
               justifyContent: "flex-end",
@@ -299,7 +307,9 @@ function PropertyPerformanceCard() {
                 },
               }}
             >
-              View All Properties
+              {propertyData.length > 4
+                ? `View All (${propertyData.length}) Properties`
+                : "View All Properties"}
             </Button>
           </Box>
         )}
