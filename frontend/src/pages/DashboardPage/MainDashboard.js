@@ -35,45 +35,40 @@ const MainDashboard = () => {
   const handleRoleChange = (event, nextRole) => {
     if (!nextRole) return;
 
-    // 🔒 enforce allowed roles only
+    // Enforce allowed roles only
     if (user.roles?.includes(nextRole)) {
       setActiveRole(nextRole);
     }
   };
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3}, bgcolor: "#F8FAFC", minHeight: "100vh" }}>
-      {/* HERO / HEADER */}
+    <>
+      {/* HERO / WELCOME CARD */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
       >
         <Card
-  elevation={0}
-  sx={{
-    mb: 4,
-    p: { xs: 2.5, sm: 3 },
-    borderRadius: "16px",
-    bgcolor: "#FFFFFF",
-    // 1. Gold border
-    border: "1.5px solid #D4AF37",
-    // 2. Enhanced shadow for prominence
-    boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
-  }}
->
+          elevation={0}
+          sx={{
+            mb: 2,
+            p: { xs: 2.5, sm: 3 },
+            bgcolor: "transparent",
+          }}
+        >
           <Stack
             direction={{ xs: "column", md: "row" }}
             justifyContent="space-between"
             alignItems={{ xs: "flex-start", md: "center" }}
             spacing={3}
           >
-            {/* USER INFO */}
+            {/* USER INFO & AVATAR */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
               <Avatar
                 sx={{
-                  bgcolor: "#0F172A", // Deep Executive Slate
-                  color: "#D4AF37", // Pensasha Gold
+                  bgcolor: "primary.main", // Deep Obsidian #0F172A
+                  color: "secondary.main", // Champagne Gold #D4AF37
                   border: "2px solid rgba(212, 175, 55, 0.4)",
                   width: { xs: 52, sm: 60 },
                   height: { xs: 52, sm: 60 },
@@ -91,39 +86,16 @@ const MainDashboard = () => {
                   sx={{
                     fontFamily: '"Playfair Display", Georgia, serif',
                     fontWeight: 700,
-                    color: "#0F172A",
+                    color: "primary.main",
                     lineHeight: 1.2,
-                    letterSpacing: "-0.01em",
                   }}
                 >
                   Welcome back{user?.name ? `, ${user.name}` : ""} 👋
                 </Typography>
-
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.75 }}>
-                  <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 500 }}>
-                    Managing as
-                  </Typography>
-                  <Box
-                    sx={{
-                      bgcolor: "rgba(212, 175, 55, 0.12)",
-                      color: "#B5922B",
-                      px: 1.2,
-                      py: 0.25,
-                      borderRadius: "6px",
-                      fontSize: "0.75rem",
-                      fontWeight: 800,
-                      letterSpacing: "0.05em",
-                      border: "1px solid rgba(212, 175, 55, 0.3)",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {activeRole?.replace("ROLE_", "")} MODE
-                  </Box>
-                </Box>
               </Box>
             </Box>
 
-            {/* ROLE SWITCHER */}
+            {/* MULTI-ROLE SWITCHER (Rendered only if user has more than 1 role) */}
             {user.roles?.length > 1 && (
               <ToggleButtonGroup
                 value={activeRole}
@@ -134,7 +106,8 @@ const MainDashboard = () => {
                   bgcolor: "#F1F5F9",
                   p: 0.5,
                   borderRadius: "12px",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid",
+                  borderColor: "divider",
                   width: { xs: "100%", md: "auto" },
                   "& .MuiToggleButtonGroup-grouped": {
                     border: 0,
@@ -142,16 +115,16 @@ const MainDashboard = () => {
                     mx: 0.3,
                     transition: "all 0.2s ease",
                     "&.Mui-selected": {
-                      bgcolor: "#0F172A", // Active role background
-                      color: "#D4AF37", // Active role text
+                      bgcolor: "primary.main",
+                      color: "secondary.main",
                       fontWeight: 700,
                       boxShadow: "0 2px 8px rgba(15, 23, 42, 0.18)",
                       "&:hover": { bgcolor: "#1E293B" },
                     },
                     "&:not(.Mui-selected)": {
-                      color: "#64748B",
+                      color: "text.secondary",
                       fontWeight: 600,
-                      "&:hover": { bgcolor: "rgba(15, 23, 42, 0.05)", color: "#0F172A" },
+                      "&:hover": { bgcolor: "rgba(15, 23, 42, 0.05)", color: "text.primary" },
                     },
                   },
                 }}
@@ -177,19 +150,19 @@ const MainDashboard = () => {
         </Card>
       </motion.div>
 
-      {/* DASHBOARD CONTENT */}
+      {/* DYNAMIC ACTIVE DASHBOARD CONTENT */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeRole}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
         >
           <ActiveDashboard />
         </motion.div>
       </AnimatePresence>
-    </Box>
+    </>
   );
 };
 
