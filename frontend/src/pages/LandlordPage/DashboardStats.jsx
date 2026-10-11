@@ -15,7 +15,6 @@ import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 
-// Dynamic stat definitions matching the luxury dashboard layout
 const stats = [
   {
     id: "occupancy",
@@ -78,24 +77,35 @@ function DashboardStats() {
               sx={{
                 borderRadius: "16px",
                 bgcolor: "#FFFFFF",
-                border: "1px solid",
-                borderColor: "divider",
                 height: "100%",
-                width: "100%", // 🌟 Ensures card fills the grid cell completely
-                boxShadow: "0 4px 16px rgba(15, 23, 42, 0.04)",
-                transition: "all 0.2s ease-in-out",
+                width: "100%",
+
+                // 🌟 Step 1: Back to light gray, thin border
+                border: "1px solid",
+                borderColor: "divider", // #4e4e4e (Subtle)
+
+                // 🌟 Step 2: Very pronounced multi-layered shadow (deep Obsidian tint)
+                boxShadow:
+                  "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
+
+                transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
-                  transform: "translateY(-3px)",
-                  boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
+                  transform: "translateY(-5px)", // Smooth lift
+
+                  // Highlight border on hover only
                   borderColor: isError
                     ? theme.palette.error.main
-                    : "secondary.main", // Gold hover border highlight
+                    : "secondary.main", // Gold light frame on hover
+
+                  // 🌟 Stronger depth on hover
+                  boxShadow:
+                    "0 25px 40px -10px rgba(15, 23, 42, 0.18), 0 12px 18px -6px rgba(15, 23, 42, 0.1)",
                 },
               }}
             >
               <CardContent
                 sx={{
-                  p: { xs: 2.5, sm: 3 }, // Generous padding for a luxury look
+                  p: { xs: 2.5, sm: 3 },
                   "&:last-child": { pb: { xs: 2.5, sm: 3 } },
                   display: "flex",
                   flexDirection: "column",
@@ -126,7 +136,7 @@ function DashboardStats() {
                           borderRadius: 4,
                           bgcolor: "#E2E8F0",
                           "& .MuiLinearProgress-bar": {
-                            bgcolor: "#10B981", // Emerald Green
+                            bgcolor: "#10B981",
                             borderRadius: 4,
                           },
                         }}
