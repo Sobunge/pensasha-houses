@@ -6,7 +6,6 @@ import {
   Typography,
   Box,
   Grid,
-  useTheme,
   alpha,
 } from "@mui/material";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
@@ -70,7 +69,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 function FinancialOverviewCard() {
-  const theme = useTheme();
 
   return (
     <Card
