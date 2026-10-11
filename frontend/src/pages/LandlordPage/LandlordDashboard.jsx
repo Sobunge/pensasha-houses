@@ -47,7 +47,7 @@ const LandlordDashboard = () => {
       >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: "#2a2a2a" }}>
-            Portfolio Portfolio
+            Portfolio Overview
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Managing 3 active properties
