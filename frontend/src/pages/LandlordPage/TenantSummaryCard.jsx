@@ -7,7 +7,6 @@ import {
   Box,
   Grid,
   Button,
-  useTheme,
   alpha,
 } from "@mui/material";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -18,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 
 function TenantSummaryCard() {
   const navigate = useNavigate();
-  const theme = useTheme();
 
   return (
     <Card

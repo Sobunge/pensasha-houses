@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
-import AddCardOutlinedIcon from "@mui/icons-material/AddCardOutlined";
 import { useNavigate } from "react-router-dom";
 
 // Sample payments data matching the financial log
