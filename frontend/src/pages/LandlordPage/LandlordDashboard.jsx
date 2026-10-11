@@ -1,6 +1,6 @@
 // src/pages/LandlordPage/LandlordDashboard.jsx
 import React from "react";
-import { Box, Typography, Button, Stack } from "@mui/material";
+import { Box, Typography} from "@mui/material";
 import { motion } from "framer-motion";
 
 import DashboardStats from "./DashboardStats";
