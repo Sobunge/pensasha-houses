@@ -19,12 +19,11 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import { useNavigate } from "react-router-dom";
 
-// Sample maintenance requests matching the mockup layout
+// Sample maintenance requests
 const maintenanceData = [
   {
     id: 1,
     status: "New",
-    contractor: "Caretaker / Contractor",
     unit: "Unit B2",
     issue: "Plumbing Leak",
     urgency: "Urgent",
@@ -32,7 +31,6 @@ const maintenanceData = [
   {
     id: 2,
     status: "In Progress",
-    contractor: "Caretaker / Contractor",
     unit: "Unit B2",
     issue: "Plumbing Leak",
     urgency: "Urgent",
@@ -40,7 +38,6 @@ const maintenanceData = [
   {
     id: 3,
     status: "Resolved",
-    contractor: "Caretaker / Contractor",
     unit: "Unit B2",
     issue: "Plumbing Leak",
     urgency: "Urgent",
@@ -48,7 +45,6 @@ const maintenanceData = [
   {
     id: 4,
     status: "In Progress",
-    contractor: "Caretaker / Contractor",
     unit: "Unit A4",
     issue: "Electrical Fitting",
     urgency: "Medium",
@@ -56,7 +52,6 @@ const maintenanceData = [
   {
     id: 5,
     status: "New",
-    contractor: "Caretaker / Contractor",
     unit: "Unit C1",
     issue: "Broken Window Latch",
     urgency: "Low",
@@ -69,7 +64,7 @@ function MaintenanceRequestsCard() {
 
   const hasRequests = maintenanceData && maintenanceData.length > 0;
   
-  // 🌟 Cap display at 3 requests maximum for the dashboard overview
+  // Cap display at 3 requests maximum for the dashboard overview
   const displayedRequests = maintenanceData ? maintenanceData.slice(0, 3) : [];
 
   // Helper to resolve status pill styles
@@ -127,7 +122,7 @@ function MaintenanceRequestsCard() {
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "75%",
+        height: "85%",
         width: "100%",
 
         // Pronounced Obsidian Depth Shadow
@@ -163,10 +158,10 @@ function MaintenanceRequestsCard() {
           </Typography>
         </Box>
 
-        {/* CONTENT AREA: 4-COLUMN TABLE OR EMPTY STATE */}
+        {/* CONTENT AREA: 3-COLUMN TABLE OR EMPTY STATE */}
         <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           {hasRequests ? (
-            <Table sx={{ minWidth: 320, mt: 1 }}>
+            <Table sx={{ minWidth: 280, mt: 1 }}>
               <TableHead>
                 <TableRow>
                   <TableCell
@@ -180,17 +175,6 @@ function MaintenanceRequestsCard() {
                     }}
                   >
                     Ticket Status
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "primary.main",
-                      fontWeight: 800,
-                      fontSize: "0.78rem",
-                      py: 1,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
-                  >
-                    Assigned / Contractor
                   </TableCell>
                   <TableCell
                     sx={{
@@ -220,7 +204,6 @@ function MaintenanceRequestsCard() {
               </TableHead>
 
               <TableBody>
-                {/* 🌟 Map only the sliced top 3 items */}
                 {displayedRequests.map((req) => {
                   const statusStyles = getStatusChipStyles(req.status);
                   const urgencyStyles = getUrgencyChipStyles(req.urgency);
@@ -252,19 +235,7 @@ function MaintenanceRequestsCard() {
                         />
                       </TableCell>
 
-                      {/* Column 2: Assigned / Contractor */}
-                      <TableCell
-                        sx={{
-                          py: 1.5,
-                          fontWeight: 600,
-                          color: "primary.main",
-                          fontSize: "0.82rem",
-                        }}
-                      >
-                        {req.contractor}
-                      </TableCell>
-
-                      {/* Column 3: Unit */}
+                      {/* Column 2: Unit */}
                       <TableCell
                         sx={{
                           py: 1.5,
@@ -276,7 +247,7 @@ function MaintenanceRequestsCard() {
                         {req.unit}
                       </TableCell>
 
-                      {/* Column 4: Issue & Urgency Pill */}
+                      {/* Column 3: Issue & Urgency Pill */}
                       <TableCell align="right" sx={{ pr: 0, py: 1.5 }}>
                         <Chip
                           label={`${req.issue} - ${req.urgency}`}
