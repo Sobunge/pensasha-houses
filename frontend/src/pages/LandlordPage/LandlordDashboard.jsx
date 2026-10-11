@@ -1,26 +1,27 @@
 // src/pages/LandlordPage/LandlordDashboard.jsx
 import React from "react";
-import { Box, Typography} from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 
+// Sub-components
 import DashboardStats from "./DashboardStats";
-import PropertyManagementCard from "./PropertyManagementCard";
+import PropertyPerformanceCard from "./PropertyPerformanceCard";
 import FinancialOverviewCard from "./FinancialOverviewCard";
 import TenantSummaryCard from "./TenantSummaryCard";
 import RecentPaymentsCard from "./RecentPaymentsCard";
 import MaintenanceRequestsCard from "./MaintenanceRequestsCard";
 
-// Reusable Section Title
+// Reusable Section Title matching Obsidian & Gold typography
 const SectionTitle = ({ children }) => (
   <Typography
     variant="subtitle2"
     sx={{
       textTransform: "uppercase",
-      letterSpacing: 1,
-      fontWeight: 600,
-      mb: 2,
-      color: "text.primary",
-      textAlign: "center",
+      letterSpacing: "0.08em",
+      fontWeight: 700,
+      fontSize: "0.75rem",
+      mb: 1.5,
+      color: "text.secondary",
     }}
   >
     {children}
@@ -28,57 +29,82 @@ const SectionTitle = ({ children }) => (
 );
 
 const LandlordDashboard = () => {
-  const sections = [
-    { title: "Properties Overview", component: <PropertyManagementCard /> },
-    { title: "Financial Snapshot", component: <FinancialOverviewCard /> },
-    { title: "Tenant Summary", component: <TenantSummaryCard /> },
-    { title: "Recent Payments", component: <RecentPaymentsCard /> },
-    { title: "Maintenance Requests", component: <MaintenanceRequestsCard /> },
-  ];
-
   return (
-    <Box>
-      {/* ===== Dashboard Stats ===== */}
+    <Box sx={{ flexGrow: 1, py: 1 }}>
+      {/* ===== 1. TOP HERO STATS ROW ===== */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
       >
         <DashboardStats />
       </motion.div>
 
-      {/* ===== Dashboard Sections (Flex Layout) ===== */}
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 3,
-          mt: 3,
-          px: { xs: 2, md: 0 },
-        }}
-      >
-        {sections.map((section, index) => (
-          <Box
-            key={section.title}
-            sx={{
-              flex: { xs: "1 1 100%", md: "0 0 350px" },
-              minWidth: 320,
-              display: "flex",
-              flexDirection: "column",
-            }}
+      {/* ===== 2. MIDDLE ROW: PERFORMANCE & FINANCIAL SNAPSHOT ===== */}
+      <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Grid item xs={12} lg={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
+            style={{ height: "100%" }}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
-            >
-              <SectionTitle>{section.title}</SectionTitle>
-              {section.component}
-            </motion.div>
-          </Box>
-        ))}
-      </Box>
+            <SectionTitle>Properties Performance</SectionTitle>
+            <PropertyPerformanceCard />
+          </motion.div>
+        </Grid>
+
+        <Grid item xs={12} lg={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.15, ease: "easeOut" }}
+            style={{ height: "100%" }}
+          >
+            <SectionTitle>Financial Overview</SectionTitle>
+            <FinancialOverviewCard />
+          </motion.div>
+        </Grid>
+      </Grid>
+
+      {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE, & TENANT SUMMARY ===== */}
+      <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Grid item xs={12} md={6} lg={4}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.2, ease: "easeOut" }}
+            style={{ height: "100%" }}
+          >
+            <SectionTitle>Recent Payments</SectionTitle>
+            <RecentPaymentsCard />
+          </motion.div>
+        </Grid>
+
+        <Grid item xs={12} md={6} lg={4}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.25, ease: "easeOut" }}
+            style={{ height: "100%" }}
+          >
+            <SectionTitle>Maintenance Requests</SectionTitle>
+            <MaintenanceRequestsCard />
+          </motion.div>
+        </Grid>
+
+        <Grid item xs={12} md={12} lg={4}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.3, ease: "easeOut" }}
+            style={{ height: "100%" }}
+          >
+            <SectionTitle>Tenant Summary</SectionTitle>
+            <TenantSummaryCard />
+          </motion.div>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
