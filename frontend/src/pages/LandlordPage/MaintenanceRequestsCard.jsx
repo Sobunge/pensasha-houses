@@ -122,7 +122,7 @@ function MaintenanceRequestsCard() {
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "85%",
+        height: "100%", // 🌟 Restored full 100% vertical stretch
         width: "100%",
 
         // Pronounced Obsidian Depth Shadow
@@ -138,11 +138,12 @@ function MaintenanceRequestsCard() {
     >
       <CardContent
         sx={{
-          p: { xs: 2.5, sm: 3 },
+          p: { xs: 2, sm: 3 },
           "&:last-child": { pb: { xs: 2, sm: 2.5 } },
           display: "flex",
           flexDirection: "column",
           height: "100%",
+          width: "100%",
         }}
       >
         {/* HEADER */}
@@ -159,16 +160,16 @@ function MaintenanceRequestsCard() {
         </Box>
 
         {/* CONTENT AREA: 3-COLUMN TABLE OR EMPTY STATE */}
-        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", width: "100%" }}>
           {hasRequests ? (
-            <Table sx={{ minWidth: 280, mt: 1 }}>
+            <Table sx={{ width: "100%", mt: 1 }}>
               <TableHead>
                 <TableRow>
                   <TableCell
                     sx={{
                       color: "primary.main",
                       fontWeight: 800,
-                      fontSize: "0.78rem",
+                      fontSize: { xs: "0.72rem", sm: "0.78rem" },
                       pl: 0,
                       py: 1,
                       borderBottom: "1px solid #E2E8F0",
@@ -180,8 +181,9 @@ function MaintenanceRequestsCard() {
                     sx={{
                       color: "primary.main",
                       fontWeight: 800,
-                      fontSize: "0.78rem",
+                      fontSize: { xs: "0.72rem", sm: "0.78rem" },
                       py: 1,
+                      px: { xs: 1, sm: 1.5 },
                       borderBottom: "1px solid #E2E8F0",
                     }}
                   >
@@ -192,7 +194,7 @@ function MaintenanceRequestsCard() {
                     sx={{
                       color: "primary.main",
                       fontWeight: 800,
-                      fontSize: "0.78rem",
+                      fontSize: { xs: "0.72rem", sm: "0.78rem" },
                       pr: 0,
                       py: 1,
                       borderBottom: "1px solid #E2E8F0",
@@ -227,7 +229,7 @@ function MaintenanceRequestsCard() {
                           sx={{
                             ...statusStyles,
                             fontWeight: 700,
-                            fontSize: "0.72rem",
+                            fontSize: { xs: "0.68rem", sm: "0.72rem" },
                             borderRadius: "8px",
                             height: 24,
                             px: 0.5,
@@ -239,9 +241,11 @@ function MaintenanceRequestsCard() {
                       <TableCell
                         sx={{
                           py: 1.5,
+                          px: { xs: 1, sm: 1.5 },
                           fontWeight: 600,
                           color: "primary.main",
-                          fontSize: "0.82rem",
+                          fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {req.unit}
@@ -255,7 +259,7 @@ function MaintenanceRequestsCard() {
                           sx={{
                             ...urgencyStyles,
                             fontWeight: 700,
-                            fontSize: "0.72rem",
+                            fontSize: { xs: "0.68rem", sm: "0.72rem" },
                             borderRadius: "10px",
                             height: 24,
                             px: 0.5,
@@ -325,6 +329,7 @@ function MaintenanceRequestsCard() {
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
+              width: "100%",
             }}
           >
             <Button

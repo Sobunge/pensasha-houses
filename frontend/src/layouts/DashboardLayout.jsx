@@ -34,6 +34,7 @@ function DashboardLayout() {
       sx={{
         display: "flex",
         minHeight: "100vh",
+        width: "100vw",
         overflow: "hidden",
         bgcolor: "#F8FAFC",
         // Subtle ambient light effect matching luxury theme
@@ -55,8 +56,10 @@ function DashboardLayout() {
           display: "flex",
           flexDirection: "column",
           minWidth: 0,
+          width: "100%",
           height: "100vh",
           position: "relative",
+          overflow: "hidden",
         }}
       >
         <UsersNavbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
@@ -74,14 +77,16 @@ function DashboardLayout() {
             overflowY: "auto",
             overflowX: "hidden",
             scrollBehavior: "smooth",
-            px: { xs: 2, sm: 3, md: 4 },
+            px: { xs: 1.5, sm: 3, md: 4 }, // 🌟 Reduced padding on mobile (xs: 1.5) to give cards full width
             pt: { xs: 2, sm: 2.5, lg: 1 },
             pb: { xs: 3, sm: 4 },
             outline: "none",
             display: "flex",
             flexDirection: "column",
             position: "relative",
-            // Custom scrollbar styling for extra polish
+            width: "100%",
+            boxSizing: "border-box",
+            // Custom scrollbar styling
             "&::-webkit-scrollbar": {
               width: "6px",
             },
@@ -100,9 +105,10 @@ function DashboardLayout() {
           {/* Main Content Area */}
           <Box
             sx={{
-              maxWidth: 1280, // Slightly widened to allow luxurious breathing room
+              maxWidth: 1400, // Slightly expanded max-width
               mx: "auto",
               width: "100%",
+              boxSizing: "border-box",
               flexGrow: 1,
               display: "flex",
               flexDirection: "column",

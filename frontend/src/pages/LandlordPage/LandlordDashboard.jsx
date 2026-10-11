@@ -28,38 +28,47 @@ const SectionTitle = ({ children }) => (
   </Typography>
 );
 
+// Motion wrapper styling helper to guarantee 100% horizontal stretch on all breakpoints
+const motionContainerStyle = {
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+};
+
 const LandlordDashboard = () => {
   return (
-    <Box sx={{ flexGrow: 1, py: 1 }}>
+    <Box sx={{ flexGrow: 1, py: 1, width: "100%" }}>
       {/* ===== 1. TOP HERO STATS ROW ===== */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
+        style={{ width: "100%" }}
       >
         <DashboardStats />
       </motion.div>
 
       {/* ===== 2. MIDDLE ROW: PERFORMANCE & FINANCIAL SNAPSHOT ===== */}
-      <Grid container spacing={3} sx={{ mt: 1 }}>
-        <Grid item xs={12} lg={6}>
+      <Grid container spacing={3} sx={{ mt: 1, width: "100%", ml: 0 }}>
+        <Grid item xs={12} lg={6} sx={{ pl: "0 !important" }}>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
-            style={{ height: "100%" }}
+            style={motionContainerStyle}
           >
             <SectionTitle>Properties Performance</SectionTitle>
             <PropertyPerformanceCard />
           </motion.div>
         </Grid>
 
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12} lg={6} sx={{ pl: "0 !important" }}>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.15, ease: "easeOut" }}
-            style={{ height: "100%" }}
+            style={motionContainerStyle}
           >
             <SectionTitle>Financial Overview</SectionTitle>
             <FinancialOverviewCard />
@@ -68,37 +77,37 @@ const LandlordDashboard = () => {
       </Grid>
 
       {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE, & TENANT SUMMARY ===== */}
-      <Grid container spacing={3} sx={{ mt: 1 }}>
-        <Grid item xs={12} md={6} lg={4}>
+      <Grid container spacing={3} sx={{ mt: 1, width: "100%", ml: 0 }}>
+        <Grid item xs={12} sm={12} md={6} lg={4} sx={{ pl: "0 !important" }}>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.2, ease: "easeOut" }}
-            style={{ height: "100%" }}
+            style={motionContainerStyle}
           >
             <SectionTitle>Recent Payments</SectionTitle>
             <RecentPaymentsCard />
           </motion.div>
         </Grid>
 
-        <Grid item xs={12} md={6} lg={4}>
+        <Grid item xs={12} sm={12} md={6} lg={4} sx={{ pl: "0 !important" }}>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.25, ease: "easeOut" }}
-            style={{ height: "100%" }}
+            style={motionContainerStyle}
           >
             <SectionTitle>Maintenance Requests</SectionTitle>
             <MaintenanceRequestsCard />
           </motion.div>
         </Grid>
 
-        <Grid item xs={12} md={12} lg={4}>
+        <Grid item xs={12} sm={12} md={12} lg={4} sx={{ pl: "0 !important" }}>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.3, ease: "easeOut" }}
-            style={{ height: "100%" }}
+            style={motionContainerStyle}
           >
             <SectionTitle>Tenant Summary</SectionTitle>
             <TenantSummaryCard />
