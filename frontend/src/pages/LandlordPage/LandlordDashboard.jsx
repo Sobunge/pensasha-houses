@@ -38,37 +38,6 @@ const LandlordDashboard = () => {
 
   return (
     <Box>
-      {/* ===== Top Action Bar ===== */}
-      <Stack 
-        direction="row" 
-        justifyContent="space-between" 
-        alignItems="center" 
-        sx={{ mb: 4 }}
-      >
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: "#2a2a2a" }}>
-            Portfolio Overview
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Managing 3 active properties
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: "#f8b500",
-            color: "#111",
-            fontWeight: 600,
-            textTransform: "none",
-            borderRadius: 2,
-            px: 3,
-            "&:hover": { bgcolor: "#ffc62c" },
-          }}
-        >
-          + Add New Property
-        </Button>
-      </Stack>
-
       {/* ===== Dashboard Stats ===== */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
