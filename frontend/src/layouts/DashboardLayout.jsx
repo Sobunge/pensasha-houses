@@ -77,8 +77,6 @@ function DashboardLayout() {
             overflowY: "auto",
             overflowX: "hidden",
             scrollBehavior: "smooth",
-            px: { xs: 1.5, sm: 3, md: 4 }, // 🌟 Reduced padding on mobile (xs: 1.5) to give cards full width
-            pt: { xs: 2, sm: 2.5, lg: 1 },
             pb: { xs: 3, sm: 4 },
             outline: "none",
             display: "flex",
@@ -105,8 +103,9 @@ function DashboardLayout() {
           {/* Main Content Area */}
           <Box
             sx={{
-              maxWidth: 1400, // Slightly expanded max-width
+              maxWidth: 1600, // Slightly expanded max-width
               mx: "auto",
+              px: { xs: 1.5, sm: 3, md: 4 }, // 🌟 Reduced padding on mobile (xs: 1.5) to give cards full width
               width: "100%",
               boxSizing: "border-box",
               flexGrow: 1,
