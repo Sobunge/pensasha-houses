@@ -103,7 +103,7 @@ function DashboardLayout() {
           {/* Main Content Area */}
           <Box
             sx={{
-              maxWidth: 1600, // Slightly expanded max-width
+              maxWidth: 1400, // Slightly expanded max-width
               mx: "auto",
               px: { xs: 1.5, sm: 3, md: 4 }, // 🌟 Reduced padding on mobile (xs: 1.5) to give cards full width
               width: "100%",
