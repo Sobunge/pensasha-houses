@@ -98,7 +98,7 @@ function RecentPaymentsCard() {
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "90%",
+        height: "100%",
         width: "100%",
 
         // Pronounced Obsidian Depth Shadow
@@ -326,7 +326,6 @@ function RecentPaymentsCard() {
           <Box
             sx={{
               mt: "auto",
-              pt: 1.5,
               borderTop: "1px solid #F1F5F9",
               display: "flex",
               justifyContent: "flex-end",

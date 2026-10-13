@@ -51,7 +51,7 @@ const RoleSwitcherDashboard = () => {
       {roleTabs.length > 1 && (
         <Box 
           sx={{ 
-            mb: 4, 
+            mb: 1,
             display: "flex", 
             justifyContent: "center",
           }}

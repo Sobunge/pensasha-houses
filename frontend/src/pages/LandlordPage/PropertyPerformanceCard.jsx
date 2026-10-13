@@ -1,4 +1,5 @@
 // src/components/cards/PropertyPerformanceCard.jsx
+
 import React from "react";
 import {
   Card,
@@ -13,303 +14,640 @@ import {
   TableRow,
   Button,
   useTheme,
+  useMediaQuery,
   alpha,
 } from "@mui/material";
+
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+
 import { useNavigate } from "react-router-dom";
 
-// Sample properties data matching the mockup
+// Sample properties data
 const propertyData = [
-  { id: 1, name: "Sunrise Apartments", units: 12, occupied: 10, revenue: "Ksh 120,000" },
-  { id: 2, name: "Pensasha Towers", units: 20, occupied: 18, revenue: "Ksh 35,000" },
-  { id: 3, name: "Sunrise Houses", units: 12, occupied: 10, revenue: "Ksh 20,000" },
-  { id: 4, name: "Pensasha Residency", units: 20, occupied: 17, revenue: "Ksh 20,000" },
-  { id: 5, name: "Grand Vista Suites", units: 15, occupied: 12, revenue: "Ksh 45,000" },
+  {
+    id: 1,
+    name: "Sunrise Apartments",
+    units: 12,
+    occupied: 10,
+    revenue: "KSh 120,000",
+  },
+  {
+    id: 2,
+    name: "Pensasha Towers",
+    units: 20,
+    occupied: 18,
+    revenue: "KSh 35,000",
+  },
+  {
+    id: 3,
+    name: "Sunrise Houses",
+    units: 12,
+    occupied: 10,
+    revenue: "KSh 20,000",
+  },
+  {
+    id: 4,
+    name: "Pensasha Residency",
+    units: 20,
+    occupied: 17,
+    revenue: "KSh 20,000",
+  },
+  {
+    id: 5,
+    name: "Grand Vista Suites",
+    units: 15,
+    occupied: 12,
+    revenue: "KSh 45,000",
+  },
 ];
 
 function PropertyPerformanceCard() {
   const navigate = useNavigate();
   const theme = useTheme();
 
+  // Use the compact property layout on mobile.
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const displayedProperties = propertyData.slice(0, 4);
+  const hasProperties = displayedProperties.length > 0;
+
   const getOccupancyColor = (rate) => {
-    if (rate >= 80) return "#10B981"; // Emerald Green
-    if (rate >= 50) return "#D4AF37"; // Champagne Gold
-    return "#EF4444"; // Crimson
+    if (rate >= 80) return "#10B981";
+    if (rate >= 50) return "#D4AF37";
+    return "#EF4444";
   };
 
-  const hasProperties = propertyData && propertyData.length > 0;
-  
-  // 🌟 Cap display at 4 properties maximum for dashboard overview
-  const displayedProperties = propertyData ? propertyData.slice(0, 4) : [];
+  const handleViewAll = () => {
+    navigate("/landlord/properties");
+  };
+
+  const handleAddProperty = () => {
+    navigate("/landlord/properties/new");
+  };
 
   return (
     <Card
       elevation={0}
       sx={{
+        display: "flex",
+        flexDirection: "column",
+
+        // Fill available parent width fluidly without breaking smaller screens
+        width: "100%",
+        minWidth: 0,
+
+        height: "auto",
+
         borderRadius: "16px",
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "90%",
-        width: "100%",
 
-        // Pronounced Obsidian Depth Shadow
         boxShadow:
           "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
-        transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+
+        transition:
+          "border-color 0.25s ease, box-shadow 0.25s ease",
+
         "&:hover": {
           borderColor: "secondary.main",
           boxShadow:
             "0 25px 40px -10px rgba(15, 23, 42, 0.18), 0 12px 18px -6px rgba(15, 23, 42, 0.1)",
         },
+
+        "@media (prefers-reduced-motion: reduce)": {
+          transition: "none",
+        },
       }}
     >
       <CardContent
         sx={{
-          p: { xs: 2.5, sm: 3 },
-          "&:last-child": { pb: { xs: 2, sm: 2.5 } },
           display: "flex",
           flexDirection: "column",
-          height: "100%",
+          flexGrow: 1,
+          minWidth: 0,
+
+          p: { xs: 2, sm: 2.5, md: 3 },
+
+          "&:last-child": {
+            pb: { xs: 2, sm: 2.5, md: 3 },
+          },
         }}
       >
         {/* HEADER */}
-        <Box sx={{ mb: 1 }}>
+        <Box sx={{ mb: { xs: 2, sm: 2.5 } }}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 800, color: "primary.main", lineHeight: 1.2 }}
+            sx={{
+              fontWeight: 800,
+              color: "primary.main",
+              fontSize: {
+                xs: "1rem",
+                sm: "1.1rem",
+                md: "1.2rem",
+              },
+              lineHeight: 1.35,
+            }}
           >
             Properties Performance
           </Typography>
-          <Typography variant="caption" color="text.secondary" fontWeight={500}>
-            Occupancy levels & revenue breakdown per estate
+
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mt: 0.5,
+              fontSize: { xs: "0.75rem", sm: "0.82rem" },
+              lineHeight: 1.5,
+            }}
+          >
+            Occupancy levels and revenue by property
           </Typography>
         </Box>
 
-        {/* CONTENT AREA: TABLE OR EMPTY STATE */}
-        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-          {hasProperties ? (
-            <Table sx={{ minWidth: 300, mt: 1 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      color: "text.secondary",
-                      fontWeight: 700,
-                      fontSize: "0.75rem",
-                      pl: 0,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
-                  >
-                    Property
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "text.secondary",
-                      fontWeight: 700,
-                      fontSize: "0.75rem",
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
-                  >
-                    Occupancy
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{
-                      color: "text.secondary",
-                      fontWeight: 700,
-                      fontSize: "0.75rem",
-                      pr: 0,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
-                  >
-                    Revenue
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {/* 🌟 Map only the sliced top 4 items */}
-                {displayedProperties.map((property) => {
+        {/* PROPERTY CONTENT */}
+        {hasProperties ? (
+          <>
+            {/* MOBILE LAYOUT */}
+            {isMobile ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  minWidth: 0,
+                }}
+              >
+                {displayedProperties.map((property, index) => {
                   const occupancyRate = Math.round(
                     (property.occupied / property.units) * 100
                   );
-                  const progressColor = getOccupancyColor(occupancyRate);
+
+                  const progressColor =
+                    getOccupancyColor(occupancyRate);
 
                   return (
-                    <TableRow
+                    <Box
                       key={property.id}
                       sx={{
-                        transition: "background-color 0.15s ease",
-                        "&:hover": {
-                          bgcolor: alpha(theme.palette.primary.main, 0.02),
-                        },
-                        "&:last-child td, &:last-child th": { border: 0 },
+                        py: 1.75,
+                        minWidth: 0,
+
+                        borderBottom:
+                          index !== displayedProperties.length - 1
+                            ? "1px solid #E2E8F0"
+                            : "none",
                       }}
                     >
-                      <TableCell
+                      {/* Property name and revenue */}
+                      <Box
                         sx={{
-                          pl: 0,
-                          py: 1.5,
-                          fontWeight: 700,
-                          color: "primary.main",
-                          fontSize: "0.85rem",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "space-between",
+                          gap: 1.5,
+                          mb: 1.5,
+                          minWidth: 0,
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 1,
+                            flex: 1,
+                            minWidth: 0,
+                          }}
+                        >
                           <HomeWorkOutlinedIcon
-                            fontSize="small"
-                            sx={{ color: "secondary.main" }}
+                            sx={{
+                              fontSize: 20,
+                              color: "secondary.main",
+                              flexShrink: 0,
+                              mt: 0.15,
+                            }}
                           />
-                          <Typography variant="body2" fontWeight={700} noWrap>
+
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 700,
+                              color: "primary.main",
+                              fontSize: "0.82rem",
+                              lineHeight: 1.45,
+                              overflowWrap: "anywhere",
+                              minWidth: 0,
+                            }}
+                          >
                             {property.name}
                           </Typography>
                         </Box>
-                      </TableCell>
 
-                      <TableCell sx={{ py: 1.5, minWidth: 120 }}>
                         <Typography
-                          variant="caption"
-                          fontWeight={700}
-                          color="text.primary"
-                          sx={{ display: "block", mb: 0.5 }}
+                          variant="body2"
+                          sx={{
+                            fontWeight: 800,
+                            color: "primary.main",
+                            fontSize: "0.78rem",
+                            lineHeight: 1.45,
+                            textAlign: "right",
+                            flexShrink: 0,
+                            whiteSpace: "nowrap",
+                          }}
                         >
-                          {occupancyRate}% Occupied
+                          {property.revenue}
                         </Typography>
+                      </Box>
+
+                      {/* Occupancy details */}
+                      <Box sx={{ pl: 3.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: 1,
+                            mb: 0.75,
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              fontSize: "0.72rem",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {property.occupied} of {property.units} units
+                            occupied
+                          </Typography>
+
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: progressColor,
+                              fontWeight: 800,
+                              fontSize: "0.75rem",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {occupancyRate}%
+                          </Typography>
+                        </Box>
+
                         <LinearProgress
                           variant="determinate"
                           value={occupancyRate}
+                          aria-label={`${property.name} occupancy: ${occupancyRate}%`}
                           sx={{
                             height: 6,
-                            borderRadius: 3,
+                            borderRadius: 4,
                             bgcolor: "#E2E8F0",
+
                             "& .MuiLinearProgress-bar": {
                               bgcolor: progressColor,
-                              borderRadius: 3,
+                              borderRadius: 4,
                             },
                           }}
                         />
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
+            ) : (
+              /* TABLET AND DESKTOP TABLE */
+              <Box
+                sx={{
+                  width: "100%",
+                  minWidth: 0,
+                  overflowX: "auto",
+                  flexGrow: 1,
+                }}
+              >
+                <Table
+                  size="small"
+                  aria-label="Property performance"
+                  sx={{
+                    width: "100%",
+                    tableLayout: "fixed",
+
+                    "& th, & td": {
+                      borderBottom: "1px solid #E2E8F0",
+                    },
+
+                    "& tr:last-child td": {
+                      borderBottom: "none",
+                    },
+                  }}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        sx={{
+                          width: "36%",
+                          pl: 0,
+                          py: 1.5,
+                          color: "text.secondary",
+                          fontWeight: 700,
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        Property
+                      </TableCell>
+
+                      <TableCell
+                        sx={{
+                          width: "34%",
+                          py: 1.5,
+                          color: "text.secondary",
+                          fontWeight: 700,
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        Occupancy
                       </TableCell>
 
                       <TableCell
                         align="right"
                         sx={{
+                          width: "30%",
                           pr: 0,
                           py: 1.5,
-                          fontWeight: 800,
-                          color: "primary.main",
-                          fontSize: "0.88rem",
+                          color: "text.secondary",
+                          fontWeight: 700,
+                          fontSize: "0.75rem",
                         }}
                       >
-                        {property.revenue}
+                        Revenue
                       </TableCell>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          ) : (
-            /* ELEGANT EMPTY STATE */
+                  </TableHead>
+
+                  <TableBody>
+                    {displayedProperties.map((property) => {
+                      const occupancyRate = Math.round(
+                        (property.occupied / property.units) * 100
+                      );
+
+                      const progressColor =
+                        getOccupancyColor(occupancyRate);
+
+                      return (
+                        <TableRow
+                          key={property.id}
+                          sx={{
+                            transition: "background-color 0.15s ease",
+
+                            "&:hover": {
+                              bgcolor: alpha(
+                                theme.palette.primary.main,
+                                0.025
+                              ),
+                            },
+                          }}
+                        >
+                          {/* Property name */}
+                          <TableCell
+                            sx={{
+                              pl: 0,
+                              py: 1.5,
+                              pr: 1,
+                              verticalAlign: "middle",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: 1,
+                                minWidth: 0,
+                              }}
+                            >
+                              <HomeWorkOutlinedIcon
+                                sx={{
+                                  fontSize: 19,
+                                  color: "secondary.main",
+                                  flexShrink: 0,
+                                  mt: 0.1,
+                                }}
+                              />
+
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: "primary.main",
+                                  fontSize: "0.78rem",
+                                  lineHeight: 1.45,
+                                  overflowWrap: "anywhere",
+                                  minWidth: 0,
+                                }}
+                              >
+                                {property.name}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+
+                          {/* Occupancy */}
+                          <TableCell
+                            sx={{
+                              py: 1.5,
+                              px: 1,
+                              verticalAlign: "middle",
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                display: "block",
+                                fontWeight: 700,
+                                color: "text.primary",
+                                fontSize: "0.72rem",
+                                mb: 0.75,
+                              }}
+                            >
+                              {occupancyRate}% Occupied
+                            </Typography>
+
+                            <LinearProgress
+                              variant="determinate"
+                              value={occupancyRate}
+                              aria-label={`${property.name} occupancy: ${occupancyRate}%`}
+                              sx={{
+                                height: 6,
+                                borderRadius: 4,
+                                bgcolor: "#E2E8F0",
+
+                                "& .MuiLinearProgress-bar": {
+                                  bgcolor: progressColor,
+                                  borderRadius: 4,
+                                },
+                              }}
+                            />
+
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                display: "block",
+                                fontSize: "0.67rem",
+                                mt: 0.5,
+                              }}
+                            >
+                              {property.occupied}/{property.units} units
+                            </Typography>
+                          </TableCell>
+
+                          {/* Revenue */}
+                          <TableCell
+                            align="right"
+                            sx={{
+                              pr: 0,
+                              pl: 0.5,
+                              py: 1.5,
+                              verticalAlign: "middle",
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 800,
+                                color: "primary.main",
+                                fontSize: {
+                                  sm: "0.72rem",
+                                  md: "0.8rem",
+                                },
+                                overflowWrap: "anywhere",
+                              }}
+                            >
+                              {property.revenue}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </Box>
+            )}
+
+            {/* VIEW ALL FOOTER */}
             <Box
               sx={{
-                flexGrow: 1,
+                mt: "auto",
+                pt: 1.5,
+                borderTop: "1px solid #F1F5F9",
                 display: "flex",
-                flexDirection: "column",
+                justifyContent: "flex-end",
                 alignItems: "center",
-                justifyContent: "center",
-                px: 2,
-                py: 3,
-                textAlign: "center",
               }}
             >
-              <Box
-                sx={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: "16px",
-                  bgcolor: "rgba(212, 175, 55, 0.12)",
-                  color: "secondary.main",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mb: 2,
-                }}
-              >
-                <HomeWorkOutlinedIcon sx={{ fontSize: 32 }} />
-              </Box>
-
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 800, color: "primary.main", mb: 0.5 }}
-              >
-                No Properties Found
-              </Typography>
-
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ maxWidth: 280, mb: 2, fontSize: "0.82rem" }}
-              >
-                You haven't registered any properties yet. Add an estate or unit to track occupancy and revenue.
-              </Typography>
-
               <Button
-                variant="contained"
                 size="small"
-                startIcon={<AddCircleOutlineIcon />}
-                onClick={() => navigate("/landlord/properties/new")}
+                endIcon={<ArrowForwardIcon fontSize="small" />}
+                onClick={handleViewAll}
                 sx={{
-                  bgcolor: "primary.main",
-                  color: "secondary.main",
                   fontWeight: 700,
-                  px: 2.5,
-                  py: 0.8,
-                  borderRadius: "10px",
+                  fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                  color: "primary.main",
                   textTransform: "none",
-                  fontSize: "0.82rem",
-                  boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+                  borderRadius: 2,
+                  minWidth: 0,
+                  px: 1,
+
                   "&:hover": {
-                    bgcolor: "#1E293B",
+                    color: "secondary.main",
+                    bgcolor: alpha(
+                      theme.palette.secondary.main,
+                      0.06
+                    ),
                   },
                 }}
               >
-                Add Your First Property
+                {propertyData.length > 4
+                  ? `View All (${propertyData.length}) Properties`
+                  : "View All Properties"}
               </Button>
             </Box>
-          )}
-        </Box>
-
-        {/* FOOTER VIEW ALL ACTION (Includes count if > 4) */}
-        {hasProperties && (
+          </>
+        ) : (
+          /* EMPTY STATE */
           <Box
             sx={{
-              mt: "auto",
-              pt: 1.5,
-              borderTop: "1px solid #F1F5F9",
+              flexGrow: 1,
               display: "flex",
-              justifyContent: "flex-end",
+              flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              px: { xs: 1, sm: 2 },
+              py: 4,
             }}
           >
-            <Button
-              size="small"
-              endIcon={<ArrowForwardIcon fontSize="small" />}
-              onClick={() => navigate("/landlord/properties")}
+            <Box
               sx={{
-                fontWeight: 700,
-                fontSize: "0.82rem",
+                width: 56,
+                height: 56,
+                borderRadius: 3,
+                bgcolor: "rgba(212, 175, 55, 0.12)",
+                color: "secondary.main",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+              }}
+            >
+              <HomeWorkOutlinedIcon sx={{ fontSize: 30 }} />
+            </Box>
+
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 800,
                 color: "primary.main",
+                mb: 0.5,
+              }}
+            >
+              No Properties Found
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                maxWidth: 280,
+                mb: 2.5,
+                fontSize: "0.82rem",
+                lineHeight: 1.6,
+              }}
+            >
+              You haven't registered any properties yet. Add a property to
+              start tracking occupancy and revenue.
+            </Typography>
+
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={handleAddProperty}
+              sx={{
+                bgcolor: "primary.main",
+                color: "#FFFFFF",
+                fontWeight: 700,
+                px: 2,
+                py: 1,
+                borderRadius: 2,
                 textTransform: "none",
+                fontSize: "0.8rem",
+
                 "&:hover": {
-                  color: "secondary.main",
-                  bgcolor: "transparent",
+                  bgcolor: "#1E293B",
                 },
               }}
             >
-              {propertyData.length > 4
-                ? `View All (${propertyData.length}) Properties`
-                : "View All Properties"}
+              Add Your First Property
             </Button>
           </Box>
         )}

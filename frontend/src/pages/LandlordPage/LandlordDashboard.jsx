@@ -1,6 +1,6 @@
 // src/pages/LandlordPage/LandlordDashboard.jsx
 import React from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box} from "@mui/material";
 import { motion } from "framer-motion";
 
 // Sub-components
@@ -11,24 +11,7 @@ import TenantSummaryCard from "./TenantSummaryCard";
 import RecentPaymentsCard from "./RecentPaymentsCard";
 import MaintenanceRequestsCard from "./MaintenanceRequestsCard";
 
-// Reusable Section Title matching Obsidian & Gold typography
-const SectionTitle = ({ children }) => (
-  <Typography
-    variant="subtitle2"
-    sx={{
-      textTransform: "uppercase",
-      letterSpacing: "0.08em",
-      fontWeight: 700,
-      fontSize: "0.75rem",
-      mb: 1.5,
-      color: "text.secondary",
-    }}
-  >
-    {children}
-  </Typography>
-);
-
-// Motion wrapper styling helper to guarantee 100% horizontal stretch on all breakpoints
+// Motion wrapper styling helper
 const motionContainerStyle = {
   width: "100%",
   height: "100%",
@@ -49,71 +32,138 @@ const LandlordDashboard = () => {
         <DashboardStats />
       </motion.div>
 
-      {/* ===== 2. MIDDLE ROW: PERFORMANCE & FINANCIAL SNAPSHOT ===== */}
-      <Grid container spacing={3} sx={{ mt: 1, width: "100%", ml: 0 }}>
-        <Grid item xs={12} lg={6} sx={{ pl: "0 !important" }}>
+      {/* ===== 2. MIDDLE ROW: PERFORMANCE & FINANCIAL OVERVIEW ===== */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", lg: "row" },
+          gap: 3,
+          mt: 1,
+          width: "100%",
+        }}
+      >
+        <Box
+          sx={{
+            width: { xs: "100%", lg: "calc(50% - 12px)" },
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
             style={motionContainerStyle}
           >
-            <SectionTitle>Properties Performance</SectionTitle>
             <PropertyPerformanceCard />
           </motion.div>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} lg={6} sx={{ pl: "0 !important" }}>
+        <Box
+          sx={{
+            width: { xs: "100%", lg: "calc(50% - 12px)" },
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.15, ease: "easeOut" }}
             style={motionContainerStyle}
           >
-            <SectionTitle>Financial Overview</SectionTitle>
             <FinancialOverviewCard />
           </motion.div>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
-      {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE, & TENANT SUMMARY ===== */}
-      <Grid container spacing={3} sx={{ mt: 1, width: "100%", ml: 0 }}>
-        <Grid item xs={12} sm={12} md={6} lg={4} sx={{ pl: "0 !important" }}>
+      {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE & TENANTS ===== */}
+      {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE & TENANTS ===== */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+          mt: 3,
+          width: "100%",
+        }}
+      >
+        {/* TOP PAIR: Recent Payments & Maintenance Requests (Side-by-Side) */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" }, // Stacks on mobile, side-by-side on tablet/desktop
+            gap: 3,
+            width: "100%",
+          }}
+        >
+          {/* Recent Payments Card */}
+          <Box
+            sx={{
+              width: { xs: "100%", md: "calc(50% - 12px)" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.35,
+                delay: 0.2,
+                ease: "easeOut",
+              }}
+              style={motionContainerStyle}
+            >
+              <RecentPaymentsCard />
+            </motion.div>
+          </Box>
+
+          {/* Maintenance Requests Card */}
+          <Box
+            sx={{
+              width: { xs: "100%", md: "calc(50% - 12px)" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.35,
+                delay: 0.25,
+                ease: "easeOut",
+              }}
+              style={motionContainerStyle}
+            >
+              <MaintenanceRequestsCard />
+            </motion.div>
+          </Box>
+        </Box>
+
+        {/* BOTTOM SINGLE: Tenant Summary (Full Width 100%) */}
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.2, ease: "easeOut" }}
+            transition={{
+              duration: 0.35,
+              delay: 0.3,
+              ease: "easeOut",
+            }}
             style={motionContainerStyle}
           >
-            <SectionTitle>Recent Payments</SectionTitle>
-            <RecentPaymentsCard />
-          </motion.div>
-        </Grid>
-
-        <Grid item xs={12} sm={12} md={6} lg={4} sx={{ pl: "0 !important" }}>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.25, ease: "easeOut" }}
-            style={motionContainerStyle}
-          >
-            <SectionTitle>Maintenance Requests</SectionTitle>
-            <MaintenanceRequestsCard />
-          </motion.div>
-        </Grid>
-
-        <Grid item xs={12} sm={12} md={12} lg={4} sx={{ pl: "0 !important" }}>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.3, ease: "easeOut" }}
-            style={motionContainerStyle}
-          >
-            <SectionTitle>Tenant Summary</SectionTitle>
             <TenantSummaryCard />
           </motion.div>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };

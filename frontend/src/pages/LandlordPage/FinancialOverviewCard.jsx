@@ -78,7 +78,7 @@ function FinancialOverviewCard() {
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "90%",
+        height: "100%",
         width: "100%",
 
         // Pronounced Obsidian Depth Shadow

@@ -52,8 +52,7 @@ const MainDashboard = () => {
         <Card
           elevation={0}
           sx={{
-            mb: 2,
-            p: { xs: 2.5, sm: 3 },
+            p: { xs: 2.5, sm: 2 },
             bgcolor: "transparent",
           }}
         >
