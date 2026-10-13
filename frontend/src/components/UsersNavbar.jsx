@@ -48,7 +48,7 @@ function UsersNavbar({ onMenuClick }) {
         color: "text.primary",
         
         // 🌟 Gold border line separating navbar from page body
-        borderBottom: "2px solid",
+        borderBottom: "1px solid",
         borderColor: "secondary.main", // #D4AF37 champagne gold from theme
         boxShadow: "0px 4px 20px rgba(212, 175, 55, 0.12)", // Subtle ambient gold glow
 
