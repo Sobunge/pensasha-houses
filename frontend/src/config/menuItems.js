@@ -38,6 +38,13 @@ const menuDefinitions = {
   LANDLORD: [
     { id: "my-properties", label: "My Properties", link: "/dashboard/my-properties", icon: <ApartmentIcon /> },
     { id: "tenants-landlord", label: "Tenants", link: "/dashboard/tenants", icon: <PeopleAltIcon /> },
+    { id: "caretakers", label: "Caretakers", link: "/dashboard/caretakers", icon: <SupportAgentIcon /> },
+    { id: "rent-payments", label: "Rent & Payments", link: "/dashboard/rent-payments", icon: <PaymentIcon /> },
+    { id: "maintenance", label: "Maintenance", link: "/dashboard/maintenance-requests", icon: <BuildIcon /> },
+    { id: "reports-analytics", label: "Reports & Analytics", link: "/dashboard/reports", icon: <AssessmentIcon /> },
+    { id: "messages", label: "Messages", link: "/dashboard/messages", icon: <MessageIcon /> },
+    { id: "notices-announcements", label: "Notices & Announcements", link: "/dashboard/announcements", icon: <AnnouncementIcon /> },
+    { id: "leases-documents", label: "Leases & Documents", link: "/dashboard/documents", icon: <DescriptionIcon /> },
   ],
 
   CARETAKER: [
@@ -63,15 +70,21 @@ const menuDefinitions = {
  * Returns the menu items for the current active role selected in the switcher.
  * Strips 'ROLE_' prefix if present and falls back to TENANT if unmapped.
  */
-export const getMenuItems = (activeRole = "TENANT") => {
-  // Normalize string: strip "ROLE_" if Spring Security returns enum values like "ROLE_TENANT"
-  const normalizedRole = activeRole?.toUpperCase().replace(/^ROLE_/, "");
-  
-  // Use requested role, or fall back to TENANT if invalid/unmapped
-  const roleSpecificMenu = menuDefinitions[normalizedRole] || menuDefinitions.TENANT;
+export const getMenuItems = (activeRole) => {
+  if (!activeRole) {
+    return [...coreMenuItems];
+  }
 
-  return [
-    ...coreMenuItems,
-    ...roleSpecificMenu,
-  ];
+  const normalizedRole = activeRole
+    .toUpperCase()
+    .replace(/^ROLE_/, "");
+
+  const roleSpecificMenu = menuDefinitions[normalizedRole];
+
+  if (!roleSpecificMenu) {
+    console.warn(`Unsupported role: ${activeRole}`);
+    return [...coreMenuItems];
+  }
+
+  return [...coreMenuItems, ...roleSpecificMenu];
 };
