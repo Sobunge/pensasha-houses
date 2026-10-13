@@ -1,6 +1,7 @@
-/* ================================
-   Global base & layout resets
-   ================================ */
+/* =========================================
+   Pensasha Properties
+   Global Base & Layout Resets
+   ========================================= */
 
 *,
 *::before,
@@ -11,64 +12,109 @@
 html,
 body,
 #root {
-  height: 100%;
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Arial, sans-serif;
   background-color: #f7f7f7;
-  color: #111;
+  color: #111111;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* allow scrolling */
   overflow: auto;
 }
 
-/* Remove default focus outline (MUI handles this better) */
-:focus {
-  outline: none;
+/* =========================================
+   Accessibility & Keyboard Navigation
+   ========================================= */
+
+/* Preserve visible focus indicators for keyboard users */
+:focus-visible {
+  outline: 2px solid #f8b500;
+  outline-offset: 2px;
 }
 
-/* ================================
-   Scroll behavior
-   ================================ */
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 
-html {
-  scroll-behavior: smooth;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-/* ================================
-   SimpleBar global customization
-   ================================ */
+/* =========================================
+   Pensasha Sidebar Scrollbar
+   ========================================= */
 
-.simplebar-scrollbar::before {
-  background-color: #f8b500;
-}
-
-.simplebar-track.simplebar-vertical {
-  background: rgba(255, 255, 255, 0.08);
+/* Vertical scrollbar track */
+.pensasha-sidebar-scroll .simplebar-track.simplebar-vertical {
   width: 8px;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
 }
 
-.simplebar-scrollbar {
-  border-radius: 4px;
+/* Horizontal scrollbar track */
+.pensasha-sidebar-scroll .simplebar-track.simplebar-horizontal {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
 }
 
-/* ================================
-   Utility globals (safe)
-   ================================ */
+/* Scrollbar thumb */
+.pensasha-sidebar-scroll .simplebar-scrollbar {
+  border-radius: 8px;
+}
+
+/* Gold scrollbar thumb */
+.pensasha-sidebar-scroll .simplebar-scrollbar::before {
+  background-color: #d4af37;
+  border-radius: 8px;
+  opacity: 1;
+  left: 1px;
+  right: 1px;
+  transition: background-color 0.2s ease;
+}
+
+/* Brighter gold on hover */
+.pensasha-sidebar-scroll .simplebar-scrollbar:hover::before {
+  background-color: #f8b500;
+  opacity: 1;
+}
+
+/* =========================================
+   Global Media
+   ========================================= */
 
 img {
   max-width: 100%;
   display: block;
 }
 
+/* =========================================
+   Global Links
+   ========================================= */
+
 a {
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
+
+/* =========================================
+   End of Global Styles
+   ========================================= */
