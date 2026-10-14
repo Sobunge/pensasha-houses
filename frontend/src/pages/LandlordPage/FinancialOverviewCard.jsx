@@ -183,31 +183,36 @@ function FinancialOverviewCard() {
         </Box>
 
         {/* FINANCIAL SUMMARY PILLS ROW */}
-        <Grid container spacing={1.5} sx={{ mt: 2 }}>
+        <Grid container spacing={{ xs: 1, sm: 1.5 }} sx={{ mt: 2 }}>
           {/* Total Income */}
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={4}>
             <Box
               sx={{
-                p: 1.5,
+                p: { xs: 1, sm: 1.5 },
                 borderRadius: "12px",
                 bgcolor: alpha("#10B981", 0.08),
                 border: "1px solid",
                 borderColor: alpha("#10B981", 0.2),
                 display: "flex",
                 alignItems: "center",
-                gap: 1.25,
+                gap: { xs: 0.75, sm: 1.25 },
+                minWidth: 0,
               }}
             >
               <AccountBalanceWalletOutlinedIcon
                 fontSize="small"
-                sx={{ color: "#10B981" }}
+                sx={{ color: "#10B981", fontSize: { xs: "1rem", sm: "1.25rem" } }}
               />
-              <Box sx={{ minWidth: 0 }}>
+              <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   fontWeight={600}
-                  sx={{ display: "block", fontSize: "0.7rem", lineHeight: 1 }}
+                  sx={{
+                    display: "block",
+                    fontSize: { xs: "0.55rem", sm: "0.7rem" },
+                    lineHeight: 1,
+                  }}
                 >
                   Collected
                 </Typography>
@@ -216,7 +221,10 @@ function FinancialOverviewCard() {
                   fontWeight={800}
                   color="primary.main"
                   noWrap
-                  sx={{ mt: 0.3 }}
+                  sx={{
+                    mt: 0.3,
+                    fontSize: { xs: "0.7rem", sm: "0.875rem" },
+                  }}
                 >
                   {financials.totalIncome}
                 </Typography>
@@ -225,29 +233,34 @@ function FinancialOverviewCard() {
           </Grid>
 
           {/* Expenses */}
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={4}>
             <Box
               sx={{
-                p: 1.5,
+                p: { xs: 1, sm: 1.5 },
                 borderRadius: "12px",
                 bgcolor: alpha("#EF4444", 0.08),
                 border: "1px solid",
                 borderColor: alpha("#EF4444", 0.2),
                 display: "flex",
                 alignItems: "center",
-                gap: 1.25,
+                gap: { xs: 0.75, sm: 1.25 },
+                minWidth: 0,
               }}
             >
               <ReceiptLongOutlinedIcon
                 fontSize="small"
-                sx={{ color: "#EF4444" }}
+                sx={{ color: "#EF4444", fontSize: { xs: "1rem", sm: "1.25rem" } }}
               />
-              <Box sx={{ minWidth: 0 }}>
+              <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   fontWeight={600}
-                  sx={{ display: "block", fontSize: "0.7rem", lineHeight: 1 }}
+                  sx={{
+                    display: "block",
+                    fontSize: { xs: "0.55rem", sm: "0.7rem" },
+                    lineHeight: 1,
+                  }}
                 >
                   Expenses
                 </Typography>
@@ -256,7 +269,10 @@ function FinancialOverviewCard() {
                   fontWeight={800}
                   color="primary.main"
                   noWrap
-                  sx={{ mt: 0.3 }}
+                  sx={{
+                    mt: 0.3,
+                    fontSize: { xs: "0.7rem", sm: "0.875rem" },
+                  }}
                 >
                   {financials.totalExpenses}
                 </Typography>
@@ -265,29 +281,34 @@ function FinancialOverviewCard() {
           </Grid>
 
           {/* Net Profit */}
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={4}>
             <Box
               sx={{
-                p: 1.5,
+                p: { xs: 1, sm: 1.5 },
                 borderRadius: "12px",
                 bgcolor: alpha("#D4AF37", 0.12),
                 border: "1px solid",
                 borderColor: alpha("#D4AF37", 0.3),
                 display: "flex",
                 alignItems: "center",
-                gap: 1.25,
+                gap: { xs: 0.75, sm: 1.25 },
+                minWidth: 0,
               }}
             >
               <TrendingUpOutlinedIcon
                 fontSize="small"
-                sx={{ color: "#B5922B" }}
+                sx={{ color: "#B5922B", fontSize: { xs: "1rem", sm: "1.25rem" } }}
               />
-              <Box sx={{ minWidth: 0 }}>
+              <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   fontWeight={600}
-                  sx={{ display: "block", fontSize: "0.7rem", lineHeight: 1 }}
+                  sx={{
+                    display: "block",
+                    fontSize: { xs: "0.55rem", sm: "0.7rem" },
+                    lineHeight: 1,
+                  }}
                 >
                   Net Profit
                 </Typography>
@@ -296,7 +317,10 @@ function FinancialOverviewCard() {
                   fontWeight={800}
                   color="primary.main"
                   noWrap
-                  sx={{ mt: 0.3 }}
+                  sx={{
+                    mt: 0.3,
+                    fontSize: { xs: "0.7rem", sm: "0.875rem" },
+                  }}
                 >
                   {financials.netProfit}
                 </Typography>
