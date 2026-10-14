@@ -9,6 +9,8 @@ import {
   Divider,
   Typography,
   Chip,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../pages/Auth/AuthContext";
@@ -33,6 +35,10 @@ const SIDEBAR_COLORS = {
 function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
   const { user, activeRole } = useAuth();
+  
+  // Detect viewport size
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
   // Normalize the role once and reuse it throughout the component.
   const currentRole = useMemo(() => {
@@ -183,11 +189,13 @@ function UserSidebar({ mobileOpen, onClose }) {
           minHeight: 0,
           pt: 2,
           overflow: "hidden",
+          position: "relative",
+          width: "100%",
         }}
       >
         <SimpleBar
-          style={{ height: "100%" }}
-          autoHide={false}
+          style={{ height: "100%", maxHeight: "100%" }}
+          autoHide={true}
           className="pensasha-sidebar-scroll"
         >
           <List
@@ -219,16 +227,15 @@ function UserSidebar({ mobileOpen, onClose }) {
                     backgroundColor: active
                       ? SIDEBAR_COLORS.activeBackground
                       : "transparent",
-                    transition: "background-color 0.2s ease-in-out, color 0.2s ease-in-out",
+                    transition:
+                      "background-color 0.2s ease-in-out, color 0.2s ease-in-out",
 
                     "&.Mui-selected": {
-                      backgroundColor:
-                        SIDEBAR_COLORS.activeBackground,
+                      backgroundColor: SIDEBAR_COLORS.activeBackground,
                     },
 
                     "&.Mui-selected:hover": {
-                      backgroundColor:
-                        SIDEBAR_COLORS.activeHoverBackground,
+                      backgroundColor: SIDEBAR_COLORS.activeHoverBackground,
                     },
 
                     "&:hover": {
@@ -251,15 +258,15 @@ function UserSidebar({ mobileOpen, onClose }) {
 
                     "&::before": active
                       ? {
-                        content: '""',
-                        position: "absolute",
-                        left: 0,
-                        top: "15%",
-                        height: "70%",
-                        width: "4px",
-                        bgcolor: SIDEBAR_COLORS.gold,
-                        borderRadius: "0 4px 4px 0",
-                      }
+                          content: '""',
+                          position: "absolute",
+                          left: 0,
+                          top: "15%",
+                          height: "70%",
+                          width: "4px",
+                          bgcolor: SIDEBAR_COLORS.gold,
+                          borderRadius: "0 4px 4px 0",
+                        }
                       : {},
                   }}
                 >
@@ -334,57 +341,51 @@ function UserSidebar({ mobileOpen, onClose }) {
         flexShrink: { md: 0 },
       }}
     >
-      {/* Mobile Drawer */}
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={onClose}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        sx={{
-          display: {
-            xs: "block",
-            md: "none",
-          },
-          zIndex: (theme) => theme.zIndex.drawer + 2,
+      {/* Mobile Drawer - Rendered only on screens smaller than md */}
+      {!isDesktop && (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={onClose}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            zIndex: (theme) => theme.zIndex.drawer + 2,
+            "& .MuiDrawer-paper": {
+              width: DRAWER_WIDTH,
+              height: "100vh",
+              bgcolor: SIDEBAR_COLORS.background,
+              borderRight: "none",
+              boxSizing: "border-box",
+              overflow: "hidden",
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
 
-          "& .MuiDrawer-paper": {
-            width: DRAWER_WIDTH,
-            height: "100vh",
-            bgcolor: SIDEBAR_COLORS.background,
-            borderRight: "none",
-            boxSizing: "border-box",
-            overflow: "hidden",
-          },
-        }}
-      >
-        {drawerContent}
-      </Drawer>
-
-      {/* Desktop Drawer */}
-      <Drawer
-        variant="permanent"
-        open
-        sx={{
-          display: {
-            xs: "none",
-            md: "block",
-          },
-
-          "& .MuiDrawer-paper": {
-            width: DRAWER_WIDTH,
-            height: "100vh",
-            bgcolor: SIDEBAR_COLORS.background,
-            borderRight: "none",
-            boxShadow: "4px 0 24px rgba(15, 23, 42, 0.08)",
-            boxSizing: "border-box",
-            overflow: "hidden",
-          },
-        }}
-      >
-        {drawerContent}
-      </Drawer>
+      {/* Desktop Drawer - Rendered only on md screens and larger */}
+      {isDesktop && (
+        <Drawer
+          variant="permanent"
+          open
+          sx={{
+            "& .MuiDrawer-paper": {
+              width: DRAWER_WIDTH,
+              height: "100vh",
+              bgcolor: SIDEBAR_COLORS.background,
+              borderRight: "none",
+              boxShadow: "4px 0 24px rgba(15, 23, 42, 0.08)",
+              boxSizing: "border-box",
+              overflow: "hidden",
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
     </Box>
   );
 }
