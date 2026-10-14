@@ -70,7 +70,8 @@ function PropertyPerformanceCard() {
   // Use the compact property layout on mobile.
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const displayedProperties = propertyData.slice(0, 4);
+  // Limit to 3 items here
+  const displayedProperties = propertyData.slice(0, 3);
   const hasProperties = displayedProperties.length > 0;
 
   const getOccupancyColor = (rate) => {
@@ -566,7 +567,7 @@ function PropertyPerformanceCard() {
                   },
                 }}
               >
-                {propertyData.length > 4
+                {propertyData.length > 3
                   ? `View All (${propertyData.length}) Properties`
                   : "View All Properties"}
               </Button>

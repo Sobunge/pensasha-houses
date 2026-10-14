@@ -5,7 +5,6 @@ import {
   CardContent,
   Typography,
   Box,
-  Grid,
   Button,
   alpha,
 } from "@mui/material";
@@ -26,7 +25,7 @@ function TenantSummaryCard() {
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "90%",
+        height: "100%",
         width: "100%",
 
         // Pronounced Obsidian Depth Shadow
@@ -52,7 +51,7 @@ function TenantSummaryCard() {
       >
         <Box>
           {/* HEADER */}
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2, textAlign: { xs: "center", md: "left" } }}>
             <Typography
               variant="h6"
               sx={{ fontWeight: 800, color: "primary.main", lineHeight: 1.2 }}
@@ -64,206 +63,247 @@ function TenantSummaryCard() {
             </Typography>
           </Box>
 
-          {/* AGGREGATE HEALTH STATS */}
-          <Grid container spacing={1.5} sx={{ mt: 0.5 }}>
+          {/* AGGREGATE HEALTH STATS (FLEXBOX ROW WRAPPER) */}
+          <Box
+            sx={{
+              display: "flex",
+              // Stack vertically on mobile, side-by-side on medium and large screens
+              flexDirection: { xs: "column", md: "row" },
+              gap: 1.5,
+              mt: 0.5,
+            }}
+          >
             {/* Active Tenants */}
-            <Grid item xs={12}>
+            <Box
+              sx={{
+                p: 1.5,
+                flex: 1, // Distribute equal width side-by-side
+                borderRadius: "12px",
+                bgcolor: "#F8FAFC",
+                border: "1px solid #F1F5F9",
+                display: "flex",
+                flexDirection: { xs: "column", md: "column", lg: "row" },
+                alignItems: "center",
+                justifyContent: { xs: "center", md: "center", lg: "space-between" },
+                gap: { xs: 1.25, lg: 0 },
+                textAlign: { xs: "center", md: "center", lg: "left" },
+              }}
+            >
               <Box
                 sx={{
-                  p: 1.5,
-                  borderRadius: "12px",
-                  bgcolor: "#F8FAFC",
-                  border: "1px solid #F1F5F9",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  gap: 1.5,
+                  minWidth: 0,
+                  flexDirection: { xs: "column", md: "column", lg: "row" },
+                  textAlign: { xs: "center", md: "center", lg: "left" },
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0, pr: 1 }}>
-                  <Box
-                    sx={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: "10px",
-                      bgcolor: alpha("#10B981", 0.12),
-                      color: "#10B981",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <PeopleOutlinedIcon fontSize="small" />
-                  </Box>
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight={700} color="primary.main" noWrap>
-                      Active Tenants
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" fontWeight={500} noWrap sx={{ display: "block" }}>
-                      Fully onboarded residents
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* 🌟 NUMERIC BADGE 1: Emerald Green (With left margin gap) */}
                 <Box
                   sx={{
-                    ml: 0.5,
-                    minWidth: 44,
-                    height: 34,
-                    px: 1.5,
+                    width: 38,
+                    height: 38,
                     borderRadius: "10px",
                     bgcolor: alpha("#10B981", 0.12),
-                    border: "1px solid",
-                    borderColor: alpha("#10B981", 0.3),
+                    color: "#10B981",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
                   }}
                 >
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 800, color: "#059669", fontSize: "1rem", lineHeight: 1 }}
-                  >
-                    34
+                  <PeopleOutlinedIcon fontSize="small" />
+                </Box>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="body2" fontWeight={700} color="primary.main">
+                    Active Tenants
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" fontWeight={500} sx={{ display: "block" }}>
+                    Fully onboarded residents
                   </Typography>
                 </Box>
               </Box>
-            </Grid>
+
+              {/* 🌟 NUMERIC BADGE 1: Emerald Green */}
+              <Box
+                sx={{
+                  mt: { xs: 0.5, lg: 0 },
+                  minWidth: 44,
+                  height: 34,
+                  px: 1.5,
+                  borderRadius: "10px",
+                  bgcolor: alpha("#10B981", 0.12),
+                  border: "1px solid",
+                  borderColor: alpha("#10B981", 0.3),
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 800, color: "#059669", fontSize: "1rem", lineHeight: 1 }}
+                >
+                  34
+                </Typography>
+              </Box>
+            </Box>
 
             {/* Leases Expiring Soon */}
-            <Grid item xs={12}>
+            <Box
+              sx={{
+                p: 1.5,
+                flex: 1,
+                borderRadius: "12px",
+                bgcolor: "#F8FAFC",
+                border: "1px solid #F1F5F9",
+                display: "flex",
+                flexDirection: { xs: "column", md: "column", lg: "row" },
+                alignItems: "center",
+                justifyContent: { xs: "center", md: "center", lg: "space-between" },
+                gap: { xs: 1.25, lg: 0 },
+                textAlign: { xs: "center", md: "center", lg: "left" },
+              }}
+            >
               <Box
                 sx={{
-                  p: 1.5,
-                  borderRadius: "12px",
-                  bgcolor: "#F8FAFC",
-                  border: "1px solid #F1F5F9",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  gap: 1.5,
+                  minWidth: 0,
+                  flexDirection: { xs: "column", md: "column", lg: "row" },
+                  textAlign: { xs: "center", md: "center", lg: "left" },
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0, pr: 1 }}>
-                  <Box
-                    sx={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: "10px",
-                      bgcolor: alpha("#D4AF37", 0.15),
-                      color: "#B5922B",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <EventRepeatOutlinedIcon fontSize="small" />
-                  </Box>
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight={700} color="primary.main" noWrap>
-                      Expiring Leases
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" fontWeight={500} noWrap sx={{ display: "block" }}>
-                      Due for renewal within 30 days
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* 🌟 NUMERIC BADGE 2: Champagne Gold (With left margin gap) */}
                 <Box
                   sx={{
-                    ml: 0.5,
-                    minWidth: 44,
-                    height: 34,
-                    px: 1.5,
+                    width: 38,
+                    height: 38,
                     borderRadius: "10px",
-                    bgcolor: alpha("#D4AF37", 0.18),
-                    border: "1px solid",
-                    borderColor: alpha("#D4AF37", 0.4),
+                    bgcolor: alpha("#D4AF37", 0.15),
+                    color: "#B5922B",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
                   }}
                 >
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 800, color: "#B5922B", fontSize: "1rem", lineHeight: 1 }}
-                  >
-                    3
+                  <EventRepeatOutlinedIcon fontSize="small" />
+                </Box>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="body2" fontWeight={700} color="primary.main">
+                    Expiring Leases
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" fontWeight={500} sx={{ display: "block" }}>
+                    Due for renewal within 30 days
                   </Typography>
                 </Box>
               </Box>
-            </Grid>
+
+              {/* 🌟 NUMERIC BADGE 2: Champagne Gold */}
+              <Box
+                sx={{
+                  mt: { xs: 0.5, lg: 0 },
+                  minWidth: 44,
+                  height: 34,
+                  px: 1.5,
+                  borderRadius: "10px",
+                  bgcolor: alpha("#D4AF37", 0.18),
+                  border: "1px solid",
+                  borderColor: alpha("#D4AF37", 0.4),
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 800, color: "#B5922B", fontSize: "1rem", lineHeight: 1 }}
+                >
+                  3
+                </Typography>
+              </Box>
+            </Box>
 
             {/* Pending Notices */}
-            <Grid item xs={12}>
+            <Box
+              sx={{
+                p: 1.5,
+                flex: 1,
+                borderRadius: "12px",
+                bgcolor: "#F8FAFC",
+                border: "1px solid #F1F5F9",
+                display: "flex",
+                flexDirection: { xs: "column", md: "column", lg: "row" },
+                alignItems: "center",
+                justifyContent: { xs: "center", md: "center", lg: "space-between" },
+                gap: { xs: 1.25, lg: 0 },
+                textAlign: { xs: "center", md: "center", lg: "left" },
+              }}
+            >
               <Box
                 sx={{
-                  p: 1.5,
-                  borderRadius: "12px",
-                  bgcolor: "#F8FAFC",
-                  border: "1px solid #F1F5F9",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  gap: 1.5,
+                  minWidth: 0,
+                  flexDirection: { xs: "column", md: "column", lg: "row" },
+                  textAlign: { xs: "center", md: "center", lg: "left" },
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0, pr: 1 }}>
-                  <Box
-                    sx={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: "10px",
-                      bgcolor: alpha("#EF4444", 0.12),
-                      color: "#DC2626",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <GavelOutlinedIcon fontSize="small" />
-                  </Box>
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight={700} color="primary.main" noWrap>
-                      Pending Notices
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" fontWeight={500} noWrap sx={{ display: "block" }}>
-                      Overdue lease agreement signatures
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* 🌟 NUMERIC BADGE 3: Crimson Red (With left margin gap) */}
                 <Box
                   sx={{
-                    ml: 0.5,
-                    minWidth: 44,
-                    height: 34,
-                    px: 1.5,
+                    width: 38,
+                    height: 38,
                     borderRadius: "10px",
                     bgcolor: alpha("#EF4444", 0.12),
-                    border: "1px solid",
-                    borderColor: alpha("#EF4444", 0.3),
+                    color: "#DC2626",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
                   }}
                 >
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 800, color: "#DC2626", fontSize: "1rem", lineHeight: 1 }}
-                  >
-                    1
+                  <GavelOutlinedIcon fontSize="small" />
+                </Box>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="body2" fontWeight={700} color="primary.main">
+                    Pending Notices
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" fontWeight={500} sx={{ display: "block" }}>
+                    Overdue lease agreement signatures
                   </Typography>
                 </Box>
               </Box>
-            </Grid>
-          </Grid>
+
+              {/* 🌟 NUMERIC BADGE 3: Crimson Red */}
+              <Box
+                sx={{
+                  mt: { xs: 0.5, lg: 0 },
+                  minWidth: 44,
+                  height: 34,
+                  px: 1.5,
+                  borderRadius: "10px",
+                  bgcolor: alpha("#EF4444", 0.12),
+                  border: "1px solid",
+                  borderColor: alpha("#EF4444", 0.3),
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 800, color: "#DC2626", fontSize: "1rem", lineHeight: 1 }}
+                >
+                  1
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
         </Box>
 
         {/* FOOTER VIEW ALL ACTION */}
@@ -273,7 +313,7 @@ function TenantSummaryCard() {
             pt: 1.5,
             borderTop: "1px solid #F1F5F9",
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: { xs: "center", md: "flex-end" },
             alignItems: "center",
           }}
         >
