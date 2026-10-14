@@ -1,6 +1,6 @@
 // src/pages/LandlordPage/LandlordDashboard.jsx
 import React from "react";
-import { Box} from "@mui/material";
+import { Box } from "@mui/material";
 import { motion } from "framer-motion";
 
 // Sub-components
@@ -91,7 +91,7 @@ const LandlordDashboard = () => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", md: "row" }, // Stacks on mobile, side-by-side on tablet/desktop
+            flexDirection: { xs: "column", lg: "row" }, // Stacks on small & medium screens, side-by-side on large screens
             gap: 3,
             width: "100%",
           }}
@@ -99,7 +99,7 @@ const LandlordDashboard = () => {
           {/* Recent Payments Card */}
           <Box
             sx={{
-              width: { xs: "100%", md: "calc(50% - 12px)" },
+              width: { xs: "100%", lg: "calc(50% - 12px)" }, // Full width on small and medium screens
               display: "flex",
               flexDirection: "column",
             }}
@@ -121,7 +121,7 @@ const LandlordDashboard = () => {
           {/* Maintenance Requests Card */}
           <Box
             sx={{
-              width: { xs: "100%", md: "calc(50% - 12px)" },
+              width: { xs: "100%", lg: "calc(50% - 12px)" }, // Full width on small and medium screens
               display: "flex",
               flexDirection: "column",
             }}
