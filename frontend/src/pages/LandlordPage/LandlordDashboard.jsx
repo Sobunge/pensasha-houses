@@ -38,7 +38,7 @@ const LandlordDashboard = () => {
           display: "flex",
           flexDirection: { xs: "column", lg: "row" },
           gap: 3,
-          mt: 1,
+          mt: 2,
           width: "100%",
         }}
       >
