@@ -78,7 +78,6 @@ const LandlordDashboard = () => {
       </Box>
 
       {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE & TENANTS ===== */}
-      {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE & TENANTS ===== */}
       <Box
         sx={{
           display: "flex",
