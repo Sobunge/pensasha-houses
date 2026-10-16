@@ -11,17 +11,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "user_credentials")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserCredentials {
 
     @Id
@@ -35,9 +31,28 @@ public class UserCredentials {
     @Column(nullable = false)
     private String password;
 
-    private boolean enabled = true;
-    private boolean locked = false;
+    // Removed inline initializers here (= true / = false)
+    private boolean enabled;
+    private boolean locked;
 
     private LocalDateTime accountExpirationDate;
     private LocalDateTime passwordExpirationDate;
+
+    // No-args constructor setting your default values
+    public UserCredentials() {
+        this.enabled = true;
+        this.locked = false;
+    }
+
+    // All-args constructor
+    public UserCredentials(Long id, User user, String password, boolean enabled, boolean locked, 
+                           LocalDateTime accountExpirationDate, LocalDateTime passwordExpirationDate) {
+        this.id = id;
+        this.user = user;
+        this.password = password;
+        this.enabled = enabled;
+        this.locked = locked;
+        this.accountExpirationDate = accountExpirationDate;
+        this.passwordExpirationDate = passwordExpirationDate;
+    }
 }

@@ -4,7 +4,6 @@ package com.pensasha.backend.modules.invoice;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -17,7 +16,6 @@ import lombok.Setter;
 @Table(name = "invoice_sequence") // Specifies the table name in the database
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceSequence {
 
@@ -28,7 +26,7 @@ public class InvoiceSequence {
      * This acts as a singleton tracker for the invoice number sequence.
      */
     @Id
-    private Long id = 1L;
+    private Long id;
 
     /**
      * Holds the value of the last generated invoice number.
@@ -38,4 +36,11 @@ public class InvoiceSequence {
      */
     @Column(nullable = false)
     private Long lastNumber;
+
+    /**
+     * No-args constructor setting the default id to 1L.
+     */
+    public InvoiceSequence() {
+        this.id = 1L;
+    }
 }
