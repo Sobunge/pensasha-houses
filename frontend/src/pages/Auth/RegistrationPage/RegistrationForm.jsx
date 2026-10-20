@@ -22,7 +22,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-import { useRegistrationForm } from "../../../components/hooks/useRegistrationForm";
+import { useRegistrationForm } from "../../../components/hooks/auth/useRegistrationForm";
 
 /* ---------------- Premium High-Contrast Input Styles ---------------- */
 const premiumInputStyles = {

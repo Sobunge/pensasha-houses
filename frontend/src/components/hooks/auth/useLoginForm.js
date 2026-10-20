@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useNotification } from "../../components/NotificationProvider";
-import { useAuth } from "../../pages/Auth/AuthContext";
-import { login } from "../../api/authApi";
-import { setAccessToken } from "../../api/api";
+import { useNotification } from "../../NotificationProvider";
+import { useAuth } from "../../../pages/Auth/AuthContext";
+import { login } from "../../../api/authApi";
+import { setAccessToken } from "../../../api/api";
 
 /* ---------------- Phone Helpers ---------------- */
 export const normalizePhone = (value) => {

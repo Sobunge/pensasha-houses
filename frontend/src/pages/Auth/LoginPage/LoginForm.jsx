@@ -19,7 +19,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Link as RouterLink } from "react-router-dom";
 
-import { useLoginForm } from "../../../components/hooks/useLoginForm";
+import { useLoginForm } from "../../../components/hooks/auth/useLoginForm";
 
 /* ---------------- Premium High-Contrast Input Styles ---------------- */
 const premiumInputStyles = {
