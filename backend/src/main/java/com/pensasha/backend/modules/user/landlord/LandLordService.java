@@ -1,6 +1,9 @@
 package com.pensasha.backend.modules.user.landlord;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
+import com.pensasha.backend.modules.invoice.InvoiceRepository;
 import com.pensasha.backend.modules.property.Property;
+import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.UserRepository;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
+import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
 import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 
 @Service
@@ -23,6 +29,7 @@ public class LandLordService {
 
     private final LandlordProfileRepository landlordProfileRepository;
     private final UserRepository userRepository;
+    private final InvoiceRepository invoiceRepository;
     private final LandlordMapper landlordMapper;
 
     /* ===================== FETCH BY USER ID ===================== */
@@ -103,4 +110,51 @@ public class LandLordService {
         profile.setBankDetails(bankDetails);
         return landlordMapper.toGetDTO(landlordProfileRepository.save(profile));
     }
+
+    // Getting the landlord statistics
+    public LandlordStatsDTO getDashboardStats(Long userId) {
+    log.info("Calculating dashboard stats for landlord userId={}", userId);
+
+    // 1. Fetch Landlord Profile
+    LandlordProfile profile = landlordProfileRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Landlord profile not found for userId: " + userId));
+
+    Set<Property> properties = profile.getProperties();
+    long propertyCount = properties != null ? properties.size() : 0;
+
+    // 3. Extract all units across all properties safely
+    List<Unit> allUnits = properties == null ? List.of() : properties.stream()
+            .filter(property -> property.getUnits() != null)
+            .flatMap(property -> property.getUnits().stream())
+            .collect(Collectors.toList());
+
+    long totalUnits = allUnits.size();
+
+    // 4. Occupied Units (A unit is occupied if it has a tenant assigned or status is OCCUPIED)
+    long occupiedUnits = allUnits.stream()
+            .filter(unit -> unit.getTenant() != null || 
+                            (unit.getStatus() != null && "OCCUPIED".equalsIgnoreCase(unit.getStatus().name())))
+            .count();
+
+    // 5. Calculate Occupancy Rate percentage
+    int occupancyRate = (totalUnits > 0) 
+            ? (int) Math.round(((double) occupiedUnits / totalUnits) * 100) 
+            : 0;
+
+    // 6. Pending Rent 
+   BigDecimal pendingRent = invoiceRepository.sumPendingOrOverdueRentByLandlordId(userId);
+    if (pendingRent == null) {
+        pendingRent = BigDecimal.ZERO;
+    }
+
+    return new LandlordStatsDTO(
+            occupancyRate,
+            occupiedUnits,
+            totalUnits, // totalOccupancyUnits
+            totalUnits,
+            propertyCount,
+            pendingRent
+    );
+}
+
 }
