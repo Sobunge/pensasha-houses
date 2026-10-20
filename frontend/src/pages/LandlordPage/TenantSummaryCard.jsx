@@ -1,4 +1,5 @@
 // src/components/cards/TenantSummaryCard.jsx
+
 import React from "react";
 import {
   Card,
@@ -6,6 +7,8 @@ import {
   Typography,
   Box,
   Button,
+  Skeleton,
+  Alert,
   alpha,
 } from "@mui/material";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -13,9 +16,62 @@ import EventRepeatOutlinedIcon from "@mui/icons-material/EventRepeatOutlined";
 import GavelOutlinedIcon from "@mui/icons-material/GavelOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router-dom";
+import { useTenantSummary } from "../../components/hooks/landlord/useTenantSummary";
 
-function TenantSummaryCard() {
+function TenantSummaryCard({ userId }) {
   const navigate = useNavigate();
+
+  const { data, isLoading, isError, error } = useTenantSummary(userId);
+
+  // Loading Skeleton State
+  if (isLoading) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Skeleton variant="text" width="50%" height={30} sx={{ mb: 1 }} />
+        <Skeleton variant="text" width="70%" height={20} sx={{ mb: 3 }} />
+        <Box sx={{ display: "flex", gap: 1.5, flexDirection: { xs: "column", md: "row" } }}>
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} variant="rounded" height={80} sx={{ flex: 1, borderRadius: "12px" }} />
+          ))}
+        </Box>
+      </Card>
+    );
+  }
+
+  // Error State
+  if (isError) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+          {error?.message || "Failed to load tenant summary."}
+        </Alert>
+      </Card>
+    );
+  }
+
+  const activeTenants = data?.activeTenants ?? 0;
+  const expiringLeases = data?.expiringLeases ?? 0;
+  const pendingNotices = data?.pendingNotices ?? 0;
 
   return (
     <Card
@@ -145,7 +201,7 @@ function TenantSummaryCard() {
                   variant="subtitle1"
                   sx={{ fontWeight: 800, color: "#059669", fontSize: "1rem", lineHeight: 1 }}
                 >
-                  34
+                  {activeTenants}
                 </Typography>
               </Box>
             </Box>
@@ -222,7 +278,7 @@ function TenantSummaryCard() {
                   variant="subtitle1"
                   sx={{ fontWeight: 800, color: "#B5922B", fontSize: "1rem", lineHeight: 1 }}
                 >
-                  3
+                  {expiringLeases}
                 </Typography>
               </Box>
             </Box>
@@ -299,7 +355,7 @@ function TenantSummaryCard() {
                   variant="subtitle1"
                   sx={{ fontWeight: 800, color: "#DC2626", fontSize: "1rem", lineHeight: 1 }}
                 >
-                  1
+                  {pendingNotices}
                 </Typography>
               </Box>
             </Box>

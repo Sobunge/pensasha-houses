@@ -1,6 +1,7 @@
 package com.pensasha.backend.modules.user.landlord;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.invoice.InvoiceRepository;
+import com.pensasha.backend.modules.lease.LeaseRepository;
 import com.pensasha.backend.modules.maintenance.MaintenanceRequest;
 import com.pensasha.backend.modules.maintenance.MaintenanceRequestRepository;
 import com.pensasha.backend.modules.payment.Payment;
@@ -34,6 +36,7 @@ import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.MaintenanceRequestDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
 import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
+import com.pensasha.backend.modules.user.landlord.dto.TenantSummaryDTO;
 import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 
 @Service
@@ -47,6 +50,7 @@ public class LandLordService {
         private final LandlordMapper landlordMapper;
         private final PaymentRepository paymentRepository;
         private final MaintenanceRequestRepository maintenanceRequestRepository;
+        private final LeaseRepository leaseRepository;
 
         /* ===================== FETCH BY USER ID ===================== */
         public GetLandLordDTO getLandlordByUserId(Long userId) {
@@ -332,6 +336,24 @@ public class LandLordService {
                                         issue,
                                         urgency);
                 }).collect(Collectors.toList());
+        }
+
+        public TenantSummaryDTO getTenantSummary(Long userId) {
+                log.info("Calculating tenant & lease summary metrics for landlord userId={}", userId);
+
+                LandlordProfile profile = landlordProfileRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Landlord profile not found for userId: " + userId));
+
+                int propertyCount = profile.getProperties() != null ? profile.getProperties().size() : 0;
+                log.debug("Found {} properties for landlord userId={}", propertyCount, userId);
+
+                long activeTenants = leaseRepository.countActiveTenantsByLandlordId(userId);
+                long expiringLeases = leaseRepository.countExpiringLeasesByLandlordId(userId,
+                                LocalDate.now().plusDays(30));
+                long pendingNotices = 0; // Can be integrated with notices or pending renewals repository if available
+
+                return new TenantSummaryDTO(activeTenants, expiringLeases, pendingNotices);
         }
 
 }
