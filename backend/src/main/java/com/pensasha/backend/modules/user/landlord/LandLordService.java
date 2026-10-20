@@ -8,13 +8,20 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.invoice.InvoiceRepository;
+import com.pensasha.backend.modules.maintenance.MaintenanceRequest;
+import com.pensasha.backend.modules.maintenance.MaintenanceRequestRepository;
 import com.pensasha.backend.modules.payment.Payment;
 import com.pensasha.backend.modules.payment.PaymentRepository;
 import com.pensasha.backend.modules.property.Property;
@@ -24,6 +31,7 @@ import com.pensasha.backend.modules.user.UserRepository;
 import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
+import com.pensasha.backend.modules.user.landlord.dto.MaintenanceRequestDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
 import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
@@ -38,6 +46,7 @@ public class LandLordService {
         private final InvoiceRepository invoiceRepository;
         private final LandlordMapper landlordMapper;
         private final PaymentRepository paymentRepository;
+        private final MaintenanceRequestRepository maintenanceRequestRepository;
 
         /* ===================== FETCH BY USER ID ===================== */
         public GetLandLordDTO getLandlordByUserId(Long userId) {
@@ -295,4 +304,34 @@ public class LandLordService {
                                         method);
                 }).collect(Collectors.toList());
         }
+
+        public List<MaintenanceRequestDTO> getMaintenanceRequests(Long userId, int limit) {
+                log.info("Fetching maintenance requests for landlord userId={}, limit={}", userId, limit);
+
+                LandlordProfile profile = landlordProfileRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Landlord profile not found for userId: " + userId));
+
+                int propertyCount = profile.getProperties() != null ? profile.getProperties().size() : 0;
+                log.debug("Verified landlord profile with {} properties for userId={}", propertyCount, userId);
+
+                Pageable pageable = PageRequest.of(0, limit);
+                List<MaintenanceRequest> requests = maintenanceRequestRepository.findRecentByLandlordId(userId,
+                                pageable);
+
+                return requests.stream().map(req -> {
+                        String unitName = req.getUnit() != null ? req.getUnit().getUnitNumber() : "N/A";
+                        String status = req.getStatus() != null ? req.getStatus().name() : "PENDING";
+                        String urgency = req.getPriority() != null ? req.getPriority().name() : "MEDIUM";
+                        String issue = req.getDescription() != null ? req.getDescription() : "Maintenance";
+
+                        return new MaintenanceRequestDTO(
+                                        req.getId(),
+                                        status,
+                                        unitName,
+                                        issue,
+                                        urgency);
+                }).collect(Collectors.toList());
+        }
+
 }

@@ -1,4 +1,5 @@
 // src/components/cards/MaintenanceRequestsCard.jsx
+
 import React from "react";
 import {
   Card,
@@ -12,107 +13,115 @@ import {
   TableHead,
   TableRow,
   Button,
+  Skeleton,
+  Alert,
   useTheme,
   alpha,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import { useNavigate } from "react-router-dom";
+import { useMaintenanceRequests } from "../../components/hooks/landlord/useMaintenanceRequests";
 
-// Sample maintenance requests
-const maintenanceData = [
-  {
-    id: 1,
-    status: "New",
-    unit: "Unit B2",
-    issue: "Plumbing Leak",
-    urgency: "Urgent",
-  },
-  {
-    id: 2,
-    status: "In Progress",
-    unit: "Unit B2",
-    issue: "Plumbing Leak",
-    urgency: "Urgent",
-  },
-  {
-    id: 3,
-    status: "Resolved",
-    unit: "Unit B2",
-    issue: "Plumbing Leak",
-    urgency: "Urgent",
-  },
-  {
-    id: 4,
-    status: "In Progress",
-    unit: "Unit A4",
-    issue: "Electrical Fitting",
-    urgency: "Medium",
-  },
-  {
-    id: 5,
-    status: "New",
-    unit: "Unit C1",
-    issue: "Broken Window Latch",
-    urgency: "Low",
-  },
-];
-
-function MaintenanceRequestsCard() {
+function MaintenanceRequestsCard({ userId }) {
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const {
+    data: maintenanceData = [],
+    isLoading,
+    isError,
+    error,
+  } = useMaintenanceRequests(userId, 5);
+
   const hasRequests = maintenanceData && maintenanceData.length > 0;
-  
-  // Cap display at 3 requests maximum for the dashboard overview
-  const displayedRequests = maintenanceData ? maintenanceData.slice(0, 3) : [];
+  const displayedRequests = maintenanceData.slice(0, 3);
 
   // Helper to resolve status pill styles
   const getStatusChipStyles = (status) => {
-    switch (status) {
-      case "New":
-        return {
-          bgcolor: "#E2E8F0",
-          color: "#475569",
-        };
-      case "In Progress":
-        return {
-          bgcolor: "#FEF3C7", // Soft warm yellow
-          color: "#D97706",
-        };
-      case "Resolved":
-        return {
-          bgcolor: "#D1FAE5", // Soft mint green
-          color: "#059669",
-        };
-      default:
-        return {
-          bgcolor: "#F1F5F9",
-          color: "#64748B",
-        };
+    const s = status?.toUpperCase() || "";
+    if (s.includes("PENDING") || s.includes("NEW") || s.includes("OPEN")) {
+      return { bgcolor: "#E2E8F0", color: "#475569" };
     }
+    if (s.includes("PROGRESS")) {
+      return { bgcolor: "#FEF3C7", color: "#D97706" };
+    }
+    if (s.includes("COMPLETED") || s.includes("RESOLVED")) {
+      return { bgcolor: "#D1FAE5", color: "#059669" };
+    }
+    return { bgcolor: "#F1F5F9", color: "#64748B" };
   };
 
   // Helper to resolve urgency pill styles
   const getUrgencyChipStyles = (urgency) => {
-    switch (urgency) {
-      case "Urgent":
-        return {
-          bgcolor: "#FEE2E2", // Light crimson pill background
-          color: "#DC2626",
-        };
-      case "Medium":
-        return {
-          bgcolor: "#FEF3C7",
-          color: "#D97706",
-        };
-      default:
-        return {
-          bgcolor: "#F1F5F9",
-          color: "#475569",
-        };
+    const u = urgency?.toUpperCase() || "";
+    if (u.includes("URGENT") || u.includes("HIGH")) {
+      return { bgcolor: "#FEE2E2", color: "#DC2626" };
     }
+    if (u.includes("MEDIUM") || u.includes("MED")) {
+      return { bgcolor: "#FEF3C7", color: "#D97706" };
+    }
+    return { bgcolor: "#F1F5F9", color: "#475569" };
   };
+
+  // Format Status enum to readable text
+  const formatStatus = (status) => {
+    if (!status) return "Pending";
+    return status
+      .replace("_", " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  // Format Urgency/Priority enum to readable text
+  const formatUrgency = (urgency) => {
+    if (!urgency) return "Medium";
+    return urgency
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Skeleton variant="text" width="50%" height={30} sx={{ mb: 1 }} />
+        <Skeleton variant="text" width="70%" height={20} sx={{ mb: 3 }} />
+        <Skeleton variant="rounded" width="100%" height={180} sx={{ borderRadius: 2 }} />
+      </Card>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+          {error?.message || "Failed to load maintenance requests."}
+        </Alert>
+      </Card>
+    );
+  }
 
   return (
     <Card
@@ -122,10 +131,8 @@ function MaintenanceRequestsCard() {
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-        height: "100%", // 🌟 Restored full 100% vertical stretch
+        height: "100%",
         width: "100%",
-
-        // Pronounced Obsidian Depth Shadow
         boxShadow:
           "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
         transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -224,7 +231,7 @@ function MaintenanceRequestsCard() {
                       {/* Column 1: Ticket Status Pill */}
                       <TableCell sx={{ pl: 0, py: 1.5 }}>
                         <Chip
-                          label={req.status}
+                          label={formatStatus(req.status)}
                           size="small"
                           sx={{
                             ...statusStyles,
@@ -248,13 +255,13 @@ function MaintenanceRequestsCard() {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {req.unit}
+                        {req.unitName}
                       </TableCell>
 
-                      {/* Column 3: Issue & Urgency Pill */}
+                      {/* Column 3: Urgency / Issue Pill */}
                       <TableCell align="right" sx={{ pr: 0, py: 1.5 }}>
                         <Chip
-                          label={`${req.issue} - ${req.urgency}`}
+                          label={`${req.issue} • ${formatUrgency(req.urgency)}`}
                           size="small"
                           sx={{
                             ...urgencyStyles,

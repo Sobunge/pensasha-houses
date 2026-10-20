@@ -12,6 +12,7 @@ import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
+import com.pensasha.backend.modules.user.landlord.dto.MaintenanceRequestDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
 import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 
@@ -179,5 +180,18 @@ public class LandLordController {
                 List<RecentPaymentDTO> recentPayments = landlordService.getRecentPayments(userId, limit);
 
                 return ResponseEntity.ok(recentPayments);
+        }
+
+        // ---------------------- Get Maintenance Requests ----------------------
+        @GetMapping("/{userId}/maintenance-requests")
+        @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
+        public ResponseEntity<List<MaintenanceRequestDTO>> getMaintenanceRequests(
+                        @PathVariable Long userId,
+                        @RequestParam(defaultValue = "5") int limit) {
+                log.info("API call: Get maintenance requests for landlord DB ID: {}", userId);
+
+                List<MaintenanceRequestDTO> requests = landlordService.getMaintenanceRequests(userId, limit);
+
+                return ResponseEntity.ok(requests);
         }
 }
