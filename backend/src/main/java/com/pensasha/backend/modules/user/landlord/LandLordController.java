@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
+import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -142,5 +143,17 @@ public class LandLordController {
                 LandlordStatsDTO stats = landlordService.getDashboardStats(userId);
 
                 return ResponseEntity.ok(stats);
+        }
+
+        // ---------------------- Get Landlord Properties Performance
+        // ----------------------
+        @GetMapping("/{userId}/properties/performance")
+        @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
+        public ResponseEntity<List<PropertyPerformanceDTO>> getPropertiesPerformance(@PathVariable Long userId) {
+                log.info("API call: Get properties performance metrics for landlord DB ID: {}", userId);
+
+                List<PropertyPerformanceDTO> performanceList = landlordService.getPropertiesPerformance(userId);
+
+                return ResponseEntity.ok(performanceList);
         }
 }
