@@ -1,4 +1,5 @@
 // src/components/cards/FinancialOverviewCard.jsx
+
 import React from "react";
 import {
   Card,
@@ -6,11 +7,14 @@ import {
   Typography,
   Box,
   Grid,
+  Skeleton,
+  Alert,
   alpha,
 } from "@mui/material";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
+import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import {
   AreaChart,
   Area,
@@ -21,25 +25,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Monthly financial trajectory data
-const monthlyData = [
-  { month: "Jan", income: 45000, expenses: 15000 },
-  { month: "Feb", income: 52000, expenses: 18000 },
-  { month: "Mar", income: 78000, expenses: 25000 },
-  { month: "Apr", income: 70000, expenses: 20000 },
-  { month: "May", income: 95000, expenses: 30000 },
-  { month: "Jun", income: 110000, expenses: 32000 },
-  { month: "Jul", income: 105000, expenses: 28000 },
-  { month: "Aug", income: 120000, expenses: 35000 },
-];
+import { useFinancialOverview } from "../../components/hooks/landlord/useFinancialOverview";
 
-const financials = {
-  totalIncome: "Ksh 120,000",
-  totalExpenses: "Ksh 35,000",
-  netProfit: "Ksh 85,000",
-};
-
-// Custom tooltip matching Obsidian theme
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -57,10 +44,10 @@ const CustomTooltip = ({ active, payload, label }) => {
           {label} Summary
         </Typography>
         <Typography variant="body2" sx={{ color: "#10B981", fontWeight: 700, mt: 0.5 }}>
-          Income: Ksh {payload[0].value.toLocaleString()}
+          Income: Ksh {Number(payload[0].value).toLocaleString()}
         </Typography>
         <Typography variant="body2" sx={{ color: "#EF4444", fontWeight: 700 }}>
-          Expenses: Ksh {payload[1].value.toLocaleString()}
+          Expenses: Ksh {Number(payload[1].value).toLocaleString()}
         </Typography>
       </Box>
     );
@@ -68,7 +55,64 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-function FinancialOverviewCard() {
+function FinancialOverviewCard({ userId }) {
+  const { data, isLoading, isError, error } = useFinancialOverview(userId);
+
+  if (isLoading) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Skeleton variant="text" width="50%" height={30} sx={{ mb: 1 }} />
+        <Skeleton variant="text" width="70%" height={20} sx={{ mb: 3 }} />
+        <Skeleton variant="rounded" width="100%" height={210} sx={{ borderRadius: 2, mb: 3 }} />
+        <Grid container spacing={1.5}>
+          {[1, 2, 3].map((i) => (
+            <Grid item xs={4} key={i}>
+              <Skeleton variant="rounded" height={50} sx={{ borderRadius: 2 }} />
+            </Grid>
+          ))}
+        </Grid>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+          {error?.message || "Failed to load financial overview data."}
+        </Alert>
+      </Card>
+    );
+  }
+
+  const monthlyData = data?.monthlyData || [];
+  const hasData = monthlyData.length > 0 && monthlyData.some(item => Number(item.income) > 0 || Number(item.expenses) > 0);
+
+  const financials = {
+    totalIncome: data?.totalIncome ? `Ksh ${Number(data.totalIncome).toLocaleString()}` : "Ksh 0",
+    totalExpenses: data?.totalExpenses ? `Ksh ${Number(data.totalExpenses).toLocaleString()}` : "Ksh 0",
+    netProfit: data?.netProfit ? `Ksh ${Number(data.netProfit).toLocaleString()}` : "Ksh 0",
+  };
 
   return (
     <Card
@@ -80,8 +124,6 @@ function FinancialOverviewCard() {
         borderColor: "divider",
         height: "100%",
         width: "100%",
-
-        // Pronounced Obsidian Depth Shadow
         boxShadow:
           "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
         transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -103,7 +145,6 @@ function FinancialOverviewCard() {
         }}
       >
         <Box>
-          {/* HEADER */}
           <Box
             sx={{
               display: "flex",
@@ -125,66 +166,108 @@ function FinancialOverviewCard() {
             </Box>
           </Box>
 
-          {/* AREA CHART */}
-          <Box sx={{ width: "100%", height: 210, mt: 1 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={monthlyData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          {/* CHART OR EMPTY STATE */}
+          <Box
+            sx={{
+              width: "100%",
+              height: 210,
+              mt: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor: hasData ? "transparent" : alpha("#F1F5F9", 0.5),
+              borderRadius: "12px",
+              border: hasData ? "none" : "1px dashed #CBD5E1",
+            }}
+          >
+            {hasData ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={monthlyData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
+                    </linearGradient>
+
+                    <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748B", fontSize: 12, fontWeight: 600 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748B", fontSize: 11 }}
+                    tickFormatter={(val) => `${val / 1000}k`}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+
+                  <Area
+                    type="monotone"
+                    dataKey="income"
+                    stroke="#10B981"
+                    strokeWidth={2.5}
+                    fillOpacity={1}
+                    fill="url(#colorIncome)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="expenses"
+                    stroke="#EF4444"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorExpenses)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <Box
+                sx={{
+                  textAlign: "center",
+                  p: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 1,
+                }}
               >
-                <defs>
-                  {/* Income Green Gradient */}
-                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
-                  </linearGradient>
-
-                  {/* Expense Red Gradient */}
-                  <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis
-                  dataKey="month"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748B", fontSize: 12, fontWeight: 600 }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748B", fontSize: 11 }}
-                  tickFormatter={(val) => `${val / 1000}k`}
-                />
-                <Tooltip content={<CustomTooltip />} />
-
-                <Area
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#10B981"
-                  strokeWidth={2.5}
-                  fillOpacity={1}
-                  fill="url(#colorIncome)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="expenses"
-                  stroke="#EF4444"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorExpenses)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: "10px",
+                    bgcolor: alpha("#D4AF37", 0.1),
+                    color: "secondary.main",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <BarChartOutlinedIcon fontSize="small" />
+                </Box>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: "primary.main" }}>
+                  No Financial Activity Yet
+                </Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary", maxWidth: 220, lineHeight: 1.4 }}>
+                  Income and expense trends will appear here once invoices are paid.
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Box>
 
-        {/* FINANCIAL SUMMARY PILLS ROW */}
         <Grid container spacing={{ xs: 1, sm: 1.5 }} sx={{ mt: 2 }}>
-          {/* Total Income */}
           <Grid item xs={4}>
             <Box
               sx={{
@@ -232,7 +315,6 @@ function FinancialOverviewCard() {
             </Box>
           </Grid>
 
-          {/* Expenses */}
           <Grid item xs={4}>
             <Box
               sx={{
@@ -280,7 +362,6 @@ function FinancialOverviewCard() {
             </Box>
           </Grid>
 
-          {/* Net Profit */}
           <Grid item xs={4}>
             <Box
               sx={{

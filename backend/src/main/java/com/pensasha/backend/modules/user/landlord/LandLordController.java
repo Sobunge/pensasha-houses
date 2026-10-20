@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pensasha.backend.modules.property.Property;
+import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
@@ -155,5 +156,14 @@ public class LandLordController {
                 List<PropertyPerformanceDTO> performanceList = landlordService.getPropertiesPerformance(userId);
 
                 return ResponseEntity.ok(performanceList);
+        }
+
+        // ---------------------- Get Landlord Financial Overview ----------------------
+        @GetMapping("/{userId}/financial-overview")
+        @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
+        public ResponseEntity<FinancialOverviewDTO> getFinancialOverview(@PathVariable Long userId) {
+                log.info("API call: Get financial overview for landlord DB ID: {}", userId);
+                FinancialOverviewDTO overview = landlordService.getFinancialOverview(userId);
+                return ResponseEntity.ok(overview);
         }
 }

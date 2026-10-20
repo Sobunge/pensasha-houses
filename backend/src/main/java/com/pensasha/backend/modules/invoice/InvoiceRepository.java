@@ -87,4 +87,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
                         "WHERE i.lease.unit.property.id = :propertyId " +
                         "AND i.status = 'PAID'")
         BigDecimal sumPaidRevenueByPropertyId(@Param("propertyId") Long propertyId);
+
+        @Query("SELECT SUM(i.amountPaid) FROM Invoice i " +
+                        "WHERE i.lease.unit.property.landlord.id = :landlordId " +
+                        "AND i.status = 'PAID'")
+        BigDecimal sumPaidRevenueByLandlordId(@Param("landlordId") Long landlordId);
 }
