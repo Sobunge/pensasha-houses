@@ -82,4 +82,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
         Page<Invoice> findByLeaseUnitPropertyIdAndStatusAndInvoiceDateBetween(
                         Long propertyId, InvoiceStatus status, LocalDate startDate, LocalDate endDate,
                         Pageable pageable);
+
+        @Query("SELECT SUM(i.amountPaid) FROM Invoice i " +
+                        "WHERE i.lease.unit.property.id = :propertyId " +
+                        "AND i.status = 'PAID'")
+        BigDecimal sumPaidRevenueByPropertyId(@Param("propertyId") Long propertyId);
 }
