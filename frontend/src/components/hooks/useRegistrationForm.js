@@ -1,6 +1,7 @@
 // src/components/Auth/RegistrationPage/useRegistrationForm.js
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { register } from "../../api/authApi";
 import { setAccessToken } from "../../api/api";
 import { useNotification } from "../../components/NotificationProvider";
@@ -55,7 +56,6 @@ export function useRegistrationForm(onSuccess) {
 
   const [touched, setTouched] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const errors = {
     firstName: validateRequired(formData.firstName, "First name"),
@@ -78,31 +78,10 @@ export function useRegistrationForm(onSuccess) {
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (hasErrors) {
-      const allTouched = Object.keys(formData).reduce(
-        (acc, key) => ({ ...acc, [key]: true }),
-        {}
-      );
-      setTouched(allTouched);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const payload = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phoneNumber: normalizePhone(formData.phoneNumber),
-        email: formData.email,
-        password: formData.password,
-        roles: [formData.role],
-      };
-
-      const res = await register(payload);
-
+  /* ---------------- TanStack Query Mutation ---------------- */
+  const registerMutation = useMutation({
+    mutationFn: (payload) => register(payload),
+    onSuccess: (res) => {
       // Support both raw payloads and Axios wrapped response objects
       const responseData = res?.data || res;
       const { accessToken, principal } = responseData;
@@ -145,14 +124,38 @@ export function useRegistrationForm(onSuccess) {
       } else if (redirectAfterAuth !== "rent-request") {
         navigate("/dashboard", { replace: true });
       }
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Registration error:", err);
       const message =
         err?.response?.data?.message || err.message || "Registration failed.";
       notify(message, "error", 4000);
-    } finally {
-      setLoading(false);
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (hasErrors) {
+      const allTouched = Object.keys(formData).reduce(
+        (acc, key) => ({ ...acc, [key]: true }),
+        {}
+      );
+      setTouched(allTouched);
+      return;
     }
+
+    const payload = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phoneNumber: normalizePhone(formData.phoneNumber),
+      email: formData.email,
+      password: formData.password,
+      roles: [formData.role],
+    };
+
+    // Trigger the mutation
+    registerMutation.mutate(payload);
   };
 
   return {
@@ -160,7 +163,7 @@ export function useRegistrationForm(onSuccess) {
     touched,
     errors,
     showPassword,
-    loading,
+    loading: registerMutation.isPending, // Maps directly to useMutation pending state
     handleChange,
     handleBlur,
     togglePasswordVisibility,

@@ -1,6 +1,7 @@
 // src/components/Auth/LoginPage/useLoginForm.js
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { useNotification } from "../../components/NotificationProvider";
 import { useAuth } from "../../pages/Auth/AuthContext";
 import { login } from "../../api/authApi";
@@ -31,7 +32,6 @@ export function useLoginForm(onClose) {
   const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
   const [touched, setTouched] = useState({ phoneNumber: false, password: false });
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const { notify } = useNotification();
   const { loginAs, redirectAfterAuth, setRedirectAfterAuth } = useAuth();
@@ -53,23 +53,10 @@ export function useLoginForm(onClose) {
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (phoneError || passwordError) {
-      setTouched({ phoneNumber: true, password: true });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const normalizedPhone = normalizePhone(formData.phoneNumber);
-
-      const res = await login({
-        phoneNumber: normalizedPhone,
-        password: formData.password,
-      });
-
+  /* ---------------- TanStack Query Mutation ---------------- */
+  const loginMutation = useMutation({
+    mutationFn: (credentials) => login(credentials),
+    onSuccess: (res) => {
       // Handle both unwrapped data objects and standard Axios response objects
       const payload = res?.data || res;
       const { accessToken, principal } = payload;
@@ -112,22 +99,38 @@ export function useLoginForm(onClose) {
       } else if (redirectAfterAuth !== "rent-request") {
         navigate("/dashboard", { replace: true });
       }
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Login error:", err);
       const message =
         err?.response?.data?.message ||
         err?.message ||
         "Unable to login. Please check your credentials.";
       notify(message, "error");
-    } finally {
-      setLoading(false);
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (phoneError || passwordError) {
+      setTouched({ phoneNumber: true, password: true });
+      return;
     }
+
+    const normalizedPhone = normalizePhone(formData.phoneNumber);
+
+    // Trigger the mutation
+    loginMutation.mutate({
+      phoneNumber: normalizedPhone,
+      password: formData.password,
+    });
   };
 
   return {
     formData,
     showPassword,
-    loading,
+    loading: loginMutation.isPending, // Maps directly to useMutation pending state
     showPhoneError,
     phoneError,
     showPasswordError,
