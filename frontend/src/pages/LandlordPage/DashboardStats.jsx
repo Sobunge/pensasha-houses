@@ -19,7 +19,7 @@ import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 
-import { useLandlordStats } from "../../hooks/useLandlordStats";
+import { useLandlordStats } from "../../components/hooks/landlord/useLandlordStats";
 
 function DashboardStats({ userId }) {
   const theme = useTheme();

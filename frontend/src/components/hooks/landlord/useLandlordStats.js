@@ -1,6 +1,6 @@
 // src/hooks/landlord/useLandlordStats.js
 import { useQuery } from "@tanstack/react-query";
-import api from "../api/api";
+import api from "../../../api/api";
 
 export const useLandlordStats = (userId) => {
   return useQuery({
