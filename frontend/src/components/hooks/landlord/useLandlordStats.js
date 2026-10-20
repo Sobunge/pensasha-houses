@@ -1,4 +1,4 @@
-// src/hooks/useLandlordStats.js
+// src/hooks/landlord/useLandlordStats.js
 import { useQuery } from "@tanstack/react-query";
 import api from "../api/api";
 

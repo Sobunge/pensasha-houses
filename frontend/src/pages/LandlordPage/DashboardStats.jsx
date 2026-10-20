@@ -8,6 +8,8 @@ import {
   Typography,
   Box,
   LinearProgress,
+  Skeleton,
+  Alert,
   useTheme,
   alpha,
 } from "@mui/material";
@@ -17,44 +19,84 @@ import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 
-const stats = [
-  {
-    id: "occupancy",
-    label: "Occupancy Rate",
-    value: "85%",
-    subtext: "10 of 12 units occupied",
-    progress: 85,
-    icon: <PeopleOutlinedIcon />,
-    colorKey: "success",
-  },
-  {
-    id: "units",
-    label: "Total Units",
-    value: "40",
-    subtext: "Units",
-    icon: <ApartmentOutlinedIcon />,
-    colorKey: "primary",
-  },
-  {
-    id: "properties",
-    label: "Property Count",
-    value: "3",
-    subtext: "Properties",
-    icon: <HomeWorkOutlinedIcon />,
-    colorKey: "primary",
-  },
-  {
-    id: "pending_rent",
-    label: "Pending Rent",
-    value: "KSh 20,000",
-    subtext: "Overdue",
-    icon: <WarningAmberOutlinedIcon />,
-    colorKey: "error",
-  },
-];
+import { useLandlordStats } from "../../hooks/useLandlordStats";
 
-function DashboardStats() {
+function DashboardStats({ userId }) {
   const theme = useTheme();
+  const { data, isLoading, isError, error } = useLandlordStats(userId);
+
+  // Loading skeleton state
+  if (isLoading) {
+    return (
+      <Grid container spacing={{ xs: 2, sm: 2.5, md: 2.5, lg: 3 }}>
+        {[1, 2, 3, 4].map((item) => (
+          <Grid key={item} size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
+            <Skeleton
+              variant="rounded"
+              width="100%"
+              height={160}
+              sx={{ borderRadius: { xs: 2.5, md: 3 } }}
+            />
+          </Grid>
+        ))}
+      </Grid>
+    );
+  }
+
+  // Error boundary state
+  if (isError) {
+    return (
+      <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+        {error?.message || "Failed to load dashboard statistics."}
+      </Alert>
+    );
+  }
+
+  // Extract metrics returned from GET /api/landlords/{userId}/stats
+  const occupancyRate = data?.occupancyRate ?? 0;
+  const occupiedUnits = data?.occupiedUnits ?? 0;
+  const totalOccupancyUnits = data?.totalOccupancyUnits ?? 0;
+  const totalUnits = data?.totalUnits ?? 0;
+  const propertyCount = data?.propertyCount ?? 0;
+  const pendingRentAmount = data?.pendingRent ?? 0;
+
+  const formattedPendingRent = `KSh ${Number(pendingRentAmount).toLocaleString()}`;
+
+  const stats = [
+    {
+      id: "occupancy",
+      label: "Occupancy Rate",
+      value: `${occupancyRate}%`,
+      subtext: `${occupiedUnits} of ${totalOccupancyUnits} units occupied`,
+      progress: occupancyRate,
+      icon: <PeopleOutlinedIcon />,
+      colorKey: "success",
+    },
+    {
+      id: "units",
+      label: "Total Units",
+      value: String(totalUnits),
+      subtext: "Units",
+      icon: <ApartmentOutlinedIcon />,
+      colorKey: "primary",
+    },
+    {
+      id: "properties",
+      label: "Property Count",
+      value: String(propertyCount),
+      subtext: "Properties",
+      icon: <HomeWorkOutlinedIcon />,
+      colorKey: "primary",
+    },
+    {
+      id: "pending_rent",
+      label: "Pending Rent",
+      value: formattedPendingRent,
+      subtext: "Overdue",
+      icon: <WarningAmberOutlinedIcon />,
+      colorKey: "error",
+    },
+  ];
 
   return (
     <Grid
@@ -63,18 +105,18 @@ function DashboardStats() {
       alignItems="stretch"
     >
       {stats.map((stat) => {
-        const isError = stat.colorKey === "error";
-        const isSuccess = stat.colorKey === "success";
+        const isErrorStat = stat.colorKey === "error";
+        const isSuccessStat = stat.colorKey === "success";
 
-        const iconBg = isError
+        const iconBg = isErrorStat
           ? alpha(theme.palette.error.main, 0.1)
-          : isSuccess
+          : isSuccessStat
             ? alpha(theme.palette.success.main, 0.1)
             : "#F1F5F9";
 
-        const iconColor = isError
+        const iconColor = isErrorStat
           ? theme.palette.error.main
-          : isSuccess
+          : isSuccessStat
             ? theme.palette.success.main
             : theme.palette.primary.main;
 
@@ -108,7 +150,7 @@ function DashboardStats() {
                     xs: "none",
                     md: "translateY(-4px)",
                   },
-                  borderColor: isError
+                  borderColor: isErrorStat
                     ? theme.palette.error.main
                     : "secondary.main",
                   boxShadow: "0 12px 28px rgba(15, 23, 42, 0.10)",
@@ -358,10 +400,10 @@ function DashboardStats() {
                           variant="caption"
                           sx={{
                             display: "block",
-                            color: isError
+                            color: isErrorStat
                               ? "error.main"
                               : "text.secondary",
-                            fontWeight: isError ? 700 : 500,
+                            fontWeight: isErrorStat ? 700 : 500,
                             fontSize: {
                               xs: "0.68rem",
                               sm: "0.7rem",
