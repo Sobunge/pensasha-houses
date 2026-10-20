@@ -1,4 +1,5 @@
 // src/components/cards/RecentPaymentsCard.jsx
+
 import React from "react";
 import {
   Card,
@@ -12,83 +13,98 @@ import {
   TableHead,
   TableRow,
   Button,
+  Skeleton,
+  Alert,
   useTheme,
   alpha,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
 import { useNavigate } from "react-router-dom";
+import { useRecentPayments } from "../../components/hooks/landlord/useRecentPayments";
 
-// Sample payments data matching the financial log
-const paymentsData = [
-  {
-    id: 1,
-    date: "10 Oct",
-    tenant: "John Doe",
-    unit: "Unit B2",
-    amount: "Ksh 20,000",
-    method: "M-Pesa",
-  },
-  {
-    id: 2,
-    date: "08 Oct",
-    tenant: "Jane Wanjiku",
-    unit: "Unit A4",
-    amount: "Ksh 18,000",
-    method: "Bank Wire",
-  },
-  {
-    id: 3,
-    date: "05 Oct",
-    tenant: "Ali Mwinyi",
-    unit: "Unit C1",
-    amount: "Ksh 15,000",
-    method: "Cash",
-  },
-  {
-    id: 4,
-    date: "01 Oct",
-    tenant: "Mary Otieno",
-    unit: "Unit A1",
-    amount: "Ksh 25,000",
-    method: "M-Pesa",
-  },
-];
-
-function RecentPaymentsCard() {
+function RecentPaymentsCard({ userId }) {
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const { data: paymentsData = [], isLoading, isError, error } = useRecentPayments(userId, 5);
+
   const hasPayments = paymentsData && paymentsData.length > 0;
+  const displayedPayments = paymentsData.slice(0, 3);
 
-  // Cap at 3 items maximum on dashboard overview
-  const displayedPayments = paymentsData ? paymentsData.slice(0, 3) : [];
-
-  // Helper to format method badge colors
-  const getMethodChipStyles = (method) => {
-    switch (method) {
-      case "M-Pesa":
-        return {
-          bgcolor: alpha("#10B981", 0.12),
-          color: "#059669",
-        };
-      case "Bank Wire":
-        return {
-          bgcolor: alpha("#3B82F6", 0.12),
-          color: "#2563EB",
-        };
-      case "Cash":
-        return {
-          bgcolor: alpha("#D4AF37", 0.15),
-          color: "#B5922B",
-        };
-      default:
-        return {
-          bgcolor: "#F1F5F9",
-          color: "#64748B",
-        };
-    }
+  const formatPaymentDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
   };
+
+  const getMethodChipStyles = (method) => {
+    const formattedMethod = method?.toUpperCase() || "";
+    if (formattedMethod.includes("MPESA") || formattedMethod.includes("M-PESA")) {
+      return {
+        bgcolor: alpha("#10B981", 0.12),
+        color: "#059669",
+      };
+    }
+    if (formattedMethod.includes("BANK") || formattedMethod.includes("WIRE")) {
+      return {
+        bgcolor: alpha("#3B82F6", 0.12),
+        color: "#2563EB",
+      };
+    }
+    if (formattedMethod.includes("CASH")) {
+      return {
+        bgcolor: alpha("#D4AF37", 0.15),
+        color: "#B5922B",
+      };
+    }
+    return {
+      bgcolor: "#F1F5F9",
+      color: "#64748B",
+    };
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Skeleton variant="text" width="50%" height={30} sx={{ mb: 1 }} />
+        <Skeleton variant="text" width="70%" height={20} sx={{ mb: 3 }} />
+        <Skeleton variant="rounded" width="100%" height={180} sx={{ borderRadius: 2 }} />
+      </Card>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: "16px",
+          bgcolor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          height: "100%",
+        }}
+      >
+        <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+          {error?.message || "Failed to load recent payments log."}
+        </Alert>
+      </Card>
+    );
+  }
 
   return (
     <Card
@@ -100,8 +116,6 @@ function RecentPaymentsCard() {
         borderColor: "divider",
         height: "100%",
         width: "100%",
-
-        // Pronounced Obsidian Depth Shadow
         boxShadow:
           "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
         transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -193,6 +207,9 @@ function RecentPaymentsCard() {
               <TableBody>
                 {displayedPayments.map((payment) => {
                   const methodStyles = getMethodChipStyles(payment.method);
+                  const formattedAmount = payment.amount
+                    ? `Ksh ${Number(payment.amount).toLocaleString()}`
+                    : "Ksh 0";
 
                   return (
                     <TableRow
@@ -216,7 +233,7 @@ function RecentPaymentsCard() {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {payment.date}
+                        {formatPaymentDate(payment.paymentDate)}
                       </TableCell>
 
                       {/* Column 2: Tenant & Unit */}
@@ -228,7 +245,7 @@ function RecentPaymentsCard() {
                           noWrap
                           sx={{ lineHeight: 1.2 }}
                         >
-                          {payment.tenant}
+                          {payment.tenantName}
                         </Typography>
                         <Typography
                           variant="caption"
@@ -236,7 +253,7 @@ function RecentPaymentsCard() {
                           fontWeight={500}
                           sx={{ fontSize: "0.72rem" }}
                         >
-                          {payment.unit}
+                          {payment.unitName}
                         </Typography>
                       </TableCell>
 
@@ -250,7 +267,7 @@ function RecentPaymentsCard() {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {payment.amount}
+                        {formattedAmount}
                       </TableCell>
 
                       {/* Column 4: Payment Method Pill */}
@@ -274,7 +291,7 @@ function RecentPaymentsCard() {
               </TableBody>
             </Table>
           ) : (
-            /* ELEGANT EMPTY STATE */
+            /* EMPTY STATE */
             <Box
               sx={{
                 flexGrow: 1,
@@ -326,6 +343,7 @@ function RecentPaymentsCard() {
           <Box
             sx={{
               mt: "auto",
+              pt: 1,
               borderTop: "1px solid #F1F5F9",
               display: "flex",
               justifyContent: "flex-end",

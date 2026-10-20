@@ -13,6 +13,7 @@ import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
+import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -165,5 +166,18 @@ public class LandLordController {
                 log.info("API call: Get financial overview for landlord DB ID: {}", userId);
                 FinancialOverviewDTO overview = landlordService.getFinancialOverview(userId);
                 return ResponseEntity.ok(overview);
+        }
+
+        // ---------------------- Get Recent Payments ----------------------
+        @GetMapping("/{userId}/recent-payments")
+        @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
+        public ResponseEntity<List<RecentPaymentDTO>> getRecentPayments(
+                        @PathVariable Long userId,
+                        @RequestParam(defaultValue = "5") int limit) {
+                log.info("API call: Get recent payments for landlord DB ID: {}", userId);
+
+                List<RecentPaymentDTO> recentPayments = landlordService.getRecentPayments(userId, limit);
+
+                return ResponseEntity.ok(recentPayments);
         }
 }

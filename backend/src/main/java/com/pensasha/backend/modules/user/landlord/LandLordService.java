@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.pensasha.backend.exceptions.ResourceNotFoundException;
 import com.pensasha.backend.modules.invoice.InvoiceRepository;
+import com.pensasha.backend.modules.payment.Payment;
+import com.pensasha.backend.modules.payment.PaymentRepository;
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.User;
@@ -22,6 +25,7 @@ import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
+import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 
 @Service
@@ -33,6 +37,7 @@ public class LandLordService {
         private final UserRepository userRepository;
         private final InvoiceRepository invoiceRepository;
         private final LandlordMapper landlordMapper;
+        private final PaymentRepository paymentRepository;
 
         /* ===================== FETCH BY USER ID ===================== */
         public GetLandLordDTO getLandlordByUserId(Long userId) {
@@ -248,5 +253,46 @@ public class LandLordService {
                                 new FinancialOverviewDTO.MonthlyDataPoint("Aug", totalIncome, totalExpenses));
 
                 return new FinancialOverviewDTO(monthlyData, totalIncome, totalExpenses, netProfit);
+        }
+
+        public List<RecentPaymentDTO> getRecentPayments(Long userId, int limit) {
+                log.info("Fetching recent payments for landlord userId={}, limit={}", userId, limit);
+
+                LandlordProfile profile = landlordProfileRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Landlord profile not found for userId: " + userId));
+
+                int propertyCount = profile.getProperties() != null ? profile.getProperties().size() : 0;
+                log.debug("Verified landlord profile with {} properties for userId={}", propertyCount, userId);
+
+                Pageable pageable = PageRequest.of(0, limit);
+                List<Payment> payments = paymentRepository.findRecentPaymentsByLandlordId(userId, pageable);
+
+                return payments.stream().map(payment -> {
+                        String tenantName = payment.getTenant() != null && payment.getTenant().getUser() != null
+                                        ? payment.getTenant().getUser().getFirstName() + " "
+                                                        + payment.getTenant().getUser().getLastName()
+                                        : "Unknown Tenant";
+
+                        String unitName = (payment.getInvoice() != null &&
+                                        payment.getInvoice().getLease() != null &&
+                                        payment.getInvoice().getLease().getUnit() != null)
+                                                        ? payment.getInvoice().getLease().getUnit().getUnitNumber()
+                                                        : "N/A";
+
+                        BigDecimal amount = payment.getAmount() != null
+                                        ? BigDecimal.valueOf(payment.getAmount())
+                                        : BigDecimal.ZERO;
+
+                        String method = payment.getMethod() != null ? payment.getMethod().name() : "Other";
+
+                        return new RecentPaymentDTO(
+                                        payment.getId(),
+                                        payment.getPaymentDate(),
+                                        tenantName,
+                                        unitName,
+                                        amount,
+                                        method);
+                }).collect(Collectors.toList());
         }
 }
