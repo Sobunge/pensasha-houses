@@ -13,6 +13,8 @@ import {
   TableHead,
   TableRow,
   Button,
+  Skeleton,
+  Alert,
   useTheme,
   useMediaQuery,
   alpha,
@@ -23,54 +25,19 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { useNavigate } from "react-router-dom";
+import { usePropertyPerformance } from "../../components/hooks/landlord/usePropertyPerformance";
 
-// Sample properties data
-const propertyData = [
-  {
-    id: 1,
-    name: "Sunrise Apartments",
-    units: 12,
-    occupied: 10,
-    revenue: "KSh 120,000",
-  },
-  {
-    id: 2,
-    name: "Pensasha Towers",
-    units: 20,
-    occupied: 18,
-    revenue: "KSh 35,000",
-  },
-  {
-    id: 3,
-    name: "Sunrise Houses",
-    units: 12,
-    occupied: 10,
-    revenue: "KSh 20,000",
-  },
-  {
-    id: 4,
-    name: "Pensasha Residency",
-    units: 20,
-    occupied: 17,
-    revenue: "KSh 20,000",
-  },
-  {
-    id: 5,
-    name: "Grand Vista Suites",
-    units: 15,
-    occupied: 12,
-    revenue: "KSh 45,000",
-  },
-];
-
-function PropertyPerformanceCard() {
+function PropertyPerformanceCard({ userId }) {
   const navigate = useNavigate();
   const theme = useTheme();
 
   // Use the compact property layout on mobile.
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Limit to 3 items here
+  // Fetch live performance data using TanStack Query
+  const { data: propertyData = [], isLoading, isError, error } = usePropertyPerformance(userId);
+
+  // Limit to top 3 items here
   const displayedProperties = propertyData.slice(0, 3);
   const hasProperties = displayedProperties.length > 0;
 
@@ -88,36 +55,70 @@ function PropertyPerformanceCard() {
     navigate("/landlord/properties/new");
   };
 
+  // Loading Skeleton State
+  if (isLoading) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          width: "100%",
+          borderRadius: "16px",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          bgcolor: "#FFFFFF",
+        }}
+      >
+        <Skeleton variant="text" width="60%" height={32} sx={{ mb: 1 }} />
+        <Skeleton variant="text" width="40%" height={20} sx={{ mb: 3 }} />
+        <Skeleton variant="rounded" width="100%" height={180} sx={{ borderRadius: 2 }} />
+      </Card>
+    );
+  }
+
+  // Error State
+  if (isError) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          width: "100%",
+          borderRadius: "16px",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 3,
+          bgcolor: "#FFFFFF",
+        }}
+      >
+        <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+          {error?.message || "Failed to load property performance data."}
+        </Alert>
+      </Card>
+    );
+  }
+
   return (
     <Card
       elevation={0}
       sx={{
         display: "flex",
         flexDirection: "column",
-
-        // Fill available parent width fluidly without breaking smaller screens
         width: "100%",
         minWidth: 0,
-
         height: "auto",
-
         borderRadius: "16px",
         bgcolor: "#FFFFFF",
         border: "1px solid",
         borderColor: "divider",
-
         boxShadow:
           "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
-
         transition:
           "border-color 0.25s ease, box-shadow 0.25s ease",
-
         "&:hover": {
           borderColor: "secondary.main",
           boxShadow:
             "0 25px 40px -10px rgba(15, 23, 42, 0.18), 0 12px 18px -6px rgba(15, 23, 42, 0.1)",
         },
-
         "@media (prefers-reduced-motion: reduce)": {
           transition: "none",
         },
@@ -129,9 +130,7 @@ function PropertyPerformanceCard() {
           flexDirection: "column",
           flexGrow: 1,
           minWidth: 0,
-
           p: { xs: 2, sm: 2.5, md: 3 },
-
           "&:last-child": {
             pb: { xs: 2, sm: 2.5, md: 3 },
           },
@@ -181,12 +180,18 @@ function PropertyPerformanceCard() {
                 }}
               >
                 {displayedProperties.map((property, index) => {
+                  const totalUnits = property.units || 1;
+                  const occupiedUnits = property.occupied || 0;
                   const occupancyRate = Math.round(
-                    (property.occupied / property.units) * 100
+                    (occupiedUnits / totalUnits) * 100
                   );
 
                   const progressColor =
                     getOccupancyColor(occupancyRate);
+                  
+                  const formattedRevenue = property.revenue
+                    ? `KSh ${Number(property.revenue).toLocaleString()}`
+                    : "KSh 0";
 
                   return (
                     <Box
@@ -194,7 +199,6 @@ function PropertyPerformanceCard() {
                       sx={{
                         py: 1.75,
                         minWidth: 0,
-
                         borderBottom:
                           index !== displayedProperties.length - 1
                             ? "1px solid #E2E8F0"
@@ -257,7 +261,7 @@ function PropertyPerformanceCard() {
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {property.revenue}
+                          {formattedRevenue}
                         </Typography>
                       </Box>
 
@@ -280,7 +284,7 @@ function PropertyPerformanceCard() {
                               fontWeight: 500,
                             }}
                           >
-                            {property.occupied} of {property.units} units
+                            {occupiedUnits} of {totalUnits} units
                             occupied
                           </Typography>
 
@@ -305,7 +309,6 @@ function PropertyPerformanceCard() {
                             height: 6,
                             borderRadius: 4,
                             bgcolor: "#E2E8F0",
-
                             "& .MuiLinearProgress-bar": {
                               bgcolor: progressColor,
                               borderRadius: 4,
@@ -333,11 +336,9 @@ function PropertyPerformanceCard() {
                   sx={{
                     width: "100%",
                     tableLayout: "fixed",
-
                     "& th, & td": {
                       borderBottom: "1px solid #E2E8F0",
                     },
-
                     "& tr:last-child td": {
                       borderBottom: "none",
                     },
@@ -388,19 +389,24 @@ function PropertyPerformanceCard() {
 
                   <TableBody>
                     {displayedProperties.map((property) => {
+                      const totalUnits = property.units || 1;
+                      const occupiedUnits = property.occupied || 0;
                       const occupancyRate = Math.round(
-                        (property.occupied / property.units) * 100
+                        (occupiedUnits / totalUnits) * 100
                       );
 
                       const progressColor =
                         getOccupancyColor(occupancyRate);
+                      
+                      const formattedRevenue = property.revenue
+                        ? `KSh ${Number(property.revenue).toLocaleString()}`
+                        : "KSh 0";
 
                       return (
                         <TableRow
                           key={property.id}
                           sx={{
                             transition: "background-color 0.15s ease",
-
                             "&:hover": {
                               bgcolor: alpha(
                                 theme.palette.primary.main,
@@ -480,7 +486,6 @@ function PropertyPerformanceCard() {
                                 height: 6,
                                 borderRadius: 4,
                                 bgcolor: "#E2E8F0",
-
                                 "& .MuiLinearProgress-bar": {
                                   bgcolor: progressColor,
                                   borderRadius: 4,
@@ -497,7 +502,7 @@ function PropertyPerformanceCard() {
                                 mt: 0.5,
                               }}
                             >
-                              {property.occupied}/{property.units} units
+                              {occupiedUnits}/{totalUnits} units
                             </Typography>
                           </TableCell>
 
@@ -523,7 +528,7 @@ function PropertyPerformanceCard() {
                                 overflowWrap: "anywhere",
                               }}
                             >
-                              {property.revenue}
+                              {formattedRevenue}
                             </Typography>
                           </TableCell>
                         </TableRow>
@@ -557,7 +562,6 @@ function PropertyPerformanceCard() {
                   borderRadius: 2,
                   minWidth: 0,
                   px: 1,
-
                   "&:hover": {
                     color: "secondary.main",
                     bgcolor: alpha(
@@ -642,7 +646,6 @@ function PropertyPerformanceCard() {
                 borderRadius: 2,
                 textTransform: "none",
                 fontSize: "0.8rem",
-
                 "&:hover": {
                   bgcolor: "#1E293B",
                 },
