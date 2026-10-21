@@ -25,66 +25,78 @@ export default function BaseProfileInfo({ profile }) {
     {
       label: "Full Name",
       value: fullName,
-      icon: <PermIdentityOutlinedIcon fontSize="small" />,
+      icon: <PermIdentityOutlinedIcon sx={{ fontSize: 18 }} />,
     },
     {
       label: "National ID",
       value: profile?.idNumber || "-",
-      icon: <BadgeOutlinedIcon fontSize="small" />,
+      icon: <BadgeOutlinedIcon sx={{ fontSize: 18 }} />,
     },
     {
       label: "Email Address",
       value: profile?.email || "-",
-      icon: <EmailOutlinedIcon fontSize="small" />,
+      icon: <EmailOutlinedIcon sx={{ fontSize: 18 }} />,
     },
     {
       label: "Phone Number",
       value: profile?.phoneNumber || "-",
-      icon: <PhoneOutlinedIcon fontSize="small" />,
+      icon: <PhoneOutlinedIcon sx={{ fontSize: 18 }} />,
     },
   ];
 
   return (
     <Box
       sx={{
-        bgcolor: "#F8FAFC",
-        borderRadius: "14px",
-        p: { xs: 2.5, sm: 3 },
-        border: "1px solid #E2E8F0",
+        bgcolor: "#FFFFFF",
+        borderRadius: "16px",
+        p: { xs: 1.5, sm: 2 },
+        border: "1px solid rgba(226, 232, 240, 0.8)",
+        boxShadow: "0 10px 30px -10px rgba(15, 23, 42, 0.05)",
+        background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
       }}
     >
       {/* INFO GRID */}
-      <Grid container spacing={2.5}>
+      <Grid container spacing={1.5}>
         {infoData.map((item) => (
           <Grid item xs={12} sm={6} key={item.label}>
             <Box
               sx={{
-                p: 2,
+                p: 1.5,
                 borderRadius: "12px",
                 bgcolor: "#FFFFFF",
                 border: "1px solid #E2E8F0",
                 display: "flex",
                 alignItems: "center",
-                gap: 2,
-                transition: "all 0.2s ease",
+                gap: 1.5,
+                transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                position: "relative",
+                overflow: "hidden",
                 "&:hover": {
-                  borderColor: "#D4AF37",
-                  boxShadow: "0 4px 12px rgba(212, 175, 55, 0.12)",
+                  borderColor: "rgba(212, 175, 55, 0.5)",
+                  boxShadow: "0 8px 20px rgba(212, 175, 55, 0.12)",
+                  transform: "translateY(-1px)",
+                  "& .icon-box": {
+                    background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+                    color: "#D4AF37",
+                    transform: "scale(1.05)",
+                  },
                 },
               }}
             >
-              {/* Gold-tinted Icon Container */}
+              {/* Premium Icon Container */}
               <Box
+                className="icon-box"
                 sx={{
-                  width: 42,
-                  height: 42,
-                  borderRadius: "10px",
-                  bgcolor: "rgba(212, 175, 55, 0.12)",
-                  color: "#D4AF37",
+                  width: 38,
+                  height: 38,
+                  borderRadius: "8px",
+                  bgcolor: "rgba(212, 175, 55, 0.1)",
+                  color: "#B48A1D",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
+                  transition: "all 0.25s ease",
                 }}
               >
                 {item.icon}
@@ -94,12 +106,13 @@ export default function BaseProfileInfo({ profile }) {
                 <Typography
                   variant="caption"
                   sx={{
-                    color: "#64748B",
+                    color: "#475569", // Darker slate color for crisp visibility
                     fontWeight: 700,
                     textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                    fontSize: "0.68rem",
+                    letterSpacing: 0.6,
+                    fontSize: "0.725rem", // Increased from 0.625rem for legibility
                     display: "block",
+                    lineHeight: 1.2,
                     mb: 0.3,
                   }}
                 >
@@ -110,7 +123,9 @@ export default function BaseProfileInfo({ profile }) {
                   sx={{
                     fontWeight: 700,
                     color: "#0F172A",
+                    fontSize: "0.875rem",
                     wordBreak: "break-word",
+                    lineHeight: 1.3,
                   }}
                 >
                   {item.value}
@@ -124,35 +139,38 @@ export default function BaseProfileInfo({ profile }) {
       {/* RESET PASSWORD ACTION */}
       <Box
         sx={{
-          mt: 3,
-          pt: 2.5,
-          borderTop: "1px solid #E2E8F0",
+          pt: 1.5,
+          borderTop: "1px solid #F1F5F9",
           display: "flex",
-          justify: "flex-end",
+          justifyContent: "flex-end",
         }}
       >
         <Button
           variant="outlined"
-          startIcon={<LockResetOutlinedIcon />}
+          startIcon={<LockResetOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           onClick={() => setOpenReset(true)}
           sx={{
-            borderColor: "#0F172A",
+            borderColor: "rgba(15, 23, 42, 0.15)",
             color: "#0F172A",
             fontWeight: 700,
+            fontSize: "0.8rem",
             textTransform: "none",
-            borderRadius: "10px",
-            px: 2.5,
-            py: 0.8,
-            "& .MuiButton-startIcon": { color: "#D4AF37" },
+            borderRadius: "8px",
+            px: 2,
+            py: 0.5,
+            bgcolor: "#FFFFFF",
+            boxShadow: "0 2px 6px rgba(15, 23, 42, 0.03)",
+            "& .MuiButton-startIcon": { color: "#D4AF37", mr: 0.8 },
             "&:hover": {
               borderColor: "#D4AF37",
-              bgcolor: "rgba(212, 175, 55, 0.08)",
+              bgcolor: "rgba(212, 175, 55, 0.05)",
               color: "#0F172A",
+              boxShadow: "0 4px 12px rgba(212, 175, 55, 0.15)",
             },
             transition: "all 0.2s ease",
           }}
         >
-          Reset Password
+          Change Password
         </Button>
       </Box>
 

@@ -50,7 +50,7 @@ export default function ProfileHeader({ profile, onChangePic }) {
       />
 
       {/* Header Body */}
-      <Box sx={{ px: { xs: 2.5, sm: 4, md: 4 }, pb: 3, pt: 0, mt: 2 }}>
+      <Box sx={{ px: { xs: 2.5, sm: 4, md: 4 }}}>
         <Stack
           // Column layout for xs, sm, and md; Row layout for lg and up
           direction={{ xs: "column", lg: "row" }}

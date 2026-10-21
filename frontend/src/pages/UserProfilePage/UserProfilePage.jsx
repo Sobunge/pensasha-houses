@@ -186,7 +186,16 @@ export default function UserProfilePage() {
         mx: "auto",
       }}
     >
- 
+      {/* DASHBOARD HEADER */}
+      <DashboardHeader
+        title={userId ? `${profile?.firstName || 'User'}'s Profile` : "User Profile"}
+        subtitle={
+          userId
+            ? "Manage and review account credentials and uploaded records."
+            : "Manage your personal details, role-specific information, and secure document vault."
+        }
+      />
+
       {/* PROFILE HEADER CARD */}
       <Paper elevation={0} sx={cardPaperStyle}>
         {loading ? (
@@ -208,7 +217,7 @@ export default function UserProfilePage() {
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          mb={2.5}
+          mb={3}
         >
           <Box
             sx={{
@@ -240,8 +249,6 @@ export default function UserProfilePage() {
             </Button>
           )}
         </Box>
-
-        <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
 
         {loading ? (
           <Stack spacing={2}>

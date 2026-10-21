@@ -1,3 +1,4 @@
+// src/components/Profile/ChangeProfilePicDialog.jsx
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -8,10 +9,15 @@ import {
   Avatar,
   Stack,
   Typography,
+  Box,
+  IconButton,
+  Divider,
 } from "@mui/material";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import SaveIcon from "@mui/icons-material/Save";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CloseIcon from "@mui/icons-material/Close";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 
 export default function ChangeProfilePicDialog({ open, handleClose, user, onSave }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -39,7 +45,9 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
       alert("Please select an image first.");
       return;
     }
-    onSave(selectedFile);
+    if (onSave) {
+      onSave(selectedFile);
+    }
     handleClose();
   };
 
@@ -50,81 +58,230 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
     user?.lastName?.charAt(0) ||
     "U";
 
+  const currentPicture = preview || user?.profilePicture || user?.avatar || "";
+
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       fullWidth
       maxWidth="xs"
-      PaperProps={{ sx: { borderRadius: 3, p: 2 } }}
+      PaperProps={{
+        sx: {
+          borderRadius: "16px",
+          border: "1px solid rgba(212, 175, 55, 0.4)",
+          boxShadow: "0 20px 40px rgba(15, 23, 42, 0.18)",
+          p: 0.5,
+          background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
+        },
+      }}
     >
       {/* ===== Header ===== */}
       <DialogTitle
-        component="div"
         sx={{
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 1.5,
+          pb: 1.5,
+          pt: 2,
+          px: { xs: 2, sm: 2.5 },
+          borderBottom: "1px solid #F1F5F9",
+          position: "relative",
         }}
       >
-        <Avatar sx={{ bgcolor: "#f8b500", width: 50, height: 50 }}>📷</Avatar>
-        <Typography variant="h6" component="div" fontWeight={600}>
-          Change Profile Picture
-        </Typography>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Box
+            sx={{
+              width: 38,
+              height: 38,
+              borderRadius: "10px",
+              bgcolor: "rgba(212, 175, 55, 0.12)",
+              color: "#D4AF37",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <PhotoCameraIcon sx={{ fontSize: 20 }} />
+          </Box>
+          <Box>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 800, color: "#0F172A", fontSize: "1.05rem", lineHeight: 1.2 }}
+            >
+              Update Picture
+            </Typography>
+            <Typography variant="caption" sx={{ color: "#64748B", fontWeight: 600, fontSize: "0.75rem" }}>
+              Upload a new profile picture or avatar
+            </Typography>
+          </Box>
+        </Stack>
+
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          size="small"
+          sx={{
+            position: "absolute",
+            right: 12,
+            top: 12,
+            color: "#64748B",
+            "&:hover": { bgcolor: "#F1F5F9", color: "#EF4444" },
+          }}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
       </DialogTitle>
 
       {/* ===== Content ===== */}
-      <DialogContent>
-        <Stack spacing={3} alignItems="center" sx={{ mt: 1 }}>
-          <Avatar
-            src={preview || user?.profilePicture || "/images/avatar.png"}
-            sx={{ width: 100, height: 100, bgcolor: "#f8b500" }}
+      <DialogContent sx={{ px: { xs: 2, sm: 2.5 }, py: 3 }}>
+        <Stack spacing={2.5} alignItems="center">
+          {/* Avatar Preview with Gold Border Frame */}
+          <Box
+            sx={{
+              p: "3px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #D4AF37 0%, #0F172A 100%)",
+              boxShadow: "0 8px 20px rgba(15, 23, 42, 0.15)",
+            }}
           >
-            {/* Show initial only if no image */}
-            {!preview && !user?.profilePicture && avatarInitial}
-          </Avatar>
+            <Avatar
+              src={currentPicture}
+              sx={{
+                width: 100,
+                height: 100,
+                bgcolor: "#FFFFFF",
+                color: "#0F172A",
+                fontWeight: 800,
+                fontSize: 36,
+                border: "3px solid #FFFFFF",
+              }}
+            >
+              {!currentPicture && avatarInitial}
+            </Avatar>
+          </Box>
 
+          {/* Upload Button Box */}
           <Button
             variant="outlined"
             component="label"
-            startIcon={<UploadFileIcon />}
-            sx={{ textTransform: "none" }}
+            startIcon={<UploadFileOutlinedIcon sx={{ fontSize: "18px !important" }} />}
+            sx={{
+              borderColor: "rgba(15, 23, 42, 0.15)",
+              color: "#0F172A",
+              fontWeight: 700,
+              fontSize: "0.825rem",
+              textTransform: "none",
+              borderRadius: "8px",
+              px: 2.5,
+              py: 0.8,
+              bgcolor: "#FFFFFF",
+              boxShadow: "0 2px 6px rgba(15, 23, 42, 0.03)",
+              "& .MuiButton-startIcon": { color: "#D4AF37" },
+              "&:hover": {
+                borderColor: "#D4AF37",
+                bgcolor: "rgba(212, 175, 55, 0.05)",
+                color: "#0F172A",
+                boxShadow: "0 4px 12px rgba(212, 175, 55, 0.15)",
+              },
+              transition: "all 0.2s ease",
+            }}
           >
-            Choose File
+            Choose Image File
             <input type="file" hidden accept="image/*" onChange={handleFileChange} />
           </Button>
 
-          {selectedFile && (
-            <Typography variant="body2" color="text.secondary">
-              {selectedFile.name}
+          {selectedFile ? (
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#0F172A",
+                fontWeight: 600,
+                fontSize: "0.75rem",
+                bgcolor: "#F1F5F9",
+                px: 1.5,
+                py: 0.5,
+                borderRadius: "6px",
+                maxWidth: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Selected: {selectedFile.name}
+            </Typography>
+          ) : (
+            <Typography variant="caption" sx={{ color: "#94A3B8", fontWeight: 500, fontSize: "0.725rem" }}>
+              Supports JPG, PNG or WEBP (Max 2MB)
             </Typography>
           )}
         </Stack>
       </DialogContent>
 
+      <Divider sx={{ borderColor: "#F1F5F9" }} />
+
       {/* ===== Actions ===== */}
       <DialogActions
         sx={{
-          px: 2,
-          pb: 2,
-          display: "flex",
-          justifyContent: "space-between",
+          px: { xs: 2, sm: 2.5 },
+          py: 1.5,
+          justifyContent: { xs: "center", md: "flex-end" },
+          gap: 1.2,
         }}
       >
         <Button
-          startIcon={<CloseIcon />}
           onClick={handleClose}
-          sx={{ bgcolor: "#f44336", color: "#fff", "&:hover": { bgcolor: "#d32f2f" } }}
+          startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px !important" }} />}
+          sx={{
+            bgcolor: "rgba(239, 68, 68, 0.08)",
+            color: "#EF4444",
+            borderRadius: "8px",
+            px: 2.5,
+            py: 0.6,
+            fontWeight: 700,
+            fontSize: "0.825rem",
+            textTransform: "none",
+            "& .MuiButton-startIcon": { color: "#EF4444" },
+            "&:hover": { 
+              bgcolor: "#EF4444", 
+              color: "#FFFFFF",
+              "& .MuiButton-startIcon": { color: "#FFFFFF" },
+              boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)"
+            },
+            transition: "all 0.2s ease",
+          }}
         >
           Cancel
         </Button>
+
         <Button
-          startIcon={<SaveIcon />}
-          variant="contained"
+          size="small"
           onClick={handleSave}
-          sx={{ bgcolor: "#f8b500", color: "#111", "&:hover": { bgcolor: "#c59000" } }}
+          variant="contained"
+          disabled={!selectedFile}
+          startIcon={<SaveOutlinedIcon sx={{ fontSize: "18px !important" }} />}
+          sx={{
+            bgcolor: "#0F172A",
+            color: "#FFFFFF",
+            borderRadius: "8px",
+            px: 3,
+            py: 0.6,
+            fontWeight: 700,
+            fontSize: "0.825rem",
+            textTransform: "none",
+            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            transition: "all 0.2s ease",
+            "& .MuiButton-startIcon": { color: "#D4AF37" },
+            "&:hover": {
+              bgcolor: "#D4AF37",
+              color: "#0F172A",
+              boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
+              "& .MuiButton-startIcon": { color: "#0F172A" },
+            },
+            "&.Mui-disabled": {
+              bgcolor: "#F1F5F9",
+              color: "#94A3B8",
+              "& .MuiButton-startIcon": { color: "#CBD5E1" },
+            },
+          }}
         >
           Save
         </Button>

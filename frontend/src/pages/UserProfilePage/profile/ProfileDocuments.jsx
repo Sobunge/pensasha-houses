@@ -1,3 +1,4 @@
+// src/components/Profile/ProfileDocuments.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -30,6 +31,7 @@ import {
   UploadFile as UploadFileIcon,
   CheckCircleOutline as CheckCircleOutlineIcon,
   Close as CloseIcon,
+  CancelOutlined as CancelOutlinedIcon,
 } from "@mui/icons-material";
 import useDocuments from "../../../components/hooks/useDocuments";
 
@@ -128,80 +130,92 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
 
   const safeDocuments = Array.isArray(documents) ? documents : [];
 
-  const primaryAccent = theme.palette.primary.main;
-  const primaryHover = theme.palette.primary.dark;
-
   return (
-    <Box>
+    <Box
+      sx={{
+        bgcolor: "#FFFFFF",
+        borderRadius: "16px",
+        p: { xs: 1.5, sm: 2 },
+        border: "1px solid rgba(226, 232, 240, 0.8)",
+        boxShadow: "0 10px 30px -10px rgba(15, 23, 42, 0.05)",
+        background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
+      }}
+    >
       {loading ? (
-        <Stack spacing={1.5}>
-          <Skeleton variant="rectangular" width="100%" height={64} sx={{ borderRadius: 3 }} />
-          <Skeleton variant="rectangular" width="100%" height={64} sx={{ borderRadius: 3 }} />
+        <Stack spacing={1}>
+          <Skeleton variant="rectangular" width="100%" height={52} sx={{ borderRadius: "10px" }} />
+          <Skeleton variant="rectangular" width="100%" height={52} sx={{ borderRadius: "10px" }} />
         </Stack>
       ) : safeDocuments.length === 0 ? (
         <Box
           sx={{
-            py: 5,
+            py: 3.5,
             px: 2,
             textAlign: "center",
-            border: `1.5px dashed ${alpha(primaryAccent, 0.4)}`,
-            borderRadius: 3.5,
-            bgcolor: alpha(primaryAccent, 0.02),
+            border: "1.5px dashed rgba(212, 175, 55, 0.4)",
+            borderRadius: "12px",
+            bgcolor: "rgba(212, 175, 55, 0.02)",
           }}
         >
           <PictureAsPdfIcon
             sx={{
-              fontSize: 48,
-              color: primaryAccent,
-              mb: 1,
-              opacity: 0.8,
+              fontSize: 38,
+              color: "#D4AF37",
+              mb: 0.5,
+              opacity: 0.9,
             }}
           />
-          <Typography fontWeight={700} variant="body1" sx={{ color: "text.primary" }}>
+          <Typography fontWeight={700} variant="body2" sx={{ color: "#0F172A", fontSize: "0.875rem" }}>
             No Documents Uploaded
           </Typography>
-          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+          <Typography variant="caption" sx={{ color: "#64748B", mt: 0.2, display: "block", fontSize: "0.75rem" }}>
             {role ? `Vault is empty for ${role.toLowerCase()} records.` : "Vault is empty."}
           </Typography>
         </Box>
       ) : (
-        <List sx={{ p: 0, display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <List sx={{ p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
           {safeDocuments.map((doc) => {
             const isProcessing = actionLoadingId === doc.id;
             return (
               <ListItem
                 key={doc.id}
                 sx={{
-                  borderRadius: 3,
-                  bgcolor: "background.paper",
-                  border: "1px solid",
-                  borderColor: "divider",
-                  p: 2,
-                  transition: "all 0.2s ease",
+                  borderRadius: "12px",
+                  bgcolor: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
+                  py: 1.2,
+                  px: 1.5,
+                  transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                   "&:hover": {
-                    borderColor: primaryAccent,
-                    bgcolor: alpha(primaryAccent, 0.04),
-                    boxShadow: `0 4px 12px ${alpha(primaryAccent, 0.12)}`,
+                    borderColor: "rgba(212, 175, 55, 0.5)",
+                    boxShadow: "0 6px 16px rgba(212, 175, 55, 0.12)",
+                    transform: "translateY(-1px)",
+                    "& .doc-icon-box": {
+                      background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+                      color: "#D4AF37",
+                    },
                   },
                 }}
                 secondaryAction={
-                  <Stack direction="row" spacing={1}>
+                  <Stack direction="row" spacing={0.8}>
                     <IconButton
                       aria-label="download"
                       size="small"
                       disabled={isProcessing}
                       onClick={() => handleDownload(doc)}
                       sx={{
-                        color: "text.primary",
-                        bgcolor: alpha(theme.palette.action.active, 0.05),
+                        width: 32,
+                        height: 32,
+                        color: "#0F172A",
+                        bgcolor: "#F1F5F9",
                         "&:hover": {
-                          bgcolor: primaryAccent,
-                          color: "#FFFFFF",
+                          bgcolor: "#0F172A",
+                          color: "#D4AF37",
                         },
                         transition: "all 0.2s ease",
                       }}
                     >
-                      {isProcessing ? <CircularProgress size={16} /> : <DownloadIcon fontSize="small" />}
+                      {isProcessing ? <CircularProgress size={14} color="inherit" /> : <DownloadIcon sx={{ fontSize: 16 }} />}
                     </IconButton>
                     <IconButton
                       aria-label="delete"
@@ -209,34 +223,38 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
                       disabled={isProcessing}
                       onClick={() => handleDelete(doc.id)}
                       sx={{
-                        color: "error.main",
-                        bgcolor: alpha(theme.palette.error.main, 0.08),
+                        width: 32,
+                        height: 32,
+                        color: "#EF4444",
+                        bgcolor: "rgba(239, 68, 68, 0.08)",
                         "&:hover": {
-                          bgcolor: "error.main",
-                          color: "error.contrastText",
+                          bgcolor: "#EF4444",
+                          color: "#FFFFFF",
                         },
                         transition: "all 0.2s ease",
                       }}
                     >
-                      <DeleteOutlineIcon fontSize="small" />
+                      <DeleteOutlineIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Stack>
                 }
               >
                 <ListItemIcon sx={{ minWidth: 44 }}>
                   <Box
+                    className="doc-icon-box"
                     sx={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 2,
-                      bgcolor: alpha(primaryAccent, 0.12),
-                      color: primaryAccent,
+                      width: 34,
+                      height: 34,
+                      borderRadius: "8px",
+                      bgcolor: "rgba(212, 175, 55, 0.1)",
+                      color: "#B48A1D",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      transition: "all 0.25s ease",
                     }}
                   >
-                    <PictureAsPdfIcon fontSize="small" />
+                    <PictureAsPdfIcon sx={{ fontSize: 18 }} />
                   </Box>
                 </ListItemIcon>
                 <ListItemText
@@ -244,12 +262,14 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
                   secondary={doc.fileName || "Uploaded File"}
                   primaryTypographyProps={{
                     fontWeight: 700,
-                    color: "text.primary",
-                    fontSize: "0.9rem",
+                    color: "#0F172A",
+                    fontSize: "0.85rem",
+                    lineHeight: 1.2,
                   }}
                   secondaryTypographyProps={{
-                    color: "text.secondary",
-                    fontSize: "0.8rem",
+                    color: "#64748B",
+                    fontSize: "0.75rem",
+                    lineHeight: 1.3,
                   }}
                 />
               </ListItem>
@@ -266,23 +286,23 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 4,
-            border: `1.5px solid ${primaryAccent}`,
-            boxShadow: theme.shadows[10],
-            bgcolor: "background.paper",
+            borderRadius: "16px",
+            border: "1px solid rgba(212, 175, 55, 0.4)",
+            boxShadow: "0 20px 40px rgba(15, 23, 42, 0.2)",
+            bgcolor: "#FFFFFF",
           },
         }}
       >
         <DialogTitle
           sx={{
             fontWeight: 800,
-            textAlign: "center",
-            px: 6,
-            color: "text.primary",
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            py: 2.5,
+            textAlign: { xs: "center", md: "center" },
+            px: 4,
+            py: 2,
+            color: "#0F172A",
+            borderBottom: "1px solid #F1F5F9",
             position: "relative",
+            fontSize: "1.1rem",
           }}
         >
           Upload Document {role ? `as ${role.toLowerCase()}` : ""}
@@ -292,44 +312,45 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
             sx={{
               position: "absolute",
               right: 12,
-              top: 12,
-              color: "text.secondary",
-              "&:hover": { color: "text.primary" },
+              top: 10,
+              color: "#64748B",
+              "&:hover": { color: "#EF4444" },
             }}
           >
-            <CloseIcon />
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ py: 3 }}>
-          <Stack spacing={3} mt={1}>
+        <DialogContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+          <Stack spacing={2} mt={0.5}>
             {errorMessage && (
-              <Alert severity="error" onClose={() => setErrorMessage("")}>
+              <Alert severity="error" onClose={() => setErrorMessage("")} sx={{ borderRadius: "8px", fontSize: "0.8rem" }}>
                 {errorMessage}
               </Alert>
             )}
 
-            <FormControl fullWidth>
+            <FormControl fullWidth size="small">
               <Select
                 value={selectedDocType}
                 onChange={(e) => setSelectedDocType(e.target.value)}
                 displayEmpty
                 sx={{
-                  borderRadius: 2.5,
+                  borderRadius: "8px",
                   fontWeight: 600,
-                  color: "text.primary",
+                  fontSize: "0.85rem",
+                  color: "#0F172A",
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "divider",
+                    borderColor: "#E2E8F0",
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: primaryAccent,
+                    borderColor: "#D4AF37",
                   },
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: primaryAccent,
+                    borderColor: "#D4AF37",
                   },
                 }}
               >
-                <MenuItem value="" disabled>
+                <MenuItem value="" disabled sx={{ fontSize: "0.85rem" }}>
                   Select document type
                 </MenuItem>
                 {availableDocTypes.map((docTypeObj) => (
@@ -337,7 +358,7 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
                     key={docTypeObj.value}
                     value={docTypeObj.value}
                     disabled={safeDocuments.some((d) => d.documentType === docTypeObj.value)}
-                    sx={{ fontWeight: 600, py: 1.2 }}
+                    sx={{ fontWeight: 600, py: 1, fontSize: "0.85rem" }}
                   >
                     {docTypeObj.label}
                   </MenuItem>
@@ -350,27 +371,28 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
               component="label"
               startIcon={
                 uploading ? (
-                  <CircularProgress size={20} color="inherit" />
+                  <CircularProgress size={18} color="inherit" />
                 ) : (
-                  <UploadFileIcon sx={{ color: "#FFFFFF" }} />
+                  <UploadFileIcon sx={{ color: "#D4AF37", fontSize: 18 }} />
                 )
               }
               disabled={!selectedDocType || uploading}
               sx={{
-                bgcolor: primaryAccent,
+                bgcolor: "#0F172A",
                 color: "#FFFFFF",
                 fontWeight: 700,
-                py: 1.5,
-                borderRadius: 2.5,
+                fontSize: "0.825rem",
+                py: 1,
+                borderRadius: "8px",
                 textTransform: "none",
-                boxShadow: theme.shadows[2],
+                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
                 "&:hover": {
-                  bgcolor: primaryHover,
+                  bgcolor: "#1E293B",
                   color: "#FFFFFF",
                 },
                 "&.Mui-disabled": {
-                  bgcolor: "action.disabledBackground",
-                  color: "action.disabled",
+                  bgcolor: "#F1F5F9",
+                  color: "#94A3B8",
                 },
                 transition: "all 0.2s ease",
               }}
@@ -389,19 +411,55 @@ export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
           </Stack>
         </DialogContent>
 
-        <Divider sx={{ borderColor: "divider" }} />
+        <Divider sx={{ borderColor: "#F1F5F9" }} />
 
-        <DialogActions sx={{ px: 3, py: 2 }}>
+        <DialogActions sx={{ px: 2.5, py: 1.5, justifyContent: { xs: "center", md: "flex-end" }, gap: 1.2 }}>
+          <Button
+            onClick={handleCloseDialog}
+            startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px !important" }} />}
+            sx={{
+              bgcolor: "rgba(239, 68, 68, 0.08)",
+              color: "#EF4444",
+              borderRadius: "8px",
+              px: 2.5,
+              py: 0.6,
+              fontWeight: 700,
+              fontSize: "0.825rem",
+              textTransform: "none",
+              "& .MuiButton-startIcon": { color: "#EF4444" },
+              "&:hover": { 
+                bgcolor: "#EF4444", 
+                color: "#FFFFFF",
+                "& .MuiButton-startIcon": { color: "#FFFFFF" },
+                boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)",
+              },
+              transition: "all 0.2s ease",
+            }}
+          >
+            Cancel
+          </Button>
+
           <Button
             onClick={handleCloseDialog}
             variant="contained"
-            color="success"
-            startIcon={<CheckCircleOutlineIcon />}
+            startIcon={<CheckCircleOutlineIcon sx={{ fontSize: 18 }} />}
             sx={{
+              bgcolor: "#0F172A",
+              color: "#FFFFFF",
               fontWeight: 700,
+              fontSize: "0.8rem",
               textTransform: "none",
-              borderRadius: 2,
+              borderRadius: "8px",
               px: 3,
+              py: 0.6,
+              boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+              "& .MuiButton-startIcon": { color: "#D4AF37" },
+              "&:hover": {
+                bgcolor: "#D4AF37",
+                color: "#0F172A",
+                boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
+                "& .MuiButton-startIcon": { color: "#0F172A" },
+              },
               transition: "all 0.2s ease",
             }}
           >
