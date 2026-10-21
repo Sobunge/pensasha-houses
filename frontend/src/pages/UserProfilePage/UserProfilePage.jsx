@@ -114,7 +114,7 @@ export default function UserProfilePage() {
 
   // Card Container Styling
   const cardPaperStyle = {
-    p: { xs: 2.5, sm: 4 },
+    p: { xs: 2.5, sm: 2 },
     borderRadius: "18px",
     bgcolor: "#FFFFFF",
     border: "1.5px solid #D4AF37",
@@ -177,11 +177,11 @@ export default function UserProfilePage() {
   return (
     <Box
       sx={{
-        pb: 4,
+        pb: 1, pt: 2,
         px: { xs: 1.5, sm: 3 },
         display: "flex",
         flexDirection: "column",
-        gap: 3.5,
+        gap: 2,
         maxWidth: 1280,
         mx: "auto",
       }}

@@ -33,7 +33,7 @@ export default function ProfileHeader({ profile, onChangePic }) {
       {/* Cover Banner */}
       <Box
         sx={{
-          height: { xs: 110, sm: 140 },
+          height: { xs: 80, sm: 80 },
           background: "linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #D4AF37 200%)",
           position: "relative",
           "&::after": {
@@ -50,18 +50,20 @@ export default function ProfileHeader({ profile, onChangePic }) {
       />
 
       {/* Header Body */}
-      <Box sx={{ px: { xs: 2.5, sm: 4 }, pb: 3, pt: 0, mt: 2 }}>
+      <Box sx={{ px: { xs: 2.5, sm: 4, md: 4 }, pb: 3, pt: 0, mt: 2 }}>
         <Stack
-          direction={{ xs: "column", sm: "row" }}
+          // Column layout for xs, sm, and md; Row layout for lg and up
+          direction={{ xs: "column", lg: "row" }}
           spacing={{ xs: 2, sm: 3 }}
-          alignItems={{ xs: "center", sm: "flex-end" }}
+          // Center items for xs, sm, and md; flex-end for lg+
+          alignItems={{ xs: "center", lg: "flex-end" }}
           sx={{ marginTop: { xs: "-45px", sm: "-55px" }, mb: 2 }}
         >
           {/* Avatar Container with Floating Camera Button */}
           <Box sx={{ position: "relative" }}>
             <Box
               sx={{
-                p: "4px",
+                p: "1px",
                 borderRadius: "50%",
                 background: "linear-gradient(135deg, #D4AF37 0%, #0F172A 100%)",
                 boxShadow: "0 10px 25px rgba(15, 23, 42, 0.2)",
@@ -113,14 +115,16 @@ export default function ProfileHeader({ profile, onChangePic }) {
           <Box
             sx={{
               flex: 1,
-              textAlign: { xs: "center", sm: "left" },
-              pt: { xs: 0, sm: 1 },
+              // Center text on xs, sm, and md screens
+              textAlign: { xs: "center", lg: "left" },
+              pt: { xs: 0, lg: 1 },
             }}
           >
             <Stack
               direction="row"
               alignItems="center"
-              justifyContent={{ xs: "center", sm: "flex-start" }}
+              // Center content row on xs, sm, and md screens
+              justifyContent={{ xs: "center", lg: "flex-start" }}
               spacing={1}
             >
               <Typography
