@@ -1,3 +1,4 @@
+// src/main/java/com/pensasha/backend/modules/user/mapper/UserMapper.java
 package com.pensasha.backend.modules.user.mapper;
 
 import java.util.Set;
@@ -17,7 +18,7 @@ import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
  * Mapper for converting between User entity and DTOs.
  *
  * Responsibilities:
- * - Entity → DTO conversion (including roles & permissions flattening)
+ * - Entity → DTO conversion (explicitly separating roles & permissions flattening)
  * - Partial updates (excluding system-managed fields)
  *
  * NOTE:
@@ -29,6 +30,7 @@ public interface UserMapper {
     /* ===================== READ ===================== */
 
     @Mapping(target = "profilePicture", source = "profilePictureUrl")
+    @Mapping(target = "roles", expression = "java(mapRoles(user.getRoles()))")
     @Mapping(target = "permissions", expression = "java(mapPermissions(user.getRoles()))")
     GetUserDTO toDTO(User user);
 
@@ -54,17 +56,22 @@ public interface UserMapper {
     @Mapping(target = "permissionOverrides", ignore = true)
     void updateEntity(@MappingTarget User user, UpdateUserDTO dto);
 
-    /* ===================== ROLE MAPPING ===================== */
+    /* ===================== ROLE & PERMISSION MAPPING ===================== */
 
     /**
-     * Maps Role → String (for DTO roles)
+     * Extracts role names (e.g., LANDLORD, TENANT) from user roles.
      */
-    default String map(Role role) {
-        return role.getName();
+    default Set<String> mapRoles(Set<Role> roles) {
+        if (roles == null)
+            return null;
+
+        return roles.stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
     }
 
     /**
-     * Extracts permissions from roles and flattens them
+     * Extracts fine-grained permissions from roles and flattens them.
      */
     default Set<String> mapPermissions(Set<Role> roles) {
         if (roles == null)

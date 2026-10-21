@@ -71,22 +71,60 @@ export default function UserProfilePage() {
     fetchUser();
   }, [userId]);
 
-  /* ---------------- Normalizing User Roles ---------------- */
+  /* ---------------- Robust Normalizing of User Roles ---------------- */
   const userRoles = useMemo(() => {
-    if (!profile?.roles || !Array.isArray(profile.roles)) return [];
+    if (!profile) return [];
 
-    return profile.roles
-      .map((r) => {
-        // Handle object notation if role is returned as { name: "TENANT" }
-        const roleStr = typeof r === "object" ? r.name || r.authority || "" : String(r);
+    const explicitRoles = [];
 
-        // Strip "ROLE_" prefix if present
-        return roleStr.toUpperCase().replace(/^ROLE_/, "");
-      })
-      .filter((roleName) =>
-        // Exclude fine-grained permissions (keeps primary structural roles)
-        ["TENANT", "LANDLORD", "CARETAKER", "ADMIN", "AGENT"].includes(roleName)
-      );
+    const directRoleSources = [
+      profile.role,
+      profile.activeRole,
+      profile.roleName,
+      profile.primaryRole,
+      ...(Array.isArray(profile.roles) ? profile.roles : []),
+    ];
+
+    directRoleSources.forEach((r) => {
+      if (!r) return;
+      const roleStr = typeof r === "object" ? r.name || r.authority || "" : String(r);
+      const clean = roleStr.toUpperCase().replace(/^ROLE_/, "");
+      if (["TENANT", "LANDLORD", "CARETAKER", "ADMIN", "AGENT"].includes(clean)) {
+        if (!explicitRoles.includes(clean)) explicitRoles.push(clean);
+      }
+    });
+
+    if (explicitRoles.length > 0) return explicitRoles;
+
+    // Fallback permission check if needed
+    const permissions = Array.isArray(profile.permissions)
+      ? profile.permissions.map((p) => String(p).toUpperCase())
+      : [];
+
+    const hasPermission = (perm) => permissions.includes(perm);
+
+    if (
+      hasPermission("CARETAKER_ASSIGN") ||
+      hasPermission("CARETAKER_CREATE") ||
+      hasPermission("PROPERTY_CREATE") ||
+      hasPermission("TENANT_APPROVE")
+    ) {
+      return ["LANDLORD"];
+    }
+
+    if (
+      hasPermission("CARETAKER_UPDATE") ||
+      hasPermission("MAINTENANCE_ASSIGN") ||
+      hasPermission("UNIT_UPDATE")
+    ) {
+      return ["CARETAKER"];
+    }
+
+    if (hasPermission("LEASE_VIEW") || hasPermission("MAINTENANCE_CREATE")) {
+      return ["TENANT"];
+    }
+
+    return [];
   }, [profile]);
 
   const primaryRole = userRoles[0] || "";
@@ -177,7 +215,8 @@ export default function UserProfilePage() {
   return (
     <Box
       sx={{
-        pb: 1, pt: 2,
+        pb: 1,
+        pt: 2,
         px: { xs: 1.5, sm: 3 },
         display: "flex",
         flexDirection: "column",
@@ -207,7 +246,7 @@ export default function UserProfilePage() {
             </Box>
           </Stack>
         ) : (
-          <ProfileHeader profile={profile} onChangePic={() => setOpenChangePic(true)} />
+          <ProfileHeader profile={{ ...profile, role: primaryRole }} onChangePic={() => setOpenChangePic(true)} />
         )}
       </Paper>
 
@@ -257,69 +296,56 @@ export default function UserProfilePage() {
             <Skeleton variant="text" width="90%" height={28} sx={{ bgcolor: "#F1F5F9" }} />
           </Stack>
         ) : (
-          <>
-            <BaseProfileInfo profile={profile} />
-
-            {/* Multi-role dynamic sections */}
-            {userRoles.includes("TENANT") && (
-              <>
-                <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    mb: 2,
-                    fontWeight: 800,
-                    color: "#0F172A",
-                    pl: 1.5,
-                    borderLeft: "3px solid #D4AF37",
-                  }}
-                >
-                  Tenant Info
-                </Typography>
-                <TenantProfileInfo profile={profile} />
-              </>
-            )}
-
-            {userRoles.includes("LANDLORD") && (
-              <>
-                <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    mb: 2,
-                    fontWeight: 800,
-                    color: "#0F172A",
-                    pl: 1.5,
-                    borderLeft: "3px solid #D4AF37",
-                  }}
-                >
-                  Landlord Info
-                </Typography>
-                <LandlordProfileInfo profile={profile} />
-              </>
-            )}
-
-            {userRoles.includes("CARETAKER") && (
-              <>
-                <Divider sx={{ my: 3.5, borderColor: "#E2E8F0" }} />
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    mb: 2,
-                    fontWeight: 800,
-                    color: "#0F172A",
-                    pl: 1.5,
-                    borderLeft: "3px solid #D4AF37",
-                  }}
-                >
-                  Caretaker Info
-                </Typography>
-                <CaretakerProfileInfo profile={profile} />
-              </>
-            )}
-          </>
+          <BaseProfileInfo profile={profile} />
         )}
       </Paper>
+
+      {/* SEPARATE ROLE-SPECIFIC CARDS */}
+      {!loading && (
+        <>
+          {userRoles.includes("TENANT") && (
+            <Paper elevation={0} sx={cardPaperStyle}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: "4px solid #D4AF37" }}>
+                  <Typography variant="h6" fontWeight={800} sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
+                    Tenant Information
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
+              <TenantProfileInfo profile={profile} />
+            </Paper>
+          )}
+
+          {userRoles.includes("LANDLORD") && (
+            <Paper elevation={0} sx={cardPaperStyle}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: "4px solid #D4AF37" }}>
+                  <Typography variant="h6" fontWeight={800} sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
+                    Landlord Information
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
+              <LandlordProfileInfo profile={profile} />
+            </Paper>
+          )}
+
+          {userRoles.includes("CARETAKER") && (
+            <Paper elevation={0} sx={cardPaperStyle}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: "4px solid #D4AF37" }}>
+                  <Typography variant="h6" fontWeight={800} sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
+                    Caretaker Information
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
+              <CaretakerProfileInfo profile={profile} />
+            </Paper>
+          )}
+        </>
+      )}
 
       {/* DOCUMENTS CARD */}
       <Paper elevation={0} sx={cardPaperStyle}>
