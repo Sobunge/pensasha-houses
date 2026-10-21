@@ -22,7 +22,7 @@ import BaseProfileInfo from "./profile/BaseProfileInfo";
 import ProfileDocuments from "./profile/ProfileDocuments";
 
 import TenantProfileInfo from "./profile/TenantProfileInfo";
-import LandlordProfileInfo from "./profile/LandlordProfileInfo";
+import LandlordProfileInfo from "./profile/landlord/LandlordProfileInfo";
 import CaretakerProfileInfo from "./profile/CaretakerProfileInfo";
 
 import EditProfileDialog from "./EditProfileDialog";
