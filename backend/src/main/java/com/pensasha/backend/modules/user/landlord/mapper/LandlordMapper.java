@@ -1,3 +1,4 @@
+// package com.pensasha.backend.modules.user.landlord.mapper;
 package com.pensasha.backend.modules.user.landlord.mapper;
 
 import java.util.Set;
@@ -9,7 +10,9 @@ import org.mapstruct.Named;
 
 import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.user.Role;
+import com.pensasha.backend.modules.user.landlord.BankDetails;
 import com.pensasha.backend.modules.user.landlord.LandlordProfile;
+import com.pensasha.backend.modules.user.landlord.dto.BankDetailsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 
 @Mapper(componentModel = "spring")
@@ -30,13 +33,22 @@ public interface LandlordMapper {
     @Mapping(target = "profilePicture", source = "user.profilePictureUrl")
     @Mapping(target = "permissions", source = "profile", qualifiedByName = "extractPermissions")
 
-    // 🔥 FIX: Explicit role mapping
+    // Explicit role mapping
     @Mapping(target = "roles", source = "user.roles", qualifiedByName = "rolesToStrings")
 
     @Mapping(target = "propertyIds", source = "properties", qualifiedByName = "propertySetToIds")
 
     @Mapping(target = "bankDetailsId", expression = "java(profile.getBankDetails() != null ? profile.getBankDetails().getId() : null)")
+    @Mapping(target = "bankDetails", source = "bankDetails")
     GetLandLordDTO toGetDTO(LandlordProfile profile);
+
+    /*
+     * ============================================================
+     * Nested Mappings
+     * ============================================================
+     */
+
+    BankDetailsDTO toBankDetailsDTO(BankDetails bankDetails);
 
     /*
      * ============================================================
@@ -55,7 +67,7 @@ public interface LandlordMapper {
                 .collect(Collectors.toSet());
     }
 
-    // 🔥 FIX: Explicit Role -> String mapping
+    // Explicit Role -> String mapping
     @Named("rolesToStrings")
     default Set<String> rolesToStrings(Set<Role> roles) {
         if (roles == null || roles.isEmpty()) {
@@ -63,7 +75,7 @@ public interface LandlordMapper {
         }
 
         return roles.stream()
-                .map((Role role) -> role.getName()) // ⚠️ or Role::name if it's an enum
+                .map((Role role) -> role.getName())
                 .collect(Collectors.toSet());
     }
 

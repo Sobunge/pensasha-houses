@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.pensasha.backend.modules.property.Property;
+import com.pensasha.backend.modules.user.landlord.dto.BankDetailsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
@@ -16,6 +17,8 @@ import com.pensasha.backend.modules.user.landlord.dto.MaintenanceRequestDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
 import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 import com.pensasha.backend.modules.user.landlord.dto.TenantSummaryDTO;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Set;
@@ -44,7 +47,6 @@ public class LandLordController {
 
                 Page<GetLandLordDTO> landlordPage = landlordService.getAllLandlords(pageable);
 
-                // Convert each DTO to an EntityModel with HATEOAS self-link
                 List<EntityModel<GetLandLordDTO>> landlordResources = landlordPage.getContent().stream()
                                 .map(dto -> EntityModel.of(dto,
                                                 linkTo(methodOn(LandLordController.class)
@@ -110,23 +112,6 @@ public class LandLordController {
                 return ResponseEntity.ok(resource);
         }
 
-        // ---------------------- Update Landlord Bank Details ----------------------
-        @PutMapping("/{userId}/bank-details")
-        @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or hasRole('ADMIN')")
-        public ResponseEntity<EntityModel<GetLandLordDTO>> updateBankDetails(
-                        @PathVariable Long userId,
-                        @RequestBody BankDetails bankDetails) {
-
-                log.info("API call: Update bank details for landlord ID: {}", userId);
-
-                GetLandLordDTO updatedLandlord = landlordService.updateLandlordBankDetails(userId, bankDetails);
-
-                EntityModel<GetLandLordDTO> resource = EntityModel.of(updatedLandlord,
-                                linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel());
-
-                return ResponseEntity.ok(resource);
-        }
-
         // ---------------------- Delete Landlord ----------------------
         @DeleteMapping("/{userId}")
         @PreAuthorize("hasAuthority('LANDLORD_UPDATE_BANK') or hasRole('ADMIN')")
@@ -149,8 +134,7 @@ public class LandLordController {
                 return ResponseEntity.ok(stats);
         }
 
-        // ---------------------- Get Landlord Properties Performance
-        // ----------------------
+        // ---------------------- Get Landlord Properties Performance ----------------------
         @GetMapping("/{userId}/properties/performance")
         @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
         public ResponseEntity<List<PropertyPerformanceDTO>> getPropertiesPerformance(@PathVariable Long userId) {
@@ -203,5 +187,28 @@ public class LandLordController {
                 log.info("API call: Get tenant summary for landlord DB ID: {}", userId);
                 TenantSummaryDTO summary = landlordService.getTenantSummary(userId);
                 return ResponseEntity.ok(summary);
+        }
+
+        // ---------------------- Update Landlord Bank Details ----------------------
+        @PutMapping("/{userId}/bank-details")
+        @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or #userId == principal.id or hasRole('ADMIN')")
+        public ResponseEntity<EntityModel<GetLandLordDTO>> updateBankDetails(
+                        @PathVariable Long userId,
+                        @Valid @RequestBody BankDetailsDTO dto) {
+
+                log.info("API call: Update bank details for landlord ID: {}", userId);
+
+                BankDetails bankDetails = new BankDetails();
+                bankDetails.setBankName(dto.getBankName());
+                bankDetails.setAccountName(dto.getAccountName());
+                bankDetails.setAccountNumber(dto.getAccountNumber());
+                bankDetails.setBranchName(dto.getBranchName());
+
+                GetLandLordDTO updatedLandlord = landlordService.updateLandlordBankDetails(userId, bankDetails);
+
+                EntityModel<GetLandLordDTO> resource = EntityModel.of(updatedLandlord,
+                                linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel());
+
+                return ResponseEntity.ok(resource);
         }
 }

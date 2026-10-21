@@ -1,3 +1,4 @@
+// package com.pensasha.backend.modules.user.landlord.dto;
 package com.pensasha.backend.modules.user.landlord.dto;
 
 import java.util.Set;
@@ -27,4 +28,9 @@ public class GetLandLordDTO extends GetUserDTO {
      * ID of the associated bank details.
      */
     private Long bankDetailsId;
+
+    /**
+     * Full bank settlement details object for UI rendering.
+     */
+    private BankDetailsDTO bankDetails;
 }
