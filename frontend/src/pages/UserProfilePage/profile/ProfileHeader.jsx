@@ -6,7 +6,7 @@ import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import ChangeProfilePicDialog from "../ChangeProfilePicDialog";
 
-export default function ProfileHeader({ profile, onChangePic }) {
+export default function ProfileHeader({ profile, onChangePic, refreshProfile }) {
   const [openChangePic, setOpenChangePic] = useState(false);
   const avatarPreview = profile?.profilePicture || profile?.avatar || "";
 
@@ -27,6 +27,8 @@ export default function ProfileHeader({ profile, onChangePic }) {
       setOpenChangePic(true);
     }
   };
+
+  const activeRole = profile?.activeRole || profile?.role || profile?.roles?.[0];
 
   return (
     <Box sx={{ position: "relative", overflow: "hidden", borderRadius: "18px" }}>
@@ -50,12 +52,10 @@ export default function ProfileHeader({ profile, onChangePic }) {
       />
 
       {/* Header Body */}
-      <Box sx={{ px: { xs: 2.5, sm: 4, md: 4 }}}>
+      <Box sx={{ px: { xs: 2.5, sm: 4, md: 4 } }}>
         <Stack
-          // Column layout for xs, sm, and md; Row layout for lg and up
           direction={{ xs: "column", lg: "row" }}
           spacing={{ xs: 2, sm: 3 }}
-          // Center items for xs, sm, and md; flex-end for lg+
           alignItems={{ xs: "center", lg: "flex-end" }}
           sx={{ marginTop: { xs: "-45px", sm: "-55px" }, mb: 2 }}
         >
@@ -89,6 +89,7 @@ export default function ProfileHeader({ profile, onChangePic }) {
             <Button
               onClick={handleOpenPic}
               size="small"
+              aria-label="change profile picture"
               sx={{
                 position: "absolute",
                 bottom: 4,
@@ -105,6 +106,7 @@ export default function ProfileHeader({ profile, onChangePic }) {
                   bgcolor: "#D4AF37",
                   color: "#0F172A",
                 },
+                transition: "all 0.2s ease",
               }}
             >
               <PhotoCameraIcon sx={{ fontSize: 16 }} />
@@ -115,7 +117,6 @@ export default function ProfileHeader({ profile, onChangePic }) {
           <Box
             sx={{
               flex: 1,
-              // Center text on xs, sm, and md screens
               textAlign: { xs: "center", lg: "left" },
               pt: { xs: 0, lg: 1 },
             }}
@@ -123,7 +124,6 @@ export default function ProfileHeader({ profile, onChangePic }) {
             <Stack
               direction="row"
               alignItems="center"
-              // Center content row on xs, sm, and md screens
               justifyContent={{ xs: "center", lg: "flex-start" }}
               spacing={1}
             >
@@ -143,7 +143,7 @@ export default function ProfileHeader({ profile, onChangePic }) {
 
             <Typography
               variant="body2"
-              sx={{ color: "#64748B", fontWeight: 500, mt: 0.2 }}
+              sx={{ color: "#64748B", fontWeight: 600, mt: 0.2 }}
             >
               {profile?.email || "Account Holder"}
             </Typography>
@@ -151,10 +151,10 @@ export default function ProfileHeader({ profile, onChangePic }) {
 
           {/* Primary Role & Verification Badge */}
           <Stack direction="row" spacing={1} justifyContent="center">
-            {profile?.role && (
+            {activeRole && (
               <Chip
                 icon={<ShieldOutlinedIcon sx={{ color: "#D4AF37 !important", fontSize: "16px" }} />}
-                label={profile.role.toUpperCase()}
+                label={String(activeRole).replace(/^ROLE_/, "").toUpperCase()}
                 sx={{
                   bgcolor: "#0F172A",
                   color: "#FFFFFF",
@@ -177,6 +177,7 @@ export default function ProfileHeader({ profile, onChangePic }) {
           open={openChangePic}
           handleClose={() => setOpenChangePic(false)}
           user={profile}
+          refreshProfile={refreshProfile}
         />
       )}
     </Box>
