@@ -1,6 +1,5 @@
 package com.pensasha.backend.auth;
 
-import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.dto.AuthPrincipalDTO;
 import org.springframework.stereotype.Component;
@@ -35,7 +34,7 @@ public class AuthPrincipalFactory {
         }
         return user.getRoles()
                 .stream()
-                .map(Role::getName)
+                .map(role -> role.getName())
                 .collect(Collectors.toUnmodifiableSet());
     }
 

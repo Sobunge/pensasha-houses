@@ -42,7 +42,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private Map<String, Permission> seedPermissions() {
         List<Permission> existingPerms = permRepo.findAll();
         Set<String> existingNames = existingPerms.stream()
-                .map(Permission::getName)
+                .map(permission -> permission.getName())
                 .collect(Collectors.toSet());
 
         List<Permission> newPerms = Arrays.stream(Permissions.values())
@@ -60,7 +60,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         return permRepo.findAll().stream()
-                .collect(Collectors.toMap(Permission::getName, Function.identity()));
+                .collect(Collectors.toMap(permission -> permission.getName(), Function.identity()));
     }
 
     private void seedRoles(Map<String, Permission> permMap) {
