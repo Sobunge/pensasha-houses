@@ -1,13 +1,31 @@
-import { useState, useEffect, useMemo } from "react";
+// src/components/hooks/useProfileForm.js
+import { useState, useEffect, useMemo, useCallback } from "react";
+
+// Helper to normalize role from strings or object notations
+const resolveRole = (p) => {
+  if (!p) return "";
+  const rawRole = p.activeRole || p.role || (Array.isArray(p.roles) ? p.roles[0] : "");
+  const roleStr = typeof rawRole === "object" ? rawRole.name || rawRole.authority || "" : String(rawRole);
+  return roleStr.toUpperCase().replace(/^ROLE_/, "");
+};
 
 /**
  * Hook for managing profile form state with validation and placeholders
- * @param {Object} profile - user profile
+ * 
+ * @param {Object} profile user profile
  */
 export default function useProfileForm(profile) {
-  const [role, setRole] = useState(profile?.roles?.[0] || "");
+  const [role, setRole] = useState(() => resolveRole(profile));
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+
+  // Update role if profile changes
+  useEffect(() => {
+    const derivedRole = resolveRole(profile);
+    if (derivedRole) {
+      setRole(derivedRole);
+    }
+  }, [profile]);
 
   const fields = useMemo(() => {
     const baseFields = [
@@ -75,8 +93,8 @@ export default function useProfileForm(profile) {
     setErrors({});
   }, [profile, fields]);
 
-  // NEW: Enhanced Validation Logic matching Spring Boot DTO
-  const validateField = (key, value, field) => {
+  // Enhanced Validation Logic matching Spring Boot DTO
+  const validateField = useCallback((key, value, field) => {
     if (field.required && (!value || value.toString().trim() === "")) {
       return `${field.label} is required`;
     }
@@ -96,7 +114,7 @@ export default function useProfileForm(profile) {
         if (!emailRegex.test(value)) return "Invalid email address";
       }
 
-      // Kenyan Phone Number validation (Matches your DTO Regex)
+      // Kenyan Phone Number validation (Matches DTO Regex)
       if (field.type === "phone") {
         const phoneRegex = /^(?:\+254|0)[17][0-9]{8}$/;
         if (!phoneRegex.test(value)) {
@@ -112,7 +130,7 @@ export default function useProfileForm(profile) {
     }
 
     return "";
-  };
+  }, []);
 
   const handleChange = (key, value, parentKey = null, fieldDef = null) => {
     setFormData((prev) => {

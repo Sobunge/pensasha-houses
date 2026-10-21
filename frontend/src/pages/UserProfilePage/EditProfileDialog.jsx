@@ -22,7 +22,7 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 
 import api from "../../api/api";
-import useProfileForm from "../../components/hooks/useProfileForm";
+import useProfileForm from "../../components/hooks/profile/useProfileForm";
 import { useNotification } from "../../components/NotificationProvider";
 
 // Map role to endpoint
