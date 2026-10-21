@@ -35,37 +35,41 @@ export default function UserProfilePage() {
   const { userId } = useParams();
   const { profile: selfProfile, loading: selfLoading, refreshProfile } = useProfile();
 
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(selfLoading);
+  const [fetchedProfile, setFetchedProfile] = useState(null);
+  const [fetching, setFetching] = useState(false);
   const [error, setError] = useState(null);
 
   const [openEditProfile, setOpenEditProfile] = useState(false);
   const [openChangePic, setOpenChangePic] = useState(false);
   const [openManageDocs, setOpenManageDocs] = useState(false);
 
-  // Fetch profile (self or other user)
+  // Determine active profile and loading status based on whether userId is present
+  const profile = userId ? fetchedProfile : selfProfile;
+  const loading = userId ? fetching : selfLoading;
+
+  // Fetch profile if viewing another user
   useEffect(() => {
     if (!userId) {
-      setProfile(selfProfile);
-      setLoading(selfLoading);
+      setFetchedProfile(null);
+      setError(null);
       return;
     }
 
     const fetchUser = async () => {
-      setLoading(true);
+      setFetching(true);
       setError(null);
       try {
         const res = await api.get(`/users/${userId}`);
-        setProfile(res.data);
+        setFetchedProfile(res.data);
       } catch (err) {
         setError("Failed to load profile. Please try again.");
       } finally {
-        setLoading(false);
+        setFetching(false);
       }
     };
 
     fetchUser();
-  }, [userId, selfProfile, selfLoading]);
+  }, [userId]);
 
   /* ---------------- Normalizing User Roles ---------------- */
   const userRoles = useMemo(() => {
@@ -182,9 +186,7 @@ export default function UserProfilePage() {
         mx: "auto",
       }}
     >
-      {/* HEADER */}
-      <DashboardHeader title="Profile" breadcrumbs={[{ label: "Profile" }]} />
-
+ 
       {/* PROFILE HEADER CARD */}
       <Paper elevation={0} sx={cardPaperStyle}>
         {loading ? (

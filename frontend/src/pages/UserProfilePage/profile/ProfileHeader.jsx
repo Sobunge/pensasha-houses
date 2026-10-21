@@ -1,171 +1,180 @@
 // src/components/Profile/ProfileHeader.jsx
 import React, { useState } from "react";
-import { Box, Avatar, Typography, Stack, Button } from "@mui/material";
-import BadgeIcon from "@mui/icons-material/Badge";
+import { Box, Avatar, Typography, Stack, Button, Chip } from "@mui/material";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import ChangeProfilePicDialog from "../ChangeProfilePicDialog";
 
-export default function ProfileHeader({ profile, onChange }) {
+export default function ProfileHeader({ profile, onChangePic }) {
   const [openChangePic, setOpenChangePic] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState(profile?.avatar || "");
+  const avatarPreview = profile?.profilePicture || profile?.avatar || "";
 
-  // Build full name safely
   const fullName = [profile?.firstName, profile?.middleName, profile?.lastName]
     .filter(Boolean)
     .join(" ");
 
-  // Fallback for avatar initial
   const avatarInitial =
     profile?.firstName?.charAt(0) ||
     profile?.middleName?.charAt(0) ||
     profile?.lastName?.charAt(0) ||
     "U";
 
-  const handleSaveAvatar = (file) => {
-    const objectUrl = URL.createObjectURL(file);
-    setAvatarPreview(objectUrl);
-    if (onChange) onChange(file);
+  const handleOpenPic = () => {
+    if (onChangePic) {
+      onChangePic();
+    } else {
+      setOpenChangePic(true);
+    }
   };
 
   return (
-    <>
-      <Stack
-        direction={{ xs: "column", md: "row" }}
-        spacing={{ xs: 2.5, md: 4 }}
-        alignItems={{ xs: "center", md: "center" }}
-        justifyContent={{ xs: "center", md: "flex-start" }}
-      >
-        {/* ===== Avatar Section ===== */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            position: "relative",
-          }}
+    <Box sx={{ position: "relative", overflow: "hidden", borderRadius: "18px" }}>
+      {/* Cover Banner */}
+      <Box
+        sx={{
+          height: { xs: 110, sm: 140 },
+          background: "linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #D4AF37 200%)",
+          position: "relative",
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              "radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.25) 0%, transparent 50%)",
+          },
+        }}
+      />
+
+      {/* Header Body */}
+      <Box sx={{ px: { xs: 2.5, sm: 4 }, pb: 3, pt: 0, mt: 2 }}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={{ xs: 2, sm: 3 }}
+          alignItems={{ xs: "center", sm: "flex-end" }}
+          sx={{ marginTop: { xs: "-45px", sm: "-55px" }, mb: 2 }}
         >
-          <Box
-            sx={{
-              p: "3px",
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #D4AF37 0%, #0F172A 100%)",
-              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
-            }}
-          >
-            <Avatar
-              src={avatarPreview}
+          {/* Avatar Container with Floating Camera Button */}
+          <Box sx={{ position: "relative" }}>
+            <Box
               sx={{
-                width: { xs: 80, sm: 96, md: 104 },
-                height: { xs: 80, sm: 96, md: 104 },
-                fontSize: { xs: 30, sm: 38, md: 42 },
-                fontWeight: 800,
-                bgcolor: "#F8FAFC",
-                color: "#0F172A",
-                border: "3px solid #FFFFFF",
-                transition: "transform 0.3s ease",
-                "&:hover": { transform: "scale(1.03)" },
+                p: "4px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #D4AF37 0%, #0F172A 100%)",
+                boxShadow: "0 10px 25px rgba(15, 23, 42, 0.2)",
               }}
             >
-              {!avatarPreview && avatarInitial}
-            </Avatar>
+              <Avatar
+                src={avatarPreview}
+                sx={{
+                  width: { xs: 90, sm: 110 },
+                  height: { xs: 90, sm: 110 },
+                  fontSize: { xs: 32, sm: 42 },
+                  fontWeight: 800,
+                  bgcolor: "#FFFFFF",
+                  color: "#0F172A",
+                  border: "4px solid #FFFFFF",
+                }}
+              >
+                {!avatarPreview && avatarInitial}
+              </Avatar>
+            </Box>
+
+            {/* Quick Action Overlay Button */}
+            <Button
+              onClick={handleOpenPic}
+              size="small"
+              sx={{
+                position: "absolute",
+                bottom: 4,
+                right: 4,
+                minWidth: 0,
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                bgcolor: "#0F172A",
+                color: "#D4AF37",
+                border: "2px solid #FFFFFF",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                "&:hover": {
+                  bgcolor: "#D4AF37",
+                  color: "#0F172A",
+                },
+              }}
+            >
+              <PhotoCameraIcon sx={{ fontSize: 16 }} />
+            </Button>
           </Box>
 
-          <Button
-            size="small"
-            startIcon={<PhotoCameraIcon sx={{ fontSize: "14px !important" }} />}
-            onClick={() => setOpenChangePic(true)}
+          {/* User Information */}
+          <Box
             sx={{
-              mt: 1.5,
-              px: 1.5,
-              py: 0.4,
-              borderRadius: "20px",
-              bgcolor: "#FFFFFF",
-              color: "#0F172A",
-              border: "1px solid #E2E8F0",
-              fontWeight: 700,
-              letterSpacing: 0.5,
-              fontSize: { xs: "0.7rem", sm: "0.75rem" },
-              textTransform: "none",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
-              "&:hover": {
-                bgcolor: "#D4AF37",
-                color: "#0F172A",
-                borderColor: "#D4AF37",
-              },
-              transition: "all 0.2s ease",
+              flex: 1,
+              textAlign: { xs: "center", sm: "left" },
+              pt: { xs: 0, sm: 1 },
             }}
           >
-            Change Photo
-          </Button>
-        </Box>
-
-        {/* ===== Name + Role Section ===== */}
-        <Box
-          sx={{
-            textAlign: { xs: "center", md: "left" },
-            display: "flex",
-            flexDirection: "column",
-            alignItems: { xs: "center", md: "flex-start" },
-            maxWidth: { xs: "100%", md: 550 },
-          }}
-        >
-          {fullName && (
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 800,
-                color: "#0F172A",
-                lineHeight: 1.2,
-                letterSpacing: "-0.5px",
-                wordBreak: "break-word",
-                fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2.1rem" },
-              }}
-            >
-              {fullName}
-            </Typography>
-          )}
-
-          {profile?.role && (
             <Stack
               direction="row"
               alignItems="center"
+              justifyContent={{ xs: "center", sm: "flex-start" }}
               spacing={1}
-              mt={1.5}
-              sx={{
-                bgcolor: "rgba(212, 175, 55, 0.12)",
-                border: "1px solid rgba(212, 175, 55, 0.3)",
-                px: 1.8,
-                py: 0.6,
-                borderRadius: "20px",
-                justifyContent: { xs: "center", md: "flex-start" },
-              }}
             >
-              <BadgeIcon sx={{ color: "#D4AF37", fontSize: 18 }} />
               <Typography
-                variant="subtitle2"
+                variant="h5"
                 sx={{
                   fontWeight: 800,
-                  letterSpacing: 0.8,
                   color: "#0F172A",
-                  fontSize: { xs: "0.72rem", sm: "0.78rem" },
+                  letterSpacing: "-0.02em",
+                  fontSize: { xs: "1.35rem", sm: "1.65rem" },
                 }}
               >
-                {profile.role.toUpperCase()}
+                {fullName || "User Account"}
               </Typography>
+              <VerifiedIcon sx={{ color: "#D4AF37", fontSize: 22 }} />
             </Stack>
-          )}
-        </Box>
-      </Stack>
 
-      {/* ===== Change Profile Picture Dialog ===== */}
-      {openChangePic && (
+            <Typography
+              variant="body2"
+              sx={{ color: "#64748B", fontWeight: 500, mt: 0.2 }}
+            >
+              {profile?.email || "Account Holder"}
+            </Typography>
+          </Box>
+
+          {/* Primary Role & Verification Badge */}
+          <Stack direction="row" spacing={1} justifyContent="center">
+            {profile?.role && (
+              <Chip
+                icon={<ShieldOutlinedIcon sx={{ color: "#D4AF37 !important", fontSize: "16px" }} />}
+                label={profile.role.toUpperCase()}
+                sx={{
+                  bgcolor: "#0F172A",
+                  color: "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: "0.75rem",
+                  letterSpacing: 0.6,
+                  px: 0.5,
+                  borderRadius: "8px",
+                  border: "1px solid rgba(212, 175, 55, 0.4)",
+                  boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
+                }}
+              />
+            )}
+          </Stack>
+        </Stack>
+      </Box>
+
+      {openChangePic && !onChangePic && (
         <ChangeProfilePicDialog
           open={openChangePic}
           handleClose={() => setOpenChangePic(false)}
-          profile={profile}
-          onSave={handleSaveAvatar}
+          user={profile}
         />
       )}
-    </>
+    </Box>
   );
 }
