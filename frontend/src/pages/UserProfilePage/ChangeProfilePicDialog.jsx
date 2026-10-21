@@ -1,5 +1,5 @@
 // src/components/Profile/ChangeProfilePicDialog.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +12,7 @@ import {
   Box,
   IconButton,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
@@ -19,51 +20,29 @@ import CloseIcon from "@mui/icons-material/Close";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 
-export default function ChangeProfilePicDialog({ open, handleClose, user, onSave }) {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState("");
+import useChangeProfilePic from "../../components/hooks/profile/useChangeProfilePic";
 
-  // Generate preview URL when a file is selected
-  useEffect(() => {
-    if (!selectedFile) {
-      setPreview("");
-      return;
-    }
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
-
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
-    }
-  };
-
-  const handleSave = () => {
-    if (!selectedFile) {
-      alert("Please select an image first.");
-      return;
-    }
-    if (onSave) {
-      onSave(selectedFile);
-    }
-    handleClose();
-  };
-
-  // Avatar fallback initial
-  const avatarInitial =
-    user?.firstName?.charAt(0) ||
-    user?.middleName?.charAt(0) ||
-    user?.lastName?.charAt(0) ||
-    "U";
-
-  const currentPicture = preview || user?.profilePicture || user?.avatar || "";
+export default function ChangeProfilePicDialog({
+  open,
+  handleClose,
+  user,
+  onSave,
+  refreshProfile,
+}) {
+  const {
+    selectedFile,
+    currentPicture,
+    avatarInitial,
+    uploading,
+    handleFileChange,
+    handleSave,
+    resetAndClose,
+  } = useChangeProfilePic({ user, onSave, handleClose, refreshProfile });
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={resetAndClose}
       fullWidth
       maxWidth="xs"
       PaperProps={{
@@ -117,7 +96,8 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
 
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={resetAndClose}
+          disabled={uploading}
           size="small"
           sx={{
             position: "absolute",
@@ -163,6 +143,7 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
           <Button
             variant="outlined"
             component="label"
+            disabled={uploading}
             startIcon={<UploadFileOutlinedIcon sx={{ fontSize: "18px !important" }} />}
             sx={{
               borderColor: "rgba(15, 23, 42, 0.15)",
@@ -228,7 +209,8 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
         }}
       >
         <Button
-          onClick={handleClose}
+          onClick={resetAndClose}
+          disabled={uploading}
           startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           sx={{
             bgcolor: "rgba(239, 68, 68, 0.08)",
@@ -240,11 +222,11 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
             fontSize: "0.825rem",
             textTransform: "none",
             "& .MuiButton-startIcon": { color: "#EF4444" },
-            "&:hover": { 
-              bgcolor: "#EF4444", 
+            "&:hover": {
+              bgcolor: "#EF4444",
               color: "#FFFFFF",
               "& .MuiButton-startIcon": { color: "#FFFFFF" },
-              boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)"
+              boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)",
             },
             transition: "all 0.2s ease",
           }}
@@ -256,8 +238,14 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
           size="small"
           onClick={handleSave}
           variant="contained"
-          disabled={!selectedFile}
-          startIcon={<SaveOutlinedIcon sx={{ fontSize: "18px !important" }} />}
+          disabled={!selectedFile || uploading}
+          startIcon={
+            uploading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <SaveOutlinedIcon sx={{ fontSize: "18px !important" }} />
+            )
+          }
           sx={{
             bgcolor: "#0F172A",
             color: "#FFFFFF",
@@ -283,7 +271,7 @@ export default function ChangeProfilePicDialog({ open, handleClose, user, onSave
             },
           }}
         >
-          Save
+          {uploading ? "Uploading..." : "Save"}
         </Button>
       </DialogActions>
     </Dialog>
