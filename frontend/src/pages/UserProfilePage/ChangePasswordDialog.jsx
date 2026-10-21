@@ -23,7 +23,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CloseIcon from "@mui/icons-material/Close";
 
-import useResetPassword from "../../components/hooks/useResetPassword";
+import useResetPassword from "../../components/hooks/profile/useResetPassword";
 
 /* ---------------- Premium & Compact Input Styles ---------------- */
 const premiumInputStyles = {

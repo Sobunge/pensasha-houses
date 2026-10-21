@@ -1,7 +1,8 @@
 // src/components/hooks/useResetPassword.js
 import { useState } from "react";
-import api from "../../api/api";
-import { useNotification } from "../NotificationProvider";
+import { useMutation } from "@tanstack/react-query";
+import api from "../../../api/api";
+import { useNotification } from "../../NotificationProvider";
 
 const INITIAL_STATE = {
   currentPassword: "",
@@ -11,9 +12,7 @@ const INITIAL_STATE = {
 
 export default function useResetPassword() {
   const { notify } = useNotification();
-
   const [values, setValues] = useState(INITIAL_STATE);
-  const [loading, setLoading] = useState(false);
 
   /* ---------------- Change handler ---------------- */
   const handleChange = (e) => {
@@ -44,6 +43,14 @@ export default function useResetPassword() {
     return errors;
   };
 
+  /* ---------------- TanStack Mutation ---------------- */
+  const mutation = useMutation({
+    mutationFn: async (payload) => {
+      const response = await api.put("/users/me/changePassword", payload);
+      return response.data;
+    },
+  });
+
   /* ---------------- Submit ---------------- */
   const resetPassword = async ({ setFieldErrors } = {}) => {
     const errors = validate();
@@ -57,9 +64,8 @@ export default function useResetPassword() {
       return false;
     }
 
-    setLoading(true);
     try {
-      await api.put("/users/me/changePassword", values);
+      await mutation.mutateAsync(values);
 
       notify("Password updated successfully", "success");
       setValues(INITIAL_STATE);
@@ -76,8 +82,6 @@ export default function useResetPassword() {
         notify(message, "error");
       }
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -86,7 +90,7 @@ export default function useResetPassword() {
 
   return {
     values,
-    loading,
+    loading: mutation.isPending, // Maps cleanly to your existing component loading checks
     handleChange,
     resetPassword,
     resetForm,
