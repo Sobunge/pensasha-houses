@@ -20,8 +20,6 @@ import {
   Divider,
   Skeleton,
   Alert,
-  alpha,
-  useTheme,
   CircularProgress
 } from "@mui/material";
 import {
@@ -43,7 +41,6 @@ const MAX_FILE_SIZE_MB = 2;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 export default function ProfileDocuments({ openDialog, setOpenDialog, role }) {
-  const theme = useTheme();
   const [selectedDocType, setSelectedDocType] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [actionLoadingId, setActionLoadingId] = useState(null);

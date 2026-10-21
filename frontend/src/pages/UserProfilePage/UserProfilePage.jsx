@@ -28,7 +28,7 @@ import CaretakerProfileInfo from "./profile/CaretakerProfileInfo";
 import EditProfileDialog from "./EditProfileDialog";
 import ChangeProfilePicDialog from "./ChangeProfilePicDialog";
 
-import useProfile from "../../components/hooks/useProfile";
+import useProfile from "../../components/hooks/profile/useProfile";
 import api from "../../api/api";
 
 export default function UserProfilePage() {
