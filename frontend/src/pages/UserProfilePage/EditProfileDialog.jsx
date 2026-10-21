@@ -1,5 +1,5 @@
 // src/pages/UserProfilePage/EditProfileDialog.jsx
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -21,21 +21,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 
-import api from "../../api/api";
 import useProfileForm from "../../components/hooks/profile/useProfileForm";
-import { useNotification } from "../../components/NotificationProvider";
-
-// Map role to endpoint
-const getProfileEndpoint = (role, id) => {
-  const cleanRole = role?.replace(/^ROLE_/, "").toUpperCase();
-  const roleMap = {
-    TENANT: `/tenants/${id}`,
-    LANDLORD: `/landlords/${id}`,
-    CARETAKER: `/caretakers/${id}`,
-    ADMIN: `/admins/${id}`,
-  };
-  return roleMap[cleanRole] || `/users/${id}`;
-};
+import useUpdateProfile from "../../components/hooks/profile/useUpdateProfile";
 
 /* ---------------- Premium & Compact Input Styles ---------------- */
 const premiumInputStyles = {
@@ -79,21 +66,24 @@ const premiumInputStyles = {
 };
 
 export default function EditProfileDialog({ open, handleClose, profile, refreshProfile }) {
-  const { notify } = useNotification();
-
   const { 
     formData, 
     errors, 
     handleChange, 
-    handleSubmit, 
+    handleSubmit: handleFormSubmit, 
     fields, 
     role: selectedRole 
   } = useProfileForm(profile || {});
 
-  const [loading, setLoading] = useState(false);
-
   // Fallback active role resolution
   const activeRole = selectedRole || profile?.role || profile?.roles?.[0];
+
+  const { handleSave, loading } = useUpdateProfile({
+    profile,
+    activeRole,
+    refreshProfile,
+    handleClose,
+  });
 
   // Helper function to render an individual input field
   const renderSingleField = (field, parentKey = null) => {
@@ -144,7 +134,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
         renderedElements.push(
           <Stack
             key="name-fields-row"
-            direction={{ xs: "column", lg: "row" }} // Column for sm & md, Horizontal Row for lg
+            direction={{ xs: "column", lg: "row" }}
             spacing={2}
             sx={{ width: "100%" }}
           >
@@ -175,7 +165,6 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
           </Box>
         );
       } else if (["firstName", "middleName", "lastName"].includes(field.key)) {
-        // Collect name fields to put in a horizontal row on large screens
         nameFieldsBuffer.push(field);
       } else {
         flushNameBuffer();
@@ -185,50 +174,6 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
 
     flushNameBuffer();
     return renderedElements;
-  };
-
-  // Save handler with Notification feedback
-  const handleSave = async () => {
-    if (!profile?.id || !activeRole) {
-      notify("Missing user or active role information.", "warning");
-      return;
-    }
-
-    const payload = handleSubmit();
-    if (!payload) {
-      notify("Please resolve validation errors before saving.", "error");
-      return;
-    }
-
-    const endpoint = getProfileEndpoint(activeRole, profile.id);
-    if (!endpoint) {
-      notify("Could not resolve update endpoint for role.", "error");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await api.put(endpoint, payload);
-      
-      notify("Profile updated successfully!", "success");
-
-      if (refreshProfile) {
-        await refreshProfile();
-      }
-
-      handleClose();
-    } catch (err) {
-      console.error("Failed to update profile:", err);
-      
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to update profile. Please try again.";
-
-      notify(errorMessage, "error");
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -344,7 +289,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
         <Button
           startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <SaveOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           variant="contained"
-          onClick={handleSave}
+          onClick={() => handleSave(handleFormSubmit)}
           disabled={loading}
           sx={{
             bgcolor: "#0F172A",
