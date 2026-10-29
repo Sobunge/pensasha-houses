@@ -18,13 +18,20 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // 2. Fetch all payments made by a specific tenant
     List<Payment> findByTenantIdOrderByPaymentDateDesc(Long tenantId, Pageable pageable);
 
-    // 3. Calculate total revenue collected for a specific landlord within a date range (for financial reports)
+    // 3. Calculate total revenue collected for a specific landlord within a date
+    // range (for financial reports)
     @Query("SELECT SUM(p.amount) FROM Payment p " +
-           "JOIN p.tenant t " +
-           "WHERE p.status = 'COMPLETED' " +
-           "AND p.paymentDate BETWEEN :startDate AND :endDate")
+            "JOIN p.tenant t " +
+            "WHERE p.status = 'COMPLETED' " +
+            "AND p.paymentDate BETWEEN :startDate AND :endDate")
     BigDecimal sumCompletedPaymentsByDateRange(
-        @Param("startDate") LocalDateTime startDate, 
-        @Param("endDate") LocalDateTime endDate
-    );
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT p FROM Payment p " +
+            "LEFT JOIN p.invoice i " +
+            "LEFT JOIN i.lease l " +
+            "WHERE p.invoice IS NULL OR l.unit.property.landlord.id = :landlordId " +
+            "ORDER BY p.paymentDate DESC")
+    List<Payment> findRecentPaymentsByLandlordId(@Param("landlordId") Long landlordId, Pageable pageable);
 }
