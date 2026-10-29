@@ -7,10 +7,10 @@ const fetchProfileData = async (authUserId, activeRole) => {
   if (!authUserId) return null;
 
   // 1. Fetch Base User Data
-  const res = await api.get("/users/me");
-  const baseProfile = res.data?.content || res.data;
+  const userRes = await api.get("/users/me");
+  const baseProfile = userRes.data?.content || userRes.data;
 
-  let extraData = {};
+  let roleProfileData = {};
 
   // 2. Map role to specific endpoints if baseProfile is valid
   if (baseProfile?.id) {
@@ -20,28 +20,34 @@ const fetchProfileData = async (authUserId, activeRole) => {
       caretaker: `/caretakers/${baseProfile.id}`,
     };
 
-    const normalizedRole = activeRole?.toLowerCase();
+    // Normalize role by converting to lower case and stripping any "role_" prefix
+    const normalizedRole = activeRole?.toLowerCase().replace("role_", "");
     const endpoint = roleEndpoints[normalizedRole];
 
     // 3. Fetch Role-Specific Data
-    if (endpoint) {
+  if (endpoint) {
       try {
         const roleRes = await api.get(endpoint);
         const rawRoleData = roleRes.data?.content || roleRes.data;
 
-        // Prevent nested id/user objects from overwriting base data
+        // Safely extract role-specific properties while retaining sets/arrays like bankDetails
         const { id, user, ...rest } = rawRoleData;
-        extraData = rest;
+        roleProfileData = {
+          ...rest,
+          bankDetails: rawRoleData.bankDetails || [],
+          properties: rawRoleData.properties || rawRoleData.propertyIds || [],
+          acceptedPaymentMethods: rawRoleData.acceptedPaymentMethods || [],
+        };
       } catch (roleErr) {
         console.warn(`Role data fetch failed for: ${activeRole}`, roleErr);
       }
     }
   }
 
-  // 4. Merge Data
+  // 4. Merge Data cleanly
   return {
     ...baseProfile,
-    ...extraData,
+    ...roleProfileData,
     activeRole,
   };
 };
@@ -58,12 +64,11 @@ export default function useProfile() {
   } = useQuery({
     queryKey: ["profile", authUserId, activeRole],
     queryFn: () => fetchProfileData(authUserId, activeRole),
-    enabled: Boolean(authUserId), // Only runs query if authUserId exists
-    staleTime: 1000 * 60 * 5, // Cache profile for 5 minutes
+    enabled: Boolean(authUserId),
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
 
-  // Refresh helper function maintaining exact backwards compatibility with your code
   const refreshProfile = async () => {
     await queryClient.invalidateQueries({ queryKey: ["profile", authUserId, activeRole] });
   };

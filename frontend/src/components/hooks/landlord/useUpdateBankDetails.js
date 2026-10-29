@@ -7,12 +7,13 @@ export default function useUpdateBankDetails(landlordId) {
 
   return useMutation({
     mutationFn: async (bankData) => {
-      // Adjust endpoint to match your landlord bank details endpoint
+      // Sends payload { id, bankName, accountName, accountNumber, branchName }
+      // Hits PUT /api/landlords/{userId}/bank-details
       const res = await api.put(`/landlords/${landlordId}/bank-details`, bankData);
       return res.data;
     },
     onSuccess: () => {
-      // Invalidate profile query to re-fetch and re-render fresh data
+      // Invalidates profile query to re-fetch and render fresh bank details set
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
   });

@@ -29,10 +29,13 @@ import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.MaintenanceRequestDTO;
+import com.pensasha.backend.modules.user.landlord.dto.PaymentPreferencesDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
 import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 import com.pensasha.backend.modules.user.landlord.dto.TenantSummaryDTO;
 import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
+
+import jakarta.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,25 +65,21 @@ public class LandLordService {
         public GetLandLordDTO getLandlordByIdNumber(String idNumber) {
                 log.info("Fetching landlord profile by user idNumber={}", idNumber);
 
-                // Fetch the user by idNumber
                 User user = userRepository.findByIdNumber(idNumber)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "User not found with idNumber: " + idNumber));
 
-                // Ensure the user has the LANDLORD role
                 if (user.getRoles() == null || user.getRoles().stream()
                                 .noneMatch(r -> "LANDLORD".equalsIgnoreCase(r.getName()))) {
                         throw new IllegalStateException("User is not a landlord");
                 }
 
-                // Fetch the landlord profile associated with the user
                 LandlordProfile profile = landlordProfileRepository.findById(user.getId())
                                 .orElseThrow(
                                                 () -> new ResourceNotFoundException(
                                                                 "Landlord profile not found for userId: "
                                                                                 + user.getId()));
 
-                // Map entity to DTO including roles and permissions
                 return landlordMapper.toGetDTO(profile);
         }
 
@@ -119,23 +118,38 @@ public class LandLordService {
                 return landlordMapper.toGetDTO(landlordProfileRepository.save(profile));
         }
 
-        /* ===================== UPDATE BANK DETAILS ===================== */
+        /* ===================== UPDATE / ADD BANK DETAILS ===================== */
+        @Transactional
         public GetLandLordDTO updateLandlordBankDetails(Long userId, BankDetails bankDetails) {
-                log.info("Updating bank details for landlord userId={}", userId);
+                log.info("Adding/Updating bank details for landlord userId={}", userId);
 
                 LandlordProfile profile = landlordProfileRepository.findById(userId)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Landlord profile not found for userId: " + userId));
 
-                profile.setBankDetails(bankDetails);
+                // If bankDetails has an ID, check if it exists in the collection to update it; otherwise add as new.
+                if (bankDetails.getId() != null) {
+                        BankDetails existing = profile.getBankDetails().stream()
+                                        .filter(b -> b.getId().equals(bankDetails.getId()))
+                                        .findFirst()
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Bank details record with ID " + bankDetails.getId() + " not found for landlord"));
+
+                        existing.setBankName(bankDetails.getBankName());
+                        existing.setAccountName(bankDetails.getAccountName());
+                        existing.setAccountNumber(bankDetails.getAccountNumber());
+                        existing.setBranchName(bankDetails.getBranchName());
+                } else {
+                        profile.addBankDetails(bankDetails);
+                }
+
                 return landlordMapper.toGetDTO(landlordProfileRepository.save(profile));
         }
 
-        // Getting the landlord statistics
+        /* ===================== DASHBOARD STATS ===================== */
         public LandlordStatsDTO getDashboardStats(Long userId) {
                 log.info("Calculating dashboard stats for landlord userId={}", userId);
 
-                // 1. Fetch Landlord Profile
                 LandlordProfile profile = landlordProfileRepository.findById(userId)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Landlord profile not found for userId: " + userId));
@@ -143,7 +157,6 @@ public class LandLordService {
                 Set<Property> properties = profile.getProperties();
                 long propertyCount = properties != null ? properties.size() : 0;
 
-                // 3. Extract all units across all properties safely
                 List<Unit> allUnits = properties == null ? List.of()
                                 : properties.stream()
                                                 .filter(property -> property.getUnits() != null)
@@ -152,20 +165,16 @@ public class LandLordService {
 
                 long totalUnits = allUnits.size();
 
-                // 4. Occupied Units (A unit is occupied if it has a tenant assigned or status
-                // is OCCUPIED)
                 long occupiedUnits = allUnits.stream()
                                 .filter(unit -> unit.getTenant() != null ||
                                                 (unit.getStatus() != null && "OCCUPIED"
                                                                 .equalsIgnoreCase(unit.getStatus().name())))
                                 .count();
 
-                // 5. Calculate Occupancy Rate percentage
                 int occupancyRate = (totalUnits > 0)
                                 ? (int) Math.round(((double) occupiedUnits / totalUnits) * 100)
                                 : 0;
 
-                // 6. Pending Rent
                 BigDecimal pendingRent = invoiceRepository.sumPendingOrOverdueRentByLandlordId(userId);
                 if (pendingRent == null) {
                         pendingRent = BigDecimal.ZERO;
@@ -174,7 +183,7 @@ public class LandLordService {
                 return new LandlordStatsDTO(
                                 occupancyRate,
                                 occupiedUnits,
-                                totalUnits, // totalOccupancyUnits
+                                totalUnits,
                                 totalUnits,
                                 propertyCount,
                                 pendingRent);
@@ -220,29 +229,21 @@ public class LandLordService {
         public FinancialOverviewDTO getFinancialOverview(Long userId) {
                 log.info("Calculating financial overview for landlord userId={}", userId);
 
-                // 1. Fetch Landlord Profile and use it
                 LandlordProfile profile = landlordProfileRepository.findById(userId)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Landlord profile not found for userId: " + userId));
 
-                // Ensure the landlord actually has properties linked (utilizing the profile
-                // variable)
                 int propertyCount = profile.getProperties() != null ? profile.getProperties().size() : 0;
                 log.debug("Found {} properties for landlord userId={}", propertyCount, userId);
 
-                // 2. Fetch actual total collected income from paid invoices
                 BigDecimal totalIncome = invoiceRepository.sumPaidRevenueByLandlordId(userId);
                 if (totalIncome == null) {
                         totalIncome = BigDecimal.ZERO;
                 }
 
-                // 3. Expenses
                 BigDecimal totalExpenses = BigDecimal.ZERO;
-
-                // 4. Net Profit Calculation
                 BigDecimal netProfit = totalIncome.subtract(totalExpenses);
 
-                // 5. Monthly Trajectory Data
                 List<FinancialOverviewDTO.MonthlyDataPoint> monthlyData = List.of(
                                 new FinancialOverviewDTO.MonthlyDataPoint("Jan", new BigDecimal("45000"),
                                                 new BigDecimal("15000")),
@@ -270,9 +271,6 @@ public class LandLordService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Landlord profile not found for userId: " + userId));
 
-                int propertyCount = profile.getProperties() != null ? profile.getProperties().size() : 0;
-                log.debug("Verified landlord profile with {} properties for userId={}", propertyCount, userId);
-
                 Pageable pageable = PageRequest.of(0, limit);
                 List<Payment> payments = paymentRepository.findRecentPaymentsByLandlordId(userId, pageable);
 
@@ -289,14 +287,18 @@ public class LandLordService {
                                                         : "N/A";
 
                         BigDecimal amount = payment.getAmount() != null
-                                        ? BigDecimal.valueOf(payment.getAmount())
+                                        ? payment.getAmount()
                                         : BigDecimal.ZERO;
 
                         String method = payment.getMethod() != null ? payment.getMethod().name() : "Other";
 
+                        LocalDate paymentDate = payment.getPaymentDate() != null
+                                        ? payment.getPaymentDate().toLocalDate()
+                                        : null;
+
                         return new RecentPaymentDTO(
                                         payment.getId(),
-                                        payment.getPaymentDate(),
+                                        paymentDate,
                                         tenantName,
                                         unitName,
                                         amount,
@@ -310,9 +312,6 @@ public class LandLordService {
                 LandlordProfile profile = landlordProfileRepository.findById(userId)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Landlord profile not found for userId: " + userId));
-
-                int propertyCount = profile.getProperties() != null ? profile.getProperties().size() : 0;
-                log.debug("Verified landlord profile with {} properties for userId={}", propertyCount, userId);
 
                 Pageable pageable = PageRequest.of(0, limit);
                 List<MaintenanceRequest> requests = maintenanceRequestRepository.findRecentByLandlordId(userId,
@@ -340,15 +339,33 @@ public class LandLordService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Landlord profile not found for userId: " + userId));
 
-                int propertyCount = profile.getProperties() != null ? profile.getProperties().size() : 0;
-                log.debug("Found {} properties for landlord userId={}", propertyCount, userId);
-
                 long activeTenants = leaseRepository.countActiveTenantsByLandlordId(userId);
                 long expiringLeases = leaseRepository.countExpiringLeasesByLandlordId(userId,
                                 LocalDate.now().plusDays(30));
-                long pendingNotices = 0; // Can be integrated with notices or pending renewals repository if available
+                long pendingNotices = 0;
 
                 return new TenantSummaryDTO(activeTenants, expiringLeases, pendingNotices);
         }
 
+        @Transactional
+        public GetLandLordDTO updatePaymentPreferences(Long userId, PaymentPreferencesDTO dto) {
+                log.info("Updating payment preferences for landlord userId={}", userId);
+
+                LandlordProfile profile = landlordProfileRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Landlord profile not found for userId: " + userId));
+
+                if (dto.getAcceptedPaymentMethods() != null) {
+                        profile.setAcceptedPaymentMethods(dto.getAcceptedPaymentMethods());
+                }
+                profile.setMpesaPaybillNumber(dto.getMpesaPaybillNumber());
+                profile.setMpesaAccountNumber(dto.getMpesaAccountNumber());
+                profile.setMpesaTillNumber(dto.getMpesaTillNumber());
+                profile.setMpesaPhoneNumber(dto.getMpesaPhoneNumber());
+                profile.setCashPaymentInstructions(dto.getCashPaymentInstructions());
+
+                LandlordProfile savedProfile = landlordProfileRepository.save(profile);
+
+                return landlordMapper.toGetDTO(savedProfile);
+        }
 }

@@ -14,6 +14,7 @@ import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
 import com.pensasha.backend.modules.user.landlord.dto.MaintenanceRequestDTO;
+import com.pensasha.backend.modules.user.landlord.dto.PaymentPreferencesDTO;
 import com.pensasha.backend.modules.user.landlord.dto.PropertyPerformanceDTO;
 import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 import com.pensasha.backend.modules.user.landlord.dto.TenantSummaryDTO;
@@ -42,15 +43,16 @@ public class LandLordController {
                         @RequestParam(defaultValue = "10") int size) {
 
                 log.info("API call: Get paginated landlords - page: {}, size: {}", page, size);
-                Pageable pageable = PageRequest.of(page, size,
-                                Sort.by((GetLandLordDTO getLandlordById) -> getLandlordById.getIdNumber()).ascending());
+                
+                // Fix: Use property path String for sorting instead of lambda expression
+                Pageable pageable = PageRequest.of(page, size, Sort.by("user.idNumber").ascending());
 
                 Page<GetLandLordDTO> landlordPage = landlordService.getAllLandlords(pageable);
 
                 List<EntityModel<GetLandLordDTO>> landlordResources = landlordPage.getContent().stream()
                                 .map(dto -> EntityModel.of(dto,
                                                 linkTo(methodOn(LandLordController.class)
-                                                                .getLandlordById(dto.getIdNumber()))
+                                                                .getLandlordByNationalId(dto.getIdNumber()))
                                                                 .withSelfRel()))
                                 .collect(Collectors.toList());
 
@@ -66,20 +68,20 @@ public class LandLordController {
         // ---------------------- Get Landlord by National ID ----------------------
         @GetMapping("/by-national-id/{idNumber}")
         @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
-        public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable String idNumber) {
-                log.info("API call: Get landlord with ID: {}", idNumber);
+        public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordByNationalId(@PathVariable String idNumber) {
+                log.info("API call: Get landlord with National ID: {}", idNumber);
 
                 GetLandLordDTO landlordDTO = landlordService.getLandlordByIdNumber(idNumber);
 
                 EntityModel<GetLandLordDTO> resource = EntityModel.of(landlordDTO,
-                                linkTo(methodOn(LandLordController.class).getLandlordById(idNumber)).withSelfRel(),
+                                linkTo(methodOn(LandLordController.class).getLandlordByNationalId(idNumber)).withSelfRel(),
                                 linkTo(methodOn(LandLordController.class).getAllLandlords(0, 10))
                                                 .withRel("all-landlords"));
 
                 return ResponseEntity.ok(resource);
         }
 
-        // ---------------------- Get landlord by ID ---------------------- //
+        // ---------------------- Get landlord by DB User ID ----------------------
         @GetMapping("/by-id/{userId}")
         @PreAuthorize("hasAuthority('LANDLORD_VIEW') or hasRole('ADMIN')")
         public ResponseEntity<EntityModel<GetLandLordDTO>> getLandlordById(@PathVariable Long userId) {
@@ -190,6 +192,7 @@ public class LandLordController {
         }
 
         // ---------------------- Update Landlord Bank Details ----------------------
+  // ---------------------- Update Landlord Bank Details ----------------------
         @PutMapping("/{userId}/bank-details")
         @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or #userId == principal.id or hasRole('ADMIN')")
         public ResponseEntity<EntityModel<GetLandLordDTO>> updateBankDetails(
@@ -199,12 +202,29 @@ public class LandLordController {
                 log.info("API call: Update bank details for landlord ID: {}", userId);
 
                 BankDetails bankDetails = new BankDetails();
+                bankDetails.setId(dto.getId()); // Pass ID if updating an existing record
                 bankDetails.setBankName(dto.getBankName());
                 bankDetails.setAccountName(dto.getAccountName());
                 bankDetails.setAccountNumber(dto.getAccountNumber());
                 bankDetails.setBranchName(dto.getBranchName());
 
                 GetLandLordDTO updatedLandlord = landlordService.updateLandlordBankDetails(userId, bankDetails);
+
+                EntityModel<GetLandLordDTO> resource = EntityModel.of(updatedLandlord,
+                                linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel());
+
+                return ResponseEntity.ok(resource);
+        }
+        // ---------------------- Update Payment Collection Preferences ----------------------
+        @PutMapping("/{userId}/payment-preferences")
+        @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or #userId == principal.id or hasRole('ADMIN')")
+        public ResponseEntity<EntityModel<GetLandLordDTO>> updatePaymentPreferences(
+                        @PathVariable Long userId,
+                        @Valid @RequestBody PaymentPreferencesDTO dto) {
+
+                log.info("API call: Update payment preferences for landlord ID: {}", userId);
+
+                GetLandLordDTO updatedLandlord = landlordService.updatePaymentPreferences(userId, dto);
 
                 EntityModel<GetLandLordDTO> resource = EntityModel.of(updatedLandlord,
                                 linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel());
