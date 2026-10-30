@@ -236,7 +236,7 @@ export default function LandlordProfileInfo({ profile }) {
           </ProfileInfoCard>
         </Box>
 
-        {/* BANK SETTLEMENT DETAILS CARD (50%) - GRID LAYOUT */}
+        {/* BANK SETTLEMENT DETAILS CARD (50%) - MULTI-ACCOUNT GRID */}
         <Box sx={{ flex: { xs: "1 1 100%", md: "1 1 50%" }, minWidth: 0 }}>
           <ProfileInfoCard
             icon={AccountBalanceOutlinedIcon}

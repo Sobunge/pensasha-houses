@@ -1,6 +1,7 @@
 package com.pensasha.backend.modules.user.landlord;
 
 import com.pensasha.backend.modules.payment.MethodsOfPayment;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,8 +14,18 @@ import java.util.Optional;
 public interface LandlordProfileRepository extends JpaRepository<LandlordProfile, Long> {
 
     /**
-     * Find a landlord profile by the national ID number of the associated User.
+     * Eagerly fetch LandlordProfile along with associated properties and bank details by ID
+     * to prevent LazyInitializationException during DTO mapping.
      */
+    @Override
+    @EntityGraph(attributePaths = {"properties", "bankDetails"})
+    Optional<LandlordProfile> findById(Long id);
+
+    /**
+     * Find a landlord profile by the national ID number of the associated User,
+     * eagerly fetching properties and bank details.
+     */
+    @EntityGraph(attributePaths = {"properties", "bankDetails"})
     Optional<LandlordProfile> findByUserIdNumber(String idNumber);
 
     /**

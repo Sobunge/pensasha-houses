@@ -35,7 +35,7 @@ import com.pensasha.backend.modules.user.landlord.dto.RecentPaymentDTO;
 import com.pensasha.backend.modules.user.landlord.dto.TenantSummaryDTO;
 import com.pensasha.backend.modules.user.landlord.mapper.LandlordMapper;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +51,7 @@ public class LandLordService {
         private final LeaseRepository leaseRepository;
 
         /* ===================== FETCH BY USER ID ===================== */
+        @Transactional(readOnly = true)
         public GetLandLordDTO getLandlordByUserId(Long userId) {
                 log.info("Fetching landlord profile for userId={}", userId);
 
