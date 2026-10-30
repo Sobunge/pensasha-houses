@@ -25,7 +25,6 @@ import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.UserRepository;
-import com.pensasha.backend.modules.user.landlord.LandlordProfile;
 import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
@@ -272,10 +271,6 @@ public class LandLordService {
         public List<RecentPaymentDTO> getRecentPayments(Long userId, int limit) {
                 log.info("Fetching recent payments for landlord userId={}, limit={}", userId, limit);
 
-                LandlordProfile profile = landlordProfileRepository.findById(userId)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Landlord profile not found for userId: " + userId));
-
                 Pageable pageable = PageRequest.of(0, limit);
                 List<Payment> payments = paymentRepository.findRecentPaymentsByLandlordId(userId, pageable);
 
@@ -314,10 +309,6 @@ public class LandLordService {
         public List<MaintenanceRequestDTO> getMaintenanceRequests(Long userId, int limit) {
                 log.info("Fetching maintenance requests for landlord userId={}, limit={}", userId, limit);
 
-                LandlordProfile profile = landlordProfileRepository.findById(userId)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Landlord profile not found for userId: " + userId));
-
                 Pageable pageable = PageRequest.of(0, limit);
                 List<MaintenanceRequest> requests = maintenanceRequestRepository.findRecentByLandlordId(userId,
                                 pageable);
@@ -339,10 +330,6 @@ public class LandLordService {
 
         public TenantSummaryDTO getTenantSummary(Long userId) {
                 log.info("Calculating tenant & lease summary metrics for landlord userId={}", userId);
-
-                LandlordProfile profile = landlordProfileRepository.findById(userId)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Landlord profile not found for userId: " + userId));
 
                 long activeTenants = leaseRepository.countActiveTenantsByLandlordId(userId);
                 long expiringLeases = leaseRepository.countExpiringLeasesByLandlordId(userId,

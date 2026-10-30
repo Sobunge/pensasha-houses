@@ -15,11 +15,20 @@ public interface PaymentMapper {
 
     @Mapping(target = "tenant", source = "tenantId")
     @Mapping(target = "invoice", source = "invoiceNumber")
+    @Mapping(target = "amount", expression = "java(dto.getAmount() != null ? BigDecimal.valueOf(dto.getAmount()) : null)")
+    @Mapping(target = "paymentDate", expression = "java(dto.getPaymentDate() != null ? dto.getPaymentDate().atStartOfDay() : null)")
+    @Mapping(target = "method", expression = "java(dto.getMethod() != null ? MethodsOfPayment.valueOf(dto.getMethod()) : null)")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "sourceIdentifier", ignore = true)
+    @Mapping(target = "transactionReference", ignore = true)
     Payment toEntity(PaymentDTO dto);
 
     @Mapping(source = "tenant.id", target = "tenantId")
-    @Mapping(source = "method", target = "method")
     @Mapping(source = "invoice.invoiceNumber", target = "invoiceNumber")
+    @Mapping(target = "amount", expression = "java(payment.getAmount() != null ? payment.getAmount().doubleValue() : null)")
+    @Mapping(target = "paymentDate", expression = "java(payment.getPaymentDate() != null ? payment.getPaymentDate().toLocalDate() : null)")
+    @Mapping(target = "method", expression = "java(payment.getMethod() != null ? payment.getMethod().name() : null)")
     PaymentDTO toDTO(Payment payment);
 
     // Convert tenantId to Tenant entity
