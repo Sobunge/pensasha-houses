@@ -81,16 +81,52 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
     setErrorMessage("");
 
     if (!form.bankName || !form.accountName || !form.accountNumber) {
-      setErrorMessage("Please complete all required bank account fields.");
+      const validationMsg = "Please complete all required bank account fields.";
+      setErrorMessage(validationMsg);
+
+      window.dispatchEvent(
+        new CustomEvent("app-notification", {
+          detail: {
+            message: validationMsg,
+            severity: "warning",
+            duration: 4000,
+          },
+        })
+      );
       return;
     }
 
+    const isEditing = Boolean(form.id);
+
     try {
       await updateBankMutation.mutateAsync(form);
+
+      window.dispatchEvent(
+        new CustomEvent("app-notification", {
+          detail: {
+            message: isEditing
+              ? "Bank account updated successfully."
+              : "Bank account added successfully.",
+            severity: "success",
+            duration: 4000,
+          },
+        })
+      );
+
       handleClose();
     } catch (err) {
-      setErrorMessage(
-        err?.response?.data?.message || "Failed to save bank details. Please try again."
+      const errorMsg =
+        err?.response?.data?.message || "Failed to save bank details. Please try again.";
+      setErrorMessage(errorMsg);
+
+      window.dispatchEvent(
+        new CustomEvent("app-notification", {
+          detail: {
+            message: errorMsg,
+            severity: "error",
+            duration: 5000,
+          },
+        })
       );
     }
   };
