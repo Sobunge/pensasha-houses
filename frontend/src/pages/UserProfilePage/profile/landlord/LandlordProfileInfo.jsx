@@ -1,13 +1,27 @@
 // src/components/Profile/landlord/LandlordProfileInfo.jsx
 import React, { useState, useMemo } from "react";
 import PropTypes from "prop-types";
-import { Box, Typography, Chip, Stack, Button } from "@mui/material";
+import { 
+  Box, 
+  Typography, 
+  Chip, 
+  Stack, 
+  Button, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions,
+  IconButton,
+  CircularProgress 
+} from "@mui/material";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import AddCardOutlinedIcon from "@mui/icons-material/AddCardOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import CloseIcon from "@mui/icons-material/Close";
 
 import AddBankDetailsDialog from "./AddBankDetailsDialog";
 import EditPaymentPreferencesDialog from "./EditPaymentPreferencesDialog";
@@ -56,7 +70,7 @@ function ProfileInfoCard({ icon: Icon, title, action, children }) {
         display: "flex",
         alignItems: "flex-start",
         gap: 2,
-        width: "100%", // Forced 100% Full Width
+        width: "100%",
         boxSizing: "border-box",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         boxShadow: "0 4px 12px rgba(15, 23, 42, 0.02)",
@@ -141,6 +155,9 @@ export default function LandlordProfileInfo({ profile }) {
   const [selectedBankToEdit, setSelectedBankToEdit] = useState(null);
   const [openPaymentPrefsDialog, setOpenPaymentPrefsDialog] = useState(false);
 
+  // Custom Delete Confirmation Dialog State
+  const [bankToDelete, setBankToDelete] = useState(null);
+
   // Initialize TanStack Query mutation hook
   const deleteBankMutation = useDeleteBankDetail();
 
@@ -171,16 +188,22 @@ export default function LandlordProfileInfo({ profile }) {
     setOpenBankDialog(true);
   };
 
-  const handleDeleteBank = (bank) => {
-    const bankId = bank.id;
-    if (!bankId || !userId) {
-      console.error("Missing userId or bankId");
-      return;
-    }
+  // Open confirmation modal
+  const handlePromptDeleteBank = (bank) => {
+    setBankToDelete(bank);
+  };
 
-    if (window.confirm(`Are you sure you want to delete ${bank.bankName || "this bank account"}?`)) {
-      deleteBankMutation.mutate({ userId, bankId });
-    }
+  // Execute deletion
+  const handleConfirmDelete = () => {
+    if (!bankToDelete || !userId) return;
+    deleteBankMutation.mutate(
+      { userId, bankId: bankToDelete.id },
+      {
+        onSuccess: () => {
+          setBankToDelete(null);
+        },
+      }
+    );
   };
 
   return (
@@ -199,7 +222,7 @@ export default function LandlordProfileInfo({ profile }) {
         boxSizing: "border-box",
       }}
     >
-      {/* SECTION 1: PROPERTIES OWNED (100% Full Width Stacked Row) */}
+      {/* SECTION 1: PROPERTIES OWNED */}
       <Box sx={{ width: "100%" }}>
         <ProfileInfoCard
           icon={HomeWorkOutlinedIcon}
@@ -248,7 +271,7 @@ export default function LandlordProfileInfo({ profile }) {
         </ProfileInfoCard>
       </Box>
 
-      {/* SECTION 2: BANK SETTLEMENT DETAILS (100% Full Width Stacked Row with 3-column grid inside) */}
+      {/* SECTION 2: BANK SETTLEMENT DETAILS */}
       <Box sx={{ width: "100%" }}>
         <ProfileInfoCard
           icon={AccountBalanceOutlinedIcon}
@@ -391,8 +414,8 @@ export default function LandlordProfileInfo({ profile }) {
                     <Button
                       size="small"
                       variant="outlined"
-                      disabled={deleteBankMutation.isPending}
-                      onClick={() => handleDeleteBank(bank)}
+                      disabled={deleteBankMutation.isPending && bankToDelete?.id === bank.id}
+                      onClick={() => handlePromptDeleteBank(bank)}
                       startIcon={<DeleteOutlineOutlinedIcon sx={{ fontSize: "11px !important" }} />}
                       sx={{
                         borderColor: colors.border,
@@ -410,7 +433,7 @@ export default function LandlordProfileInfo({ profile }) {
                         },
                       }}
                     >
-                      {deleteBankMutation.isPending ? "Deleting..." : "Delete"}
+                      Delete
                     </Button>
                   </Stack>
                 </Box>
@@ -444,7 +467,7 @@ export default function LandlordProfileInfo({ profile }) {
         </ProfileInfoCard>
       </Box>
 
-      {/* SECTION 3: ACCEPTED PAYMENT METHODS (100% Full Width Stacked Row) */}
+      {/* SECTION 3: ACCEPTED PAYMENT METHODS */}
       <Box sx={{ width: "100%" }}>
         <ProfileInfoCard
           icon={PaymentsOutlinedIcon}
@@ -603,6 +626,134 @@ export default function LandlordProfileInfo({ profile }) {
           )}
         </ProfileInfoCard>
       </Box>
+
+      {/* THEME-ALIGNED DELETE CONFIRMATION DIALOG */}
+      <Dialog
+        open={Boolean(bankToDelete)}
+        onClose={() => !deleteBankMutation.isPending && setBankToDelete(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "18px",
+            border: `1.5px solid ${colors.error}`,
+            boxShadow: "0 20px 40px rgba(15, 23, 42, 0.2)",
+            bgcolor: "#FFFFFF",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            bgcolor: colors.primary,
+            color: "#FFFFFF",
+            p: 2.5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "8px",
+                bgcolor: colors.errorLight,
+                color: colors.error,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <WarningAmberRoundedIcon sx={{ fontSize: 20 }} />
+            </Box>
+            <Box>
+              <Typography variant="h6" fontWeight={800} fontSize="1.05rem" lineHeight={1.2}>
+                Confirm Deletion
+              </Typography>
+              <Typography variant="caption" sx={{ color: "#94A3B8", fontSize: "0.75rem" }}>
+                Action cannot be undone
+              </Typography>
+            </Box>
+          </Box>
+
+          <IconButton
+            onClick={() => setBankToDelete(null)}
+            disabled={deleteBankMutation.isPending}
+            sx={{
+              color: "#94A3B8",
+              padding: "4px",
+              "&:hover": { color: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)" },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 3, bgcolor: "#FFFFFF", textAlign: "center" }}>
+          <Typography variant="body2" sx={{ color: colors.textHeader, fontWeight: 600, fontSize: "0.925rem" }}>
+            Are you sure you want to delete <Box component="span" sx={{ fontWeight: 800, color: colors.primary }}>{bankToDelete?.bankName || "this bank account"}</Box>?
+          </Typography>
+          <Typography variant="caption" sx={{ display: "block", color: colors.textMuted, mt: 1 }}>
+            Account Number: {bankToDelete?.accountNumber}
+          </Typography>
+        </DialogContent>
+
+        <DialogActions
+          sx={{
+            px: 3,
+            pb: 2.5,
+            pt: 1.5,
+            bgcolor: colors.bgSubtle,
+            borderTop: `1px solid ${colors.border}`,
+            justifyContent: "flex-end",
+            gap: 1.5,
+          }}
+        >
+          <Button
+            onClick={() => setBankToDelete(null)}
+            disabled={deleteBankMutation.isPending}
+            sx={{
+              color: colors.textMuted,
+              fontWeight: 700,
+              textTransform: "none",
+              borderRadius: "8px",
+              px: 2,
+              "&:hover": { bgcolor: "rgba(100, 116, 139, 0.08)" },
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            disabled={deleteBankMutation.isPending}
+            onClick={handleConfirmDelete}
+            startIcon={
+              deleteBankMutation.isPending ? (
+                <CircularProgress size={16} sx={{ color: "#FFFFFF" }} />
+              ) : (
+                <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
+              )
+            }
+            sx={{
+              bgcolor: colors.error,
+              color: "#FFFFFF",
+              fontWeight: 700,
+              textTransform: "none",
+              borderRadius: "10px",
+              px: 2.5,
+              py: 0.8,
+              "&:hover": {
+                bgcolor: "#DC2626",
+              },
+            }}
+          >
+            {deleteBankMutation.isPending ? "Deleting..." : "Yes, Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Add / Edit Bank Dialog */}
       {openBankDialog && (

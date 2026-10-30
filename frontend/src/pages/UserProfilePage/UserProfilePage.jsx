@@ -10,8 +10,10 @@ import {
   CircularProgress,
   Fade,
   Skeleton,
+  useTheme,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import UploadFileIcon from "@mui/icons-material/UploadFileOutlined";
 
@@ -31,7 +33,16 @@ import ChangeProfilePicDialog from "./ChangeProfilePicDialog";
 import useProfile from "../../components/hooks/profile/useProfile";
 import api from "../../api/api";
 
+// Motion container helper matching LandlordDashboard
+const motionContainerStyle = {
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+};
+
 export default function UserProfilePage() {
+  const theme = useTheme();
   const { userId } = useParams();
   const { profile: selfProfile, loading: selfLoading, refreshProfile } = useProfile();
 
@@ -76,7 +87,6 @@ export default function UserProfilePage() {
     if (!profile) return [];
 
     const explicitRoles = [];
-
     const directRoleSources = [
       profile.role,
       profile.activeRole,
@@ -96,7 +106,6 @@ export default function UserProfilePage() {
 
     if (explicitRoles.length > 0) return explicitRoles;
 
-    // Fallback permission check if needed
     const permissions = Array.isArray(profile.permissions)
       ? profile.permissions.map((p) => String(p).toUpperCase())
       : [];
@@ -129,37 +138,38 @@ export default function UserProfilePage() {
 
   const primaryRole = userRoles[0] || "";
 
-  // Luxury Styled Button Theme
+  // Theme-driven Luxury Button Styling
   const primaryThemeButton = {
-    bgcolor: "#0F172A",
-    color: "#FFFFFF",
+    bgcolor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
     fontWeight: 700,
     textTransform: "none",
     borderRadius: "10px",
     px: 3,
     py: 1,
     boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
-    "& .MuiButton-startIcon": { color: "#D4AF37" },
+    "& .MuiButton-startIcon": { color: theme.palette.secondary.main },
     "&:hover": {
-      bgcolor: "#D4AF37",
-      color: "#0F172A",
+      bgcolor: theme.palette.secondary.main,
+      color: theme.palette.primary.main,
       boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
       transform: "translateY(-2px)",
-      "& .MuiButton-startIcon": { color: "#0F172A" },
+      "& .MuiButton-startIcon": { color: theme.palette.primary.main },
     },
     transition: "all 0.2s ease",
   };
 
-  // Card Container Styling
+  // Theme-driven Card Paper Styling
   const cardPaperStyle = {
-    p: { xs: 2.5, sm: 2 },
-    borderRadius: "18px",
-    bgcolor: "#FFFFFF",
-    border: "1.5px solid #D4AF37",
+    p: { xs: 2.5, sm: 3 },
+    borderRadius: `${theme.shape.borderRadius}px`,
+    bgcolor: theme.palette.background.paper,
+    border: `1.5px solid ${theme.palette.secondary.main}`,
     boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+    width: "100%",
+    boxSizing: "border-box",
   };
 
-  // Visual Loading State
   if (!profile && loading) {
     return (
       <Fade in timeout={800}>
@@ -173,11 +183,11 @@ export default function UserProfilePage() {
             gap: 2,
           }}
         >
-          <CircularProgress size={45} thickness={4} sx={{ color: "#D4AF37" }} />
+          <CircularProgress size={45} thickness={4} sx={{ color: theme.palette.secondary.main }} />
           <Typography
             variant="body2"
             sx={{
-              color: "#64748B",
+              color: theme.palette.text.secondary,
               fontWeight: 700,
               textTransform: "uppercase",
               letterSpacing: 1.5,
@@ -194,10 +204,10 @@ export default function UserProfilePage() {
   if (error) {
     return (
       <Box sx={{ p: 5, textAlign: "center" }}>
-        <Typography variant="h6" sx={{ color: "#EF4444", fontWeight: 700 }}>
+        <Typography variant="h6" sx={{ color: theme.palette.error?.main || "#EF4444", fontWeight: 700 }}>
           Oops!
         </Typography>
-        <Typography variant="body2" sx={{ color: "#64748B", mt: 1 }}>
+        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mt: 1 }}>
           {error}
         </Typography>
       </Box>
@@ -206,7 +216,7 @@ export default function UserProfilePage() {
 
   if (!profile) {
     return (
-      <Typography variant="h6" sx={{ p: 5, textAlign: "center", color: "#64748B" }}>
+      <Typography variant="h6" sx={{ p: 5, textAlign: "center", color: theme.palette.text.secondary }}>
         Please log in to view this profile.
       </Typography>
     );
@@ -215,14 +225,15 @@ export default function UserProfilePage() {
   return (
     <Box
       sx={{
-        pb: 1,
-        pt: 2,
-        px: { xs: 1.5, sm: 3 },
+        flexGrow: 1,
+        py: 1,
+        width: "100%",
+        maxWidth: 1280,
+        mx: "auto",
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        maxWidth: 1280,
-        mx: "auto",
+        boxSizing: "border-box",
       }}
     >
       {/* DASHBOARD HEADER */}
@@ -235,168 +246,200 @@ export default function UserProfilePage() {
         }
       />
 
-      {/* PROFILE HEADER CARD */}
-      <Paper elevation={0} sx={cardPaperStyle}>
-        {loading ? (
-          <Stack direction="row" spacing={3} alignItems="center">
-            <Skeleton variant="circular" width={100} height={100} sx={{ bgcolor: "#F1F5F9" }} />
-            <Box sx={{ flex: 1 }}>
-              <Skeleton variant="text" width="40%" height={36} sx={{ bgcolor: "#F1F5F9" }} />
-              <Skeleton variant="text" width="25%" height={24} sx={{ bgcolor: "#F1F5F9" }} />
-            </Box>
-          </Stack>
-        ) : (
-          <ProfileHeader profile={{ ...profile, role: primaryRole }} onChangePic={() => setOpenChangePic(true)} />
-        )}
-      </Paper>
+      {/* ===== 1. PROFILE HEADER CARD ===== */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        style={motionContainerStyle}
+      >
+        <Paper elevation={0} sx={cardPaperStyle}>
+          {loading ? (
+            <Stack direction="row" spacing={3} alignItems="center">
+              <Skeleton variant="circular" width={100} height={100} sx={{ bgcolor: theme.palette.divider }} />
+              <Box sx={{ flex: 1 }}>
+                <Skeleton variant="text" width="40%" height={36} sx={{ bgcolor: theme.palette.divider }} />
+                <Skeleton variant="text" width="25%" height={24} sx={{ bgcolor: theme.palette.divider }} />
+              </Box>
+            </Stack>
+          ) : (
+            <ProfileHeader profile={{ ...profile, role: primaryRole }} onChangePic={() => setOpenChangePic(true)} />
+          )}
+        </Paper>
+      </motion.div>
 
-      {/* PERSONAL INFO CARD */}
-      <Paper elevation={0} sx={cardPaperStyle}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              pl: 1.5,
-              borderLeft: "4px solid #D4AF37",
-            }}
-          >
-            <Typography
-              variant="h6"
-              fontWeight={800}
-              sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}
+      {/* ===== 2. PERSONAL INFO CARD ===== */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
+        style={motionContainerStyle}
+      >
+        <Paper elevation={0} sx={cardPaperStyle}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                pl: 1.5,
+                borderLeft: `4px solid ${theme.palette.secondary.main}`,
+              }}
             >
-              Personal Information
-            </Typography>
+              <Typography
+                variant="h6"
+                fontWeight={800}
+                sx={{ color: theme.palette.text.primary, fontSize: "1.15rem", letterSpacing: "-0.01em" }}
+              >
+                Personal Information
+              </Typography>
+            </Box>
+
+            {!loading && !userId && (
+              <Button
+                variant="contained"
+                startIcon={<EditIcon />}
+                size="small"
+                onClick={() => setOpenEditProfile(true)}
+                sx={primaryThemeButton}
+              >
+                Edit Profile
+              </Button>
+            )}
           </Box>
 
-          {!loading && !userId && (
-            <Button
-              variant="contained"
-              startIcon={<EditIcon />}
-              size="small"
-              onClick={() => setOpenEditProfile(true)}
-              sx={primaryThemeButton}
-            >
-              Edit Profile
-            </Button>
+          {loading ? (
+            <Stack spacing={2}>
+              <Skeleton variant="text" width="80%" height={28} sx={{ bgcolor: theme.palette.divider }} />
+              <Skeleton variant="text" width="60%" height={28} sx={{ bgcolor: theme.palette.divider }} />
+              <Skeleton variant="text" width="90%" height={28} sx={{ bgcolor: theme.palette.divider }} />
+            </Stack>
+          ) : (
+            <BaseProfileInfo profile={profile} />
           )}
-        </Box>
+        </Paper>
+      </motion.div>
 
-        {loading ? (
-          <Stack spacing={2}>
-            <Skeleton variant="text" width="80%" height={28} sx={{ bgcolor: "#F1F5F9" }} />
-            <Skeleton variant="text" width="60%" height={28} sx={{ bgcolor: "#F1F5F9" }} />
-            <Skeleton variant="text" width="90%" height={28} sx={{ bgcolor: "#F1F5F9" }} />
-          </Stack>
-        ) : (
-          <BaseProfileInfo profile={profile} />
-        )}
-      </Paper>
-
-      {/* SEPARATE ROLE-SPECIFIC CARDS */}
+      {/* ===== 3. ROLE-SPECIFIC CARDS ===== */}
       {!loading && (
         <>
           {userRoles.includes("TENANT") && (
-            <Paper elevation={0} sx={cardPaperStyle}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: "4px solid #D4AF37" }}>
-                  <Typography variant="h6" fontWeight={800} sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
-                    Tenant Information
-                  </Typography>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.15, ease: "easeOut" }}
+              style={motionContainerStyle}
+            >
+              <Paper elevation={0} sx={cardPaperStyle}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: `4px solid ${theme.palette.secondary.main}` }}>
+                    <Typography variant="h6" fontWeight={800} sx={{ color: theme.palette.text.primary, fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
+                      Tenant Information
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-              <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
-              <TenantProfileInfo profile={profile} />
-            </Paper>
+                <Divider sx={{ mb: 3, borderColor: theme.palette.divider }} />
+                <TenantProfileInfo profile={profile} />
+              </Paper>
+            </motion.div>
           )}
 
           {userRoles.includes("LANDLORD") && (
-            <Paper elevation={0} sx={cardPaperStyle}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: "4px solid #D4AF37" }}>
-                  <Typography variant="h6" fontWeight={800} sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
-                    Landlord Information
-                  </Typography>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.15, ease: "easeOut" }}
+              style={motionContainerStyle}
+            >
+              <Paper elevation={0} sx={cardPaperStyle}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: `4px solid ${theme.palette.secondary.main}` }}>
+                    <Typography variant="h6" fontWeight={800} sx={{ color: theme.palette.text.primary, fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
+                      Landlord Information
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-              <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
-              <LandlordProfileInfo profile={profile} />
-            </Paper>
+                <Divider sx={{ mb: 3, borderColor: theme.palette.divider }} />
+                <LandlordProfileInfo profile={profile} />
+              </Paper>
+            </motion.div>
           )}
 
           {userRoles.includes("CARETAKER") && (
-            <Paper elevation={0} sx={cardPaperStyle}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: "4px solid #D4AF37" }}>
-                  <Typography variant="h6" fontWeight={800} sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
-                    Caretaker Information
-                  </Typography>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.15, ease: "easeOut" }}
+              style={motionContainerStyle}
+            >
+              <Paper elevation={0} sx={cardPaperStyle}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, pl: 1.5, borderLeft: `4px solid ${theme.palette.secondary.main}` }}>
+                    <Typography variant="h6" fontWeight={800} sx={{ color: theme.palette.text.primary, fontSize: "1.15rem", letterSpacing: "-0.01em" }}>
+                      Caretaker Information
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-              <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
-              <CaretakerProfileInfo profile={profile} />
-            </Paper>
+                <Divider sx={{ mb: 3, borderColor: theme.palette.divider }} />
+                <CaretakerProfileInfo profile={profile} />
+              </Paper>
+            </motion.div>
           )}
         </>
       )}
 
-      {/* DOCUMENTS CARD */}
-      <Paper elevation={0} sx={cardPaperStyle}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2.5}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              pl: 1.5,
-              borderLeft: "4px solid #D4AF37",
-            }}
-          >
-            <Typography
-              variant="h6"
-              fontWeight={800}
-              sx={{ color: "#0F172A", fontSize: "1.15rem", letterSpacing: "-0.01em" }}
+      {/* ===== 4. DOCUMENTS VAULT CARD ===== */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.2, ease: "easeOut" }}
+        style={motionContainerStyle}
+      >
+        <Paper elevation={0} sx={cardPaperStyle}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.5}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                pl: 1.5,
+                borderLeft: `4px solid ${theme.palette.secondary.main}`,
+              }}
             >
-              Documents Vault
-            </Typography>
+              <Typography
+                variant="h6"
+                fontWeight={800}
+                sx={{ color: theme.palette.text.primary, fontSize: "1.15rem", letterSpacing: "-0.01em" }}
+              >
+                Documents Vault
+              </Typography>
+            </Box>
+
+            {!loading && !userId && (
+              <Button
+                variant="contained"
+                startIcon={<UploadFileIcon />}
+                size="small"
+                onClick={() => setOpenManageDocs(true)}
+                sx={primaryThemeButton}
+              >
+                Upload Document
+              </Button>
+            )}
           </Box>
 
-          {!loading && !userId && (
-            <Button
-              variant="contained"
-              startIcon={<UploadFileIcon />}
-              size="small"
-              onClick={() => setOpenManageDocs(true)}
-              sx={primaryThemeButton}
-            >
-              Upload Document
-            </Button>
+          <Divider sx={{ mb: 3, borderColor: theme.palette.divider }} />
+
+          {!loading && (
+            <ProfileDocuments
+              openDialog={openManageDocs}
+              setOpenDialog={setOpenManageDocs}
+              role={primaryRole}
+              userId={userId || null}
+            />
           )}
-        </Box>
-
-        <Divider sx={{ mb: 3, borderColor: "#E2E8F0" }} />
-
-        {!loading && (
-          <ProfileDocuments
-            openDialog={openManageDocs}
-            setOpenDialog={setOpenManageDocs}
-            role={primaryRole}
-            userId={userId || null}
-          />
-        )}
-      </Paper>
+        </Paper>
+      </motion.div>
 
       {/* MODAL DIALOGS */}
       {!loading && !userId && openEditProfile && (
