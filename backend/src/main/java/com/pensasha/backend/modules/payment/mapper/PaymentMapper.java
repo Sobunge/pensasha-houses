@@ -15,9 +15,9 @@ public interface PaymentMapper {
 
     @Mapping(target = "tenant", source = "tenantId")
     @Mapping(target = "invoice", source = "invoiceNumber")
-    @Mapping(target = "amount", expression = "java(dto.getAmount() != null ? BigDecimal.valueOf(dto.getAmount()) : null)")
+    @Mapping(target = "amount", expression = "java(dto.getAmount() != null ? java.math.BigDecimal.valueOf(dto.getAmount()) : null)")
     @Mapping(target = "paymentDate", expression = "java(dto.getPaymentDate() != null ? dto.getPaymentDate().atStartOfDay() : null)")
-    @Mapping(target = "method", expression = "java(dto.getMethod() != null ? MethodsOfPayment.valueOf(dto.getMethod()) : null)")
+    @Mapping(target = "method", expression = "java(dto.getMethod() != null ? com.pensasha.backend.modules.payment.MethodsOfPayment.valueOf(dto.getMethod()) : null)")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "sourceIdentifier", ignore = true)

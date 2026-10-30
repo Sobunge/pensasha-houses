@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.user.caretaker.mapper;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -9,8 +10,6 @@ import org.mapstruct.Named;
 
 import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.caretaker.CaretakerProfile;
-import com.pensasha.backend.modules.user.caretaker.dto.GetCaretakerDTO;
-import com.pensasha.backend.modules.user.caretaker.dto.CreateCaretakerDTO;
 
 @Mapper(componentModel = "spring")
 public interface CaretakerMapper {
@@ -26,26 +25,29 @@ public interface CaretakerMapper {
     @Mapping(target = "roles", expression = "java(rolesToStrings(caretakerProfile.getUser().getRoles()))")
     @Mapping(target = "permissions", expression = "java(mapPermissions(caretakerProfile.getUser().getRoles()))")
     @Mapping(target = "propertyId", expression = "java(caretakerProfile.getAssignedProperty() != null ? caretakerProfile.getAssignedProperty().getId() : null)")
-    GetCaretakerDTO toGetDTO(CaretakerProfile caretakerProfile);
+    com.pensasha.backend.modules.user.caretaker.dto.GetCaretakerDTO toGetDTO(CaretakerProfile caretakerProfile);
 
     // ====================== Create DTO -> Entity ======================
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true) // Link separately in service
-    @Mapping(target = "assignedProperty", ignore = true) // Assign manually in service
-    CaretakerProfile toEntity(CreateCaretakerDTO caretakerDTO);
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "assignedProperty", ignore = true)
+    CaretakerProfile toEntity(com.pensasha.backend.modules.user.caretaker.dto.CreateCaretakerDTO caretakerDTO);
 
     // ====================== Helper Methods ======================
     @Named("rolesToStrings")
     default Set<String> rolesToStrings(Set<Role> roles) {
         if (roles == null || roles.isEmpty()) return Set.of();
-        return roles.stream().map((Role role) -> role.getName()).collect(Collectors.toSet());
+        return roles.stream().map(Role::getName).collect(Collectors.toSet());
     }
 
     default Set<String> mapPermissions(Set<Role> roles) {
         if (roles == null || roles.isEmpty()) return Set.of();
-        return roles.stream()
-                .flatMap(role -> role.getPermissions().stream())
-                .map(p -> p.getName())
-                .collect(Collectors.toSet());
+        Set<String> permissions = new HashSet<>();
+        for (Role role : roles) {
+            if (role.getPermissions() != null) {
+                role.getPermissions().forEach(p -> permissions.add(p.getName()));
+            }
+        }
+        return permissions;
     }
 }

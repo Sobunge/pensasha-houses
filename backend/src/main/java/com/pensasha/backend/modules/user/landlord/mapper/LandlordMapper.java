@@ -1,5 +1,6 @@
 package com.pensasha.backend.modules.user.landlord.mapper;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,6 @@ import com.pensasha.backend.modules.user.Role;
 import com.pensasha.backend.modules.user.landlord.BankDetails;
 import com.pensasha.backend.modules.user.landlord.LandlordProfile;
 import com.pensasha.backend.modules.user.landlord.dto.BankDetailsDTO;
-import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 
 @Mapper(componentModel = "spring")
 public interface LandlordMapper {
@@ -28,10 +28,10 @@ public interface LandlordMapper {
     @Mapping(target = "permissions", source = "profile", qualifiedByName = "extractPermissions")
     @Mapping(target = "roles", source = "user.roles", qualifiedByName = "rolesToStrings")
     @Mapping(target = "propertyIds", source = "properties", qualifiedByName = "propertySetToIds")
-    @Mapping(target = "bankDetails", source = "bankDetails") // Maps Set<BankDetails> -> Set<BankDetailsDTO> automatically
+    @Mapping(target = "bankDetails", source = "bankDetails")
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "bankDetailsId", ignore = true)
-    GetLandLordDTO toGetDTO(LandlordProfile profile);
+    com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO toGetDTO(LandlordProfile profile);
 
     /* ===================== NESTED MAPPINGS ===================== */
 
@@ -60,9 +60,16 @@ public interface LandlordMapper {
         if (profile == null || profile.getUser() == null || profile.getUser().getRoles() == null) {
             return Set.of();
         }
-        return profile.getUser().getRoles().stream()
-                .flatMap(role -> role.getPermissions().stream())
-                .map(Permission::getName)
-                .collect(Collectors.toSet());
+        Set<String> permissions = new HashSet<>();
+        for (Role role : profile.getUser().getRoles()) {
+            if (role.getPermissions() != null) {
+                for (Permission permission : role.getPermissions()) {
+                    if (permission != null && permission.getName() != null) {
+                        permissions.add(permission.getName());
+                    }
+                }
+            }
+        }
+        return permissions;
     }
 }

@@ -30,7 +30,7 @@ public interface InvoiceMapper {
     @Mapping(target = "tenant", ignore = true)
     @Mapping(target = "lease", ignore = true)
     @Mapping(target = "payments", ignore = true)
-    Invoice toEntity(InvoiceDTO dto);
+    Invoice toEntity(com.pensasha.backend.modules.invoice.dto.InvoiceDTO dto);
 
     /* =========================
        HELPERS
@@ -39,7 +39,7 @@ public interface InvoiceMapper {
     default List<Long> mapPaymentsToIds(List<Payment> payments) {
         if (payments == null) return List.of();
         return payments.stream()
-                .map((Payment payment) -> payment.getId())
+                .map(Payment::getId)
                 .collect(Collectors.toList());
     }
 }

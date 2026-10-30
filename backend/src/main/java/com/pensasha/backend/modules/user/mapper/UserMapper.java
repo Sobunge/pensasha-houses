@@ -1,4 +1,3 @@
-// src/main/java/com/pensasha/backend/modules/user/mapper/UserMapper.java
 package com.pensasha.backend.modules.user.mapper;
 
 import java.util.Set;
@@ -7,6 +6,7 @@ import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.pensasha.backend.modules.user.Role;
@@ -14,24 +14,14 @@ import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.dto.GetUserDTO;
 import com.pensasha.backend.modules.user.dto.UpdateUserDTO;
 
-/**
- * Mapper for converting between User entity and DTOs.
- *
- * Responsibilities:
- * - Entity → DTO conversion (explicitly separating roles & permissions flattening)
- * - Partial updates (excluding system-managed fields)
- *
- * NOTE:
- * - Does NOT handle DTO → Entity role resolution (handled in service layer)
- */
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
 
     /* ===================== READ ===================== */
 
     @Mapping(target = "profilePicture", source = "profilePictureUrl")
-    @Mapping(target = "roles", expression = "java(mapRoles(user.getRoles()))")
-    @Mapping(target = "permissions", expression = "java(mapPermissions(user.getRoles()))")
+    @Mapping(target = "roles", source = "roles", qualifiedByName = "mapRoles")
+    @Mapping(target = "permissions", source = "roles", qualifiedByName = "mapPermissions")
     GetUserDTO toDTO(User user);
 
     /* ===================== UPDATE ===================== */
@@ -58,9 +48,7 @@ public interface UserMapper {
 
     /* ===================== ROLE & PERMISSION MAPPING ===================== */
 
-    /**
-     * Extracts role names (e.g., LANDLORD, TENANT) from user roles.
-     */
+    @Named("mapRoles")
     default Set<String> mapRoles(Set<Role> roles) {
         if (roles == null)
             return null;
@@ -70,9 +58,7 @@ public interface UserMapper {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Extracts fine-grained permissions from roles and flattens them.
-     */
+    @Named("mapPermissions")
     default Set<String> mapPermissions(Set<Role> roles) {
         if (roles == null)
             return null;

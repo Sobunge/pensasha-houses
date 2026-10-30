@@ -10,7 +10,6 @@ import org.mapstruct.Named;
 
 import com.pensasha.backend.modules.invoice.Invoice;
 import com.pensasha.backend.modules.lease.Lease;
-import com.pensasha.backend.modules.lease.dto.LeaseDTO;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.tenant.TenantProfile;
 
@@ -21,13 +20,13 @@ public interface LeaseMapper {
     @Mapping(target = "tenant", source = "tenantId")
     @Mapping(target = "unit", source = "unitId")
     @Mapping(target = "invoices", ignore = true) // handled elsewhere
-    Lease toEntity(LeaseDTO leaseDTO);
+    Lease toEntity(com.pensasha.backend.modules.lease.dto.LeaseDTO leaseDTO);
 
     // Map Lease entity to LeaseDTO
     @Mapping(source = "tenant.id", target = "tenantId")
     @Mapping(source = "unit.id", target = "unitId")
     @Mapping(source = "invoices", target = "invoiceNumbers", qualifiedByName = "mapInvoiceUUIDsToStrings")
-    LeaseDTO toDTO(Lease lease);
+    com.pensasha.backend.modules.lease.dto.LeaseDTO toDTO(Lease lease);
 
     // Convert tenantId to Tenant entity
     default TenantProfile mapTenant(Long tenantId) {
@@ -50,8 +49,8 @@ public interface LeaseMapper {
     default List<String> mapInvoiceUUIDsToStrings(List<Invoice> invoices) {
         if (invoices == null || invoices.isEmpty()) return List.of();
         return invoices.stream()
-                       .map((Invoice invoice) -> invoice.getInvoiceNumber()) // UUID
-                       .map((UUID uuid) -> uuid.toString())             // convert to String
+                       .map(Invoice::getInvoiceNumber) // UUID
+                       .map(UUID::toString)             // convert to String
                        .collect(Collectors.toList());
     }
 }
