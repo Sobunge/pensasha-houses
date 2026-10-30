@@ -9,11 +9,11 @@ const DashboardHeader = React.memo(function DashboardHeader({
 }) {
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         pb: subtitle || action ? 2 : 1.5,
-        borderBottom: "1px solid rgba(226, 232, 240, 0.8)",
+        borderBottom: `1px solid ${theme.palette.divider}`,
         position: "relative",
-      }}
+      })}
     >
       <Stack
         direction={{ xs: "column", sm: "row" }}
@@ -31,26 +31,26 @@ const DashboardHeader = React.memo(function DashboardHeader({
         >
           {/* Gold Accent Bar */}
           <Box
-            sx={{
+            sx={(theme) => ({
               width: 36,
               height: 3,
               borderRadius: "2px",
-              background: "linear-gradient(90deg, #D4AF37 0%, #0F172A 100%)",
+              background: `linear-gradient(90deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`,
               mb: 1,
               mx: { xs: "auto", sm: 0, md: "auto" },
-            }}
+            })}
           />
 
           <Typography
             variant="h5"
-            sx={{
+            sx={(theme) => ({
               fontWeight: 800,
               letterSpacing: "-0.02em",
-              color: "#0F172A",
+              color: theme.palette.text.primary,
               fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
               lineHeight: 1.2,
               wordBreak: "break-word",
-            }}
+            })}
           >
             {title}
           </Typography>
@@ -58,12 +58,12 @@ const DashboardHeader = React.memo(function DashboardHeader({
           {subtitle && (
             <Typography
               variant="body2"
-              sx={{
-                color: "#64748B",
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
                 fontWeight: 500,
                 fontSize: { xs: "0.75rem", sm: "0.85rem" },
                 mt: 0.5,
-              }}
+              })}
             >
               {subtitle}
             </Typography>

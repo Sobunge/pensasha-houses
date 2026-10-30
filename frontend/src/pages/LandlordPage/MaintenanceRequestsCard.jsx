@@ -1,5 +1,4 @@
 // src/components/cards/MaintenanceRequestsCard.jsx
-
 import React from "react";
 import {
   Card,
@@ -37,31 +36,49 @@ function MaintenanceRequestsCard({ userId }) {
   const hasRequests = maintenanceData && maintenanceData.length > 0;
   const displayedRequests = maintenanceData.slice(0, 3);
 
-  // Helper to resolve status pill styles
-  const getStatusChipStyles = (status) => {
+  // Helper to resolve status pill styles using theme tokens
+  const getStatusChipStyles = (currentTheme, status) => {
     const s = status?.toUpperCase() || "";
     if (s.includes("PENDING") || s.includes("NEW") || s.includes("OPEN")) {
-      return { bgcolor: "#E2E8F0", color: "#475569" };
+      return { bgcolor: currentTheme.palette.action.hover, color: currentTheme.palette.text.secondary };
     }
     if (s.includes("PROGRESS")) {
-      return { bgcolor: "#FEF3C7", color: "#D97706" };
+      return {
+        bgcolor: alpha(currentTheme.palette.warning?.main || "#D97706", 0.15),
+        color: currentTheme.palette.warning?.dark || "#D97706",
+      };
     }
     if (s.includes("COMPLETED") || s.includes("RESOLVED")) {
-      return { bgcolor: "#D1FAE5", color: "#059669" };
+      return {
+        bgcolor: alpha(currentTheme.palette.success?.main || "#10B981", 0.15),
+        color: currentTheme.palette.success?.dark || "#059669",
+      };
     }
-    return { bgcolor: "#F1F5F9", color: "#64748B" };
+    return {
+      bgcolor: currentTheme.palette.action.hover,
+      color: currentTheme.palette.text.secondary,
+    };
   };
 
-  // Helper to resolve urgency pill styles
-  const getUrgencyChipStyles = (urgency) => {
+  // Helper to resolve urgency pill styles using theme tokens
+  const getUrgencyChipStyles = (currentTheme, urgency) => {
     const u = urgency?.toUpperCase() || "";
     if (u.includes("URGENT") || u.includes("HIGH")) {
-      return { bgcolor: "#FEE2E2", color: "#DC2626" };
+      return {
+        bgcolor: alpha(currentTheme.palette.error?.main || "#EF4444", 0.15),
+        color: currentTheme.palette.error?.main || "#DC2626",
+      };
     }
     if (u.includes("MEDIUM") || u.includes("MED")) {
-      return { bgcolor: "#FEF3C7", color: "#D97706" };
+      return {
+        bgcolor: alpha(currentTheme.palette.warning?.main || "#D97706", 0.15),
+        color: currentTheme.palette.warning?.dark || "#D97706",
+      };
     }
-    return { bgcolor: "#F1F5F9", color: "#475569" };
+    return {
+      bgcolor: currentTheme.palette.action.hover,
+      color: currentTheme.palette.text.secondary,
+    };
   };
 
   // Format Status enum to readable text
@@ -86,14 +103,14 @@ function MaintenanceRequestsCard({ userId }) {
     return (
       <Card
         elevation={0}
-        sx={{
-          borderRadius: "16px",
-          bgcolor: "#FFFFFF",
+        sx={(t) => ({
+          borderRadius: `${t.shape.borderRadius * 2}px`,
+          bgcolor: t.palette.background.paper,
           border: "1px solid",
-          borderColor: "divider",
+          borderColor: t.palette.divider,
           p: 3,
           height: "100%",
-        }}
+        })}
       >
         <Skeleton variant="text" width="50%" height={30} sx={{ mb: 1 }} />
         <Skeleton variant="text" width="70%" height={20} sx={{ mb: 3 }} />
@@ -107,14 +124,14 @@ function MaintenanceRequestsCard({ userId }) {
     return (
       <Card
         elevation={0}
-        sx={{
-          borderRadius: "16px",
-          bgcolor: "#FFFFFF",
+        sx={(t) => ({
+          borderRadius: `${t.shape.borderRadius * 2}px`,
+          bgcolor: t.palette.background.paper,
           border: "1px solid",
-          borderColor: "divider",
+          borderColor: t.palette.divider,
           p: 3,
           height: "100%",
-        }}
+        })}
       >
         <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
           {error?.message || "Failed to load maintenance requests."}
@@ -126,22 +143,20 @@ function MaintenanceRequestsCard({ userId }) {
   return (
     <Card
       elevation={0}
-      sx={{
-        borderRadius: "16px",
-        bgcolor: "#FFFFFF",
+      sx={(t) => ({
+        borderRadius: `${t.shape.borderRadius * 2}px`,
+        bgcolor: t.palette.background.paper,
         border: "1px solid",
-        borderColor: "divider",
+        borderColor: t.palette.divider,
         height: "100%",
         width: "100%",
-        boxShadow:
-          "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
+        boxShadow: `0 15px 35px -5px ${t.palette.primary.main}1F, 0 10px 15px -8px ${t.palette.primary.main}0F`,
         transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          borderColor: "secondary.main",
-          boxShadow:
-            "0 25px 40px -10px rgba(15, 23, 42, 0.18), 0 12px 18px -6px rgba(15, 23, 42, 0.1)",
+          borderColor: t.palette.secondary.main,
+          boxShadow: `0 25px 40px -10px ${t.palette.primary.main}2E, 0 12px 18px -6px ${t.palette.primary.main}1A`,
         },
-      }}
+      })}
     >
       <CardContent
         sx={{
@@ -157,7 +172,7 @@ function MaintenanceRequestsCard({ userId }) {
         <Box sx={{ mb: 1 }}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 800, color: "primary.main", lineHeight: 1.2 }}
+            sx={(t) => ({ fontWeight: 800, color: t.palette.primary.main, lineHeight: 1.2 })}
           >
             Open Maintenance Requests
           </Typography>
@@ -173,39 +188,39 @@ function MaintenanceRequestsCard({ userId }) {
               <TableHead>
                 <TableRow>
                   <TableCell
-                    sx={{
-                      color: "primary.main",
+                    sx={(t) => ({
+                      color: t.palette.primary.main,
                       fontWeight: 800,
                       fontSize: { xs: "0.72rem", sm: "0.78rem" },
                       pl: 0,
                       py: 1,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
+                      borderBottom: `1px solid ${t.palette.divider}`,
+                    })}
                   >
                     Ticket Status
                   </TableCell>
                   <TableCell
-                    sx={{
-                      color: "primary.main",
+                    sx={(t) => ({
+                      color: t.palette.primary.main,
                       fontWeight: 800,
                       fontSize: { xs: "0.72rem", sm: "0.78rem" },
                       py: 1,
                       px: { xs: 1, sm: 1.5 },
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
+                      borderBottom: `1px solid ${t.palette.divider}`,
+                    })}
                   >
                     Unit
                   </TableCell>
                   <TableCell
                     align="right"
-                    sx={{
-                      color: "primary.main",
+                    sx={(t) => ({
+                      color: t.palette.primary.main,
                       fontWeight: 800,
                       fontSize: { xs: "0.72rem", sm: "0.78rem" },
                       pr: 0,
                       py: 1,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
+                      borderBottom: `1px solid ${t.palette.divider}`,
+                    })}
                   >
                     Urgency
                   </TableCell>
@@ -214,46 +229,46 @@ function MaintenanceRequestsCard({ userId }) {
 
               <TableBody>
                 {displayedRequests.map((req) => {
-                  const statusStyles = getStatusChipStyles(req.status);
-                  const urgencyStyles = getUrgencyChipStyles(req.urgency);
+                  const statusStyles = getStatusChipStyles(theme, req.status);
+                  const urgencyStyles = getUrgencyChipStyles(theme, req.urgency);
 
                   return (
                     <TableRow
                       key={req.id}
-                      sx={{
+                      sx={(t) => ({
                         transition: "background-color 0.15s ease",
                         "&:hover": {
-                          bgcolor: alpha(theme.palette.primary.main, 0.02),
+                          bgcolor: alpha(t.palette.primary.main, 0.02),
                         },
                         "&:last-child td, &:last-child th": { border: 0 },
-                      }}
+                      })}
                     >
                       {/* Column 1: Ticket Status Pill */}
                       <TableCell sx={{ pl: 0, py: 1.5 }}>
                         <Chip
                           label={formatStatus(req.status)}
                           size="small"
-                          sx={{
+                          sx={(t) => ({
                             ...statusStyles,
                             fontWeight: 700,
                             fontSize: { xs: "0.68rem", sm: "0.72rem" },
-                            borderRadius: "8px",
+                            borderRadius: `${t.shape.borderRadius / 1.5}px`,
                             height: 24,
                             px: 0.5,
-                          }}
+                          })}
                         />
                       </TableCell>
 
                       {/* Column 2: Unit */}
                       <TableCell
-                        sx={{
+                        sx={(t) => ({
                           py: 1.5,
                           px: { xs: 1, sm: 1.5 },
                           fontWeight: 600,
-                          color: "primary.main",
+                          color: t.palette.primary.main,
                           fontSize: { xs: "0.78rem", sm: "0.82rem" },
                           whiteSpace: "nowrap",
-                        }}
+                        })}
                       >
                         {req.unitName}
                       </TableCell>
@@ -263,14 +278,14 @@ function MaintenanceRequestsCard({ userId }) {
                         <Chip
                           label={`${req.issue} • ${formatUrgency(req.urgency)}`}
                           size="small"
-                          sx={{
+                          sx={(t) => ({
                             ...urgencyStyles,
                             fontWeight: 700,
                             fontSize: { xs: "0.68rem", sm: "0.72rem" },
-                            borderRadius: "10px",
+                            borderRadius: `${t.shape.borderRadius}px`,
                             height: 24,
                             px: 0.5,
-                          }}
+                          })}
                         />
                       </TableCell>
                     </TableRow>
@@ -293,24 +308,24 @@ function MaintenanceRequestsCard({ userId }) {
               }}
             >
               <Box
-                sx={{
+                sx={(t) => ({
                   width: 56,
                   height: 56,
-                  borderRadius: "16px",
-                  bgcolor: "rgba(212, 175, 55, 0.12)",
-                  color: "secondary.main",
+                  borderRadius: `${t.shape.borderRadius * 1.5}px`,
+                  bgcolor: alpha(t.palette.secondary.main, 0.12),
+                  color: t.palette.secondary.main,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   mb: 2,
-                }}
+                })}
               >
                 <HandymanOutlinedIcon sx={{ fontSize: 30 }} />
               </Box>
 
               <Typography
                 variant="subtitle1"
-                sx={{ fontWeight: 800, color: "primary.main", mb: 0.5 }}
+                sx={(t) => ({ fontWeight: 800, color: t.palette.primary.main, mb: 0.5 })}
               >
                 No Pending Maintenance
               </Typography>
@@ -329,30 +344,31 @@ function MaintenanceRequestsCard({ userId }) {
         {/* FOOTER VIEW ALL ACTION */}
         {hasRequests && (
           <Box
-            sx={{
+            sx={(t) => ({
               mt: "auto",
               pt: 1.5,
-              borderTop: "1px solid #F1F5F9",
+              borderTop: `1px solid ${t.palette.divider}`,
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
               width: "100%",
-            }}
+            })}
           >
             <Button
               size="small"
               endIcon={<ArrowForwardIcon fontSize="small" />}
               onClick={() => navigate("/landlord/maintenance-requests")}
-              sx={{
+              sx={(t) => ({
                 fontWeight: 700,
                 fontSize: "0.82rem",
-                color: "primary.main",
+                color: t.palette.primary.main,
                 textTransform: "none",
+                borderRadius: `${t.shape.borderRadius}px`,
                 "&:hover": {
-                  color: "secondary.main",
-                  bgcolor: "transparent",
+                  color: t.palette.secondary.main,
+                  bgcolor: alpha(t.palette.secondary.main, 0.06),
                 },
-              }}
+              })}
             >
               {maintenanceData.length > 3
                 ? `View All (${maintenanceData.length}) Requests`

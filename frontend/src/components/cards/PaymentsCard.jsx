@@ -6,7 +6,6 @@ import {
   Typography,
   Box,
   List,
-  ListItem,
   Button,
   Divider,
   Stack,
@@ -21,12 +20,6 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForwardOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAuth } from "../../pages/Auth/AuthContext";
 
-const STATUS_CONFIG = {
-  Paid: { icon: CheckCircleIcon, color: "#10B981", bg: "rgba(16, 185, 129, 0.1)" },
-  Pending: { icon: HourglassEmptyIcon, color: "#D4AF37", bg: "rgba(212, 175, 55, 0.1)" },
-  Failed: { icon: CancelIcon, color: "#EF4444", bg: "rgba(239, 68, 68, 0.1)" },
-};
-
 function PaymentsCard({ payments = [], compact = false, onClose }) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -40,65 +33,90 @@ function PaymentsCard({ payments = [], compact = false, onClose }) {
     if (onClose) onClose();
   };
 
+  // Dynamic status mapping utilizing theme palette tokens
+  const getStatusConfig = (theme, status) => {
+    switch (status) {
+      case "Paid":
+        return {
+          icon: CheckCircleIcon,
+          color: theme.palette.success?.main || "#10B981",
+          bg: `${theme.palette.success?.main || "#10B981"}1A`,
+        };
+      case "Failed":
+        return {
+          icon: CancelIcon,
+          color: theme.palette.error?.main || "#EF4444",
+          bg: `${theme.palette.error?.main || "#EF4444"}1A`,
+        };
+      case "Pending":
+      default:
+        return {
+          icon: HourglassEmptyIcon,
+          color: theme.palette.secondary.main,
+          bg: `${theme.palette.secondary.main}1A`,
+        };
+    }
+  };
+
   return (
     <Card
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         flex: compact
           ? undefined
           : { xs: "1 1 100%", md: "1 1 45%", lg: "0 1 400px" },
         minWidth: compact
           ? { xs: 300, sm: 360 }
           : { xs: "100%", sm: "320px" },
-        borderRadius: "16px",
-        border: "1.5px solid #D4AF37", // Gold border applied
-        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)", // Enhanced shadow applied
-        bgcolor: "#FFFFFF",
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
+        border: `1.5px solid ${theme.palette.secondary.main}`,
+        boxShadow: `0 10px 30px ${theme.palette.primary.main}14`,
+        bgcolor: theme.palette.background.paper,
         display: "flex",
         flexDirection: "column",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          boxShadow: "0 14px 36px rgba(15, 23, 42, 0.12)",
+          boxShadow: `0 14px 36px ${theme.palette.primary.main}1F`,
           transform: "translateY(-4px)",
-          borderColor: "#B5922B",
+          borderColor: theme.palette.secondary.dark,
         },
-      }}
+      })}
     >
       {/* --- Header --- */}
       <Box
-        sx={{
+        sx={(theme) => ({
           display: "flex",
           alignItems: "center",
           gap: 1.5,
           p: 2,
-          bgcolor: "rgba(212, 175, 55, 0.04)",
-          borderBottom: "1px solid #E2E8F0",
-        }}
+          bgcolor: `${theme.palette.secondary.main}0A`,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        })}
       >
         <Box
-          sx={{
+          sx={(theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             width: 32,
             height: 32,
-            borderRadius: "8px",
-            bgcolor: "rgba(212, 175, 55, 0.12)",
-            color: "#D4AF37",
-          }}
+            borderRadius: `${theme.shape.borderRadius}px`,
+            bgcolor: `${theme.palette.secondary.main}1F`,
+            color: theme.palette.secondary.main,
+          })}
         >
           <PaymentIcon sx={{ fontSize: 18 }} />
         </Box>
 
         <Typography
           variant="subtitle1"
-          sx={{
+          sx={(theme) => ({
             fontWeight: 700,
-            color: "#0F172A",
+            color: theme.palette.text.primary,
             flexGrow: 1,
             fontSize: "1rem",
             letterSpacing: "-0.2px",
-          }}
+          })}
         >
           Payment History
         </Typography>
@@ -107,10 +125,13 @@ function PaymentsCard({ payments = [], compact = false, onClose }) {
           <IconButton
             size="small"
             onClick={onClose}
-            sx={{
-              color: "#64748B",
-              "&:hover": { bgcolor: "rgba(15, 23, 42, 0.05)", color: "#0F172A" },
-            }}
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              "&:hover": {
+                bgcolor: `${theme.palette.primary.main}0D`,
+                color: theme.palette.text.primary,
+              },
+            })}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -130,86 +151,21 @@ function PaymentsCard({ payments = [], compact = false, onClose }) {
       >
         {hasPayments ? (
           <List disablePadding>
-            {displayPayments.map((payment, index) => {
-              const config = STATUS_CONFIG[payment.status] || STATUS_CONFIG.Pending;
-              const StatusIcon = config.icon;
-
-              return (
-                <Box key={payment.id || index}>
-                  <ListItem
-                    disableGutters
-                    sx={{
-                      py: 1.25,
-                      px: 1,
-                      borderRadius: "12px",
-                      transition: "all 0.2s ease-in-out",
-                      "&:hover": {
-                        bgcolor: "rgba(212, 175, 55, 0.06)",
-                      },
-                    }}
-                  >
-                    <Stack
-                      direction="row"
-                      spacing={1.5}
-                      alignItems="center"
-                      sx={{ width: "100%" }}
-                    >
-                      {/* Status Icon Badge */}
-                      <Box
-                        sx={{
-                          bgcolor: config.bg,
-                          width: 36,
-                          height: 36,
-                          borderRadius: "10px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <StatusIcon sx={{ color: config.color, fontSize: 20 }} />
-                      </Box>
-
-                      {/* Payment Metadata */}
-                      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            fontWeight: 700,
-                            color: "#0F172A",
-                            fontSize: "0.875rem",
-                          }}
-                          noWrap
-                        >
-                          {payment.amount}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: "#64748B",
-                            fontSize: "0.75rem",
-                            fontWeight: 500,
-                          }}
-                          noWrap
-                        >
-                          {payment.date} • {payment.status}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </ListItem>
-
-                  {index < displayPayments.length - 1 && (
-                    <Divider sx={{ my: 0.5, borderColor: "#F1F5F9" }} />
-                  )}
-                </Box>
-              );
-            })}
+            {displayPayments.map((payment, index) => (
+              <PaymentListItem
+                key={payment.id || index}
+                payment={payment}
+                index={index}
+                length={displayPayments.length}
+                getStatusConfig={getStatusConfig}
+              />
+            ))}
           </List>
         ) : (
           <Box sx={{ py: 3, textAlign: "center", my: "auto" }}>
             <Typography
               variant="body2"
-              sx={{ color: "#64748B", fontWeight: 500 }}
+              sx={(theme) => ({ color: theme.palette.text.secondary, fontWeight: 500 })}
             >
               No recent transactions found.
             </Typography>
@@ -217,7 +173,7 @@ function PaymentsCard({ payments = [], compact = false, onClose }) {
         )}
       </CardContent>
 
-      <Divider sx={{ borderStyle: "dashed", borderColor: "#E2E8F0" }} />
+      <Divider sx={(theme) => ({ borderStyle: "dashed", borderColor: theme.palette.divider })} />
 
       {/* --- Action Footer --- */}
       <Box
@@ -231,35 +187,118 @@ function PaymentsCard({ payments = [], compact = false, onClose }) {
           variant="contained"
           endIcon={<ArrowForwardIcon />}
           onClick={() => handleNavigate(`/${role}/rent-payments`)}
-          sx={{
-            bgcolor: "#0F172A",
-            color: "#FFFFFF",
+          sx={(theme) => ({
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
             textTransform: "none",
             fontWeight: 700,
             fontSize: { xs: "0.8125rem", sm: "0.875rem" },
             px: { xs: 2, sm: 3 },
             py: 1.2,
-            borderRadius: "10px",
+            borderRadius: `${theme.shape.borderRadius}px`,
             width: { xs: "100%", sm: "auto" },
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
             "& .MuiButton-endIcon": {
-              color: "#D4AF37",
+              color: theme.palette.secondary.main,
             },
             "&:hover": {
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
-              boxShadow: "0 6px 16px rgba(212, 175, 55, 0.3)",
+              bgcolor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              boxShadow: `0 6px 16px ${theme.palette.secondary.main}4D`,
               "& .MuiButton-endIcon": {
-                color: "#0F172A",
+                color: theme.palette.primary.main,
               },
             },
             transition: "all 0.2s ease-in-out",
-          }}
+          })}
         >
           View Full History
         </Button>
       </Box>
     </Card>
+  );
+}
+
+// Helper sub-component to cleanly scope theme callbacks for list items
+function PaymentListItem({ payment, index, length, getStatusConfig }) {
+  return (
+    <Box>
+      <Box
+        sx={(theme) => ({
+          display: "flex",
+          alignItems: "center",
+          py: 1.25,
+          px: 1,
+          borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+          transition: "all 0.2s ease-in-out",
+          cursor: "pointer",
+          "&:hover": {
+            bgcolor: `${theme.palette.secondary.main}0F`,
+          },
+        })}
+      >
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="center"
+          sx={{ width: "100%" }}
+        >
+          {/* Status Icon Badge */}
+          <Box
+            sx={(theme) => {
+              const config = getStatusConfig(theme, payment.status);
+              return {
+                bgcolor: config.bg,
+                width: 36,
+                height: 36,
+                borderRadius: `${theme.shape.borderRadius}px`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              };
+            }}
+          >
+            {(theme) => {
+              const config = getStatusConfig(theme, payment.status);
+              const StatusIcon = config.icon;
+              return <StatusIcon sx={{ color: config.color, fontSize: 20 }} />;
+            }}
+          </Box>
+
+          {/* Payment Metadata */}
+          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+            <Typography
+              variant="subtitle2"
+              sx={(theme) => ({
+                fontWeight: 700,
+                color: theme.palette.text.primary,
+                fontSize: "0.875rem",
+              })}
+              noWrap
+            >
+              {payment.amount}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
+                fontSize: "0.75rem",
+                fontWeight: 500,
+                display: "block",
+              })}
+              noWrap
+            >
+              {payment.date} • {payment.status}
+            </Typography>
+          </Box>
+        </Stack>
+      </Box>
+
+      {index < length - 1 && (
+        <Divider sx={(theme) => ({ my: 0.5, borderColor: theme.palette.divider })} />
+      )}
+    </Box>
   );
 }
 

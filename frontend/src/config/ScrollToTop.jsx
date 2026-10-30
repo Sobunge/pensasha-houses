@@ -1,3 +1,4 @@
+// src/components/ScrollToTop.jsx
 import React from "react";
 import { Fab, Zoom, useScrollTrigger } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -22,17 +23,21 @@ export default function ScrollToTop() {
         onClick={handleClick}
         size="small"
         aria-label="scroll back to top"
-        sx={{
+        sx={(theme) => ({
           position: "fixed",
           bottom: 24,
           right: 24,
-          backgroundColor: "#D4AF37", // Matching your gold accent color
-          color: "#000000",
+          backgroundColor: theme.palette.secondary.main, // Champagne Gold token
+          color: theme.palette.primary.main,            // Obsidian Dark Slate token
+          boxShadow: `0 4px 14px ${theme.palette.secondary.main}59`,
+          transition: "all 0.2s ease-in-out",
           "&:hover": {
-            backgroundColor: "#B5922B",
+            backgroundColor: theme.palette.secondary.dark,
+            boxShadow: `0 6px 18px ${theme.palette.secondary.main}73`,
+            transform: "translateY(-2px)",
           },
-          zIndex: 1000,
-        }}
+          zIndex: theme.zIndex.speedDial || 1000,
+        })}
       >
         <KeyboardArrowUpIcon />
       </Fab>

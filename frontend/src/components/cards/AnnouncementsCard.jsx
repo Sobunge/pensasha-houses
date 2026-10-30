@@ -36,62 +36,62 @@ function AnnouncementsCard({ userId, compact = false, onClose }) {
   return (
     <Card
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         flex: compact
           ? undefined
           : { xs: "1 1 100%", md: "1 1 45%", lg: "0 1 400px" },
         minWidth: compact
           ? { xs: 300, sm: 360 }
           : { xs: "100%", sm: "320px" },
-        borderRadius: "16px",
-        border: "1.5px solid #D4AF37", // Gold border applied
-        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)", // Enhanced shadow applied
-        bgcolor: "#FFFFFF",
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
+        border: `1.5px solid ${theme.palette.secondary.main}`, // Gold border applied
+        boxShadow: `0 10px 30px ${theme.palette.primary.main}14`,
+        bgcolor: theme.palette.background.paper,
         display: "flex",
         flexDirection: "column",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          boxShadow: "0 14px 36px rgba(15, 23, 42, 0.12)",
+          boxShadow: `0 14px 36px ${theme.palette.primary.main}1F`,
           transform: "translateY(-4px)",
-          borderColor: "#B5922B",
+          borderColor: theme.palette.secondary.dark,
         },
-      }}
+      })}
     >
       {/* --- Header --- */}
       <Box
-        sx={{
+        sx={(theme) => ({
           display: "flex",
           alignItems: "center",
           gap: 1.5,
           p: 2,
-          bgcolor: "rgba(212, 175, 55, 0.04)",
-          borderBottom: "1px solid #E2E8F0",
-        }}
+          bgcolor: `${theme.palette.secondary.main}0A`,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        })}
       >
         <Box
-          sx={{
+          sx={(theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             width: 32,
             height: 32,
-            borderRadius: "8px",
-            bgcolor: "rgba(212, 175, 55, 0.12)",
-            color: "#D4AF37",
-          }}
+            borderRadius: `${theme.shape.borderRadius}px`,
+            bgcolor: `${theme.palette.secondary.main}1F`, // ~12% gold fill
+            color: theme.palette.secondary.main,
+          })}
         >
           <CampaignIcon sx={{ fontSize: 18 }} />
         </Box>
 
         <Typography
           variant="subtitle1"
-          sx={{
+          sx={(theme) => ({
             fontWeight: 700,
-            color: "#0F172A",
+            color: theme.palette.text.primary,
             flexGrow: 1,
             fontSize: "1rem",
             letterSpacing: "-0.2px",
-          }}
+          })}
         >
           Announcements
         </Typography>
@@ -100,10 +100,13 @@ function AnnouncementsCard({ userId, compact = false, onClose }) {
           <IconButton
             size="small"
             onClick={onClose}
-            sx={{
-              color: "#64748B",
-              "&:hover": { bgcolor: "rgba(15, 23, 42, 0.05)", color: "#0F172A" },
-            }}
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              "&:hover": {
+                bgcolor: `${theme.palette.primary.main}0D`,
+                color: theme.palette.text.primary,
+              },
+            })}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -123,10 +126,10 @@ function AnnouncementsCard({ userId, compact = false, onClose }) {
       >
         {loading ? (
           <Stack alignItems="center" spacing={1.5}>
-            <CircularProgress size={28} sx={{ color: "#D4AF37" }} />
+            <CircularProgress size={28} sx={(theme) => ({ color: theme.palette.secondary.main })} />
             <Typography
               variant="body2"
-              sx={{ color: "#64748B", fontWeight: 500 }}
+              sx={(theme) => ({ color: theme.palette.text.secondary, fontWeight: 500 })}
             >
               Checking updates...
             </Typography>
@@ -135,49 +138,49 @@ function AnnouncementsCard({ userId, compact = false, onClose }) {
           <Stack
             alignItems="center"
             spacing={1}
-            sx={{ py: 2, color: "#64748B" }}
+            sx={(theme) => ({ py: 2, color: theme.palette.text.secondary })}
           >
-            <InfoOutlinedIcon sx={{ color: "#94A3B8", fontSize: 32 }} />
+            <InfoOutlinedIcon sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: 32 })} />
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               No announcements today.
             </Typography>
           </Stack>
         ) : (
           <Box
-            sx={{
+            sx={(theme) => ({
               p: 2,
-              bgcolor: "rgba(212, 175, 55, 0.06)",
-              border: "1px solid rgba(212, 175, 55, 0.25)",
-              borderRadius: "12px",
+              bgcolor: `${theme.palette.secondary.main}0F`,
+              border: `1px solid ${theme.palette.secondary.main}40`,
+              borderRadius: `${theme.shape.borderRadius * 1.5}px`,
               transition: "all 0.2s ease-in-out",
               "&:hover": {
-                bgcolor: "rgba(212, 175, 55, 0.10)",
-                borderColor: "rgba(212, 175, 55, 0.4)",
+                bgcolor: `${theme.palette.secondary.main}1A`,
+                borderColor: `${theme.palette.secondary.main}66`,
               },
-            }}
+            })}
           >
             {latestAnnouncement.title && (
               <Typography
                 variant="subtitle2"
-                sx={{
+                sx={(theme) => ({
                   fontWeight: 700,
-                  color: "#0F172A",
+                  color: theme.palette.text.primary,
                   mb: 0.5,
                   fontSize: "0.875rem",
-                }}
+                })}
               >
                 {latestAnnouncement.title}
               </Typography>
             )}
             <Typography
               variant="body2"
-              sx={{
+              sx={(theme) => ({
                 lineHeight: 1.6,
-                color: "#334155",
+                color: theme.palette.text.primary,
                 fontWeight: 500,
                 fontSize: "0.8125rem",
                 wordBreak: "break-word",
-              }}
+              })}
             >
               {latestAnnouncement.message}
             </Typography>
@@ -185,7 +188,7 @@ function AnnouncementsCard({ userId, compact = false, onClose }) {
         )}
       </CardContent>
 
-      <Divider sx={{ borderStyle: "dashed", borderColor: "#E2E8F0" }} />
+      <Divider sx={(theme) => ({ borderStyle: "dashed", borderColor: theme.palette.divider })} />
 
       {/* --- Action Footer --- */}
       <Box
@@ -200,30 +203,30 @@ function AnnouncementsCard({ userId, compact = false, onClose }) {
           startIcon={<NotificationsActiveIcon />}
           endIcon={<ArrowForwardIcon />}
           onClick={() => handleNavigate(`/${role}/announcements`)}
-          sx={{
-            bgcolor: "#0F172A",
-            color: "#FFFFFF",
+          sx={(theme) => ({
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
             textTransform: "none",
             fontWeight: 700,
             fontSize: { xs: "0.8125rem", sm: "0.875rem" },
             px: { xs: 2, sm: 3 },
             py: 1.2,
-            borderRadius: "10px",
+            borderRadius: `${theme.shape.borderRadius}px`,
             width: { xs: "100%", sm: "auto" },
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
             "& .MuiButton-startIcon, & .MuiButton-endIcon": {
-              color: "#D4AF37",
+              color: theme.palette.secondary.main,
             },
             "&:hover": {
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
-              boxShadow: "0 6px 16px rgba(212, 175, 55, 0.3)",
+              bgcolor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              boxShadow: `0 6px 16px ${theme.palette.secondary.main}4D`,
               "& .MuiButton-startIcon, & .MuiButton-endIcon": {
-                color: "#0F172A",
+                color: theme.palette.primary.main,
               },
             },
             transition: "all 0.2s ease-in-out",
-          }}
+          })}
         >
           View Bulletin Board
         </Button>

@@ -23,15 +23,15 @@ const TenantCard = ({ tenant }) => {
     return (
       <Card
         elevation={0}
-        sx={{
-          borderRadius: "16px",
-          border: "1px solid #E2E8F0",
-          bgcolor: "#FFFFFF",
+        sx={(theme) => ({
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          border: `1px solid ${theme.palette.divider}`,
+          bgcolor: theme.palette.background.paper,
           p: 4,
           textAlign: "center",
-        }}
+        })}
       >
-        <Typography variant="body2" sx={{ color: "#64748B", fontWeight: 500 }}>
+        <Typography variant="body2" sx={(theme) => ({ color: theme.palette.text.secondary, fontWeight: 500 })}>
           No current tenant assigned.
         </Typography>
       </Card>
@@ -52,54 +52,54 @@ const TenantCard = ({ tenant }) => {
   return (
     <Card
       elevation={0}
-      sx={{
-        borderRadius: "16px",
-        border: "1px solid #E2E8F0",
-        bgcolor: "#FFFFFF",
+      sx={(theme) => ({
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
+        border: `1px solid ${theme.palette.divider}`,
+        bgcolor: theme.palette.background.paper,
         display: "flex",
         flexDirection: "column",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          boxShadow: "0px 12px 32px rgba(15, 23, 42, 0.08)",
+          boxShadow: `0px 12px 32px ${theme.palette.primary.main}14`,
           transform: "translateY(-4px)",
-          borderColor: "rgba(212, 175, 55, 0.4)",
+          borderColor: `${theme.palette.secondary.main}66`,
         },
-      }}
+      })}
     >
       {/* --- Header --- */}
       <Box
-        sx={{
+        sx={(theme) => ({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           p: 2,
-          bgcolor: "rgba(212, 175, 55, 0.04)",
-          borderBottom: "1px solid #E2E8F0",
-        }}
+          bgcolor: `${theme.palette.secondary.main}0A`,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        })}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Box
-            sx={{
+            sx={(theme) => ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               width: 32,
               height: 32,
-              borderRadius: "8px",
-              bgcolor: "rgba(212, 175, 55, 0.12)",
-              color: "#D4AF37",
-            }}
+              borderRadius: `${theme.shape.borderRadius}px`,
+              bgcolor: `${theme.palette.secondary.main}1F`,
+              color: theme.palette.secondary.main,
+            })}
           >
             <PersonOutlinedIcon sx={{ fontSize: 18 }} />
           </Box>
           <Typography
             variant="subtitle1"
-            sx={{
+            sx={(theme) => ({
               fontWeight: 700,
-              color: "#0F172A",
+              color: theme.palette.text.primary,
               fontSize: "1rem",
               letterSpacing: "-0.2px",
-            }}
+            })}
           >
             Current Tenant
           </Typography>
@@ -108,14 +108,14 @@ const TenantCard = ({ tenant }) => {
         <Chip
           label={status}
           size="small"
-          sx={{
+          sx={(theme) => ({
             fontWeight: 700,
-            bgcolor: "rgba(16, 185, 129, 0.1)",
-            color: "#10B981",
+            bgcolor: `${theme.palette.success?.main || "#10B981"}1A`,
+            color: theme.palette.success?.main || "#10B981",
             fontSize: "0.75rem",
-            borderRadius: "6px",
+            borderRadius: `${theme.shape.borderRadius / 1.5}px`,
             height: "24px",
-          }}
+          })}
         />
       </Box>
 
@@ -124,16 +124,16 @@ const TenantCard = ({ tenant }) => {
         {/* Tenant Details */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, mb: 3 }}>
           <Avatar
-            sx={{
+            sx={(theme) => ({
               width: 60,
               height: 60,
-              bgcolor: "#0F172A",
-              color: "#D4AF37",
+              bgcolor: theme.palette.primary.main,
+              color: theme.palette.secondary.main,
               fontSize: "1.5rem",
               fontWeight: 800,
-              border: "2px solid #D4AF37",
-              boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
-            }}
+              border: `2px solid ${theme.palette.secondary.main}`,
+              boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
+            })}
           >
             {initial}
           </Avatar>
@@ -141,14 +141,14 @@ const TenantCard = ({ tenant }) => {
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography
               variant="h6"
-              sx={{
+              sx={(theme) => ({
                 fontWeight: 800,
-                color: "#0F172A",
+                color: theme.palette.text.primary,
                 fontSize: "1.125rem",
                 letterSpacing: "-0.2px",
                 lineHeight: 1.2,
                 mb: 0.5,
-              }}
+              })}
               noWrap
             >
               {name}
@@ -156,11 +156,11 @@ const TenantCard = ({ tenant }) => {
 
             <Typography
               variant="body2"
-              sx={{
-                color: "#64748B",
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
                 fontSize: "0.8125rem",
                 fontWeight: 500,
-              }}
+              })}
               noWrap
             >
               {email}
@@ -168,11 +168,11 @@ const TenantCard = ({ tenant }) => {
 
             <Typography
               variant="body2"
-              sx={{
-                color: "#64748B",
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
                 fontSize: "0.8125rem",
                 fontWeight: 500,
-              }}
+              })}
               noWrap
             >
               {phone}
@@ -187,16 +187,17 @@ const TenantCard = ({ tenant }) => {
                   component="a"
                   href={`mailto:${email}`}
                   size="small"
-                  sx={{
-                    color: "#64748B",
-                    bgcolor: "#F8FAFC",
-                    border: "1px solid #E2E8F0",
+                  sx={(theme) => ({
+                    color: theme.palette.text.secondary,
+                    bgcolor: theme.palette.background.default,
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: `${theme.shape.borderRadius}px`,
                     "&:hover": {
-                      bgcolor: "rgba(212, 175, 55, 0.12)",
-                      color: "#0F172A",
-                      borderColor: "rgba(212, 175, 55, 0.4)",
+                      bgcolor: `${theme.palette.secondary.main}1F`,
+                      color: theme.palette.primary.main,
+                      borderColor: `${theme.palette.secondary.main}66`,
                     },
-                  }}
+                  })}
                 >
                   <EmailOutlinedIcon fontSize="small" />
                 </IconButton>
@@ -208,16 +209,17 @@ const TenantCard = ({ tenant }) => {
                   component="a"
                   href={`tel:${phone}`}
                   size="small"
-                  sx={{
-                    color: "#64748B",
-                    bgcolor: "#F8FAFC",
-                    border: "1px solid #E2E8F0",
+                  sx={(theme) => ({
+                    color: theme.palette.text.secondary,
+                    bgcolor: theme.palette.background.default,
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: `${theme.shape.borderRadius}px`,
                     "&:hover": {
-                      bgcolor: "rgba(212, 175, 55, 0.12)",
-                      color: "#0F172A",
-                      borderColor: "rgba(212, 175, 55, 0.4)",
+                      bgcolor: `${theme.palette.secondary.main}1F`,
+                      color: theme.palette.primary.main,
+                      borderColor: `${theme.palette.secondary.main}66`,
                     },
-                  }}
+                  })}
                 >
                   <PhoneOutlinedIcon fontSize="small" />
                 </IconButton>
@@ -226,36 +228,36 @@ const TenantCard = ({ tenant }) => {
           </Box>
         </Box>
 
-        <Divider sx={{ borderStyle: "dashed", borderColor: "#E2E8F0", my: 2.5 }} />
+        <Divider sx={(theme) => ({ borderStyle: "dashed", borderColor: theme.palette.divider, my: 2.5 })} />
 
         {/* Lease Dates Metadata */}
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Box
-              sx={{
-                bgcolor: "rgba(15, 23, 42, 0.02)",
+              sx={(theme) => ({
+                bgcolor: `${theme.palette.primary.main}0A`,
                 p: 1.5,
-                borderRadius: "10px",
-                border: "1px solid #F1F5F9",
-              }}
+                borderRadius: `${theme.shape.borderRadius}px`,
+                border: `1px solid ${theme.palette.divider}`,
+              })}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.5 }}>
-                <CalendarTodayOutlinedIcon sx={{ fontSize: 14, color: "#D4AF37" }} />
+                <CalendarTodayOutlinedIcon sx={(theme) => ({ fontSize: 14, color: theme.palette.secondary.main })} />
                 <Typography
                   variant="caption"
-                  sx={{
+                  sx={(theme) => ({
                     fontWeight: 800,
-                    color: "#64748B",
+                    color: theme.palette.text.secondary,
                     letterSpacing: "0.5px",
                     textTransform: "uppercase",
-                  }}
+                  })}
                 >
                   Lease Started
                 </Typography>
               </Box>
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 700, color: "#0F172A", fontSize: "0.875rem" }}
+                sx={(theme) => ({ fontWeight: 700, color: theme.palette.text.primary, fontSize: "0.875rem" })}
               >
                 {leaseStart}
               </Typography>
@@ -264,30 +266,30 @@ const TenantCard = ({ tenant }) => {
 
           <Grid item xs={6}>
             <Box
-              sx={{
-                bgcolor: "rgba(15, 23, 42, 0.02)",
+              sx={(theme) => ({
+                bgcolor: `${theme.palette.primary.main}0A`,
                 p: 1.5,
-                borderRadius: "10px",
-                border: "1px solid #F1F5F9",
-              }}
+                borderRadius: `${theme.shape.borderRadius}px`,
+                border: `1px solid ${theme.palette.divider}`,
+              })}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.5 }}>
-                <EventOutlinedIcon sx={{ fontSize: 14, color: "#D4AF37" }} />
+                <EventOutlinedIcon sx={(theme) => ({ fontSize: 14, color: theme.palette.secondary.main })} />
                 <Typography
                   variant="caption"
-                  sx={{
+                  sx={(theme) => ({
                     fontWeight: 800,
-                    color: "#64748B",
+                    color: theme.palette.text.secondary,
                     letterSpacing: "0.5px",
                     textTransform: "uppercase",
-                  }}
+                  })}
                 >
                   Lease Ends
                 </Typography>
               </Box>
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 700, color: "#0F172A", fontSize: "0.875rem" }}
+                sx={(theme) => ({ fontWeight: 700, color: theme.palette.text.primary, fontSize: "0.875rem" })}
               >
                 {leaseEnd}
               </Typography>

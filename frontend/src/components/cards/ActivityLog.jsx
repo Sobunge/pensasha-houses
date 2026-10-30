@@ -11,27 +11,27 @@ const ActivityLog = ({ activities = [] }) => {
       {/* Title with Gold Header Icon */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
         <Box
-          sx={{
+          sx={(theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             width: 32,
             height: 32,
-            borderRadius: "8px",
-            bgcolor: "rgba(212, 175, 55, 0.12)",
-            color: "#D4AF37",
-          }}
+            borderRadius: `${theme.shape.borderRadius}px`,
+            bgcolor: `${theme.palette.secondary.main}1F`, // ~12% gold fill
+            color: theme.palette.secondary.main,
+          })}
         >
           <HistoryIcon sx={{ fontSize: 18 }} />
         </Box>
         <Typography
           variant="h6"
-          sx={{
+          sx={(theme) => ({
             fontWeight: 700,
-            color: "#0F172A",
+            color: theme.palette.text.primary,
             fontSize: "1.125rem",
             letterSpacing: "-0.2px",
-          }}
+          })}
         >
           Recent Activity
         </Typography>
@@ -40,17 +40,17 @@ const ActivityLog = ({ activities = [] }) => {
       {/* Main Container */}
       <Paper
         elevation={0}
-        sx={{
-          borderRadius: "16px",
+        sx={(theme) => ({
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
           overflow: "hidden",
-          border: "1px solid #E2E8F0",
-          bgcolor: "#FFFFFF",
-          boxShadow: "0px 4px 20px rgba(15, 23, 42, 0.03)",
-        }}
+          border: `1px solid ${theme.palette.divider}`,
+          bgcolor: theme.palette.background.paper,
+          boxShadow: `0px 4px 20px ${theme.palette.primary.main}08`,
+        })}
       >
         {activities.length === 0 ? (
           <Box sx={{ p: 4, textAlign: "center" }}>
-            <Typography variant="body2" sx={{ color: "#64748B" }}>
+            <Typography variant="body2" sx={(theme) => ({ color: theme.palette.text.secondary })}>
               No recent activity recorded.
             </Typography>
           </Box>
@@ -61,33 +61,33 @@ const ActivityLog = ({ activities = [] }) => {
             return (
               <Box
                 key={index}
-                sx={{
+                sx={(theme) => ({
                   p: 2.25,
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   borderBottom:
-                    index !== activities.length - 1 ? "1px solid #E2E8F0" : "none",
+                    index !== activities.length - 1 ? `1px solid ${theme.palette.divider}` : "none",
                   transition: "all 0.2s ease-in-out",
                   "&:hover": {
-                    bgcolor: "rgba(212, 175, 55, 0.04)",
+                    bgcolor: `${theme.palette.secondary.main}0A`, // ~4% gold hover
                   },
-                }}
+                })}
               >
                 <Stack direction="row" spacing={2} alignItems="center">
                   {/* Icon Badge */}
                   <Box
-                    sx={{
+                    sx={(theme) => ({
                       p: 1.25,
-                      borderRadius: "10px",
+                      borderRadius: `${theme.shape.borderRadius}px`,
                       bgcolor: isMaintenance
-                        ? "rgba(15, 23, 42, 0.06)"
-                        : "rgba(212, 175, 55, 0.12)",
-                      color: isMaintenance ? "#0F172A" : "#D4AF37",
+                        ? `${theme.palette.primary.main}0F`
+                        : `${theme.palette.secondary.main}1F`,
+                      color: isMaintenance ? theme.palette.primary.main : theme.palette.secondary.main,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                    }}
+                    })}
                   >
                     {isMaintenance ? (
                       <ConstructionIcon sx={{ fontSize: 20 }} />
@@ -100,17 +100,17 @@ const ActivityLog = ({ activities = [] }) => {
                   <Box>
                     <Typography
                       variant="body2"
-                      sx={{
+                      sx={(theme) => ({
                         fontWeight: 700,
-                        color: "#0F172A",
+                        color: theme.palette.text.primary,
                         fontSize: "0.875rem",
-                      }}
+                      })}
                     >
                       {item.task}
                     </Typography>
                     <Typography
                       variant="caption"
-                      sx={{ color: "#64748B", fontSize: "0.75rem" }}
+                      sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "0.75rem" })}
                     >
                       {item.date}
                     </Typography>
@@ -121,20 +121,20 @@ const ActivityLog = ({ activities = [] }) => {
                 <Chip
                   label={item.type}
                   size="small"
-                  sx={{
+                  sx={(theme) => ({
                     height: 22,
                     fontSize: "0.65rem",
                     fontWeight: 700,
                     textTransform: "uppercase",
                     bgcolor: isMaintenance
-                      ? "rgba(15, 23, 42, 0.08)"
-                      : "rgba(212, 175, 55, 0.15)",
-                    color: isMaintenance ? "#0F172A" : "#D4AF37",
+                      ? `${theme.palette.primary.main}14`
+                      : `${theme.palette.secondary.main}26`,
+                    color: isMaintenance ? theme.palette.primary.main : theme.palette.secondary.main,
                     border: "1px solid",
                     borderColor: isMaintenance
-                      ? "rgba(15, 23, 42, 0.15)"
-                      : "rgba(212, 175, 55, 0.3)",
-                  }}
+                      ? `${theme.palette.primary.main}26`
+                      : `${theme.palette.secondary.main}4D`,
+                  })}
                 />
               </Box>
             );

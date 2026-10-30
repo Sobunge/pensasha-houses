@@ -25,44 +25,48 @@ export default function AuthModal({ open, onClose, initialTab = 0 }) {
       maxWidth="xs" 
       fullWidth
       PaperProps={{
-        sx: { 
-          borderRadius: "24px",
-          bgcolor: "#FFFFFF",
-          color: "#0F172A",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        sx: (theme) => ({ 
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          boxShadow: `0 25px 50px -12px ${theme.palette.primary.main}40`,
           overflow: "hidden",
           maxHeight: "90vh", // Keeps dialog within screen viewport
-        }
+        })
       }}
     >
       {/* Top Navigation Bar */}
       <Box 
-        sx={{ 
+        sx={(theme) => ({ 
           display: "flex", 
           alignItems: "center", 
           justifyContent: "space-between", 
-          borderBottom: "1px solid #E2E8F0",
-          bgcolor: "#FFFFFF",
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          bgcolor: theme.palette.background.paper,
           pt: 0.5,
           px: 1,
           zIndex: 10
-        }}
+        })}
       >
         <Tabs 
           value={activeTab} 
           onChange={(_, val) => setActiveTab(val)} 
           variant="fullWidth" 
-          sx={{ 
+          sx={(theme) => ({ 
             flex: 1,
             "& .MuiTab-root": { 
               py: 1.5, 
               fontWeight: 600, 
               textTransform: "none",
-              color: "#64748B",
-              "&.Mui-selected": { color: "#D4AF37" }
+              color: theme.palette.text.secondary,
+              "&.Mui-selected": { color: theme.palette.secondary.main }
             },
-            "& .MuiTabs-indicator": { backgroundColor: "#D4AF37", height: 3, borderRadius: "3px 3px 0 0" }
-          }}
+            "& .MuiTabs-indicator": { 
+              backgroundColor: theme.palette.secondary.main, 
+              height: 3, 
+              borderRadius: "3px 3px 0 0" 
+            }
+          })}
         >
           <Tab icon={<LoginIcon fontSize="small" />} iconPosition="start" label="Login" />
           <Tab icon={<PersonAddIcon fontSize="small" />} iconPosition="start" label="Sign Up" />
@@ -70,7 +74,13 @@ export default function AuthModal({ open, onClose, initialTab = 0 }) {
         
         <IconButton 
           onClick={onClose} 
-          sx={{ color: "#64748B", "&:hover": { color: "#0F172A", bgcolor: "#F1F5F9" } }}
+          sx={(theme) => ({ 
+            color: theme.palette.text.secondary, 
+            "&:hover": { 
+              color: theme.palette.text.primary, 
+              bgcolor: `${theme.palette.primary.main}0A` 
+            } 
+          })}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
@@ -78,8 +88,8 @@ export default function AuthModal({ open, onClose, initialTab = 0 }) {
 
       {/* Content Area with Hidden Scrollbar */}
       <DialogContent 
-        sx={{ 
-          bgcolor: "#FFFFFF", 
+        sx={(theme) => ({ 
+          bgcolor: theme.palette.background.paper, 
           pt: 3, 
           pb: 3, 
           px: { xs: 2.5, sm: 3 },
@@ -88,7 +98,7 @@ export default function AuthModal({ open, onClose, initialTab = 0 }) {
           "&::-webkit-scrollbar": { display: "none" },
           msOverflowStyle: "none",
           scrollbarWidth: "none",
-        }}
+        })}
       >
         {activeTab === 0 ? (
           <LoginForm onClose={onClose} switchToSignup={switchToSignup} />

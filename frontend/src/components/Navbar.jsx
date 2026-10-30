@@ -43,7 +43,8 @@ function Navbar() {
   const [authTab, setAuthTab] = useState(0); // 0 = Login, 1 = Register
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // Changed from "md" to "lg" so it collapses at large screens and below
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   const isTiny = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
   const navigate = useNavigate();
@@ -76,10 +77,10 @@ function Navbar() {
   const handleAuthClose = () => setAuthOpen(false);
 
   // Desktop Navigation Link Styling
-  const getButtonStyles = (link) => {
+  const getButtonStyles = (link) => (theme) => {
     const isActive = location.pathname === link;
     return {
-      color: isActive ? "#D4AF37" : "#CBD5E1",
+      color: isActive ? theme.palette.secondary.main : theme.palette.text.secondary,
       textTransform: "none",
       fontWeight: isActive ? 600 : 500,
       fontSize: "0.95rem",
@@ -87,14 +88,14 @@ function Navbar() {
       px: 1.5,
       transition: "all 0.2s ease-in-out",
       "& .MuiButton-startIcon": {
-        color: isActive ? "#D4AF37" : "#94A3B8",
+        color: isActive ? theme.palette.secondary.main : theme.palette.text.secondary,
         transition: "color 0.2s ease-in-out",
       },
       "&:hover": {
-        color: "#D4AF37",
+        color: theme.palette.secondary.main,
         backgroundColor: "transparent",
         "& .MuiButton-startIcon": {
-          color: "#D4AF37",
+          color: theme.palette.secondary.main,
         },
       },
       "&::after": isActive ? {
@@ -104,69 +105,49 @@ function Navbar() {
         left: "12%",
         width: "76%",
         height: "2px",
-        backgroundColor: "#D4AF37",
+        backgroundColor: theme.palette.secondary.main,
         borderRadius: "2px",
-        boxShadow: "0 0 8px rgba(212, 175, 55, 0.6)",
+        boxShadow: `0 0 8px ${theme.palette.secondary.main}99`,
       } : {},
     };
   };
 
   // Auth Link Styling
-  const authLinkStyles = {
-    color: "#CBD5E1",
+  const authLinkStyles = (theme) => ({
+    color: theme.palette.text.secondary,
     textTransform: "none",
     fontWeight: 500,
     fontSize: "0.95rem",
     px: 1.5,
     transition: "all 0.2s ease-in-out",
     "& .MuiButton-startIcon": {
-      color: "#94A3B8",
+      color: theme.palette.text.secondary,
       transition: "color 0.2s ease-in-out",
     },
     "&:hover": {
-      color: "#D4AF37",
+      color: theme.palette.secondary.main,
       backgroundColor: "transparent",
       "& .MuiButton-startIcon": {
-        color: "#D4AF37",
+        color: theme.palette.secondary.main,
       },
     },
-  };
-
-  // Mobile Drawer Styling
-  const getDrawerItemStyles = (link) => {
-    const isActive = location.pathname === link;
-    return {
-      px: 2.5,
-      py: 1.5,
-      mb: 1,
-      borderRadius: 2,
-      backgroundColor: isActive ? "rgba(212, 175, 55, 0.12)" : "transparent",
-      color: isActive ? "#D4AF37" : "#94A3B8",
-      fontWeight: isActive ? 600 : 500,
-      transition: "all 0.2s ease",
-      "&:hover": {
-        backgroundColor: "rgba(212, 175, 55, 0.08)",
-        color: "#F8FAFC",
-        transform: "translateX(4px)"
-      },
-    };
-  };
+  });
 
   const drawerContent = (
     <Box
-      sx={{
+      sx={(theme) => ({
         width: 300,
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "rgba(11, 15, 23, 0.96)",
+        bgcolor: `${theme.palette.primary.main}F5`,
         backdropFilter: "blur(20px)",
-        borderLeft: "1px solid rgba(255, 255, 255, 0.08)",
+        borderLeft: `1px solid ${theme.palette.common.white}14`,
         px: 3,
         py: { xs: 3, md: 4 },
-        boxShadow: "-10px 0 30px rgba(0, 0, 0, 0.5)",
-        color: "#fff",
-      }}
+        boxShadow: `-10px 0 30px ${theme.palette.primary.main}80`,
+        color: theme.palette.primary.contrastText,
+      })}
     >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Box
@@ -175,53 +156,70 @@ function Navbar() {
           sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none" }}
         >
           <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: 32 }} />
-          <Typography variant="h6" sx={{ fontFamily: '"Playfair Display", serif', fontWeight: 600, color: "#fff" }}>
-            Pensasha <Box component="span" sx={{ color: "#D4AF37", fontWeight: 400 }}>Houses</Box>
+          <Typography variant="h6" sx={(theme) => ({ fontWeight: 600, color: theme.palette.primary.contrastText })}>
+            Pensasha <Box component="span" sx={(theme) => ({ color: theme.palette.secondary.main, fontWeight: 400 })}>Houses</Box>
           </Typography>
         </Box>
-        <IconButton onClick={() => setMobileOpen(false)} sx={{ color: "#94A3B8", "&:hover": { color: "#fff" } }}>
+        <IconButton onClick={() => setMobileOpen(false)} sx={(theme) => ({ color: theme.palette.text.secondary, "&:hover": { color: theme.palette.primary.contrastText } })}>
           <CloseIcon />
         </IconButton>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", mb: 3 }} />
+      <Divider sx={(theme) => ({ borderColor: `${theme.palette.common.white}14`, mb: 3 })} />
 
       <List sx={{ flexGrow: 1 }}>
-        {navItems.map((item) => (
-          <ListItem key={item.label} disablePadding>
-            <ListItemButton
-              component={item.requiresAuth ? "div" : RouterLink}
-              to={item.requiresAuth ? undefined : item.link}
-              onClick={item.requiresAuth ? () => handleAuthOpen(0) : undefined}
-              sx={getDrawerItemStyles(item.link)}
-            >
-              <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.link ? "#D4AF37" : "#94A3B8" }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.label} disableTypography sx={{ fontSize: "0.95rem" }} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.link;
+          return (
+            <ListItem key={item.label} disablePadding>
+              <ListItemButton
+                component={item.requiresAuth ? "div" : RouterLink}
+                to={item.requiresAuth ? undefined : item.link}
+                onClick={item.requiresAuth ? () => handleAuthOpen(0) : undefined}
+                sx={(theme) => ({
+                  px: 2.5,
+                  py: 1.5,
+                  mb: 1,
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                  backgroundColor: isActive ? `${theme.palette.secondary.main}1F` : "transparent",
+                  color: isActive ? theme.palette.secondary.main : theme.palette.text.secondary,
+                  fontWeight: isActive ? 600 : 500,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    backgroundColor: `${theme.palette.secondary.main}14`,
+                    color: theme.palette.primary.contrastText,
+                    transform: "translateX(4px)"
+                  },
+                })}
+              >
+                <ListItemIcon sx={(theme) => ({ minWidth: 40, color: isActive ? theme.palette.secondary.main : theme.palette.text.secondary })}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.label} disableTypography sx={{ fontSize: "0.95rem" }} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
 
-      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", mb: 3 }} />
+      <Divider sx={(theme) => ({ borderColor: `${theme.palette.common.white}14`, mb: 3 })} />
 
       <ListItem disablePadding>
         <ListItemButton
           onClick={() => handleAuthOpen(0)}
-          sx={{
+          sx={(theme) => ({
             py: 1.5,
-            borderRadius: 2,
-            backgroundColor: "#D4AF37",
+            borderRadius: `${theme.shape.borderRadius}px`,
+            backgroundColor: theme.palette.secondary.main,
             justifyContent: "center",
             fontWeight: 600,
-            color: "#0B0F17",
-            boxShadow: "0 4px 14px rgba(212, 175, 55, 0.25)",
-            "&:hover": { backgroundColor: "#B5922B" },
-          }}
+            color: theme.palette.primary.main,
+            boxShadow: `0 4px 14px ${theme.palette.secondary.main}40`,
+            "&:hover": { backgroundColor: theme.palette.secondary.dark },
+          })}
         >
           <ListItemIcon sx={{ minWidth: 35 }}>
-            <LoginIcon sx={{ color: "#0B0F17", fontSize: "1.2rem" }} />
+            <LoginIcon sx={(theme) => ({ color: theme.palette.primary.main, fontSize: "1.2rem" })} />
           </ListItemIcon>
           <ListItemText primary="Login / Register" disableTypography sx={{ fontWeight: 600 }} />
         </ListItemButton>
@@ -234,8 +232,8 @@ function Navbar() {
       <AppBar
         position="fixed"
         elevation={0}
-        sx={{
-          backgroundColor: "rgba(11, 15, 23, 0.75)",
+        sx={(theme) => ({
+          backgroundColor: `${theme.palette.primary.main}BF`, // ~75% obsidian
           backdropFilter: "blur(16px)",
           flexShrink: 0,
           "&::after": {
@@ -245,18 +243,17 @@ function Navbar() {
             left: 0,
             right: 0,
             height: "1px",
-            background:
-              "linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.6) 50%, rgba(212, 175, 55, 0) 100%)",
+            background: `linear-gradient(90deg, ${theme.palette.secondary.main}00 0%, ${theme.palette.secondary.main}99 50%, ${theme.palette.secondary.main}00 100%)`,
             pointerEvents: "none",
           },
-        }}
+        })}
       >
         <Container maxWidth="xl">
           <Toolbar
             disableGutters
             sx={{
               justifyContent: "space-between",
-              minHeight: { xs: 60, md: 72 }
+              minHeight: { xs: 60, lg: 72 }
             }}
           >
             {/* Logo */}
@@ -265,22 +262,21 @@ function Navbar() {
               to="/"
               sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none" }}
             >
-              <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: { xs: 28, md: 34 } }} />
+              <Box component="img" src="/assets/images/logo.svg" alt="Pensasha Logo" sx={{ height: { xs: 28, lg: 34 } }} />
               <Typography
                 variant="h6"
-                sx={{
-                  fontFamily: '"Playfair Display", Georgia, serif',
+                sx={(theme) => ({
                   fontWeight: 600,
-                  color: "#FFFFFF",
+                  color: theme.palette.primary.contrastText,
                   letterSpacing: "-0.02em",
-                  fontSize: { xs: "1.15rem", md: "1.35rem" }
-                }}
+                  fontSize: { xs: "1.15rem", lg: "1.35rem" }
+                })}
               >
-                Pensasha{!isTiny && <Box component="span" sx={{ color: "#D4AF37", fontWeight: 400 }}> Houses</Box>}
+                Pensasha{!isTiny && <Box component="span" sx={(theme) => ({ color: theme.palette.secondary.main, fontWeight: 400 })}> Houses</Box>}
               </Typography>
             </Box>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation (Visible on lg and up) */}
             {!isMobile ? (
               <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {navItems.map((item) => (
@@ -299,7 +295,7 @@ function Navbar() {
                 <Divider 
                   orientation="vertical" 
                   flexItem 
-                  sx={{ borderColor: "rgba(255, 255, 255, 0.12)", my: 2, mx: 0.5 }} 
+                  sx={(theme) => ({ borderColor: `${theme.palette.common.white}1F`, my: 2, mx: 0.5 })} 
                 />
 
                 <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
@@ -323,7 +319,16 @@ function Navbar() {
             ) : (
               <IconButton
                 onClick={handleDrawerToggle}
-                sx={{ color: "#F8FAFC", p: 1 }}
+                sx={(theme) => ({
+                  color: theme.palette.primary.contrastText,
+                  p: 1,
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                  border: `1px solid ${theme.palette.common.white}14`,
+                  "&:hover": {
+                    backgroundColor: `${theme.palette.secondary.main}1A`,
+                    borderColor: theme.palette.secondary.main,
+                  },
+                })}
               >
                 <MenuIcon fontSize="medium" />
               </IconButton>
@@ -335,7 +340,7 @@ function Navbar() {
       <Backdrop
         open={mobileOpen}
         onClick={() => setMobileOpen(false)}
-        sx={{ zIndex: theme.zIndex.drawer - 1, backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+        sx={(theme) => ({ zIndex: theme.zIndex.drawer - 1, backgroundColor: "rgba(0, 0, 0, 0.7)" })}
       />
       <Drawer
         anchor="right"

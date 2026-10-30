@@ -12,7 +12,8 @@ import {
   DialogContent, 
   DialogActions,
   IconButton,
-  CircularProgress 
+  CircularProgress,
+  useTheme
 } from "@mui/material";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
@@ -27,24 +28,6 @@ import AddBankDetailsDialog from "./AddBankDetailsDialog";
 import EditPaymentPreferencesDialog from "./EditPaymentPreferencesDialog";
 import { useDeleteBankDetail } from "../../../../components/hooks/landlord/useDeleteBankDetail";
 
-// Clean Design System Constants
-const DESIGN_SYSTEM = {
-  colors: {
-    primary: "#0F172A",
-    primaryLight: "#1E293B",
-    gold: "#D4AF37",
-    goldDark: "#B48A1D",
-    goldLight: "rgba(212, 175, 55, 0.12)",
-    goldBorder: "rgba(212, 175, 55, 0.35)",
-    border: "#E2E8F0",
-    textMuted: "#64748B",
-    textHeader: "#0F172A",
-    bgSubtle: "#F8FAFC",
-    error: "#EF4444",
-    errorLight: "rgba(239, 68, 68, 0.08)",
-  },
-};
-
 const PAYMENT_METHOD_MAP = {
   MPESA_C2B_PAYBILL: "M-Pesa Paybill",
   MPESA_STK_PUSH: "M-Pesa STK Push",
@@ -58,29 +41,29 @@ const formatPaymentMethod = (method) =>
 
 // Shared Card Wrapper Component
 function ProfileInfoCard({ icon: Icon, title, action, children }) {
-  const { colors } = DESIGN_SYSTEM;
+  const theme = useTheme();
 
   return (
     <Box
       sx={{
         p: 2.5,
-        borderRadius: "14px",
-        bgcolor: "#FFFFFF",
-        border: `1px solid ${colors.border}`,
+        borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+        bgcolor: theme.palette.background.paper,
+        border: `1px solid ${theme.palette.divider}`,
         display: "flex",
         alignItems: "flex-start",
         gap: 2,
         width: "100%",
         boxSizing: "border-box",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        boxShadow: "0 4px 12px rgba(15, 23, 42, 0.02)",
+        boxShadow: `0 4px 12px ${theme.palette.primary.main}08`,
         "&:hover": {
-          borderColor: "rgba(212, 175, 55, 0.6)",
-          boxShadow: "0 10px 25px rgba(212, 175, 55, 0.12)",
+          borderColor: `${theme.palette.secondary.main}99`,
+          boxShadow: `0 10px 25px ${theme.palette.secondary.main}1F`,
           transform: "translateY(-2px)",
           "& .icon-box": {
-            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
-            color: colors.gold,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #1E293B 100%)`,
+            color: theme.palette.secondary.main,
             transform: "scale(1.05)",
           },
         },
@@ -91,9 +74,9 @@ function ProfileInfoCard({ icon: Icon, title, action, children }) {
         sx={{
           width: 42,
           height: 42,
-          borderRadius: "10px",
-          bgcolor: colors.goldLight,
-          color: colors.goldDark,
+          borderRadius: `${theme.shape.borderRadius}px`,
+          bgcolor: `${theme.palette.secondary.main}1F`,
+          color: theme.palette.secondary.main,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -117,14 +100,14 @@ function ProfileInfoCard({ icon: Icon, title, action, children }) {
               sx={{
                 width: 4,
                 height: 14,
-                bgcolor: colors.gold,
+                bgcolor: theme.palette.secondary.main,
                 borderRadius: "2px",
               }}
             />
             <Typography
               variant="subtitle2"
               sx={{
-                color: colors.textHeader,
+                color: theme.palette.text.primary,
                 fontWeight: 800,
                 textTransform: "uppercase",
                 letterSpacing: 0.9,
@@ -151,6 +134,7 @@ ProfileInfoCard.propTypes = {
 };
 
 export default function LandlordProfileInfo({ profile }) {
+  const theme = useTheme();
   const [openBankDialog, setOpenBankDialog] = useState(false);
   const [selectedBankToEdit, setSelectedBankToEdit] = useState(null);
   const [openPaymentPrefsDialog, setOpenPaymentPrefsDialog] = useState(false);
@@ -160,8 +144,6 @@ export default function LandlordProfileInfo({ profile }) {
 
   // Initialize TanStack Query mutation hook
   const deleteBankMutation = useDeleteBankDetail();
-
-  const { colors } = DESIGN_SYSTEM;
 
   const userId = profile?.id || profile?.userId;
   const properties = useMemo(() => profile?.properties || [], [profile]);
@@ -209,12 +191,12 @@ export default function LandlordProfileInfo({ profile }) {
   return (
     <Box
       sx={{
-        bgcolor: "#FFFFFF",
-        borderRadius: "18px",
+        bgcolor: theme.palette.background.paper,
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
         p: { xs: 2, sm: 2.5 },
-        border: `1px solid ${colors.border}`,
-        boxShadow: "0 12px 35px -10px rgba(15, 23, 42, 0.06)",
-        background: `linear-gradient(180deg, #FFFFFF 0%, ${colors.bgSubtle} 100%)`,
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: `0 12px 35px -10px ${theme.palette.primary.main}0F`,
+        background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.action.hover} 100%)`,
         width: "100%",
         display: "flex",
         flexDirection: "column",
@@ -237,19 +219,19 @@ export default function LandlordProfileInfo({ profile }) {
                     <HomeWorkOutlinedIcon
                       sx={{
                         fontSize: "0.85rem !important",
-                        color: `${colors.gold} !important`,
+                        color: `${theme.palette.secondary.main} !important`,
                       }}
                     />
                   }
                   label={property.name || "Property"}
                   size="small"
                   sx={{
-                    bgcolor: colors.primary,
-                    color: "#FFFFFF",
+                    bgcolor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
                     fontWeight: 700,
                     fontSize: "0.75rem",
-                    borderRadius: "8px",
-                    border: `1px solid ${colors.goldBorder}`,
+                    borderRadius: `${theme.shape.borderRadius}px`,
+                    border: `1px solid ${theme.palette.secondary.main}66`,
                     px: 0.5,
                   }}
                 />
@@ -260,11 +242,11 @@ export default function LandlordProfileInfo({ profile }) {
               label="No Properties Registered"
               size="small"
               sx={{
-                bgcolor: "rgba(100, 116, 139, 0.08)",
-                color: colors.textMuted,
+                bgcolor: `${theme.palette.text.secondary}14`,
+                color: theme.palette.text.secondary,
                 fontWeight: 700,
                 fontSize: "0.725rem",
-                borderRadius: "8px",
+                borderRadius: `${theme.shape.borderRadius}px`,
               }}
             />
           )}
@@ -283,19 +265,19 @@ export default function LandlordProfileInfo({ profile }) {
               onClick={handleOpenAddBank}
               startIcon={<AddCardOutlinedIcon sx={{ fontSize: "14px !important" }} />}
               sx={{
-                bgcolor: colors.goldLight,
-                color: colors.goldDark,
+                bgcolor: `${theme.palette.secondary.main}1F`,
+                color: theme.palette.secondary.main,
                 fontSize: "0.725rem",
                 fontWeight: 800,
                 textTransform: "none",
                 py: 0.4,
                 px: 1.2,
-                borderRadius: "8px",
-                border: `1px solid ${colors.goldBorder}`,
+                borderRadius: `${theme.shape.borderRadius}px`,
+                border: `1px solid ${theme.palette.secondary.main}59`,
                 boxShadow: "none",
                 "&:hover": {
-                  bgcolor: colors.gold,
-                  color: colors.primary,
+                  bgcolor: theme.palette.secondary.main,
+                  color: theme.palette.primary.main,
                 },
               }}
             >
@@ -326,9 +308,9 @@ export default function LandlordProfileInfo({ profile }) {
                   key={bank.id || index}
                   sx={{
                     p: 1.5,
-                    borderRadius: "10px",
-                    bgcolor: colors.bgSubtle,
-                    border: `1px solid ${colors.border}`,
+                    borderRadius: `${theme.shape.borderRadius}px`,
+                    bgcolor: theme.palette.action.hover,
+                    border: `1px solid ${theme.palette.divider}`,
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
@@ -337,8 +319,8 @@ export default function LandlordProfileInfo({ profile }) {
                     boxSizing: "border-box",
                     transition: "all 0.2s ease",
                     "&:hover": {
-                      borderColor: colors.goldBorder,
-                      boxShadow: "0 4px 12px rgba(15, 23, 42, 0.03)",
+                      borderColor: `${theme.palette.secondary.main}66`,
+                      boxShadow: `0 4px 12px ${theme.palette.primary.main}08`,
                     },
                   }}
                 >
@@ -347,7 +329,7 @@ export default function LandlordProfileInfo({ profile }) {
                       variant="subtitle2"
                       sx={{
                         fontWeight: 800,
-                        color: colors.primary,
+                        color: theme.palette.primary.main,
                         fontSize: "0.825rem",
                         lineHeight: 1.2,
                       }}
@@ -358,7 +340,7 @@ export default function LandlordProfileInfo({ profile }) {
                           component="span"
                           sx={{
                             fontWeight: 500,
-                            color: colors.textMuted,
+                            color: theme.palette.text.secondary,
                             fontSize: "0.7rem",
                             ml: 0.5,
                           }}
@@ -371,15 +353,14 @@ export default function LandlordProfileInfo({ profile }) {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: colors.textMuted,
+                        color: theme.palette.text.secondary,
                         display: "block",
                         mt: 0.5,
                         fontSize: "0.725rem",
                         fontWeight: 600,
                       }}
                     >
-                      {bank.accountName ? `${bank.accountName} - ` : ""}
-                      <Box component="span" sx={{ color: colors.primary, fontWeight: 700 }}>
+                      <Box component="span" sx={{ color: theme.palette.primary.main, fontWeight: 700 }}>
                         {bank.accountNumber}
                       </Box>
                     </Typography>
@@ -393,19 +374,19 @@ export default function LandlordProfileInfo({ profile }) {
                       onClick={() => handleOpenEditBank(bank)}
                       startIcon={<EditOutlinedIcon sx={{ fontSize: "11px !important" }} />}
                       sx={{
-                        borderColor: colors.border,
-                        color: colors.goldDark,
+                        borderColor: theme.palette.divider,
+                        color: theme.palette.secondary.main,
                         fontSize: "0.685rem",
                         fontWeight: 700,
                         textTransform: "none",
                         py: 0.15,
                         px: 1,
                         minWidth: 0,
-                        borderRadius: "6px",
+                        borderRadius: `${theme.shape.borderRadius * 0.75}px`,
                         "&:hover": {
-                          borderColor: colors.gold,
-                          color: colors.primary,
-                          bgcolor: colors.goldLight,
+                          borderColor: theme.palette.secondary.main,
+                          color: theme.palette.primary.main,
+                          bgcolor: `${theme.palette.secondary.main}1F`,
                         },
                       }}
                     >
@@ -418,18 +399,18 @@ export default function LandlordProfileInfo({ profile }) {
                       onClick={() => handlePromptDeleteBank(bank)}
                       startIcon={<DeleteOutlineOutlinedIcon sx={{ fontSize: "11px !important" }} />}
                       sx={{
-                        borderColor: colors.border,
-                        color: colors.error,
+                        borderColor: theme.palette.divider,
+                        color: theme.palette.error?.main || "#EF4444",
                         fontSize: "0.685rem",
                         fontWeight: 700,
                         textTransform: "none",
                         py: 0.15,
                         px: 1,
                         minWidth: 0,
-                        borderRadius: "6px",
+                        borderRadius: `${theme.shape.borderRadius * 0.75}px`,
                         "&:hover": {
-                          borderColor: colors.error,
-                          bgcolor: colors.errorLight,
+                          borderColor: theme.palette.error?.main || "#EF4444",
+                          bgcolor: `${theme.palette.error?.main || "#EF4444"}14`,
                         },
                       }}
                     >
@@ -443,9 +424,9 @@ export default function LandlordProfileInfo({ profile }) {
             <Box
               sx={{
                 p: 2,
-                borderRadius: "10px",
-                bgcolor: colors.bgSubtle,
-                border: `1px dashed ${colors.border}`,
+                borderRadius: `${theme.shape.borderRadius}px`,
+                bgcolor: theme.palette.action.hover,
+                border: `1px dashed ${theme.palette.divider}`,
                 textAlign: "center",
                 display: "flex",
                 flexDirection: "column",
@@ -458,7 +439,7 @@ export default function LandlordProfileInfo({ profile }) {
             >
               <Typography
                 variant="body2"
-                sx={{ color: colors.textMuted, fontSize: "0.8rem", fontWeight: 600 }}
+                sx={{ color: theme.palette.text.secondary, fontSize: "0.8rem", fontWeight: 600 }}
               >
                 No bank accounts configured for settlement.
               </Typography>
@@ -479,13 +460,13 @@ export default function LandlordProfileInfo({ profile }) {
               onClick={() => setOpenPaymentPrefsDialog(true)}
               startIcon={<EditOutlinedIcon sx={{ fontSize: "14px !important" }} />}
               sx={{
-                color: colors.goldDark,
+                color: theme.palette.secondary.main,
                 fontSize: "0.75rem",
                 fontWeight: 800,
                 textTransform: "none",
                 p: 0,
                 minWidth: 0,
-                "&:hover": { color: colors.primary, bgcolor: "transparent" },
+                "&:hover": { color: theme.palette.primary.main, bgcolor: "transparent" },
               }}
             >
               {acceptedMethods.length > 0 ? "Edit Preferences" : "Configure"}
@@ -501,12 +482,12 @@ export default function LandlordProfileInfo({ profile }) {
                     label={formatPaymentMethod(method)}
                     size="small"
                     sx={{
-                      bgcolor: colors.primary,
-                      color: colors.gold,
+                      bgcolor: theme.palette.primary.main,
+                      color: theme.palette.secondary.main,
                       fontWeight: 700,
                       fontSize: "0.725rem",
-                      borderRadius: "8px",
-                      border: `1px solid ${colors.goldBorder}`,
+                      borderRadius: `${theme.shape.borderRadius}px`,
+                      border: `1px solid ${theme.palette.secondary.main}59`,
                       px: 0.5,
                     }}
                   />
@@ -516,9 +497,9 @@ export default function LandlordProfileInfo({ profile }) {
               <Box
                 sx={{
                   p: 1.5,
-                  borderRadius: "10px",
-                  bgcolor: colors.bgSubtle,
-                  border: `1px solid ${colors.border}`,
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                  bgcolor: theme.palette.action.hover,
+                  border: `1px solid ${theme.palette.divider}`,
                   display: "flex",
                   flexDirection: "column",
                   gap: 1,
@@ -537,11 +518,11 @@ export default function LandlordProfileInfo({ profile }) {
                       variant="body2"
                       sx={{
                         fontSize: "0.85rem",
-                        color: colors.primaryLight,
+                        color: theme.palette.text.primary,
                         textAlign: "center",
                       }}
                     >
-                      <Box component="span" sx={{ fontWeight: 800, color: colors.primary }}>
+                      <Box component="span" sx={{ fontWeight: 800, color: theme.palette.primary.main }}>
                         Paybill:
                       </Box>{" "}
                       {profile.mpesaPaybillNumber}{" "}
@@ -553,11 +534,11 @@ export default function LandlordProfileInfo({ profile }) {
                       variant="body2"
                       sx={{
                         fontSize: "0.85rem",
-                        color: colors.primaryLight,
+                        color: theme.palette.text.primary,
                         textAlign: "center",
                       }}
                     >
-                      <Box component="span" sx={{ fontWeight: 800, color: colors.primary }}>
+                      <Box component="span" sx={{ fontWeight: 800, color: theme.palette.primary.main }}>
                         Till Number:
                       </Box>{" "}
                       {profile.mpesaTillNumber}
@@ -568,11 +549,11 @@ export default function LandlordProfileInfo({ profile }) {
                       variant="body2"
                       sx={{
                         fontSize: "0.85rem",
-                        color: colors.primaryLight,
+                        color: theme.palette.text.primary,
                         textAlign: "center",
                       }}
                     >
-                      <Box component="span" sx={{ fontWeight: 800, color: colors.primary }}>
+                      <Box component="span" sx={{ fontWeight: 800, color: theme.palette.primary.main }}>
                         M-Pesa Phone:
                       </Box>{" "}
                       {profile.mpesaPhoneNumber}
@@ -585,9 +566,9 @@ export default function LandlordProfileInfo({ profile }) {
                     variant="caption"
                     sx={{
                       display: "block",
-                      color: colors.textMuted,
+                      color: theme.palette.text.secondary,
                       fontStyle: "italic",
-                      borderTop: `1px dashed ${colors.border}`,
+                      borderTop: `1px dashed ${theme.palette.divider}`,
                       pt: 1,
                       mt: 0.5,
                       textAlign: "center",
@@ -595,7 +576,7 @@ export default function LandlordProfileInfo({ profile }) {
                   >
                     <Box
                       component="span"
-                      sx={{ fontStyle: "normal", fontWeight: 800, color: colors.primary }}
+                      sx={{ fontStyle: "normal", fontWeight: 800, color: theme.palette.primary.main }}
                     >
                       Cash Note:
                     </Box>{" "}
@@ -608,9 +589,9 @@ export default function LandlordProfileInfo({ profile }) {
             <Box
               sx={{
                 p: 2,
-                borderRadius: "10px",
-                bgcolor: "rgba(241, 245, 249, 0.6)",
-                border: "1px dashed #CBD5E1",
+                borderRadius: `${theme.shape.borderRadius}px`,
+                bgcolor: theme.palette.action.hover,
+                border: `1px dashed ${theme.palette.divider}`,
                 textAlign: "center",
                 width: "100%",
                 boxSizing: "border-box",
@@ -618,7 +599,7 @@ export default function LandlordProfileInfo({ profile }) {
             >
               <Typography
                 variant="body2"
-                sx={{ color: colors.textMuted, fontSize: "0.825rem", fontWeight: 600 }}
+                sx={{ color: theme.palette.text.secondary, fontSize: "0.825rem", fontWeight: 600 }}
               >
                 No payment collection preferences configured yet.
               </Typography>
@@ -635,18 +616,18 @@ export default function LandlordProfileInfo({ profile }) {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: "18px",
-            border: `1.5px solid ${colors.error}`,
-            boxShadow: "0 20px 40px rgba(15, 23, 42, 0.2)",
-            bgcolor: "#FFFFFF",
+            borderRadius: `${theme.shape.borderRadius * 2}px`,
+            border: `1.5px solid ${theme.palette.error?.main || "#EF4444"}`,
+            boxShadow: `0 20px 40px ${theme.palette.primary.main}33`,
+            bgcolor: theme.palette.background.paper,
             overflow: "hidden",
           },
         }}
       >
         <DialogTitle
           sx={{
-            bgcolor: colors.primary,
-            color: "#FFFFFF",
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
             p: 2.5,
             display: "flex",
             alignItems: "center",
@@ -658,9 +639,9 @@ export default function LandlordProfileInfo({ profile }) {
               sx={{
                 width: 36,
                 height: 36,
-                borderRadius: "8px",
-                bgcolor: colors.errorLight,
-                color: colors.error,
+                borderRadius: `${theme.shape.borderRadius}px`,
+                bgcolor: `${theme.palette.error?.main || "#EF4444"}1F`,
+                color: theme.palette.error?.main || "#EF4444",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -672,7 +653,7 @@ export default function LandlordProfileInfo({ profile }) {
               <Typography variant="h6" fontWeight={800} fontSize="1.05rem" lineHeight={1.2}>
                 Confirm Deletion
               </Typography>
-              <Typography variant="caption" sx={{ color: "#94A3B8", fontSize: "0.75rem" }}>
+              <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontSize: "0.75rem" }}>
                 Action cannot be undone
               </Typography>
             </Box>
@@ -682,20 +663,20 @@ export default function LandlordProfileInfo({ profile }) {
             onClick={() => setBankToDelete(null)}
             disabled={deleteBankMutation.isPending}
             sx={{
-              color: "#94A3B8",
+              color: theme.palette.text.secondary,
               padding: "4px",
-              "&:hover": { color: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)" },
+              "&:hover": { color: theme.palette.common.white, bgcolor: "rgba(255,255,255,0.1)" },
             }}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ p: 3, bgcolor: "#FFFFFF", textAlign: "center" }}>
-          <Typography variant="body2" sx={{ color: colors.textHeader, fontWeight: 600, fontSize: "0.925rem" }}>
-            Are you sure you want to delete <Box component="span" sx={{ fontWeight: 800, color: colors.primary }}>{bankToDelete?.bankName || "this bank account"}</Box>?
+        <DialogContent sx={{ p: 3, bgcolor: theme.palette.background.paper, textAlign: "center" }}>
+          <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 600, fontSize: "0.925rem" }}>
+            Are you sure you want to delete <Box component="span" sx={{ fontWeight: 800, color: theme.palette.primary.main }}>{bankToDelete?.bankName || "this bank account"}</Box>?
           </Typography>
-          <Typography variant="caption" sx={{ display: "block", color: colors.textMuted, mt: 1 }}>
+          <Typography variant="caption" sx={{ display: "block", color: theme.palette.text.secondary, mt: 1 }}>
             Account Number: {bankToDelete?.accountNumber}
           </Typography>
         </DialogContent>
@@ -705,8 +686,8 @@ export default function LandlordProfileInfo({ profile }) {
             px: 3,
             pb: 2.5,
             pt: 1.5,
-            bgcolor: colors.bgSubtle,
-            borderTop: `1px solid ${colors.border}`,
+            bgcolor: theme.palette.action.hover,
+            borderTop: `1px solid ${theme.palette.divider}`,
             justifyContent: "flex-end",
             gap: 1.5,
           }}
@@ -715,12 +696,12 @@ export default function LandlordProfileInfo({ profile }) {
             onClick={() => setBankToDelete(null)}
             disabled={deleteBankMutation.isPending}
             sx={{
-              color: colors.textMuted,
+              color: theme.palette.text.secondary,
               fontWeight: 700,
               textTransform: "none",
-              borderRadius: "8px",
+              borderRadius: `${theme.shape.borderRadius}px`,
               px: 2,
-              "&:hover": { bgcolor: "rgba(100, 116, 139, 0.08)" },
+              "&:hover": { bgcolor: `${theme.palette.text.secondary}14` },
             }}
           >
             Cancel
@@ -732,17 +713,17 @@ export default function LandlordProfileInfo({ profile }) {
             onClick={handleConfirmDelete}
             startIcon={
               deleteBankMutation.isPending ? (
-                <CircularProgress size={16} sx={{ color: "#FFFFFF" }} />
+                <CircularProgress size={16} sx={{ color: theme.palette.common.white }} />
               ) : (
                 <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
               )
             }
             sx={{
-              bgcolor: colors.error,
-              color: "#FFFFFF",
+              bgcolor: theme.palette.error?.main || "#EF4444",
+              color: theme.palette.common.white,
               fontWeight: 700,
               textTransform: "none",
-              borderRadius: "10px",
+              borderRadius: `${theme.shape.borderRadius}px`,
               px: 2.5,
               py: 0.8,
               "&:hover": {

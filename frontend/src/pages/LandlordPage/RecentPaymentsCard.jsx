@@ -1,5 +1,4 @@
 // src/components/cards/RecentPaymentsCard.jsx
-
 import React from "react";
 import {
   Card,
@@ -38,29 +37,29 @@ function RecentPaymentsCard({ userId }) {
     return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
   };
 
-  const getMethodChipStyles = (method) => {
+  const getMethodChipStyles = (currentTheme, method) => {
     const formattedMethod = method?.toUpperCase() || "";
     if (formattedMethod.includes("MPESA") || formattedMethod.includes("M-PESA")) {
       return {
-        bgcolor: alpha("#10B981", 0.12),
-        color: "#059669",
+        bgcolor: alpha(currentTheme.palette.success?.main || "#10B981", 0.12),
+        color: currentTheme.palette.success?.dark || "#059669",
       };
     }
     if (formattedMethod.includes("BANK") || formattedMethod.includes("WIRE")) {
       return {
-        bgcolor: alpha("#3B82F6", 0.12),
-        color: "#2563EB",
+        bgcolor: alpha(currentTheme.palette.info?.main || "#3B82F6", 0.12),
+        color: currentTheme.palette.info?.dark || "#2563EB",
       };
     }
     if (formattedMethod.includes("CASH")) {
       return {
-        bgcolor: alpha("#D4AF37", 0.15),
-        color: "#B5922B",
+        bgcolor: alpha(currentTheme.palette.secondary.main, 0.15),
+        color: currentTheme.palette.secondary.dark,
       };
     }
     return {
-      bgcolor: "#F1F5F9",
-      color: "#64748B",
+      bgcolor: currentTheme.palette.action.hover,
+      color: currentTheme.palette.text.secondary,
     };
   };
 
@@ -69,14 +68,14 @@ function RecentPaymentsCard({ userId }) {
     return (
       <Card
         elevation={0}
-        sx={{
-          borderRadius: "16px",
-          bgcolor: "#FFFFFF",
+        sx={(t) => ({
+          borderRadius: `${t.shape.borderRadius * 2}px`,
+          bgcolor: t.palette.background.paper,
           border: "1px solid",
-          borderColor: "divider",
+          borderColor: t.palette.divider,
           p: 3,
           height: "100%",
-        }}
+        })}
       >
         <Skeleton variant="text" width="50%" height={30} sx={{ mb: 1 }} />
         <Skeleton variant="text" width="70%" height={20} sx={{ mb: 3 }} />
@@ -90,14 +89,14 @@ function RecentPaymentsCard({ userId }) {
     return (
       <Card
         elevation={0}
-        sx={{
-          borderRadius: "16px",
-          bgcolor: "#FFFFFF",
+        sx={(t) => ({
+          borderRadius: `${t.shape.borderRadius * 2}px`,
+          bgcolor: t.palette.background.paper,
           border: "1px solid",
-          borderColor: "divider",
+          borderColor: t.palette.divider,
           p: 3,
           height: "100%",
-        }}
+        })}
       >
         <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
           {error?.message || "Failed to load recent payments log."}
@@ -109,22 +108,20 @@ function RecentPaymentsCard({ userId }) {
   return (
     <Card
       elevation={0}
-      sx={{
-        borderRadius: "16px",
-        bgcolor: "#FFFFFF",
+      sx={(t) => ({
+        borderRadius: `${t.shape.borderRadius * 2}px`,
+        bgcolor: t.palette.background.paper,
         border: "1px solid",
-        borderColor: "divider",
+        borderColor: t.palette.divider,
         height: "100%",
         width: "100%",
-        boxShadow:
-          "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
+        boxShadow: `0 15px 35px -5px ${t.palette.primary.main}1F, 0 10px 15px -8px ${t.palette.primary.main}0F`,
         transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          borderColor: "secondary.main",
-          boxShadow:
-            "0 25px 40px -10px rgba(15, 23, 42, 0.18), 0 12px 18px -6px rgba(15, 23, 42, 0.1)",
+          borderColor: t.palette.secondary.main,
+          boxShadow: `0 25px 40px -10px ${t.palette.primary.main}2E, 0 12px 18px -6px ${t.palette.primary.main}1A`,
         },
-      }}
+      })}
     >
       <CardContent
         sx={{
@@ -139,7 +136,7 @@ function RecentPaymentsCard({ userId }) {
         <Box sx={{ mb: 1 }}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 800, color: "primary.main", lineHeight: 1.2 }}
+            sx={(t) => ({ fontWeight: 800, color: t.palette.primary.main, lineHeight: 1.2 })}
           >
             Recent Payment Log
           </Typography>
@@ -155,49 +152,49 @@ function RecentPaymentsCard({ userId }) {
               <TableHead>
                 <TableRow>
                   <TableCell
-                    sx={{
-                      color: "primary.main",
+                    sx={(t) => ({
+                      color: t.palette.primary.main,
                       fontWeight: 800,
                       fontSize: "0.78rem",
                       pl: 0,
                       py: 1,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
+                      borderBottom: `1px solid ${t.palette.divider}`,
+                    })}
                   >
                     Date
                   </TableCell>
                   <TableCell
-                    sx={{
-                      color: "primary.main",
+                    sx={(t) => ({
+                      color: t.palette.primary.main,
                       fontWeight: 800,
                       fontSize: "0.78rem",
                       py: 1,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
+                      borderBottom: `1px solid ${t.palette.divider}`,
+                    })}
                   >
                     Tenant & Unit
                   </TableCell>
                   <TableCell
-                    sx={{
-                      color: "primary.main",
+                    sx={(t) => ({
+                      color: t.palette.primary.main,
                       fontWeight: 800,
                       fontSize: "0.78rem",
                       py: 1,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
+                      borderBottom: `1px solid ${t.palette.divider}`,
+                    })}
                   >
                     Amount
                   </TableCell>
                   <TableCell
                     align="right"
-                    sx={{
-                      color: "primary.main",
+                    sx={(t) => ({
+                      color: t.palette.primary.main,
                       fontWeight: 800,
                       fontSize: "0.78rem",
                       pr: 0,
                       py: 1,
-                      borderBottom: "1px solid #E2E8F0",
-                    }}
+                      borderBottom: `1px solid ${t.palette.divider}`,
+                    })}
                   >
                     Method
                   </TableCell>
@@ -206,7 +203,7 @@ function RecentPaymentsCard({ userId }) {
 
               <TableBody>
                 {displayedPayments.map((payment) => {
-                  const methodStyles = getMethodChipStyles(payment.method);
+                  const methodStyles = getMethodChipStyles(theme, payment.method);
                   const formattedAmount = payment.amount
                     ? `Ksh ${Number(payment.amount).toLocaleString()}`
                     : "Ksh 0";
@@ -214,13 +211,13 @@ function RecentPaymentsCard({ userId }) {
                   return (
                     <TableRow
                       key={payment.id}
-                      sx={{
+                      sx={(t) => ({
                         transition: "background-color 0.15s ease",
                         "&:hover": {
-                          bgcolor: alpha(theme.palette.primary.main, 0.02),
+                          bgcolor: alpha(t.palette.primary.main, 0.02),
                         },
                         "&:last-child td, &:last-child th": { border: 0 },
-                      }}
+                      })}
                     >
                       {/* Column 1: Date */}
                       <TableCell
@@ -259,13 +256,13 @@ function RecentPaymentsCard({ userId }) {
 
                       {/* Column 3: Amount */}
                       <TableCell
-                        sx={{
+                        sx={(t) => ({
                           py: 1.5,
                           fontWeight: 800,
-                          color: "primary.main",
+                          color: t.palette.primary.main,
                           fontSize: "0.85rem",
                           whiteSpace: "nowrap",
-                        }}
+                        })}
                       >
                         {formattedAmount}
                       </TableCell>
@@ -275,14 +272,14 @@ function RecentPaymentsCard({ userId }) {
                         <Chip
                           label={payment.method}
                           size="small"
-                          sx={{
+                          sx={(t) => ({
                             ...methodStyles,
                             fontWeight: 700,
                             fontSize: "0.7rem",
-                            borderRadius: "8px",
+                            borderRadius: `${t.shape.borderRadius / 1.5}px`,
                             height: 24,
                             px: 0.5,
-                          }}
+                          })}
                         />
                       </TableCell>
                     </TableRow>
@@ -305,24 +302,24 @@ function RecentPaymentsCard({ userId }) {
               }}
             >
               <Box
-                sx={{
+                sx={(t) => ({
                   width: 56,
                   height: 56,
-                  borderRadius: "16px",
-                  bgcolor: "rgba(212, 175, 55, 0.12)",
-                  color: "secondary.main",
+                  borderRadius: `${t.shape.borderRadius * 1.5}px`,
+                  bgcolor: alpha(t.palette.secondary.main, 0.12),
+                  color: t.palette.secondary.main,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   mb: 2,
-                }}
+                })}
               >
                 <PaymentOutlinedIcon sx={{ fontSize: 30 }} />
               </Box>
 
               <Typography
                 variant="subtitle1"
-                sx={{ fontWeight: 800, color: "primary.main", mb: 0.5 }}
+                sx={(t) => ({ fontWeight: 800, color: t.palette.primary.main, mb: 0.5 })}
               >
                 No Payments Recorded
               </Typography>
@@ -341,29 +338,30 @@ function RecentPaymentsCard({ userId }) {
         {/* FOOTER VIEW ALL ACTION */}
         {hasPayments && (
           <Box
-            sx={{
+            sx={(t) => ({
               mt: "auto",
               pt: 1,
-              borderTop: "1px solid #F1F5F9",
+              borderTop: `1px solid ${t.palette.divider}`,
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
-            }}
+            })}
           >
             <Button
               size="small"
               endIcon={<ArrowForwardIcon fontSize="small" />}
               onClick={() => navigate("/landlord/finances")}
-              sx={{
+              sx={(t) => ({
                 fontWeight: 700,
                 fontSize: "0.82rem",
-                color: "primary.main",
+                color: t.palette.primary.main,
                 textTransform: "none",
+                borderRadius: `${t.shape.borderRadius}px`,
                 "&:hover": {
-                  color: "secondary.main",
-                  bgcolor: "transparent",
+                  color: t.palette.secondary.main,
+                  bgcolor: alpha(t.palette.secondary.main, 0.06),
                 },
-              }}
+              })}
             >
               {paymentsData.length > 3
                 ? `View All (${paymentsData.length}) Payments`

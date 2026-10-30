@@ -21,54 +21,46 @@ import { useNavigate, Link as RouterLink } from "react-router-dom";
 import api from "../../../api/api";
 import { useNotification } from "../../../components/NotificationProvider";
 
-/* ---------------- Global Font Family Constant ---------------- */
-const fontFamilyStyle =
-  '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
-/* ---------------- Premium High-Contrast Input Styles ---------------- */
-const premiumInputStyles = {
+/* ---------------- Theme-Integrated Input Styles ---------------- */
+const getPremiumInputStyles = (theme) => ({
   "& .MuiOutlinedInput-root": {
-    borderRadius: "12px",
-    backgroundColor: "#FAFAFA",
-    color: "#0F172A",
+    borderRadius: `${theme.shape.borderRadius}px`,
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.text.primary,
     fontSize: "0.95rem",
     fontWeight: 500,
-    fontFamily: fontFamilyStyle,
     "& fieldset": {
-      borderColor: "#CBD5E1",
+      borderColor: theme.palette.divider,
       borderWidth: "1.5px",
     },
     "&:hover fieldset": {
-      borderColor: "#94A3B8",
+      borderColor: theme.palette.text.secondary,
     },
     "&.Mui-focused": {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.palette.background.paper,
       "& fieldset": {
-        borderColor: "#D4AF37",
+        borderColor: theme.palette.secondary.main,
         borderWidth: "2px",
       },
     },
   },
   "& .MuiInputLabel-root": {
-    color: "#475569",
+    color: theme.palette.text.secondary,
     fontWeight: 600,
     fontSize: "0.9rem",
-    fontFamily: fontFamilyStyle,
     "&.Mui-focused": {
-      color: "#D4AF37",
+      color: theme.palette.secondary.main,
     },
   },
   "& input::placeholder": {
-    color: "#94A3B8",
+    color: theme.palette.text.secondary,
     opacity: 1,
-    fontFamily: fontFamilyStyle,
   },
   "& .MuiFormHelperText-root": {
-    color: "#DC2626",
+    color: theme.palette.error?.main || "#DC2626",
     fontWeight: 500,
-    fontFamily: fontFamilyStyle,
   },
-};
+});
 
 export default function ForgotPasswordPage() {
   const [phone, setPhone] = useState("");
@@ -106,7 +98,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         flex: 1,
         minHeight: "calc(100vh - 64px)",
         display: "flex",
@@ -126,60 +118,58 @@ export default function ForgotPasswordPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(15, 23, 42, 0.55)",
+          backgroundColor: `${theme.palette.primary.main}8C`, // ~55% primary dark overlay
           zIndex: 1,
         },
-      }}
+      })}
     >
       <Container maxWidth="xs" sx={{ position: "relative", zIndex: 2 }}>
         <Paper
           elevation={0}
-          sx={{
+          sx={(theme) => ({
             p: { xs: 3, sm: 4 },
-            borderRadius: "24px",
-            bgcolor: "#FFFFFF",
-            border: "1px solid #E2E8F0",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            borderRadius: `${theme.shape.borderRadius * 2}px`,
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: `0 25px 50px -12px ${theme.palette.primary.main}40`,
             textAlign: "center",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-          }}
+          })}
         >
           {/* Icon Badge above Title */}
           <Avatar
-            sx={{
-              bgcolor: "rgba(212, 175, 55, 0.12)",
-              color: "#D4AF37",
-              border: "1px solid rgba(212, 175, 55, 0.25)",
+            sx={(theme) => ({
+              bgcolor: `${theme.palette.secondary.main}1F`, // ~12% gold fill
+              color: theme.palette.secondary.main,
+              border: `1px solid ${theme.palette.secondary.main}40`, // ~25% gold border
               width: 56,
               height: 56,
               mb: 2,
-            }}
+            })}
           >
             <LockResetIcon sx={{ fontSize: "1.75rem" }} />
           </Avatar>
 
           <Typography
             variant="h5"
-            sx={{
+            sx={(theme) => ({
               fontWeight: 800,
-              color: "#0F172A",
-              fontFamily: fontFamilyStyle,
+              color: theme.palette.text.primary,
               letterSpacing: "-0.02em",
               mb: 0.5,
-            }}
+            })}
           >
             Reset Password
           </Typography>
 
           <Typography
             variant="body2"
-            sx={{
-              color: "#64748B",
-              fontFamily: fontFamilyStyle,
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
               mb: 3,
-            }}
+            })}
           >
             Enter your phone number below. We'll send a secure reset link to your email.
           </Typography>
@@ -199,20 +189,19 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 size="small"
-                sx={premiumInputStyles}
+                sx={getPremiumInputStyles}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
                       <PhoneOutlinedIcon
-                        sx={{ color: "#475569", mr: 0.5, fontSize: "1.1rem" }}
+                        sx={(theme) => ({ color: theme.palette.text.secondary, mr: 0.5, fontSize: "1.1rem" })}
                       />
                       <Typography
-                        sx={{
-                          color: "#0F172A",
+                        sx={(theme) => ({
+                          color: theme.palette.text.primary,
                           fontWeight: 700,
                           fontSize: "0.9rem",
-                          fontFamily: fontFamilyStyle,
-                        }}
+                        })}
                       >
                         +254
                       </Typography>
@@ -234,22 +223,21 @@ export default function ForgotPasswordPage() {
                     <SendIcon sx={{ fontSize: "1.1rem !important" }} />
                   )
                 }
-                sx={{
+                sx={(theme) => ({
                   py: 1.4,
                   borderRadius: "50px",
                   fontWeight: 700,
                   fontSize: "0.95rem",
-                  fontFamily: fontFamilyStyle,
                   textTransform: "none",
-                  bgcolor: "#D4AF37",
-                  color: "#000000",
-                  boxShadow: "0 4px 14px rgba(212, 175, 55, 0.35)",
+                  bgcolor: theme.palette.secondary.main,
+                  color: theme.palette.primary.main,
+                  boxShadow: `0 4px 14px ${theme.palette.secondary.main}59`,
                   transition: "all 0.2s ease-in-out",
                   "&:hover": {
-                    bgcolor: "#B5922B",
-                    boxShadow: "0 6px 18px rgba(181, 146, 43, 0.45)",
+                    bgcolor: theme.palette.secondary.dark,
+                    boxShadow: `0 6px 18px ${theme.palette.secondary.main}73`,
                   },
-                }}
+                })}
               >
                 {loading ? "Sending Link..." : "Send Reset Link"}
               </Button>
@@ -259,17 +247,16 @@ export default function ForgotPasswordPage() {
                 <MuiLink
                   component={RouterLink}
                   to="/"
-                  sx={{
+                  sx={(theme) => ({
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 0.5,
                     fontSize: "0.85rem",
-                    color: "#64748B",
-                    fontFamily: fontFamilyStyle,
+                    color: theme.palette.text.secondary,
                     fontWeight: 600,
                     textDecoration: "none",
-                    "&:hover": { color: "#0F172A", textDecoration: "underline" },
-                  }}
+                    "&:hover": { color: theme.palette.text.primary, textDecoration: "underline" },
+                  })}
                 >
                   <ArrowBackIcon sx={{ fontSize: "1rem" }} />
                   Back to Home

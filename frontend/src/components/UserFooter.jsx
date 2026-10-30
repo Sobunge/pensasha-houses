@@ -1,47 +1,75 @@
 // src/components/UserFooter.jsx
 import React from "react";
-import { Box, Container, Stack, Link } from "@mui/material";
+import { Box, Container, Stack, Link as MuiLink, Typography } from "@mui/material";
 
 function UserFooter() {
   return (
     <Box
       component="footer"
-      sx={{
-        backgroundColor: "#F7F7F7",
-        color: "#222",
-        py: 2,
+      sx={(theme) => ({
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.secondary,
+        py: 2.5,
         px: 2,
-        flexShrink: 0, // keeps it at bottom
-        borderTop: "1px solid rgba(255,255,255,0.1)",
-      }}
+        flexShrink: 0, // Keeps it fixed at bottom of layout
+        borderTop: `1px solid ${theme.palette.divider}`,
+      })}
     >
-      <Container>
-        <Stack direction="column" spacing={1.5} alignItems="center" textAlign="center">
-          <Stack direction="row" spacing={2} justifyContent="center">
-            <Link
+      <Container maxWidth="lg">
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          justifyContent="space-between"
+          alignItems="center"
+          textAlign="center"
+        >
+          {/* Copyright Note */}
+          <Typography
+            variant="caption"
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              fontWeight: 500,
+              fontSize: "0.8rem",
+            })}
+          >
+            © {new Date().getFullYear()} <strong>Pensasha Houses</strong>. All rights reserved.
+          </Typography>
+
+          {/* Legal Links */}
+          <Stack direction="row" spacing={2.5} justifyContent="center">
+            <MuiLink
               href="#"
-              underline="hover"
-              sx={{
-                color: "#222",
+              underline="none"
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
                 fontSize: "0.85rem",
-                transition: "color 0.2s",
-                "&:hover": { color: "#f8b500" },
-              }}
+                fontWeight: 500,
+                transition: "color 0.2s ease",
+                "&:hover": {
+                  color: theme.palette.secondary.main,
+                  textDecoration: "underline",
+                },
+              })}
             >
               Privacy Policy
-            </Link>
-            <Link
+            </MuiLink>
+
+            <MuiLink
               href="#"
-              underline="hover"
-              sx={{
-                color: "#222",
+              underline="none"
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
                 fontSize: "0.85rem",
-                transition: "color 0.2s",
-                "&:hover": { color: "#f8b500" },
-              }}
+                fontWeight: 500,
+                transition: "color 0.2s ease",
+                "&:hover": {
+                  color: theme.palette.secondary.main,
+                  textDecoration: "underline",
+                },
+              })}
             >
               Terms of Service
-            </Link>
+            </MuiLink>
           </Stack>
         </Stack>
       </Container>

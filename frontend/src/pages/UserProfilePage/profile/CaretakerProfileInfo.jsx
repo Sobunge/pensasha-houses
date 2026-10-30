@@ -10,24 +10,24 @@ export default function CaretakerProfileInfo({ profile }) {
 
   return (
     <Box
-      sx={{
-        bgcolor: "#FFFFFF",
-        borderRadius: "16px",
+      sx={(theme) => ({
+        bgcolor: theme.palette.background.paper,
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
         p: { xs: 1.5, sm: 2 },
-        border: "1px solid rgba(226, 232, 240, 0.8)",
-        boxShadow: "0 10px 30px -10px rgba(15, 23, 42, 0.05)",
-        background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
-      }}
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: `0 10px 30px -10px ${theme.palette.primary.main}14`,
+        background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.action.hover} 100%)`,
+      })}
     >
       <Grid container spacing={1.5}>
         {/* ASSIGNED PROPERTY */}
         <Grid item xs={12} sm={6}>
           <Box
-            sx={{
+            sx={(theme) => ({
               p: 1.5,
-              borderRadius: "12px",
-              bgcolor: "#FFFFFF",
-              border: "1px solid #E2E8F0",
+              borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+              bgcolor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
               display: "flex",
               alignItems: "center",
               gap: 1.5,
@@ -35,31 +35,31 @@ export default function CaretakerProfileInfo({ profile }) {
               position: "relative",
               overflow: "hidden",
               "&:hover": {
-                borderColor: "rgba(212, 175, 55, 0.5)",
-                boxShadow: "0 8px 20px rgba(212, 175, 55, 0.12)",
+                borderColor: `${theme.palette.secondary.main}80`,
+                boxShadow: `0 8px 20px ${theme.palette.secondary.main}20`,
                 transform: "translateY(-1px)",
                 "& .icon-box": {
-                  background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-                  color: "#D4AF37",
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #1E293B 100%)`,
+                  color: theme.palette.secondary.main,
                   transform: "scale(1.05)",
                 },
               },
-            }}
+            })}
           >
             <Box
               className="icon-box"
-              sx={{
+              sx={(theme) => ({
                 width: 38,
                 height: 38,
-                borderRadius: "8px",
-                bgcolor: "rgba(212, 175, 55, 0.1)",
-                color: "#B48A1D",
+                borderRadius: `${theme.shape.borderRadius}px`,
+                bgcolor: `${theme.palette.secondary.main}1A`,
+                color: theme.palette.secondary.main,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
                 transition: "all 0.25s ease",
-              }}
+              })}
             >
               <HomeWorkOutlinedIcon sx={{ fontSize: 18 }} />
             </Box>
@@ -67,8 +67,8 @@ export default function CaretakerProfileInfo({ profile }) {
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 variant="caption"
-                sx={{
-                  color: "#475569",
+                sx={(theme) => ({
+                  color: theme.palette.text.secondary,
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: 0.6,
@@ -76,7 +76,7 @@ export default function CaretakerProfileInfo({ profile }) {
                   display: "block",
                   lineHeight: 1.2,
                   mb: 0.3,
-                }}
+                })}
               >
                 Assigned Property
               </Typography>
@@ -84,13 +84,13 @@ export default function CaretakerProfileInfo({ profile }) {
               {propertyName ? (
                 <Typography
                   variant="body2"
-                  sx={{
+                  sx={(theme) => ({
                     fontWeight: 700,
-                    color: "#0F172A",
+                    color: theme.palette.primary.main,
                     fontSize: "0.875rem",
                     wordBreak: "break-word",
                     lineHeight: 1.3,
-                  }}
+                  })}
                 >
                   {propertyName}
                 </Typography>
@@ -98,13 +98,13 @@ export default function CaretakerProfileInfo({ profile }) {
                 <Chip
                   label="No Property Assigned"
                   size="small"
-                  sx={{
-                    bgcolor: "rgba(100, 116, 139, 0.1)",
-                    color: "#64748B",
+                  sx={(theme) => ({
+                    bgcolor: `${theme.palette.text.secondary}1A`,
+                    color: theme.palette.text.secondary,
                     fontWeight: 700,
                     fontSize: "0.72rem",
-                    borderRadius: "6px",
-                  }}
+                    borderRadius: `${theme.shape.borderRadius * 0.75}px`,
+                  })}
                 />
               )}
             </Box>
@@ -114,11 +114,11 @@ export default function CaretakerProfileInfo({ profile }) {
         {/* PROPERTY LOCATION */}
         <Grid item xs={12} sm={6}>
           <Box
-            sx={{
+            sx={(theme) => ({
               p: 1.5,
-              borderRadius: "12px",
-              bgcolor: "#FFFFFF",
-              border: "1px solid #E2E8F0",
+              borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+              bgcolor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
               display: "flex",
               alignItems: "center",
               gap: 1.5,
@@ -126,31 +126,31 @@ export default function CaretakerProfileInfo({ profile }) {
               position: "relative",
               overflow: "hidden",
               "&:hover": {
-                borderColor: "rgba(212, 175, 55, 0.5)",
-                boxShadow: "0 8px 20px rgba(212, 175, 55, 0.12)",
+                borderColor: `${theme.palette.secondary.main}80`,
+                boxShadow: `0 8px 20px ${theme.palette.secondary.main}20`,
                 transform: "translateY(-1px)",
                 "& .icon-box": {
-                  background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-                  color: "#D4AF37",
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #1E293B 100%)`,
+                  color: theme.palette.secondary.main,
                   transform: "scale(1.05)",
                 },
               },
-            }}
+            })}
           >
             <Box
               className="icon-box"
-              sx={{
+              sx={(theme) => ({
                 width: 38,
                 height: 38,
-                borderRadius: "8px",
-                bgcolor: "rgba(212, 175, 55, 0.1)",
-                color: "#B48A1D",
+                borderRadius: `${theme.shape.borderRadius}px`,
+                bgcolor: `${theme.palette.secondary.main}1A`,
+                color: theme.palette.secondary.main,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
                 transition: "all 0.25s ease",
-              }}
+              })}
             >
               <LocationOnOutlinedIcon sx={{ fontSize: 18 }} />
             </Box>
@@ -158,8 +158,8 @@ export default function CaretakerProfileInfo({ profile }) {
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 variant="caption"
-                sx={{
-                  color: "#475569",
+                sx={(theme) => ({
+                  color: theme.palette.text.secondary,
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: 0.6,
@@ -167,19 +167,19 @@ export default function CaretakerProfileInfo({ profile }) {
                   display: "block",
                   lineHeight: 1.2,
                   mb: 0.3,
-                }}
+                })}
               >
                 Property Location
               </Typography>
               <Typography
                 variant="body2"
-                sx={{
+                sx={(theme) => ({
                   fontWeight: 700,
-                  color: propertyLocation ? "#0F172A" : "#94A3B8",
+                  color: propertyLocation ? theme.palette.primary.main : theme.palette.text.disabled,
                   fontSize: "0.875rem",
                   wordBreak: "break-word",
                   lineHeight: 1.3,
-                }}
+                })}
               >
                 {propertyLocation || "Not specified"}
               </Typography>

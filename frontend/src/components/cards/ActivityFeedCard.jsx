@@ -1,4 +1,4 @@
-// src/components/ActivityFeedCard.jsx
+// src/components/cards/ActivityFeedCard.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -21,7 +21,6 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
   const { user } = useAuth();
   const role = user?.role || "tenant";
 
-  // Fallback activities if none provided
   const defaultActivities = [
     { id: 1, type: "Payment Received", message: "Rent payment for Sept.", date: "10:00 AM", status: "Unread" },
     { id: 2, type: "Maintenance Update", message: "Plumbing request approved.", date: "11:30 AM", status: "Read" },
@@ -33,7 +32,6 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
 
   const itemsToShow = compact ? activityList.slice(0, 3) : activityList;
 
-  // Open activity and mark as read if unread
   const handleOpenActivity = (activity) => {
     let updated = activity;
     if (activity.status === "Unread") {
@@ -45,7 +43,6 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
     setSelectedActivity(updated);
   };
 
-  // Mark an activity as read from modal
   const handleMarkRead = (id) => {
     let updated;
     setActivityList((prev) =>
@@ -68,33 +65,50 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         p: 2.5,
-        width: compact ? { xs: 300, sm: 360 } : "100%",
-        bgcolor: "#FFFFFF",
-      }}
+        // Fluid width that respects screen edges safely
+        width: compact ? { xs: "calc(100vw - 24px)", sm: 420 } : "100%",
+        maxWidth: "100%",
+        boxSizing: "border-box",
+        bgcolor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
+        boxShadow: `0 25px 50px -12px ${theme.palette.primary.main}66, 0 0 0 1px ${theme.palette.divider}`,
+        border: `2px solid ${theme.palette.secondary.main}`,
+        zIndex: theme.zIndex.tooltip + 10,
+      })}
     >
       {/* Header with Close Button */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 1.5, minWidth: 0 }}>
         <Box
-          sx={{
+          sx={(theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             width: 32,
             height: 32,
-            borderRadius: "8px",
-            bgcolor: "rgba(212, 175, 55, 0.12)",
-            color: "#D4AF37",
+            borderRadius: `${theme.shape.borderRadius}px`,
+            bgcolor: `${theme.palette.secondary.main}26`,
+            color: theme.palette.secondary.main,
             mr: 1.5,
-          }}
+            border: `1px solid ${theme.palette.secondary.main}66`,
+            flexShrink: 0,
+          })}
         >
           <NotificationsIcon sx={{ fontSize: 18 }} />
         </Box>
 
         <Typography
           variant="subtitle1"
-          sx={{ fontWeight: 700, color: "#0F172A", flexGrow: 1, letterSpacing: "-0.2px" }}
+          sx={(theme) => ({
+            fontWeight: 800,
+            color: theme.palette.primary.main,
+            flexGrow: 1,
+            letterSpacing: "-0.2px",
+            minWidth: 0,
+          })}
+          noWrap
         >
           Activity Feed
         </Typography>
@@ -103,17 +117,23 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
           <IconButton
             size="small"
             onClick={onClose}
-            sx={{
-              color: "#64748B",
-              "&:hover": { bgcolor: "#F1F5F9", color: "#0F172A" },
-            }}
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              borderRadius: `${theme.shape.borderRadius}px`,
+              flexShrink: 0,
+              ml: 1,
+              "&:hover": {
+                bgcolor: `${theme.palette.primary.main}0A`,
+                color: theme.palette.text.primary,
+              },
+            })}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
         )}
       </Box>
 
-      <Divider sx={{ mb: 2, borderColor: "#E2E8F0" }} />
+      <Divider sx={(theme) => ({ mb: 2, borderColor: theme.palette.divider })} />
 
       {/* Activity List */}
       <Stack spacing={1}>
@@ -126,73 +146,80 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
             <Box
               key={activity.id}
               onClick={() => handleOpenActivity(activity)}
-              sx={{
+              sx={(theme) => ({
                 display: "flex",
                 alignItems: "flex-start",
                 gap: 1.5,
-                p: 1.25,
-                borderRadius: "12px",
+                p: 1.5,
+                borderRadius: `${theme.shape.borderRadius * 1.5}px`,
                 cursor: "pointer",
                 transition: "all 0.2s ease-in-out",
-                bgcolor: activity.status === "Unread" ? "rgba(212, 175, 55, 0.05)" : "transparent",
+                bgcolor: activity.status === "Unread" ? `${theme.palette.secondary.main}14` : theme.palette.background.default,
                 border: "1px solid",
-                borderColor: activity.status === "Unread" ? "rgba(212, 175, 55, 0.25)" : "transparent",
+                borderColor: activity.status === "Unread" ? `${theme.palette.secondary.main}66` : theme.palette.divider,
+                minWidth: 0,
+                boxSizing: "border-box",
                 "&:hover": {
-                  bgcolor: "rgba(212, 175, 55, 0.10)",
-                  borderColor: "rgba(212, 175, 55, 0.4)",
+                  bgcolor: `${theme.palette.secondary.main}26`,
+                  borderColor: theme.palette.secondary.main,
                   transform: "translateX(2px)",
                 },
-              }}
+              })}
             >
               <Avatar
-                sx={{
-                  bgcolor: activity.status === "Unread" ? "#0F172A" : "#64748B",
-                  color: activity.status === "Unread" ? "#D4AF37" : "#FFFFFF",
-                  width: 36,
-                  height: 36,
+                sx={(theme) => ({
+                  bgcolor: activity.status === "Unread" ? theme.palette.primary.main : theme.palette.action.hover,
+                  color: activity.status === "Unread" ? theme.palette.secondary.main : theme.palette.text.secondary,
+                  width: 38,
+                  height: 38,
                   fontSize: "0.85rem",
-                  fontWeight: 700,
-                  border: activity.status === "Unread" ? "1.5px solid #D4AF37" : "none",
-                }}
+                  fontWeight: 800,
+                  flexShrink: 0,
+                  border: activity.status === "Unread" ? `1.5px solid ${theme.palette.secondary.main}` : `1px solid ${theme.palette.divider}`,
+                })}
               >
                 {activity.type ? activity.type[0].toUpperCase() : "A"}
               </Avatar>
 
               <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
                   <Typography
                     variant="subtitle2"
-                    sx={{
-                      fontWeight: activity.status === "Unread" ? 700 : 500,
-                      color: "#0F172A",
+                    sx={(theme) => ({
+                      fontWeight: activity.status === "Unread" ? 800 : 600,
+                      color: theme.palette.primary.main,
                       fontSize: "0.875rem",
-                    }}
+                      minWidth: 0,
+                    })}
                     noWrap
                   >
                     {activity.type}
                   </Typography>
 
-                  {/* Unread Glowing Dot */}
                   {activity.status === "Unread" && (
                     <Box
-                      sx={{
-                        width: 7,
-                        height: 7,
+                      sx={(theme) => ({
+                        width: 8,
+                        height: 8,
                         borderRadius: "50%",
-                        bgcolor: "#D4AF37",
-                        boxShadow: "0 0 6px rgba(212, 175, 55, 0.8)",
-                      }}
+                        bgcolor: theme.palette.secondary.main,
+                        boxShadow: `0 0 10px ${theme.palette.secondary.main}`,
+                        flexShrink: 0,
+                        ml: 1,
+                      })}
                     />
                   )}
                 </Box>
 
                 <Typography
                   variant="body2"
-                  sx={{
-                    color: activity.status === "Unread" ? "#334155" : "#64748B",
+                  sx={(theme) => ({
+                    color: activity.status === "Unread" ? theme.palette.text.primary : theme.palette.text.secondary,
                     fontSize: "0.78rem",
-                    fontWeight: activity.status === "Unread" ? 500 : 400,
-                  }}
+                    fontWeight: activity.status === "Unread" ? 600 : 400,
+                    minWidth: 0,
+                    mt: 0.25,
+                  })}
                   noWrap
                 >
                   {activity.message}
@@ -200,7 +227,7 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
               </Box>
 
               {!compact && (
-                <Typography variant="caption" sx={{ color: "#94A3B8", fontSize: "0.7rem" }}>
+                <Typography variant="caption" sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "0.7rem", fontWeight: 500, flexShrink: 0, pt: 0.25 })}>
                   {activity.date}
                 </Typography>
               )}
@@ -210,28 +237,28 @@ function ActivityFeedCard({ activities = [], compact = false, onClose }) {
 
         {/* View All Button */}
         {compact && (
-          <Box sx={{ pt: 1 }}>
+          <Box sx={{ pt: 1, minWidth: 0 }}>
             <Button
               fullWidth
               variant="contained"
               size="small"
               onClick={handleViewAll}
               endIcon={<ArrowForwardIcon fontSize="small" />}
-              sx={{
-                bgcolor: "#0F172A",
-                color: "#FFFFFF",
-                fontWeight: 600,
+              sx={(theme) => ({
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                fontWeight: 700,
                 textTransform: "none",
-                borderRadius: "10px",
-                py: 1,
+                borderRadius: `${theme.shape.borderRadius}px`,
+                py: 1.1,
                 fontSize: "0.8125rem",
-                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+                boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
                 "&:hover": {
-                  bgcolor: "#D4AF37",
-                  color: "#0F172A",
-                  boxShadow: "0 4px 12px rgba(212, 175, 55, 0.3)",
+                  bgcolor: theme.palette.secondary.main,
+                  color: theme.palette.primary.main,
+                  boxShadow: `0 6px 16px ${theme.palette.secondary.main}4D`,
                 },
-              }}
+              })}
             >
               View All Activities
             </Button>

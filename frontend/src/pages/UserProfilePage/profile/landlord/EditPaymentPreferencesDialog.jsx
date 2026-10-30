@@ -17,6 +17,7 @@ import {
     Grid,
     CircularProgress,
     Alert,
+    useTheme,
 } from "@mui/material";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
@@ -24,21 +25,6 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import api from "../../../../api/api";
 import useProfile from "../../../../components/hooks/profile/useProfile";
-
-// Clean Design System Constants matching LandlordProfileInfo
-const DESIGN_SYSTEM = {
-    colors: {
-        primary: "#0F172A",
-        primaryLight: "#1E293B",
-        gold: "#D4AF37",
-        goldDark: "#B48A1D",
-        goldLight: "rgba(212, 175, 55, 0.15)",
-        border: "#E2E8F0",
-        textMuted: "#64748B",
-        textDark: "#334155",
-        bgAction: "#FAFAFA",
-    },
-};
 
 const AVAILABLE_PAYMENT_METHODS = [
     { id: "MPESA_C2B_PAYBILL", label: "M-Pesa C2B Paybill" },
@@ -49,8 +35,8 @@ const AVAILABLE_PAYMENT_METHODS = [
 ];
 
 export default function EditPaymentPreferencesDialog({ open, handleClose, profile }) {
+    const theme = useTheme();
     const { refreshProfile } = useProfile();
-    const { colors } = DESIGN_SYSTEM;
 
     const [selectedMethods, setSelectedMethods] = useState([]);
     const [paybillNumber, setPaybillNumber] = useState("");
@@ -114,18 +100,18 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
     };
 
     const primaryBtnStyle = {
-        bgcolor: colors.primary,
-        color: "#FFFFFF",
+        bgcolor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
         fontWeight: 700,
         textTransform: "none",
-        borderRadius: "10px",
+        borderRadius: `${theme.shape.borderRadius}px`,
         px: 2.5,
         py: 0.8,
-        "& .MuiButton-startIcon": { color: colors.gold },
+        "& .MuiButton-startIcon": { color: theme.palette.secondary.main },
         "&:hover": {
-            bgcolor: colors.gold,
-            color: colors.primary,
-            "& .MuiButton-startIcon": { color: colors.primary },
+            bgcolor: theme.palette.secondary.main,
+            color: theme.palette.primary.main,
+            "& .MuiButton-startIcon": { color: theme.palette.primary.main },
         },
         transition: "all 0.2s ease",
     };
@@ -138,19 +124,20 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: "18px",
-                    border: `1.5px solid ${colors.gold}`,
-                    boxShadow: "0 20px 40px rgba(15, 23, 42, 0.2)",
+                    borderRadius: `${theme.shape.borderRadius * 2}px`,
+                    border: `1.5px solid ${theme.palette.secondary.main}`,
+                    boxShadow: `0 20px 40px ${theme.palette.primary.main}33`,
                     width: "100%",
                     maxWidth: "520px",
                     mx: "auto",
+                    bgcolor: theme.palette.background.paper,
                 },
             }}
         >
             <DialogTitle
                 sx={{
-                    bgcolor: colors.primary,
-                    color: "#FFFFFF",
+                    bgcolor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
                     p: 2.5,
                     display: "flex",
                     alignItems: "center",
@@ -162,9 +149,9 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                         sx={{
                             width: 36,
                             height: 36,
-                            borderRadius: "8px",
-                            bgcolor: colors.goldLight,
-                            color: colors.gold,
+                            borderRadius: `${theme.shape.borderRadius}px`,
+                            bgcolor: `${theme.palette.secondary.main}26`,
+                            color: theme.palette.secondary.main,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -182,8 +169,8 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                     sx={{
                         minWidth: 0,
                         p: 0.5,
-                        color: "#94A3B8",
-                        "&:hover": { color: "#FFFFFF" },
+                        color: theme.palette.text.secondary,
+                        "&:hover": { color: theme.palette.common.white },
                     }}
                 >
                     <CloseIcon fontSize="small" />
@@ -191,9 +178,9 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
             </DialogTitle>
 
             <Box component="form" onSubmit={handleSubmit}>
-                <DialogContent sx={{ p: 3, bgcolor: "#FFFFFF" }}>
+                <DialogContent sx={{ p: 3, bgcolor: theme.palette.background.paper }}>
                     {error && (
-                        <Alert severity="error" sx={{ mb: 2.5, borderRadius: "10px" }}>
+                        <Alert severity="error" sx={{ mb: 2.5, borderRadius: `${theme.shape.borderRadius}px` }}>
                             {error}
                         </Alert>
                     )}
@@ -203,7 +190,7 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                         <Typography
                             variant="subtitle2"
                             sx={{
-                                color: colors.primary,
+                                color: theme.palette.primary.main,
                                 fontWeight: 800,
                                 mb: 0.5,
                                 letterSpacing: "-0.01em",
@@ -213,7 +200,7 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                         </Typography>
                         <Typography
                             variant="caption"
-                            sx={{ color: colors.textMuted, display: "block" }}
+                            sx={{ color: theme.palette.text.secondary, display: "block" }}
                         >
                             Select all payment options tenants are permitted to use when paying rent.
                         </Typography>
@@ -229,8 +216,8 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                                                 checked={selectedMethods.includes(method.id)}
                                                 onChange={() => handleToggleMethod(method.id)}
                                                 sx={{
-                                                    color: "#94A3B8",
-                                                    "&.Mui-checked": { color: colors.gold },
+                                                    color: theme.palette.text.secondary,
+                                                    "&.Mui-checked": { color: theme.palette.secondary.main },
                                                 }}
                                             />
                                         }
@@ -238,7 +225,7 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                                             <Typography
                                                 variant="body2"
                                                 fontWeight={600}
-                                                color={colors.textDark}
+                                                color={theme.palette.text.primary}
                                             >
                                                 {method.label}
                                             </Typography>
@@ -249,14 +236,14 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                         </Grid>
                     </FormGroup>
 
-                    <Divider sx={{ mb: 3, borderColor: colors.border }} />
+                    <Divider sx={{ mb: 3, borderColor: theme.palette.divider }} />
 
                     {/* ROUTING & COLLECTION DETAILS */}
                     <Box sx={{ textAlign: "left", mb: 2 }}>
                         <Typography
                             variant="subtitle2"
                             sx={{
-                                color: colors.primary,
+                                color: theme.palette.primary.main,
                                 fontWeight: 800,
                                 letterSpacing: "-0.01em",
                             }}
@@ -278,6 +265,11 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                                     onChange={(e) => setPaybillNumber(e.target.value)}
                                     size="small"
                                     InputLabelProps={{ shrink: true }}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            borderRadius: `${theme.shape.borderRadius}px`,
+                                        },
+                                    }}
                                 />
                             </Box>
                             <Box sx={{ flex: 1, width: "100%" }}>
@@ -289,6 +281,11 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                                     onChange={(e) => setAccountNumber(e.target.value)}
                                     size="small"
                                     InputLabelProps={{ shrink: true }}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            borderRadius: `${theme.shape.borderRadius}px`,
+                                        },
+                                    }}
                                 />
                             </Box>
                         </Box>
@@ -304,6 +301,11 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                                     onChange={(e) => setTillNumber(e.target.value)}
                                     size="small"
                                     InputLabelProps={{ shrink: true }}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            borderRadius: `${theme.shape.borderRadius}px`,
+                                        },
+                                    }}
                                 />
                             </Box>
                             <Box sx={{ flex: 1, width: "100%" }}>
@@ -315,6 +317,11 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                                     onChange={(e) => setMpesaPhone(e.target.value)}
                                     size="small"
                                     InputLabelProps={{ shrink: true }}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            borderRadius: `${theme.shape.borderRadius}px`,
+                                        },
+                                    }}
                                 />
                             </Box>
                         </Box>
@@ -331,6 +338,11 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                                 onChange={(e) => setCashInstructions(e.target.value)}
                                 size="small"
                                 InputLabelProps={{ shrink: true }}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        borderRadius: `${theme.shape.borderRadius}px`,
+                                    },
+                                }}
                             />
                         </Box>
                     </Box>
@@ -341,7 +353,8 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                         px: 3,
                         pb: 2.5,
                         pt: 1.5,
-                        bgcolor: colors.bgAction,
+                        bgcolor: theme.palette.action.hover,
+                        borderTop: `1px solid ${theme.palette.divider}`,
                         justifyContent: "flex-end",
                         gap: 1.5,
                     }}
@@ -351,20 +364,20 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                         disabled={submitting}
                         startIcon={<CloseOutlinedIcon sx={{ fontSize: "18px !important" }} />}
                         sx={{
-                            color: colors.textMuted,
+                            color: theme.palette.text.secondary,
                             fontWeight: 700,
                             textTransform: "none",
-                            borderRadius: "8px",
+                            borderRadius: `${theme.shape.borderRadius}px`,
                             px: 2,
                             transition: "all 0.2s ease",
                             "& .MuiButton-startIcon": {
                                 transition: "color 0.2s ease",
                             },
                             "&:hover": {
-                                color: "#DC2626",
-                                bgcolor: "rgba(220, 38, 38, 0.08)",
+                                color: theme.palette.error?.main || "#EF4444",
+                                bgcolor: `${theme.palette.error?.main || "#EF4444"}14`,
                                 "& .MuiButton-startIcon": {
-                                    color: "#DC2626",
+                                    color: theme.palette.error?.main || "#EF4444",
                                 },
                             },
                         }}
@@ -378,7 +391,7 @@ export default function EditPaymentPreferencesDialog({ open, handleClose, profil
                         disabled={submitting}
                         startIcon={
                             submitting ? (
-                                <CircularProgress size={16} sx={{ color: "#FFFFFF" }} />
+                                <CircularProgress size={16} sx={{ color: theme.palette.common.white }} />
                             ) : (
                                 <SaveOutlinedIcon />
                             )

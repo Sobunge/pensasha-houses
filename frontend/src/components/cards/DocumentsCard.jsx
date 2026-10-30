@@ -13,7 +13,7 @@ import {
 import DescriptionIcon from "@mui/icons-material/DescriptionOutlined";
 import FolderSharedIcon from "@mui/icons-material/FolderSharedOutlined";
 import { useNavigate } from "react-router-dom";
-import { useDocumentCount } from "../hooks/useDocumentCount"; // Adjusted relative import
+import { useDocumentCount } from "../hooks/useDocumentCount";
 
 function DocumentsCard({ userId, activeRole = "TENANT" }) {
   const navigate = useNavigate();
@@ -28,56 +28,56 @@ function DocumentsCard({ userId, activeRole = "TENANT" }) {
   return (
     <Card
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         flex: { xs: "1 1 100%", md: "1 1 45%", lg: "0 1 400px" },
         minWidth: { xs: "100%", sm: "320px" },
-        borderRadius: "16px",
-        border: "1.5px solid #D4AF37", // Pensasha Gold
-        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
-        bgcolor: "#FFFFFF",
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
+        border: `1.5px solid ${theme.palette.secondary.main}`,
+        boxShadow: `0 10px 30px ${theme.palette.primary.main}14`,
+        bgcolor: theme.palette.background.paper,
         display: "flex",
         flexDirection: "column",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          boxShadow: "0 14px 36px rgba(15, 23, 42, 0.12)",
+          boxShadow: `0 14px 36px ${theme.palette.primary.main}1F`,
           transform: "translateY(-4px)",
-          borderColor: "#B5922B",
+          borderColor: theme.palette.secondary.dark,
         },
-      }}
+      })}
     >
       {/* Header */}
       <Box
-        sx={{
+        sx={(theme) => ({
           display: "flex",
           alignItems: "center",
           gap: 1.5,
           p: 2,
-          bgcolor: "rgba(212, 175, 55, 0.04)",
-          borderBottom: "1px solid #E2E8F0",
-        }}
+          bgcolor: `${theme.palette.secondary.main}0A`,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        })}
       >
         <Box
-          sx={{
+          sx={(theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             width: 32,
             height: 32,
-            borderRadius: "8px",
-            bgcolor: "rgba(212, 175, 55, 0.12)",
-            color: "#D4AF37",
-          }}
+            borderRadius: `${theme.shape.borderRadius}px`,
+            bgcolor: `${theme.palette.secondary.main}1F`,
+            color: theme.palette.secondary.main,
+          })}
         >
           <DescriptionIcon sx={{ fontSize: 18 }} />
         </Box>
         <Typography
           variant="subtitle1"
-          sx={{
+          sx={(theme) => ({
             fontWeight: 700,
-            color: "#0F172A",
+            color: theme.palette.text.primary,
             fontSize: "1rem",
             letterSpacing: "-0.2px",
-          }}
+          })}
         >
           Document Vault
         </Typography>
@@ -97,10 +97,10 @@ function DocumentsCard({ userId, activeRole = "TENANT" }) {
       >
         {loading ? (
           <Stack alignItems="center" spacing={1.5}>
-            <CircularProgress size={28} sx={{ color: "#D4AF37" }} />
+            <CircularProgress size={28} sx={(theme) => ({ color: theme.palette.secondary.main })} />
             <Typography
               variant="body2"
-              sx={{ color: "#64748B", fontWeight: 500 }}
+              sx={(theme) => ({ color: theme.palette.text.secondary, fontWeight: 500 })}
             >
               Syncing files...
             </Typography>
@@ -108,7 +108,7 @@ function DocumentsCard({ userId, activeRole = "TENANT" }) {
         ) : error ? (
           <Typography
             variant="body2"
-            sx={{ color: "#EF4444", fontWeight: 600 }}
+            sx={(theme) => ({ color: theme.palette.error?.main || "#EF4444", fontWeight: 600 })}
           >
             Connection failed. Please retry.
           </Typography>
@@ -116,25 +116,25 @@ function DocumentsCard({ userId, activeRole = "TENANT" }) {
           <Box textAlign="center">
             <Typography
               variant="h3"
-              sx={{
+              sx={(theme) => ({
                 fontWeight: 800,
-                color: "#0F172A",
+                color: theme.palette.text.primary,
                 lineHeight: 1,
                 fontSize: { xs: "2.5rem", sm: "3rem" },
-              }}
+              })}
             >
               {docCount || 0}
             </Typography>
             <Typography
               variant="body2"
-              sx={{
+              sx={(theme) => ({
                 mt: 1.5,
-                color: "#64748B",
+                color: theme.palette.text.secondary,
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.8px",
                 fontSize: "0.75rem",
-              }}
+              })}
             >
               Available Document{docCount !== 1 ? "s" : ""}
             </Typography>
@@ -142,7 +142,7 @@ function DocumentsCard({ userId, activeRole = "TENANT" }) {
         )}
       </CardContent>
 
-      <Divider sx={{ borderStyle: "dashed", borderColor: "#E2E8F0" }} />
+      <Divider sx={(theme) => ({ borderStyle: "dashed", borderColor: theme.palette.divider })} />
 
       {/* Footer Action */}
       <Box
@@ -157,37 +157,37 @@ function DocumentsCard({ userId, activeRole = "TENANT" }) {
           startIcon={<FolderSharedIcon />}
           onClick={() => navigate(getDocumentRoute())}
           disabled={loading || error}
-          sx={{
-            bgcolor: "#0F172A",
-            color: "#FFFFFF",
+          sx={(theme) => ({
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
             textTransform: "none",
             fontWeight: 700,
             fontSize: { xs: "0.8125rem", sm: "0.875rem" },
             px: { xs: 2, sm: 3 },
             py: 1.2,
-            borderRadius: "10px",
+            borderRadius: `${theme.shape.borderRadius}px`,
             width: { xs: "100%", sm: "auto" },
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
             "& .MuiButton-startIcon": {
-              color: "#D4AF37",
+              color: theme.palette.secondary.main,
             },
             "&:hover": {
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
-              boxShadow: "0 6px 16px rgba(212, 175, 55, 0.3)",
+              bgcolor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              boxShadow: `0 6px 16px ${theme.palette.secondary.main}4D`,
               "& .MuiButton-startIcon": {
-                color: "#0F172A",
+                color: theme.palette.primary.main,
               },
             },
             "&.Mui-disabled": {
-              bgcolor: "#F1F5F9",
-              color: "#94A3B8",
+              bgcolor: theme.palette.action.disabledBackground,
+              color: theme.palette.action.disabled,
               "& .MuiButton-startIcon": {
-                color: "#94A3B8",
+                color: theme.palette.action.disabled,
               },
             },
             transition: "all 0.2s ease-in-out",
-          }}
+          })}
         >
           View Document Vault
         </Button>

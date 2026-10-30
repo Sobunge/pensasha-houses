@@ -45,17 +45,21 @@ export default function ScrollToTopButton({ containerId }) {
         onClick={handleClick}
         size="small"
         aria-label="scroll back to top"
-        sx={{
+        sx={(theme) => ({
           position: "fixed",
           bottom: 24,
           right: 24,
-          backgroundColor: "#D4AF37", // Gold accent
-          color: "#0F172A",
+          backgroundColor: theme.palette.secondary.main, // Champagne Gold token
+          color: theme.palette.primary.main,            // Obsidian Dark Slate token
+          boxShadow: `0 4px 14px ${theme.palette.secondary.main}59`,
+          transition: "all 0.2s ease-in-out",
           "&:hover": {
-            backgroundColor: "#B5922B",
+            backgroundColor: theme.palette.secondary.dark,
+            boxShadow: `0 6px 18px ${theme.palette.secondary.main}73`,
+            transform: "translateY(-2px)",
           },
-          zIndex: 9999, // Keeps it on top of dashboard cards/tables
-        }}
+          zIndex: theme.zIndex.speedDial || 9999,
+        })}
       >
         <KeyboardArrowUpIcon />
       </Fab>

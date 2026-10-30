@@ -1,3 +1,4 @@
+// src/components/UserSidebar.jsx
 import React, { useEffect, useMemo, useRef } from "react";
 import {
   Box,
@@ -19,18 +20,6 @@ import "simplebar-react/dist/simplebar.min.css";
 
 import { DRAWER_WIDTH } from "../layouts/constants";
 import { getMenuItems } from "../config/menuItems";
-
-const SIDEBAR_COLORS = {
-  background: "#0F172A",
-  text: "#F8FAFC",
-  gold: "#D4AF37",
-  muted: "#94A3B8",
-  icon: "#64748B",
-  divider: "rgba(255, 255, 255, 0.08)",
-  activeBackground: "rgba(212, 175, 55, 0.12)",
-  activeHoverBackground: "rgba(212, 175, 55, 0.18)",
-  hoverBackground: "rgba(255, 255, 255, 0.05)",
-};
 
 function UserSidebar({ mobileOpen, onClose }) {
   const location = useLocation();
@@ -91,14 +80,14 @@ function UserSidebar({ mobileOpen, onClose }) {
   // Shared navigation content for desktop and mobile drawers.
   const drawerContent = (
     <Box
-      sx={{
+      sx={(theme) => ({
         height: "100%",
-        bgcolor: SIDEBAR_COLORS.background,
-        color: SIDEBAR_COLORS.text,
+        bgcolor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-      }}
+      })}
     >
       {/* Brand Header */}
       <Box
@@ -124,25 +113,24 @@ function UserSidebar({ mobileOpen, onClose }) {
 
         <Typography
           variant="h6"
-          sx={{
-            fontFamily: '"Playfair Display", Georgia, serif',
+          sx={(theme) => ({
             fontWeight: 600,
-            color: "#FFFFFF",
+            color: theme.palette.primary.contrastText,
             letterSpacing: "-0.02em",
             fontSize: {
               xs: "1.15rem",
               md: "1.35rem",
             },
             whiteSpace: "nowrap",
-          }}
+          })}
         >
           Pensasha
           <Box
             component="span"
-            sx={{
-              color: SIDEBAR_COLORS.gold,
+            sx={(theme) => ({
+              color: theme.palette.secondary.main,
               fontWeight: 400,
-            }}
+            })}
           >
             {" "}
             Houses
@@ -161,25 +149,25 @@ function UserSidebar({ mobileOpen, onClose }) {
         <Chip
           label={currentRole ? `${currentRole} MODE` : "ROLE UNAVAILABLE"}
           size="small"
-          sx={{
-            bgcolor: "rgba(212, 175, 55, 0.15)",
-            color: SIDEBAR_COLORS.gold,
+          sx={(theme) => ({
+            bgcolor: `${theme.palette.secondary.main}26`, // ~15% opacity gold
+            color: theme.palette.secondary.main,
             fontWeight: 800,
             fontSize: "0.65rem",
-            borderRadius: "6px",
-            border: "1px solid rgba(212, 175, 55, 0.3)",
+            borderRadius: `${theme.shape.borderRadius / 2}px`,
+            border: `1px solid ${theme.palette.secondary.main}4D`, // ~30% opacity gold border
             letterSpacing: "0.05em",
             maxWidth: "100%",
-          }}
+          })}
         />
       </Box>
 
       <Divider
-        sx={{
-          borderColor: SIDEBAR_COLORS.divider,
+        sx={(theme) => ({
+          borderColor: `${theme.palette.common.white}14`,
           mx: 2,
           flexShrink: 0,
-        }}
+        })}
       />
 
       {/* Navigation Menu */}
@@ -217,42 +205,42 @@ function UserSidebar({ mobileOpen, onClose }) {
                   selected={active}
                   onClick={onClose}
                   aria-current={active ? "page" : undefined}
-                  sx={{
-                    borderRadius: "10px",
+                  sx={(theme) => ({
+                    borderRadius: `${theme.shape.borderRadius}px`,
                     mb: 0.75,
                     position: "relative",
                     color: active
-                      ? SIDEBAR_COLORS.gold
-                      : SIDEBAR_COLORS.muted,
+                      ? theme.palette.secondary.main
+                      : theme.palette.text.secondary,
                     backgroundColor: active
-                      ? SIDEBAR_COLORS.activeBackground
+                      ? `${theme.palette.secondary.main}1F` // ~12% active fill
                       : "transparent",
                     transition:
                       "background-color 0.2s ease-in-out, color 0.2s ease-in-out",
 
                     "&.Mui-selected": {
-                      backgroundColor: SIDEBAR_COLORS.activeBackground,
+                      backgroundColor: `${theme.palette.secondary.main}1F`,
                     },
 
                     "&.Mui-selected:hover": {
-                      backgroundColor: SIDEBAR_COLORS.activeHoverBackground,
+                      backgroundColor: `${theme.palette.secondary.main}2E`, // ~18% active hover
                     },
 
                     "&:hover": {
                       backgroundColor: active
-                        ? SIDEBAR_COLORS.activeHoverBackground
-                        : SIDEBAR_COLORS.hoverBackground,
+                        ? `${theme.palette.secondary.main}2E`
+                        : `${theme.palette.common.white}0D`,
                       color: active
-                        ? SIDEBAR_COLORS.gold
-                        : SIDEBAR_COLORS.text,
+                        ? theme.palette.secondary.main
+                        : theme.palette.primary.contrastText,
 
                       "& .MuiListItemIcon-root": {
-                        color: SIDEBAR_COLORS.gold,
+                        color: theme.palette.secondary.main,
                       },
                     },
 
                     "&:focus-visible": {
-                      outline: `2px solid ${SIDEBAR_COLORS.gold}`,
+                      outline: `2px solid ${theme.palette.secondary.main}`,
                       outlineOffset: "-2px",
                     },
 
@@ -264,20 +252,20 @@ function UserSidebar({ mobileOpen, onClose }) {
                           top: "15%",
                           height: "70%",
                           width: "4px",
-                          bgcolor: SIDEBAR_COLORS.gold,
+                          bgcolor: theme.palette.secondary.main,
                           borderRadius: "0 4px 4px 0",
                         }
                       : {},
-                  }}
+                  })}
                 >
                   <ListItemIcon
-                    sx={{
+                    sx={(theme) => ({
                       minWidth: 36,
                       color: active
-                        ? SIDEBAR_COLORS.gold
-                        : SIDEBAR_COLORS.icon,
+                        ? theme.palette.secondary.main
+                        : theme.palette.text.secondary,
                       transition: "color 0.2s ease-in-out",
-                    }}
+                    })}
                   >
                     {React.cloneElement(item.icon, {
                       sx: {
@@ -304,10 +292,10 @@ function UserSidebar({ mobileOpen, onClose }) {
 
       {/* Footer */}
       <Divider
-        sx={{
-          borderColor: SIDEBAR_COLORS.divider,
+        sx={(theme) => ({
+          borderColor: `${theme.palette.common.white}14`,
           flexShrink: 0,
-        }}
+        })}
       />
 
       <Box
@@ -319,12 +307,12 @@ function UserSidebar({ mobileOpen, onClose }) {
       >
         <Typography
           variant="caption"
-          sx={{
-            color: SIDEBAR_COLORS.icon,
+          sx={(theme) => ({
+            color: theme.palette.text.secondary,
             fontWeight: 700,
             letterSpacing: "0.05em",
             fontSize: "0.7rem",
-          }}
+          })}
         >
           © {new Date().getFullYear()} PENSASHA HOUSES
         </Typography>
@@ -355,7 +343,7 @@ function UserSidebar({ mobileOpen, onClose }) {
             "& .MuiDrawer-paper": {
               width: DRAWER_WIDTH,
               height: "100vh",
-              bgcolor: SIDEBAR_COLORS.background,
+              bgcolor: (theme) => theme.palette.primary.main,
               borderRight: "none",
               boxSizing: "border-box",
               overflow: "hidden",
@@ -375,9 +363,9 @@ function UserSidebar({ mobileOpen, onClose }) {
             "& .MuiDrawer-paper": {
               width: DRAWER_WIDTH,
               height: "100vh",
-              bgcolor: SIDEBAR_COLORS.background,
+              bgcolor: (theme) => theme.palette.primary.main,
               borderRight: "none",
-              boxShadow: "4px 0 24px rgba(15, 23, 42, 0.08)",
+              boxShadow: (theme) => `4px 0 24px ${theme.palette.primary.main}14`,
               boxSizing: "border-box",
               overflow: "hidden",
             },

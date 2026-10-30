@@ -45,45 +45,44 @@ export default function Footer({ howItWorksRef }) {
   return (
     <Box
       component="footer"
-      sx={{
-        backgroundColor: 'rgba(11, 15, 23, 0.95)',
-         backgroundImage: `
-          linear-gradient(180deg, #F8FAFC 0%, #0F172A 20px, #0F172A calc(100% - 20px))
+      sx={(theme) => ({
+        backgroundColor: `${theme.palette.primary.main}F2`, // ~95% dark slate
+        backgroundImage: `
+          linear-gradient(180deg, ${theme.palette.background.default} 0%, ${theme.palette.primary.main} 20px, ${theme.palette.primary.main} calc(100% - 20px))
         `,
         backdropFilter: 'blur(8px)',
-        color: '#F8FAFC',
+        color: theme.palette.primary.contrastText,
         pt: { xs: 8, md: 10 },
         pb: { xs: 4, md: 6 },
         position: 'relative',
         width: '100%',
-      }}
+      })}
     >
       <Container maxWidth="lg">
         {/* Brand Header */}
         <Box sx={{ mb: { xs: 6, md: 8 }, textAlign: { xs: 'center', md: 'left' } }}>
           <Typography
             variant="h4"
-            sx={{
-              fontFamily: '"Playfair Display", Georgia, serif',
+            sx={(theme) => ({
               fontWeight: 700,
               mb: 1,
               fontSize: { xs: '1.75rem', md: '2.25rem' },
-              color: '#FFFFFF',
-            }}
+              color: theme.palette.primary.contrastText,
+            })}
           >
             Pensasha{' '}
-            <Box component="span" sx={{ color: '#D4AF37' }}>
+            <Box component="span" sx={(theme) => ({ color: theme.palette.secondary.main })}>
               Houses
             </Box>
           </Typography>
           <Typography
             variant="body1"
-            sx={{
-              color: '#94A3B8',
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
               maxWidth: 540,
               fontSize: { xs: '0.9rem', md: '1rem' },
               lineHeight: 1.6,
-            }}
+            })}
           >
             Connecting tenants to quality homes and landlords to reliable tenants — faster, simpler, smarter.
           </Typography>
@@ -95,14 +94,14 @@ export default function Footer({ howItWorksRef }) {
           <Grid item xs={12} sm={6} md={4}>
             <Typography
               variant="subtitle1"
-              sx={{
+              sx={(theme) => ({
                 fontWeight: 700,
-                color: '#B5922B',
+                color: theme.palette.secondary.dark,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 fontSize: '0.8rem',
                 mb: 2.5,
-              }}
+              })}
             >
               Quick Links
             </Typography>
@@ -118,21 +117,21 @@ export default function Footer({ howItWorksRef }) {
           <Grid item xs={12} sm={6} md={4}>
             <Typography
               variant="subtitle1"
-              sx={{
+              sx={(theme) => ({
                 fontWeight: 700,
-                color: '#B5922B',
+                color: theme.palette.secondary.dark,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 fontSize: '0.8rem',
                 mb: 2.5,
-              }}
+              })}
             >
               Contact Info
             </Typography>
             <Stack spacing={2.5} alignItems="flex-start">
-              <ContactItem icon={<PhoneIcon sx={{ fontSize: 20, color: '#D4AF37' }} />} text="+254 707 335 375" />
-              <ContactItem icon={<EmailIcon sx={{ fontSize: 20, color: '#D4AF37' }} />} text="support@pensasha.co.ke" />
-              <ContactItem icon={<LocationOnIcon sx={{ fontSize: 20, color: '#D4AF37' }} />} text="Kisumu, Kenya" />
+              <ContactItem icon={<PhoneIcon sx={{ fontSize: 20 }} />} text="+254 707 335 375" />
+              <ContactItem icon={<EmailIcon sx={{ fontSize: 20 }} />} text="support@pensasha.co.ke" />
+              <ContactItem icon={<LocationOnIcon sx={{ fontSize: 20 }} />} text="Kisumu, Kenya" />
             </Stack>
           </Grid>
 
@@ -140,18 +139,18 @@ export default function Footer({ howItWorksRef }) {
           <Grid item xs={12} sm={6} md={4}>
             <Typography
               variant="subtitle1"
-              sx={{
+              sx={(theme) => ({
                 fontWeight: 700,
-                color: '#B5922B',
+                color: theme.palette.secondary.dark,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 fontSize: '0.8rem',
                 mb: 2.5,
-              }}
+              })}
             >
               Connect With Us
             </Typography>
-            <Typography variant="body2" sx={{ color: '#94A3B8', mb: 2, fontSize: '0.875rem' }}>
+            <Typography variant="body2" sx={(theme) => ({ color: theme.palette.text.secondary, mb: 2, fontSize: '0.875rem' })}>
               Follow our official channels for real-time listing updates and market insights.
             </Typography>
             <Stack direction="row" spacing={1.5}>
@@ -159,19 +158,19 @@ export default function Footer({ howItWorksRef }) {
                 <IconButton
                   key={idx}
                   href="#"
-                  sx={{
-                    color: '#94A3B8',
-                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                  sx={(theme) => ({
+                    color: theme.palette.text.secondary,
+                    backgroundColor: `${theme.palette.common.white}0A`,
+                    border: `1px solid ${theme.palette.common.white}14`,
                     p: 1.25,
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      color: '#0B0F17',
-                      backgroundColor: '#D4AF37',
-                      borderColor: '#D4AF37',
+                      color: theme.palette.primary.main,
+                      backgroundColor: theme.palette.secondary.main,
+                      borderColor: theme.palette.secondary.main,
                       transform: 'translateY(-3px)',
                     },
-                  }}
+                  })}
                 >
                   <Icon sx={{ fontSize: 20 }} />
                 </IconButton>
@@ -180,7 +179,7 @@ export default function Footer({ howItWorksRef }) {
           </Grid>
         </Grid>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)', my: 4 }} />
+        <Divider sx={(theme) => ({ borderColor: `${theme.palette.common.white}14`, my: 4 })} />
 
         {/* Bottom Bar & Scroll to Top */}
         <Stack
@@ -191,12 +190,12 @@ export default function Footer({ howItWorksRef }) {
         >
           <Typography
             variant="body2"
-            sx={{
-              color: '#F7F7F7',
+            sx={(theme) => ({
+              color: theme.palette.common.white,
               opacity: 0.85,
               fontSize: { xs: '0.75rem', md: '0.85rem' },
               letterSpacing: '0.3px',
-            }}
+            })}
           >
             © {new Date().getFullYear()} <strong>Pensasha Houses</strong>. All rights reserved.
           </Typography>
@@ -205,23 +204,23 @@ export default function Footer({ howItWorksRef }) {
             onClick={scrollToTop}
             size="small"
             startIcon={<ArrowUpwardIcon sx={{ fontSize: 16 }} />}
-            sx={{
-              color: '#94A3B8',
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
               textTransform: 'none',
               fontSize: '0.85rem',
               fontWeight: 600,
               px: 2,
               py: 0.75,
-              borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              borderRadius: `${theme.shape.borderRadius}px`,
+              border: `1px solid ${theme.palette.common.white}1A`,
+              backgroundColor: `${theme.palette.common.white}05`,
               transition: 'all 0.25s ease',
               '&:hover': {
-                color: '#D4AF37',
-                borderColor: '#D4AF37',
-                backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                color: theme.palette.secondary.main,
+                borderColor: theme.palette.secondary.main,
+                backgroundColor: `${theme.palette.secondary.main}14`,
               },
-            }}
+            })}
           >
             Back to top
           </Button>
@@ -238,23 +237,23 @@ export default function Footer({ howItWorksRef }) {
 function FooterLink({ to, icon, text, onClick }) {
   const content = (
     <Box
-      sx={{
+      sx={(theme) => ({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 1.5,
-        color: '#94A3B8',
+        color: theme.palette.text.secondary,
         fontSize: '0.9rem',
         fontWeight: 500,
         cursor: 'pointer',
         transition: 'all 0.25s ease',
         '&:hover': {
-          color: '#D4AF37',
+          color: theme.palette.secondary.main,
           transform: 'translateX(4px)',
         },
-      }}
+      })}
       onClick={onClick}
     >
-      <Box sx={{ color: '#64748B', display: 'flex', transition: 'color 0.25s ease' }}>
+      <Box sx={(theme) => ({ color: theme.palette.text.secondary, display: 'flex', transition: 'color 0.25s ease' })}>
         {icon}
       </Box>
       {text}
@@ -276,8 +275,8 @@ function FooterLink({ to, icon, text, onClick }) {
 function ContactItem({ icon, text }) {
   return (
     <Stack direction="row" spacing={1.5} alignItems="center">
-      <Box sx={{ display: 'flex' }}>{icon}</Box>
-      <Typography variant="body2" sx={{ color: '#94A3B8', fontSize: '0.9rem' }}>
+      <Box sx={(theme) => ({ display: 'flex', color: theme.palette.secondary.main })}>{icon}</Box>
+      <Typography variant="body2" sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: '0.9rem' })}>
         {text}
       </Typography>
     </Stack>

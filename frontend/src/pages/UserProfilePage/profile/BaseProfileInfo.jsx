@@ -46,25 +46,25 @@ export default function BaseProfileInfo({ profile }) {
 
   return (
     <Box
-      sx={{
-        bgcolor: "#FFFFFF",
-        borderRadius: "16px",
+      sx={(theme) => ({
+        bgcolor: theme.palette.background.paper,
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
         p: { xs: 1.5, sm: 2 },
-        border: "1px solid rgba(226, 232, 240, 0.8)",
-        boxShadow: "0 10px 30px -10px rgba(15, 23, 42, 0.05)",
-        background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
-      }}
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: `0 10px 30px -10px ${theme.palette.primary.main}14`,
+        background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.action.hover} 100%)`,
+      })}
     >
       {/* INFO GRID */}
       <Grid container spacing={1.5}>
         {infoData.map((item) => (
           <Grid item xs={12} sm={6} key={item.label}>
             <Box
-              sx={{
+              sx={(theme) => ({
                 p: 1.5,
-                borderRadius: "12px",
-                bgcolor: "#FFFFFF",
-                border: "1px solid #E2E8F0",
+                borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+                bgcolor: theme.palette.background.paper,
+                border: `1px solid ${theme.palette.divider}`,
                 display: "flex",
                 alignItems: "center",
                 gap: 1.5,
@@ -72,32 +72,32 @@ export default function BaseProfileInfo({ profile }) {
                 position: "relative",
                 overflow: "hidden",
                 "&:hover": {
-                  borderColor: "rgba(212, 175, 55, 0.5)",
-                  boxShadow: "0 8px 20px rgba(212, 175, 55, 0.12)",
+                  borderColor: `${theme.palette.secondary.main}80`,
+                  boxShadow: `0 8px 20px ${theme.palette.secondary.main}20`,
                   transform: "translateY(-1px)",
                   "& .icon-box": {
-                    background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-                    color: "#D4AF37",
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #1E293B 100%)`,
+                    color: theme.palette.secondary.main,
                     transform: "scale(1.05)",
                   },
                 },
-              }}
+              })}
             >
               {/* Premium Icon Container */}
               <Box
                 className="icon-box"
-                sx={{
+                sx={(theme) => ({
                   width: 38,
                   height: 38,
-                  borderRadius: "8px",
-                  bgcolor: "rgba(212, 175, 55, 0.1)",
-                  color: "#B48A1D",
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                  bgcolor: `${theme.palette.secondary.main}1A`,
+                  color: theme.palette.secondary.main,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
                   transition: "all 0.25s ease",
-                }}
+                })}
               >
                 {item.icon}
               </Box>
@@ -105,28 +105,28 @@ export default function BaseProfileInfo({ profile }) {
               <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Typography
                   variant="caption"
-                  sx={{
-                    color: "#475569", // Darker slate color for crisp visibility
+                  sx={(theme) => ({
+                    color: theme.palette.text.secondary,
                     fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: 0.6,
-                    fontSize: "0.725rem", // Increased from 0.625rem for legibility
+                    fontSize: "0.725ProfileInfo",
                     display: "block",
                     lineHeight: 1.2,
                     mb: 0.3,
-                  }}
+                  })}
                 >
                   {item.label}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{
+                  sx={(theme) => ({
                     fontWeight: 700,
-                    color: "#0F172A",
+                    color: theme.palette.primary.main,
                     fontSize: "0.875rem",
                     wordBreak: "break-word",
                     lineHeight: 1.3,
-                  }}
+                  })}
                 >
                   {item.value}
                 </Typography>
@@ -138,37 +138,38 @@ export default function BaseProfileInfo({ profile }) {
 
       {/* RESET PASSWORD ACTION */}
       <Box
-        sx={{
+        sx={(theme) => ({
           pt: 1.5,
-          borderTop: "1px solid #F1F5F9",
+          mt: 2,
+          borderTop: `1px solid ${theme.palette.divider}`,
           display: "flex",
           justifyContent: "flex-end",
-        }}
+        })}
       >
         <Button
           variant="outlined"
           startIcon={<LockResetOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           onClick={() => setOpenReset(true)}
-          sx={{
-            borderColor: "rgba(15, 23, 42, 0.15)",
-            color: "#0F172A",
+          sx={(theme) => ({
+            borderColor: `${theme.palette.primary.main}26`,
+            color: theme.palette.primary.main,
             fontWeight: 700,
             fontSize: "0.8rem",
             textTransform: "none",
-            borderRadius: "8px",
+            borderRadius: `${theme.shape.borderRadius}px`,
             px: 2,
             py: 0.5,
-            bgcolor: "#FFFFFF",
-            boxShadow: "0 2px 6px rgba(15, 23, 42, 0.03)",
-            "& .MuiButton-startIcon": { color: "#D4AF37", mr: 0.8 },
+            bgcolor: theme.palette.background.paper,
+            boxShadow: `0 2px 6px ${theme.palette.primary.main}08`,
+            "& .MuiButton-startIcon": { color: theme.palette.secondary.main, mr: 0.8 },
             "&:hover": {
-              borderColor: "#D4AF37",
-              bgcolor: "rgba(212, 175, 55, 0.05)",
-              color: "#0F172A",
-              boxShadow: "0 4px 12px rgba(212, 175, 55, 0.15)",
+              borderColor: theme.palette.secondary.main,
+              bgcolor: `${theme.palette.secondary.main}0D`,
+              color: theme.palette.primary.main,
+              boxShadow: `0 4px 12px ${theme.palette.secondary.main}26`,
             },
             transition: "all 0.2s ease",
-          }}
+          })}
         >
           Change Password
         </Button>

@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import api, { setAccessToken, setLogoutHandler } from "../../api/api";
 
-export const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
 /* ===================== ROLE NORMALIZER ===================== */
 const normalizeRole = (role) => {
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
     setLogoutHandler(logout);
 
     const restoreSession = async () => {
-      // 🛑 Prevent duplicate parallel refresh requests on double render / Strict Mode
+      // Prevent duplicate parallel refresh requests on double render / Strict Mode
       if (isRefreshingRef.current) return;
       isRefreshingRef.current = true;
 
@@ -70,11 +70,14 @@ export const AuthProvider = ({ children }) => {
               : [];
 
             const userObj = {
+              ...principalData, // Preserves email, avatar, phone, etc.
               id: principalData.id,
               name:
+                principalData.name ||
                 principalData.firstName ||
                 principalData.firstname ||
-                principalData.name,
+                "User",
+              email: principalData.email || "",
               roles: rolesList,
               permissions: principalData.permissions || [],
               defaultRoute: "/dashboard",
@@ -97,7 +100,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   if (loading) {
-    return null;
+    return null; // Session restoration in progress
   }
 
   return (
@@ -119,4 +122,10 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

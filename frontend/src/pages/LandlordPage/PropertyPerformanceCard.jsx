@@ -1,5 +1,4 @@
 // src/components/cards/PropertyPerformanceCard.jsx
-
 import React from "react";
 import {
   Card,
@@ -41,10 +40,10 @@ function PropertyPerformanceCard({ userId }) {
   const displayedProperties = propertyData.slice(0, 3);
   const hasProperties = displayedProperties.length > 0;
 
-  const getOccupancyColor = (rate) => {
-    if (rate >= 80) return "#10B981";
-    if (rate >= 50) return "#D4AF37";
-    return "#EF4444";
+  const getOccupancyColor = (currentTheme, rate) => {
+    if (rate >= 80) return currentTheme.palette.success?.main || "#10B981";
+    if (rate >= 50) return currentTheme.palette.secondary.main;
+    return currentTheme.palette.error?.main || "#EF4444";
   };
 
   const handleViewAll = () => {
@@ -60,14 +59,14 @@ function PropertyPerformanceCard({ userId }) {
     return (
       <Card
         elevation={0}
-        sx={{
+        sx={(t) => ({
           width: "100%",
-          borderRadius: "16px",
+          borderRadius: `${t.shape.borderRadius * 2}px`,
           border: "1px solid",
-          borderColor: "divider",
+          borderColor: t.palette.divider,
           p: 3,
-          bgcolor: "#FFFFFF",
-        }}
+          bgcolor: t.palette.background.paper,
+        })}
       >
         <Skeleton variant="text" width="60%" height={32} sx={{ mb: 1 }} />
         <Skeleton variant="text" width="40%" height={20} sx={{ mb: 3 }} />
@@ -81,14 +80,14 @@ function PropertyPerformanceCard({ userId }) {
     return (
       <Card
         elevation={0}
-        sx={{
+        sx={(t) => ({
           width: "100%",
-          borderRadius: "16px",
+          borderRadius: `${t.shape.borderRadius * 2}px`,
           border: "1px solid",
-          borderColor: "divider",
+          borderColor: t.palette.divider,
           p: 3,
-          bgcolor: "#FFFFFF",
-        }}
+          bgcolor: t.palette.background.paper,
+        })}
       >
         <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
           {error?.message || "Failed to load property performance data."}
@@ -100,29 +99,26 @@ function PropertyPerformanceCard({ userId }) {
   return (
     <Card
       elevation={0}
-      sx={{
+      sx={(t) => ({
         display: "flex",
         flexDirection: "column",
         width: "100%",
         minWidth: 0,
         height: "auto",
-        borderRadius: "16px",
-        bgcolor: "#FFFFFF",
+        borderRadius: `${t.shape.borderRadius * 2}px`,
+        bgcolor: t.palette.background.paper,
         border: "1px solid",
-        borderColor: "divider",
-        boxShadow:
-          "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
-        transition:
-          "border-color 0.25s ease, box-shadow 0.25s ease",
+        borderColor: t.palette.divider,
+        boxShadow: `0 15px 35px -5px ${t.palette.primary.main}1F, 0 10px 15px -8px ${t.palette.primary.main}0F`,
+        transition: "border-color 0.25s ease, box-shadow 0.25s ease",
         "&:hover": {
-          borderColor: "secondary.main",
-          boxShadow:
-            "0 25px 40px -10px rgba(15, 23, 42, 0.18), 0 12px 18px -6px rgba(15, 23, 42, 0.1)",
+          borderColor: t.palette.secondary.main,
+          boxShadow: `0 25px 40px -10px ${t.palette.primary.main}2E, 0 12px 18px -6px ${t.palette.primary.main}1A`,
         },
         "@media (prefers-reduced-motion: reduce)": {
           transition: "none",
         },
-      }}
+      })}
     >
       <CardContent
         sx={{
@@ -140,16 +136,16 @@ function PropertyPerformanceCard({ userId }) {
         <Box sx={{ mb: { xs: 2, sm: 2.5 } }}>
           <Typography
             variant="h6"
-            sx={{
+            sx={(t) => ({
               fontWeight: 800,
-              color: "primary.main",
+              color: t.palette.primary.main,
               fontSize: {
                 xs: "1rem",
                 sm: "1.1rem",
                 md: "1.2rem",
               },
               lineHeight: 1.35,
-            }}
+            })}
           >
             Properties Performance
           </Typography>
@@ -186,8 +182,7 @@ function PropertyPerformanceCard({ userId }) {
                     (occupiedUnits / totalUnits) * 100
                   );
 
-                  const progressColor =
-                    getOccupancyColor(occupancyRate);
+                  const progressColor = getOccupancyColor(theme, occupancyRate);
                   
                   const formattedRevenue = property.revenue
                     ? `KSh ${Number(property.revenue).toLocaleString()}`
@@ -196,14 +191,14 @@ function PropertyPerformanceCard({ userId }) {
                   return (
                     <Box
                       key={property.id}
-                      sx={{
+                      sx={(t) => ({
                         py: 1.75,
                         minWidth: 0,
                         borderBottom:
                           index !== displayedProperties.length - 1
-                            ? "1px solid #E2E8F0"
+                            ? `1px solid ${t.palette.divider}`
                             : "none",
-                      }}
+                      })}
                     >
                       {/* Property name and revenue */}
                       <Box
@@ -236,14 +231,14 @@ function PropertyPerformanceCard({ userId }) {
 
                           <Typography
                             variant="body2"
-                            sx={{
+                            sx={(t) => ({
                               fontWeight: 700,
-                              color: "primary.main",
+                              color: t.palette.primary.main,
                               fontSize: "0.82rem",
                               lineHeight: 1.45,
                               overflowWrap: "anywhere",
                               minWidth: 0,
-                            }}
+                            })}
                           >
                             {property.name}
                           </Typography>
@@ -251,15 +246,15 @@ function PropertyPerformanceCard({ userId }) {
 
                         <Typography
                           variant="body2"
-                          sx={{
+                          sx={(t) => ({
                             fontWeight: 800,
-                            color: "primary.main",
+                            color: t.palette.primary.main,
                             fontSize: "0.78rem",
                             lineHeight: 1.45,
                             textAlign: "right",
                             flexShrink: 0,
                             whiteSpace: "nowrap",
-                          }}
+                          })}
                         >
                           {formattedRevenue}
                         </Typography>
@@ -305,15 +300,15 @@ function PropertyPerformanceCard({ userId }) {
                           variant="determinate"
                           value={occupancyRate}
                           aria-label={`${property.name} occupancy: ${occupancyRate}%`}
-                          sx={{
+                          sx={(t) => ({
                             height: 6,
                             borderRadius: 4,
-                            bgcolor: "#E2E8F0",
+                            bgcolor: t.palette.divider,
                             "& .MuiLinearProgress-bar": {
                               bgcolor: progressColor,
                               borderRadius: 4,
                             },
-                          }}
+                          })}
                         />
                       </Box>
                     </Box>
@@ -333,16 +328,16 @@ function PropertyPerformanceCard({ userId }) {
                 <Table
                   size="small"
                   aria-label="Property performance"
-                  sx={{
+                  sx={(t) => ({
                     width: "100%",
                     tableLayout: "fixed",
                     "& th, & td": {
-                      borderBottom: "1px solid #E2E8F0",
+                      borderBottom: `1px solid ${t.palette.divider}`,
                     },
                     "& tr:last-child td": {
                       borderBottom: "none",
                     },
-                  }}
+                  })}
                 >
                   <TableHead>
                     <TableRow>
@@ -395,8 +390,7 @@ function PropertyPerformanceCard({ userId }) {
                         (occupiedUnits / totalUnits) * 100
                       );
 
-                      const progressColor =
-                        getOccupancyColor(occupancyRate);
+                      const progressColor = getOccupancyColor(theme, occupancyRate);
                       
                       const formattedRevenue = property.revenue
                         ? `KSh ${Number(property.revenue).toLocaleString()}`
@@ -405,15 +399,15 @@ function PropertyPerformanceCard({ userId }) {
                       return (
                         <TableRow
                           key={property.id}
-                          sx={{
+                          sx={(t) => ({
                             transition: "background-color 0.15s ease",
                             "&:hover": {
                               bgcolor: alpha(
-                                theme.palette.primary.main,
+                                t.palette.primary.main,
                                 0.025
                               ),
                             },
-                          }}
+                          })}
                         >
                           {/* Property name */}
                           <TableCell
@@ -443,14 +437,14 @@ function PropertyPerformanceCard({ userId }) {
 
                               <Typography
                                 variant="body2"
-                                sx={{
+                                sx={(t) => ({
                                   fontWeight: 700,
-                                  color: "primary.main",
+                                  color: t.palette.primary.main,
                                   fontSize: "0.78rem",
                                   lineHeight: 1.45,
                                   overflowWrap: "anywhere",
                                   minWidth: 0,
-                                }}
+                                })}
                               >
                                 {property.name}
                               </Typography>
@@ -482,15 +476,15 @@ function PropertyPerformanceCard({ userId }) {
                               variant="determinate"
                               value={occupancyRate}
                               aria-label={`${property.name} occupancy: ${occupancyRate}%`}
-                              sx={{
+                              sx={(t) => ({
                                 height: 6,
                                 borderRadius: 4,
-                                bgcolor: "#E2E8F0",
+                                bgcolor: t.palette.divider,
                                 "& .MuiLinearProgress-bar": {
                                   bgcolor: progressColor,
                                   borderRadius: 4,
                                 },
-                              }}
+                              })}
                             />
 
                             <Typography
@@ -518,15 +512,15 @@ function PropertyPerformanceCard({ userId }) {
                           >
                             <Typography
                               variant="body2"
-                              sx={{
+                              sx={(t) => ({
                                 fontWeight: 800,
-                                color: "primary.main",
+                                color: t.palette.primary.main,
                                 fontSize: {
                                   sm: "0.72rem",
                                   md: "0.8rem",
                                 },
                                 overflowWrap: "anywhere",
-                              }}
+                              })}
                             >
                               {formattedRevenue}
                             </Typography>
@@ -541,35 +535,35 @@ function PropertyPerformanceCard({ userId }) {
 
             {/* VIEW ALL FOOTER */}
             <Box
-              sx={{
+              sx={(t) => ({
                 mt: "auto",
                 pt: 1.5,
-                borderTop: "1px solid #F1F5F9",
+                borderTop: `1px solid ${t.palette.divider}`,
                 display: "flex",
                 justifyContent: "flex-end",
                 alignItems: "center",
-              }}
+              })}
             >
               <Button
                 size="small"
                 endIcon={<ArrowForwardIcon fontSize="small" />}
                 onClick={handleViewAll}
-                sx={{
+                sx={(t) => ({
                   fontWeight: 700,
                   fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                  color: "primary.main",
+                  color: t.palette.primary.main,
                   textTransform: "none",
-                  borderRadius: 2,
+                  borderRadius: `${t.shape.borderRadius}px`,
                   minWidth: 0,
                   px: 1,
                   "&:hover": {
-                    color: "secondary.main",
+                    color: t.palette.secondary.main,
                     bgcolor: alpha(
-                      theme.palette.secondary.main,
+                      t.palette.secondary.main,
                       0.06
                     ),
                   },
-                }}
+                })}
               >
                 {propertyData.length > 3
                   ? `View All (${propertyData.length}) Properties`
@@ -592,28 +586,28 @@ function PropertyPerformanceCard({ userId }) {
             }}
           >
             <Box
-              sx={{
+              sx={(t) => ({
                 width: 56,
                 height: 56,
-                borderRadius: 3,
-                bgcolor: "rgba(212, 175, 55, 0.12)",
-                color: "secondary.main",
+                borderRadius: `${t.shape.borderRadius * 1.5}px`,
+                bgcolor: alpha(t.palette.secondary.main, 0.12),
+                color: t.palette.secondary.main,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 mb: 2,
-              }}
+              })}
             >
               <HomeWorkOutlinedIcon sx={{ fontSize: 30 }} />
             </Box>
 
             <Typography
               variant="subtitle1"
-              sx={{
+              sx={(t) => ({
                 fontWeight: 800,
-                color: "primary.main",
+                color: t.palette.primary.main,
                 mb: 0.5,
-              }}
+              })}
             >
               No Properties Found
             </Typography>
@@ -637,19 +631,20 @@ function PropertyPerformanceCard({ userId }) {
               size="small"
               startIcon={<AddCircleOutlineIcon />}
               onClick={handleAddProperty}
-              sx={{
-                bgcolor: "primary.main",
-                color: "#FFFFFF",
+              sx={(t) => ({
+                bgcolor: t.palette.primary.main,
+                color: t.palette.primary.contrastText,
                 fontWeight: 700,
                 px: 2,
                 py: 1,
-                borderRadius: 2,
+                borderRadius: `${t.shape.borderRadius}px`,
                 textTransform: "none",
                 fontSize: "0.8rem",
                 "&:hover": {
-                  bgcolor: "#1E293B",
+                  bgcolor: t.palette.secondary.main,
+                  color: t.palette.primary.main,
                 },
-              }}
+              })}
             >
               Add Your First Property
             </Button>

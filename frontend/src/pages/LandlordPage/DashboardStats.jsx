@@ -1,5 +1,4 @@
 // src/components/cards/DashboardStats.jsx
-
 import React from "react";
 import {
   Grid,
@@ -112,7 +111,7 @@ function DashboardStats({ userId }) {
           ? alpha(theme.palette.error.main, 0.1)
           : isSuccessStat
             ? alpha(theme.palette.success.main, 0.1)
-            : "#F1F5F9";
+            : theme.palette.action.hover;
 
         const iconColor = isErrorStat
           ? theme.palette.error.main
@@ -138,10 +137,10 @@ function DashboardStats({ userId }) {
                 minWidth: 0,
                 minHeight: { xs: 140, sm: 150, md: 155, lg: 165 },
                 borderRadius: { xs: 2.5, md: 3 },
-                bgcolor: "#FFFFFF",
+                bgcolor: theme.palette.background.paper,
                 border: "1px solid",
-                borderColor: "divider",
-                boxShadow: "0 4px 16px rgba(15, 23, 42, 0.04)",
+                borderColor: theme.palette.divider,
+                boxShadow: `0 4px 16px ${theme.palette.primary.main}0A`,
                 transition:
                   "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
 
@@ -152,8 +151,8 @@ function DashboardStats({ userId }) {
                   },
                   borderColor: isErrorStat
                     ? theme.palette.error.main
-                    : "secondary.main",
-                  boxShadow: "0 12px 28px rgba(15, 23, 42, 0.10)",
+                    : theme.palette.secondary.main,
+                  boxShadow: `0 12px 28px ${theme.palette.primary.main}1A`,
                 },
 
                 "@media (prefers-reduced-motion: reduce)": {
@@ -211,7 +210,7 @@ function DashboardStats({ userId }) {
                       <Typography
                         variant="caption"
                         sx={{
-                          color: "text.secondary",
+                          color: theme.palette.text.secondary,
                           fontWeight: 600,
                           fontSize: {
                             xs: "0.72rem",
@@ -232,7 +231,7 @@ function DashboardStats({ userId }) {
                           width: 34,
                           height: 34,
                           flexShrink: 0,
-                          borderRadius: "10px",
+                          borderRadius: `${theme.shape.borderRadius}px`,
                           bgcolor: iconBg,
                           color: iconColor,
                         }}
@@ -247,7 +246,7 @@ function DashboardStats({ userId }) {
                       variant="h5"
                       sx={{
                         fontWeight: 800,
-                        color: "primary.main",
+                        color: theme.palette.primary.main,
                         fontSize: {
                           xs: "1.4rem",
                           sm: "1.5rem",
@@ -268,9 +267,9 @@ function DashboardStats({ userId }) {
                       sx={{
                         height: 6,
                         borderRadius: 4,
-                        bgcolor: "#E2E8F0",
+                        bgcolor: theme.palette.divider,
                         "& .MuiLinearProgress-bar": {
-                          bgcolor: "#10B981",
+                          bgcolor: theme.palette.success?.main || "#10B981",
                           borderRadius: 4,
                         },
                       }}
@@ -279,7 +278,7 @@ function DashboardStats({ userId }) {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: "text.secondary",
+                        color: theme.palette.text.secondary,
                         fontWeight: 500,
                         fontSize: {
                           xs: "0.68rem",
@@ -325,11 +324,7 @@ function DashboardStats({ userId }) {
                           md: 44,
                           lg: 48,
                         },
-                        borderRadius: {
-                          xs: "11px",
-                          md: "12px",
-                          lg: "14px",
-                        },
+                        borderRadius: `${theme.shape.borderRadius}px`,
                         bgcolor: iconBg,
                         color: iconColor,
                         flexShrink: 0,
@@ -350,7 +345,7 @@ function DashboardStats({ userId }) {
                         variant="caption"
                         sx={{
                           display: "block",
-                          color: "text.secondary",
+                          color: theme.palette.text.secondary,
                           fontWeight: 600,
                           fontSize: {
                             xs: "0.7rem",
@@ -369,7 +364,7 @@ function DashboardStats({ userId }) {
                         variant="h6"
                         sx={{
                           fontWeight: 800,
-                          color: "primary.main",
+                          color: theme.palette.primary.main,
                           fontSize: {
                             xs:
                               stat.id === "pending_rent"
@@ -401,8 +396,8 @@ function DashboardStats({ userId }) {
                           sx={{
                             display: "block",
                             color: isErrorStat
-                              ? "error.main"
-                              : "text.secondary",
+                              ? theme.palette.error.main
+                              : theme.palette.text.secondary,
                             fontWeight: isErrorStat ? 700 : 500,
                             fontSize: {
                               xs: "0.68rem",

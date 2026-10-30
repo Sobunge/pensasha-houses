@@ -72,11 +72,11 @@ function Categories() {
 
   return (
     <Box
-      sx={{
-        backgroundColor: '#F8FAFC',
+      sx={(theme) => ({
+        backgroundColor: theme.palette.background.default,
         py: { xs: 8, md: 12 },
         position: 'relative',
-      }}
+      })}
     >
       <Container maxWidth="lg">
         {/* Header & Controls */}
@@ -90,24 +90,23 @@ function Categories() {
           <Box>
             <Typography
               variant="overline"
-              sx={{
-                color: '#B5922B',
+              sx={(theme) => ({
+                color: theme.palette.secondary.dark,
                 fontWeight: 700,
                 letterSpacing: '0.15em',
                 fontSize: '0.8rem',
-              }}
+              })}
             >
               EXPLORE OPTIONS
             </Typography>
             <Typography
               variant="h3"
-              sx={{
-                fontFamily: '"Playfair Display", Georgia, serif',
+              sx={(theme) => ({
                 fontWeight: 600,
-                color: '#0F172A',
+                color: theme.palette.text.primary,
                 fontSize: { xs: '1.8rem', md: '2.5rem' },
                 mt: 0.5,
-              }}
+              })}
             >
               Browse by Property Type
             </Typography>
@@ -118,33 +117,33 @@ function Categories() {
             <Stack direction="row" spacing={1.5}>
               <IconButton
                 onClick={() => instanceRef.current?.prev()}
-                sx={{
-                  color: '#0F172A',
-                  border: '1px solid #D4AF37',
-                  backgroundColor: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                sx={(theme) => ({
+                  color: theme.palette.text.primary,
+                  border: `1px solid ${theme.palette.secondary.main}`,
+                  backgroundColor: theme.palette.background.paper,
+                  boxShadow: `0 2px 8px ${theme.palette.primary.main}0A`,
                   '&:hover': {
-                    backgroundColor: '#F1F5F9',
-                    borderColor: '#B5922B',
-                    color: '#B5922B',
+                    backgroundColor: `${theme.palette.primary.main}08`,
+                    borderColor: theme.palette.secondary.dark,
+                    color: theme.palette.secondary.dark,
                   },
-                }}
+                })}
               >
                 <ChevronLeftIcon />
               </IconButton>
               <IconButton
                 onClick={() => instanceRef.current?.next()}
-                sx={{
-                  color: '#0F172A',
-                  border: '1px solid #D4AF37',
-                  backgroundColor: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                sx={(theme) => ({
+                  color: theme.palette.text.primary,
+                  border: `1px solid ${theme.palette.secondary.main}`,
+                  backgroundColor: theme.palette.background.paper,
+                  boxShadow: `0 2px 8px ${theme.palette.primary.main}0A`,
                   '&:hover': {
-                    backgroundColor: '#F1F5F9',
-                    borderColor: '#B5922B',
-                    color: '#B5922B',
+                    backgroundColor: `${theme.palette.primary.main}08`,
+                    borderColor: theme.palette.secondary.dark,
+                    color: theme.palette.secondary.dark,
                   },
-                }}
+                })}
               >
                 <ChevronRightIcon />
               </IconButton>
@@ -159,7 +158,7 @@ function Categories() {
               <Card
                 component={Link}
                 to={`/properties?type=${item.query}`}
-                sx={{
+                sx={(theme) => ({
                   textDecoration: 'none',
                   display: 'flex',
                   flexDirection: 'column',
@@ -167,27 +166,27 @@ function Categories() {
                   justifyContent: 'center',
                   p: 3,
                   height: 160,
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '16px',
-                  border: '1px solid #D4AF37', // Gold Border
-                  boxShadow: '0 10px 30px -5px rgba(212, 175, 55, 0.1)',
+                  backgroundColor: theme.palette.background.paper,
+                  borderRadius: `${theme.shape.borderRadius * 1.33}px`,
+                  border: `1px solid ${theme.palette.secondary.main}`,
+                  boxShadow: `0 10px 30px -5px ${theme.palette.secondary.main}1F`,
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                   cursor: 'pointer',
                   '&:hover': {
                     transform: 'translateY(-6px)',
-                    border: '1.5px solid #B5922B', // Darker Gold on Hover
-                    boxShadow: '0 12px 30px rgba(212, 175, 55, 0.25)',
+                    border: `1.5px solid ${theme.palette.secondary.dark}`,
+                    boxShadow: `0 12px 30px ${theme.palette.secondary.main}40`,
                     '& .category-icon': {
-                      color: '#B5922B',
+                      color: theme.palette.secondary.dark,
                       transform: 'scale(1.12)',
                     },
                   },
-                }}
+                })}
               >
                 <Box
                   className="category-icon"
-                  sx={{
-                    color: '#0F172A',
+                  sx={(theme) => ({
+                    color: theme.palette.primary.main,
                     transition: 'all 0.3s ease',
                     mb: 2,
                     display: 'flex',
@@ -195,19 +194,19 @@ function Categories() {
                     justifyContent: 'center',
                     p: 1.5,
                     borderRadius: '12px',
-                    backgroundColor: '#F8FAFC',
-                  }}
+                    backgroundColor: theme.palette.background.default,
+                  })}
                 >
                   {item.icon}
                 </Box>
                 <Typography
                   variant="body1"
-                  sx={{
+                  sx={(theme) => ({
                     fontWeight: 600,
-                    color: '#0F172A',
+                    color: theme.palette.text.primary,
                     fontSize: '0.95rem',
                     textAlign: 'center',
-                  }}
+                  })}
                 >
                   {item.label}
                 </Typography>
@@ -223,14 +222,14 @@ function Categories() {
               <Box
                 key={idx}
                 onClick={() => instanceRef.current?.moveToIdx(idx)}
-                sx={{
+                sx={(theme) => ({
                   width: currentSlide === idx ? 28 : 8,
                   height: 8,
                   borderRadius: '4px',
-                  backgroundColor: currentSlide === idx ? '#B5922B' : '#CBD5E1',
+                  backgroundColor: currentSlide === idx ? theme.palette.secondary.dark : theme.palette.divider,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                }}
+                })}
               />
             ))}
           </Stack>

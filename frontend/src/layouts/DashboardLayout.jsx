@@ -36,11 +36,11 @@ function DashboardLayout() {
         minHeight: "100vh",
         width: "100vw",
         overflow: "hidden",
-        bgcolor: "#F8FAFC",
-        // Subtle ambient light effect matching luxury theme
-        backgroundImage:
-          "radial-gradient(at 90% 10%, rgba(212, 175, 55, 0.03) 0px, transparent 50%), radial-gradient(at 10% 90%, rgba(15, 23, 42, 0.03) 0px, transparent 50%)",
-        color: "#0F172A",
+        bgcolor: "background.default",
+        color: "text.primary",
+        // Dynamic ambient radial glow referencing your gold (secondary) & obsidian (primary) theme tokens
+        backgroundImage: (theme) =>
+          `radial-gradient(at 90% 10%, ${theme.palette.secondary.main}0D 0px, transparent 50%), radial-gradient(at 10% 90%, ${theme.palette.primary.main}0A 0px, transparent 50%)`,
       }}
     >
       {/* Sidebar */}
@@ -71,7 +71,7 @@ function DashboardLayout() {
           role="main"
           id="mainContent"
           tabIndex={-1}
-          sx={{
+          sx={(theme) => ({
             flexGrow: 1,
             mt: `${NAVBAR_HEIGHT}px`,
             overflowY: "auto",
@@ -84,7 +84,7 @@ function DashboardLayout() {
             position: "relative",
             width: "100%",
             boxSizing: "border-box",
-            // Custom scrollbar styling
+            // Custom scrollbar with dynamic theme gold thumb
             "&::-webkit-scrollbar": {
               width: "6px",
             },
@@ -92,20 +92,20 @@ function DashboardLayout() {
               background: "transparent",
             },
             "&::-webkit-scrollbar-thumb": {
-              background: "rgba(212, 175, 55, 0.25)",
+              background: `${theme.palette.secondary.main}40`, // 25% opacity secondary gold
               borderRadius: "4px",
               "&:hover": {
-                background: "rgba(212, 175, 55, 0.5)",
+                background: `${theme.palette.secondary.main}80`, // 50% opacity on hover
               },
             },
-          }}
+          })}
         >
           {/* Main Content Area */}
           <Box
             sx={{
-              maxWidth: 1400, // Slightly expanded max-width
+              maxWidth: 1400,
               mx: "auto",
-              px: { xs: 1.5, sm: 3, md: 4 }, // 🌟 Reduced padding on mobile (xs: 1.5) to give cards full width
+              px: { xs: 1.5, sm: 3, md: 4 },
               width: "100%",
               boxSizing: "border-box",
               flexGrow: 1,

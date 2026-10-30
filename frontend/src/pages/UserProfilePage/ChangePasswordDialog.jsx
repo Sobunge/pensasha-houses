@@ -14,6 +14,7 @@ import {
   InputAdornment,
   IconButton,
   Divider,
+  useTheme,
 } from "@mui/material";
 
 import LockResetIcon from "@mui/icons-material/LockReset";
@@ -25,58 +26,8 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import useResetPassword from "../../components/hooks/profile/useResetPassword";
 
-/* ---------------- Premium & Compact Input Styles ---------------- */
-const premiumInputStyles = {
-  mt: 0.5,
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    backgroundColor: "#FFFFFF",
-    color: "#0F172A",
-    fontSize: "0.875rem",
-    fontWeight: 600,
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    "& fieldset": {
-      borderColor: "#E2E8F0",
-      borderWidth: "1.5px",
-    },
-    "&:hover fieldset": {
-      borderColor: "rgba(212, 175, 55, 0.5)",
-    },
-    "&.Mui-focused": {
-      backgroundColor: "#FFFFFF",
-      boxShadow: "0 4px 12px rgba(212, 175, 55, 0.12)",
-      "& fieldset": {
-        borderColor: "#D4AF37",
-        borderWidth: "1.5px",
-      },
-    },
-  },
-  "& .MuiInputLabel-root": {
-    color: "#475569",
-    fontWeight: 700,
-    fontSize: "0.825rem",
-    "&.Mui-focused": {
-      color: "#B48A1D",
-    },
-  },
-  "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
-    transform: "translate(14px, -8px) scale(0.75)",
-    bgcolor: "#FFFFFF",
-    px: 0.5,
-  },
-  "& input::placeholder": {
-    color: "#94A3B8",
-    opacity: 0.8,
-  },
-  "& .MuiFormHelperText-root": {
-    color: "#EF4444",
-    fontWeight: 600,
-    fontSize: "0.725rem",
-    mt: 0.3,
-  },
-};
-
 export default function ChangePasswordDialog({ open, handleClose }) {
+  const theme = useTheme();
   const { values, handleChange, resetPassword, loading } = useResetPassword();
 
   /* ---------------- Visibility toggles ---------------- */
@@ -106,13 +57,68 @@ export default function ChangePasswordDialog({ open, handleClose }) {
   }, [values.newPassword]);
 
   const strengthColor =
-    strength < 50 ? "#EF4444" : strength < 75 ? "#F59E0B" : "#10B981";
+    strength < 50
+      ? theme.palette.error?.main || "#EF4444"
+      : strength < 75
+      ? "#F59E0B"
+      : "#10B981";
 
   /* ---------------- Submit ---------------- */
   const handleSubmit = async () => {
     setFieldErrors({});
     const success = await resetPassword({ setFieldErrors });
     if (success) handleClose();
+  };
+
+  /* ---------------- Premium & Compact Input Styles (Theme-Driven) ---------------- */
+  const premiumInputStyles = {
+    mt: 0.5,
+    "& .MuiOutlinedInput-root": {
+      borderRadius: `${theme.shape.borderRadius}px`,
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.primary.main,
+      fontSize: "0.875rem",
+      fontWeight: 600,
+      transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+        borderWidth: "1.5px",
+      },
+      "&:hover fieldset": {
+        borderColor: `${theme.palette.secondary.main}80`,
+      },
+      "&.Mui-focused": {
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: `0 4px 12px ${theme.palette.secondary.main}20`,
+        "& fieldset": {
+          borderColor: theme.palette.secondary.main,
+          borderWidth: "1.5px",
+        },
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: theme.palette.text.secondary,
+      fontWeight: 700,
+      fontSize: "0.825rem",
+      "&.Mui-focused": {
+        color: theme.palette.secondary.main,
+      },
+    },
+    "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
+      transform: "translate(14px, -8px) scale(0.75)",
+      bgcolor: theme.palette.background.paper,
+      px: 0.5,
+    },
+    "& input::placeholder": {
+      color: theme.palette.text.disabled,
+      opacity: 0.8,
+    },
+    "& .MuiFormHelperText-root": {
+      color: theme.palette.error?.main || "#EF4444",
+      fontWeight: 600,
+      fontSize: "0.725rem",
+      mt: 0.3,
+    },
   };
 
   return (
@@ -123,11 +129,12 @@ export default function ChangePasswordDialog({ open, handleClose }) {
       maxWidth="xs"
       PaperProps={{
         sx: {
-          borderRadius: "16px",
-          border: "1px solid rgba(212, 175, 55, 0.4)",
-          boxShadow: "0 20px 40px rgba(15, 23, 42, 0.18)",
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          border: `1.5px solid ${theme.palette.secondary.main}66`,
+          boxShadow: `0 20px 40px ${theme.palette.primary.main}2E`,
           p: 0.5,
-          background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
+          background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.action.hover} 100%)`,
+          bgcolor: theme.palette.background.paper,
         },
       }}
     >
@@ -137,7 +144,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
           pb: 1.5,
           pt: 2,
           px: { xs: 2, sm: 2.5 },
-          borderBottom: "1px solid #F1F5F9",
+          borderBottom: `1px solid ${theme.palette.divider}`,
           position: "relative",
         }}
       >
@@ -146,9 +153,9 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             sx={{
               width: 38,
               height: 38,
-              borderRadius: "10px",
-              bgcolor: "rgba(212, 175, 55, 0.12)",
-              color: "#D4AF37",
+              borderRadius: `${theme.shape.borderRadius}px`,
+              bgcolor: `${theme.palette.secondary.main}1F`,
+              color: theme.palette.secondary.main,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -160,11 +167,11 @@ export default function ChangePasswordDialog({ open, handleClose }) {
           <Box>
             <Typography
               variant="h6"
-              sx={{ fontWeight: 800, color: "#0F172A", fontSize: "1.05rem", lineHeight: 1.2 }}
+              sx={{ fontWeight: 800, color: theme.palette.primary.main, fontSize: "1.05rem", lineHeight: 1.2 }}
             >
               Change Password
             </Typography>
-            <Typography variant="caption" sx={{ color: "#64748B", fontWeight: 600, fontSize: "0.75rem" }}>
+            <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontWeight: 600, fontSize: "0.75rem" }}>
               Choose a strong password you haven’t used before
             </Typography>
           </Box>
@@ -179,8 +186,8 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             position: "absolute",
             right: 12,
             top: 12,
-            color: "#64748B",
-            "&:hover": { bgcolor: "#F1F5F9", color: "#EF4444" },
+            color: theme.palette.text.secondary,
+            "&:hover": { bgcolor: theme.palette.action.hover, color: theme.palette.error?.main || "#EF4444" },
           }}
         >
           <CloseIcon fontSize="small" />
@@ -210,7 +217,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <LockIcon sx={{ color: "#D4AF37", fontSize: "1.1rem" }} />
+                  <LockIcon sx={{ color: theme.palette.secondary.main, fontSize: "1.1rem" }} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -218,7 +225,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
                   size="small"
                   onClick={() => toggleShow("currentPassword")}
                   edge="end"
-                  sx={{ color: "#64748B" }}
+                  sx={{ color: theme.palette.text.secondary }}
                 >
                   {show.currentPassword ? (
                     <VisibilityOff sx={{ fontSize: 18 }} />
@@ -250,7 +257,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <LockIcon sx={{ color: "#D4AF37", fontSize: "1.1rem" }} />
+                  <LockIcon sx={{ color: theme.palette.secondary.main, fontSize: "1.1rem" }} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -258,7 +265,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
                   size="small"
                   onClick={() => toggleShow("newPassword")}
                   edge="end"
-                  sx={{ color: "#64748B" }}
+                  sx={{ color: theme.palette.text.secondary }}
                 >
                   {show.newPassword ? (
                     <VisibilityOff sx={{ fontSize: 18 }} />
@@ -274,7 +281,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
           <Box sx={{ px: 0.5, mt: -0.5 }}>
             <Box
               height={5}
-              bgcolor="#E2E8F0"
+              bgcolor={theme.palette.divider}
               borderRadius={3}
               sx={{ overflow: "hidden" }}
             >
@@ -292,7 +299,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
               alignItems="center"
               mt={0.6}
             >
-              <Typography variant="caption" sx={{ color: "#64748B", fontWeight: 600, fontSize: "0.725rem" }}>
+              <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontWeight: 600, fontSize: "0.725rem" }}>
                 Password Strength
               </Typography>
               <Typography
@@ -324,7 +331,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <LockIcon sx={{ color: "#D4AF37", fontSize: "1.1rem" }} />
+                  <LockIcon sx={{ color: theme.palette.secondary.main, fontSize: "1.1rem" }} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -332,7 +339,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
                   size="small"
                   onClick={() => toggleShow("confirmNewPassword")}
                   edge="end"
-                  sx={{ color: "#64748B" }}
+                  sx={{ color: theme.palette.text.secondary }}
                 >
                   {show.confirmNewPassword ? (
                     <VisibilityOff sx={{ fontSize: 18 }} />
@@ -346,7 +353,7 @@ export default function ChangePasswordDialog({ open, handleClose }) {
         </Stack>
       </DialogContent>
 
-      <Divider sx={{ borderColor: "#F1F5F9" }} />
+      <Divider sx={{ borderColor: theme.palette.divider }} />
 
       {/* DIALOG ACTIONS */}
       <DialogActions
@@ -362,20 +369,20 @@ export default function ChangePasswordDialog({ open, handleClose }) {
           disabled={loading}
           startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           sx={{
-            bgcolor: "rgba(239, 68, 68, 0.08)",
-            color: "#EF4444",
-            borderRadius: "8px",
+            bgcolor: `${theme.palette.error?.main || "#EF4444"}14`,
+            color: theme.palette.error?.main || "#EF4444",
+            borderRadius: `${theme.shape.borderRadius}px`,
             px: 2.5,
             py: 0.6,
             fontWeight: 700,
             fontSize: "0.825rem",
             textTransform: "none",
-            "& .MuiButton-startIcon": { color: "#EF4444" },
+            "& .MuiButton-startIcon": { color: theme.palette.error?.main || "#EF4444" },
             "&:hover": { 
-              bgcolor: "#EF4444", 
-              color: "#FFFFFF",
-              "& .MuiButton-startIcon": { color: "#FFFFFF" },
-              boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)",
+              bgcolor: theme.palette.error?.main || "#EF4444", 
+              color: theme.palette.common.white,
+              "& .MuiButton-startIcon": { color: theme.palette.common.white },
+              boxShadow: `0 4px 12px ${theme.palette.error?.main || "#EF4444"}40`,
             },
             transition: "all 0.2s ease",
           }}
@@ -396,22 +403,22 @@ export default function ChangePasswordDialog({ open, handleClose }) {
             )
           }
           sx={{
-            bgcolor: "#0F172A",
-            color: "#FFFFFF",
-            borderRadius: "8px",
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: `${theme.shape.borderRadius}px`,
             px: 3,
             py: 0.6,
             fontWeight: 700,
             fontSize: "0.825rem",
             textTransform: "none",
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
             transition: "all 0.2s ease",
-            "& .MuiButton-startIcon": { color: "#D4AF37" },
+            "& .MuiButton-startIcon": { color: theme.palette.secondary.main },
             "&:hover": {
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
-              boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
-              "& .MuiButton-startIcon": { color: "#0F172A" },
+              bgcolor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              boxShadow: `0 6px 18px ${theme.palette.secondary.main}59`,
+              "& .MuiButton-startIcon": { color: theme.palette.primary.main },
             },
           }}
         >

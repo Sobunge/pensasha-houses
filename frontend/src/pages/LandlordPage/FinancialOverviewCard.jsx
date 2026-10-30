@@ -1,5 +1,4 @@
 // src/components/cards/FinancialOverviewCard.jsx
-
 import React from "react";
 import {
   Card,
@@ -10,6 +9,7 @@ import {
   Skeleton,
   Alert,
   alpha,
+  useTheme,
 } from "@mui/material";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
@@ -28,25 +28,26 @@ import {
 import { useFinancialOverview } from "../../components/hooks/landlord/useFinancialOverview";
 
 const CustomTooltip = ({ active, payload, label }) => {
+  const theme = useTheme();
   if (active && payload && payload.length) {
     return (
       <Box
         sx={{
-          bgcolor: "#0F172A",
-          color: "#FFFFFF",
+          bgcolor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
           p: 1.5,
-          borderRadius: "10px",
-          boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)",
-          border: "1px solid rgba(212, 175, 55, 0.3)",
+          borderRadius: `${theme.shape.borderRadius}px`,
+          boxShadow: `0 10px 20px ${theme.palette.primary.main}33`,
+          border: `1px solid ${theme.palette.secondary.main}4D`,
         }}
       >
-        <Typography variant="caption" sx={{ color: "#D4AF37", fontWeight: 700 }}>
+        <Typography variant="caption" sx={{ color: theme.palette.secondary.main, fontWeight: 700 }}>
           {label} Summary
         </Typography>
-        <Typography variant="body2" sx={{ color: "#10B981", fontWeight: 700, mt: 0.5 }}>
+        <Typography variant="body2" sx={{ color: theme.palette.success?.main || "#10B981", fontWeight: 700, mt: 0.5 }}>
           Income: Ksh {Number(payload[0].value).toLocaleString()}
         </Typography>
-        <Typography variant="body2" sx={{ color: "#EF4444", fontWeight: 700 }}>
+        <Typography variant="body2" sx={{ color: theme.palette.error?.main || "#EF4444", fontWeight: 700 }}>
           Expenses: Ksh {Number(payload[1].value).toLocaleString()}
         </Typography>
       </Box>
@@ -56,28 +57,31 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 function FinancialOverviewCard({ userId }) {
+  const theme = useTheme();
   const { data, isLoading, isError, error } = useFinancialOverview(userId);
+
+  const successColor = theme.palette.success?.main || "#10B981";
+  const errorColor = theme.palette.error?.main || "#EF4444";
 
   if (isLoading) {
     return (
       <Card
         elevation={0}
         sx={{
-          borderRadius: "16px",
-          bgcolor: "#FFFFFF",
-          border: "1px solid",
-          borderColor: "divider",
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          bgcolor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
           p: 3,
           height: "100%",
         }}
       >
         <Skeleton variant="text" width="50%" height={30} sx={{ mb: 1 }} />
         <Skeleton variant="text" width="70%" height={20} sx={{ mb: 3 }} />
-        <Skeleton variant="rounded" width="100%" height={210} sx={{ borderRadius: 2, mb: 3 }} />
+        <Skeleton variant="rounded" width="100%" height={210} sx={{ borderRadius: `${theme.shape.borderRadius}px`, mb: 3 }} />
         <Grid container spacing={1.5}>
           {[1, 2, 3].map((i) => (
             <Grid item xs={4} key={i}>
-              <Skeleton variant="rounded" height={50} sx={{ borderRadius: 2 }} />
+              <Skeleton variant="rounded" height={50} sx={{ borderRadius: `${theme.shape.borderRadius}px` }} />
             </Grid>
           ))}
         </Grid>
@@ -90,15 +94,14 @@ function FinancialOverviewCard({ userId }) {
       <Card
         elevation={0}
         sx={{
-          borderRadius: "16px",
-          bgcolor: "#FFFFFF",
-          border: "1px solid",
-          borderColor: "divider",
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          bgcolor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
           p: 3,
           height: "100%",
         }}
       >
-        <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+        <Alert severity="error" sx={{ width: "100%", borderRadius: `${theme.shape.borderRadius}px` }}>
           {error?.message || "Failed to load financial overview data."}
         </Alert>
       </Card>
@@ -118,19 +121,17 @@ function FinancialOverviewCard({ userId }) {
     <Card
       elevation={0}
       sx={{
-        borderRadius: "16px",
-        bgcolor: "#FFFFFF",
-        border: "1px solid",
-        borderColor: "divider",
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
+        bgcolor: theme.palette.background.paper,
+        border: `1.5px solid ${theme.palette.secondary.main}66`,
         height: "100%",
         width: "100%",
-        boxShadow:
-          "0 15px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06)",
-        transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+        boxShadow: `0 15px 35px -5px ${theme.palette.primary.main}14`,
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          borderColor: "secondary.main",
-          boxShadow:
-            "0 25px 40px -10px rgba(15, 23, 42, 0.18), 0 12px 18px -6px rgba(15, 23, 42, 0.1)",
+          borderColor: theme.palette.secondary.main,
+          boxShadow: `0 25px 40px -10px ${theme.palette.primary.main}24`,
+          transform: "translateY(-4px)",
         },
       }}
     >
@@ -156,7 +157,7 @@ function FinancialOverviewCard({ userId }) {
             <Box>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 800, color: "primary.main", lineHeight: 1.2 }}
+                sx={{ fontWeight: 800, color: theme.palette.primary.main, lineHeight: 1.2 }}
               >
                 Financial Overview
               </Typography>
@@ -166,7 +167,7 @@ function FinancialOverviewCard({ userId }) {
             </Box>
           </Box>
 
-          {/* CHART OR EMPTY STATE */}
+          {/* CLEAN LIGHT EMPTY STATE MATCHING REFERENCE IMAGE */}
           <Box
             sx={{
               width: "100%",
@@ -175,9 +176,11 @@ function FinancialOverviewCard({ userId }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              bgcolor: hasData ? "transparent" : alpha("#F1F5F9", 0.5),
-              borderRadius: "12px",
-              border: hasData ? "none" : "1px dashed #CBD5E1",
+              bgcolor: hasData ? "transparent" : theme.palette.background.default,
+              borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+              border: hasData ? "none" : `1.5px dashed ${theme.palette.divider}`,
+              position: "relative",
+              overflow: "hidden",
             }}
           >
             {hasData ? (
@@ -188,27 +191,27 @@ function FinancialOverviewCard({ userId }) {
                 >
                   <defs>
                     <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor={successColor} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={successColor} stopOpacity={0.0} />
                     </linearGradient>
 
                     <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor={errorColor} stopOpacity={0.2} />
+                      <stop offset="95%" stopColor={errorColor} stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
 
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme.palette.divider} />
                   <XAxis
                     dataKey="month"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "#64748B", fontSize: 12, fontWeight: 600 }}
+                    tick={{ fill: theme.palette.text.secondary, fontSize: 12, fontWeight: 600 }}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "#64748B", fontSize: 11 }}
+                    tick={{ fill: theme.palette.text.secondary, fontSize: 11 }}
                     tickFormatter={(val) => `${val / 1000}k`}
                   />
                   <Tooltip content={<CustomTooltip />} />
@@ -216,7 +219,7 @@ function FinancialOverviewCard({ userId }) {
                   <Area
                     type="monotone"
                     dataKey="income"
-                    stroke="#10B981"
+                    stroke={successColor}
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorIncome)"
@@ -224,7 +227,7 @@ function FinancialOverviewCard({ userId }) {
                   <Area
                     type="monotone"
                     dataKey="expenses"
-                    stroke="#EF4444"
+                    stroke={errorColor}
                     strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#colorExpenses)"
@@ -235,7 +238,7 @@ function FinancialOverviewCard({ userId }) {
               <Box
                 sx={{
                   textAlign: "center",
-                  p: 2,
+                  p: 3,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -246,20 +249,21 @@ function FinancialOverviewCard({ userId }) {
                   sx={{
                     width: 44,
                     height: 44,
-                    borderRadius: "10px",
-                    bgcolor: alpha("#D4AF37", 0.1),
-                    color: "secondary.main",
+                    borderRadius: `${theme.shape.borderRadius}px`,
+                    bgcolor: alpha(theme.palette.secondary.main, 0.15),
+                    color: theme.palette.secondary.dark,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    mb: 0.5,
                   }}
                 >
                   <BarChartOutlinedIcon fontSize="small" />
                 </Box>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: "primary.main" }}>
+                <Typography variant="body2" sx={{ fontWeight: 800, color: theme.palette.primary.main, letterSpacing: "-0.2px" }}>
                   No Financial Activity Yet
                 </Typography>
-                <Typography variant="caption" sx={{ color: "text.secondary", maxWidth: 220, lineHeight: 1.4 }}>
+                <Typography variant="caption" sx={{ color: theme.palette.text.secondary, maxWidth: 220, lineHeight: 1.4, fontWeight: 500 }}>
                   Income and expense trends will appear here once invoices are paid.
                 </Typography>
               </Box>
@@ -272,10 +276,10 @@ function FinancialOverviewCard({ userId }) {
             <Box
               sx={{
                 p: { xs: 1, sm: 1.5 },
-                borderRadius: "12px",
-                bgcolor: alpha("#10B981", 0.08),
+                borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+                bgcolor: alpha(successColor, 0.08),
                 border: "1px solid",
-                borderColor: alpha("#10B981", 0.2),
+                borderColor: alpha(successColor, 0.2),
                 display: "flex",
                 alignItems: "center",
                 gap: { xs: 0.75, sm: 1.25 },
@@ -284,7 +288,7 @@ function FinancialOverviewCard({ userId }) {
             >
               <AccountBalanceWalletOutlinedIcon
                 fontSize="small"
-                sx={{ color: "#10B981", fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                sx={{ color: successColor, fontSize: { xs: "1rem", sm: "1.25rem" } }}
               />
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography
@@ -319,10 +323,10 @@ function FinancialOverviewCard({ userId }) {
             <Box
               sx={{
                 p: { xs: 1, sm: 1.5 },
-                borderRadius: "12px",
-                bgcolor: alpha("#EF4444", 0.08),
+                borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+                bgcolor: alpha(errorColor, 0.08),
                 border: "1px solid",
-                borderColor: alpha("#EF4444", 0.2),
+                borderColor: alpha(errorColor, 0.2),
                 display: "flex",
                 alignItems: "center",
                 gap: { xs: 0.75, sm: 1.25 },
@@ -331,7 +335,7 @@ function FinancialOverviewCard({ userId }) {
             >
               <ReceiptLongOutlinedIcon
                 fontSize="small"
-                sx={{ color: "#EF4444", fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                sx={{ color: errorColor, fontSize: { xs: "1rem", sm: "1.25rem" } }}
               />
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography
@@ -366,10 +370,10 @@ function FinancialOverviewCard({ userId }) {
             <Box
               sx={{
                 p: { xs: 1, sm: 1.5 },
-                borderRadius: "12px",
-                bgcolor: alpha("#D4AF37", 0.12),
+                borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+                bgcolor: alpha(theme.palette.secondary.main, 0.12),
                 border: "1px solid",
-                borderColor: alpha("#D4AF37", 0.3),
+                borderColor: alpha(theme.palette.secondary.main, 0.3),
                 display: "flex",
                 alignItems: "center",
                 gap: { xs: 0.75, sm: 1.25 },
@@ -378,7 +382,7 @@ function FinancialOverviewCard({ userId }) {
             >
               <TrendingUpOutlinedIcon
                 fontSize="small"
-                sx={{ color: "#B5922B", fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                sx={{ color: theme.palette.secondary.dark, fontSize: { xs: "1rem", sm: "1.25rem" } }}
               />
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography

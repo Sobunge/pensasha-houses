@@ -21,46 +21,46 @@ import { Link as RouterLink } from "react-router-dom";
 
 import { useLoginForm } from "../../../components/hooks/auth/useLoginForm";
 
-/* ---------------- Premium High-Contrast Input Styles ---------------- */
-const premiumInputStyles = {
+/* ---------------- Theme-Integrated Input Styles ---------------- */
+const getPremiumInputStyles = (theme) => ({
   "& .MuiOutlinedInput-root": {
-    borderRadius: "12px",
-    backgroundColor: "#FAFAFA",
-    color: "#0F172A",
+    borderRadius: `${theme.shape.borderRadius}px`,
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.text.primary,
     fontSize: "0.95rem",
     fontWeight: 500,
     "& fieldset": {
-      borderColor: "#CBD5E1",
+      borderColor: theme.palette.divider,
       borderWidth: "1.5px",
     },
     "&:hover fieldset": {
-      borderColor: "#94A3B8",
+      borderColor: theme.palette.text.secondary,
     },
     "&.Mui-focused": {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.palette.background.paper,
       "& fieldset": {
-        borderColor: "#D4AF37",
+        borderColor: theme.palette.secondary.main,
         borderWidth: "2px",
       },
     },
   },
   "& .MuiInputLabel-root": {
-    color: "#475569",
+    color: theme.palette.text.secondary,
     fontWeight: 600,
     fontSize: "0.9rem",
     "&.Mui-focused": {
-      color: "#D4AF37",
+      color: theme.palette.secondary.main,
     },
   },
   "& input::placeholder": {
-    color: "#94A3B8",
+    color: theme.palette.text.secondary,
     opacity: 1,
   },
   "& .MuiFormHelperText-root": {
-    color: "#DC2626",
+    color: theme.palette.error?.main || "#DC2626",
     fontWeight: 500,
   },
-};
+});
 
 export default function LoginForm({ switchToSignup, onClose }) {
   const {
@@ -91,20 +91,20 @@ export default function LoginForm({ switchToSignup, onClose }) {
       {/* Header */}
       <Typography
         variant="h5"
-        sx={{
+        sx={(theme) => ({
           fontWeight: 800,
-          color: "#0F172A",
+          color: theme.palette.text.primary,
           letterSpacing: "-0.02em",
           mb: 0.5,
           textAlign: "center",
-        }}
+        })}
       >
         Welcome Back
       </Typography>
 
       <Typography
         variant="body2"
-        sx={{ color: "#64748B", mb: 2.5, textAlign: "center" }}
+        sx={(theme) => ({ color: theme.palette.text.secondary, mb: 2.5, textAlign: "center" })}
       >
         Login with your phone number
       </Typography>
@@ -123,15 +123,15 @@ export default function LoginForm({ switchToSignup, onClose }) {
           placeholder="7XXXXXXXX"
           error={showPhoneError}
           helperText={showPhoneError ? phoneError : ""}
-          sx={premiumInputStyles}
+          sx={getPremiumInputStyles}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
                 <PhoneOutlinedIcon
-                  sx={{ color: "#475569", mr: 0.5, fontSize: "1.1rem" }}
+                  sx={(theme) => ({ color: theme.palette.text.secondary, mr: 0.5, fontSize: "1.1rem" })}
                 />
                 <Typography
-                  sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.9rem" }}
+                  sx={(theme) => ({ color: theme.palette.text.primary, fontWeight: 700, fontSize: "0.9rem" })}
                 >
                   +254
                 </Typography>
@@ -153,15 +153,15 @@ export default function LoginForm({ switchToSignup, onClose }) {
           placeholder="Enter your password"
           error={showPasswordError}
           helperText={showPasswordError ? passwordError : ""}
-          sx={{
-            ...premiumInputStyles,
+          sx={(theme) => ({
+            ...getPremiumInputStyles(theme),
             "& input::-ms-reveal, & input::-ms-clear": { display: "none" },
-          }}
+          })}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
                 <LockOutlinedIcon
-                  sx={{ color: "#475569", fontSize: "1.1rem" }}
+                  sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "1.1rem" })}
                 />
               </InputAdornment>
             ),
@@ -172,7 +172,7 @@ export default function LoginForm({ switchToSignup, onClose }) {
                   onClick={togglePasswordVisibility}
                   edge="end"
                   size="small"
-                  sx={{ color: "#64748B" }}
+                  sx={(theme) => ({ color: theme.palette.text.secondary })}
                 >
                   {showPassword ? (
                     <VisibilityOffIcon fontSize="small" />
@@ -192,13 +192,13 @@ export default function LoginForm({ switchToSignup, onClose }) {
           component={RouterLink}
           to="/forgot-password"
           onClick={onClose}
-          sx={{
+          sx={(theme) => ({
             fontSize: "0.85rem",
-            color: "#D4AF37",
+            color: theme.palette.secondary.main,
             textDecoration: "none",
             fontWeight: 700,
             "&:hover": { textDecoration: "underline" },
-          }}
+          })}
         >
           Forgot password?
         </MuiLink>
@@ -219,44 +219,44 @@ export default function LoginForm({ switchToSignup, onClose }) {
               <LockOutlinedIcon sx={{ fontSize: "1.1rem !important" }} />
             )
           }
-          sx={{
+          sx={(theme) => ({
             py: 1.4,
             borderRadius: "50px",
             fontWeight: 700,
             fontSize: "0.95rem",
             textTransform: "none",
-            bgcolor: "#D4AF37",
-            color: "#000000",
-            boxShadow: "0 4px 14px rgba(212, 175, 55, 0.35)",
+            bgcolor: theme.palette.secondary.main,
+            color: theme.palette.primary.main,
+            boxShadow: `0 4px 14px ${theme.palette.secondary.main}59`,
             transition: "all 0.2s ease-in-out",
             "&:hover": {
-              bgcolor: "#B5922B",
-              boxShadow: "0 6px 18px rgba(181, 146, 43, 0.45)",
+              bgcolor: theme.palette.secondary.dark,
+              boxShadow: `0 6px 18px ${theme.palette.secondary.main}73`,
             },
-          }}
+          })}
         >
           {loading ? "Logging in..." : "Login"}
         </Button>
 
-        <Divider sx={{ borderColor: "#F1F5F9", my: 0.5 }} />
+        <Divider sx={(theme) => ({ borderColor: theme.palette.divider, my: 0.5 })} />
 
         <Typography
           variant="body2"
           textAlign="center"
-          sx={{ color: "#64748B" }}
+          sx={(theme) => ({ color: theme.palette.text.secondary })}
         >
           Don’t have an account?{" "}
           <MuiLink
             component="button"
             type="button"
             onClick={switchToSignup}
-            sx={{
+            sx={(theme) => ({
               fontWeight: 700,
-              color: "#D4AF37",
+              color: theme.palette.secondary.main,
               textDecoration: "none",
               ml: 0.5,
               "&:hover": { textDecoration: "underline" },
-            }}
+            })}
           >
             Sign Up
           </MuiLink>

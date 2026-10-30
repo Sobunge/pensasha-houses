@@ -62,19 +62,19 @@ export const NotificationProvider = ({ children }) => {
     info: <InfoIcon sx={{ fontSize: 22 }} />,
   };
 
-  // Modern Theme Color Mapping (Slate & Gold Aesthetic)
+  // Theme-Integrated Color Mapping
   const severityColors = {
-    success: "#10B981", // Soft Emerald
-    error: "#EF4444",   // Soft Red
-    warning: "#D97706", // Brand Warm Gold/Mustard
-    info: "#0F172A",    // Deep Dark Slate
+    success: theme.palette.success?.main || "#10B981",
+    error: theme.palette.error?.main || "#EF4444",
+    warning: theme.palette.secondary.main, // Champagne Gold for warnings
+    info: theme.palette.primary.main,     // Obsidian Slate for info
   };
 
   const severityBorders = {
-    success: "#A7F3D0",
-    error: "#FECACA",
-    warning: "#FDE68A",
-    info: "#CBD5E1",
+    success: theme.palette.success?.light || "#A7F3D0",
+    error: theme.palette.error?.light || "#FECACA",
+    warning: `${theme.palette.secondary.main}66`, // Gold with opacity
+    info: theme.palette.divider,
   };
 
   const current = queue[0] || null;
@@ -104,13 +104,12 @@ export const NotificationProvider = ({ children }) => {
             severity={current.severity}
             icon={severityIcons[current.severity]}
             sx={{
-              bgcolor: theme.palette.mode === "dark" ? "#1E293B" : "#FFFFFF",
+              bgcolor: theme.palette.background.paper,
               border: `1.5px solid ${severityBorders[current.severity]}`,
-              borderRadius: "12px",
+              borderRadius: `${theme.shape.borderRadius * 1.5}px`,
               width: { xs: "calc(100vw - 32px)", sm: "420px" },
               maxWidth: "100%",
-              boxShadow:
-                "0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.04)",
+              boxShadow: `0 10px 25px -5px ${theme.palette.primary.main}26, 0 8px 10px -6px ${theme.palette.primary.main}0A`,
               display: "flex",
               alignItems: "center",
               py: 1,
@@ -123,7 +122,7 @@ export const NotificationProvider = ({ children }) => {
                 flex: 1,
                 textAlign: "left",
                 fontSize: "0.925rem",
-                color: theme.palette.mode === "dark" ? "#F8FAFC" : "#0F172A",
+                color: theme.palette.text.primary,
                 fontWeight: 600,
                 lineHeight: 1.4,
               },
@@ -145,16 +144,16 @@ export const NotificationProvider = ({ children }) => {
                     handleClose(current.id);
                   }}
                   sx={{
-                    color: "#D97706",
+                    color: theme.palette.primary.main,
                     fontWeight: 700,
                     fontSize: "0.825rem",
                     textTransform: "none",
-                    borderRadius: "6px",
+                    borderRadius: `${theme.shape.borderRadius}px`,
                     px: 1.5,
                     py: 0.5,
-                    bgcolor: "#FEF3C7",
+                    bgcolor: theme.palette.secondary.main,
                     "&:hover": {
-                      bgcolor: "#FDE68A",
+                      bgcolor: theme.palette.secondary.dark,
                     },
                   }}
                 >

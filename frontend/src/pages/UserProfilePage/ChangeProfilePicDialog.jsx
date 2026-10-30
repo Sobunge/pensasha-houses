@@ -13,6 +13,7 @@ import {
   IconButton,
   Divider,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
@@ -29,6 +30,7 @@ export default function ChangeProfilePicDialog({
   onSave,
   refreshProfile,
 }) {
+  const theme = useTheme();
   const {
     selectedFile,
     currentPicture,
@@ -47,11 +49,12 @@ export default function ChangeProfilePicDialog({
       maxWidth="xs"
       PaperProps={{
         sx: {
-          borderRadius: "16px",
-          border: "1px solid rgba(212, 175, 55, 0.4)",
-          boxShadow: "0 20px 40px rgba(15, 23, 42, 0.18)",
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          border: `1.5px solid ${theme.palette.secondary.main}66`,
+          boxShadow: `0 20px 40px ${theme.palette.primary.main}2E`,
           p: 0.5,
-          background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
+          background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.action.hover} 100%)`,
+          bgcolor: theme.palette.background.paper,
         },
       }}
     >
@@ -61,7 +64,7 @@ export default function ChangeProfilePicDialog({
           pb: 1.5,
           pt: 2,
           px: { xs: 2, sm: 2.5 },
-          borderBottom: "1px solid #F1F5F9",
+          borderBottom: `1px solid ${theme.palette.divider}`,
           position: "relative",
         }}
       >
@@ -70,9 +73,9 @@ export default function ChangeProfilePicDialog({
             sx={{
               width: 38,
               height: 38,
-              borderRadius: "10px",
-              bgcolor: "rgba(212, 175, 55, 0.12)",
-              color: "#D4AF37",
+              borderRadius: `${theme.shape.borderRadius}px`,
+              bgcolor: `${theme.palette.secondary.main}1F`,
+              color: theme.palette.secondary.main,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -84,11 +87,11 @@ export default function ChangeProfilePicDialog({
           <Box>
             <Typography
               variant="h6"
-              sx={{ fontWeight: 800, color: "#0F172A", fontSize: "1.05rem", lineHeight: 1.2 }}
+              sx={{ fontWeight: 800, color: theme.palette.primary.main, fontSize: "1.05rem", lineHeight: 1.2 }}
             >
               Update Picture
             </Typography>
-            <Typography variant="caption" sx={{ color: "#64748B", fontWeight: 600, fontSize: "0.75rem" }}>
+            <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontWeight: 600, fontSize: "0.75rem" }}>
               Upload a new profile picture or avatar
             </Typography>
           </Box>
@@ -103,8 +106,8 @@ export default function ChangeProfilePicDialog({
             position: "absolute",
             right: 12,
             top: 12,
-            color: "#64748B",
-            "&:hover": { bgcolor: "#F1F5F9", color: "#EF4444" },
+            color: theme.palette.text.secondary,
+            "&:hover": { bgcolor: theme.palette.action.hover, color: theme.palette.error?.main || "#EF4444" },
           }}
         >
           <CloseIcon fontSize="small" />
@@ -119,8 +122,8 @@ export default function ChangeProfilePicDialog({
             sx={{
               p: "3px",
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #D4AF37 0%, #0F172A 100%)",
-              boxShadow: "0 8px 20px rgba(15, 23, 42, 0.15)",
+              background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`,
+              boxShadow: `0 8px 20px ${theme.palette.primary.main}26`,
             }}
           >
             <Avatar
@@ -128,11 +131,11 @@ export default function ChangeProfilePicDialog({
               sx={{
                 width: 100,
                 height: 100,
-                bgcolor: "#FFFFFF",
-                color: "#0F172A",
+                bgcolor: theme.palette.background.paper,
+                color: theme.palette.primary.main,
                 fontWeight: 800,
                 fontSize: 36,
-                border: "3px solid #FFFFFF",
+                border: `3px solid ${theme.palette.background.paper}`,
               }}
             >
               {!currentPicture && avatarInitial}
@@ -146,22 +149,22 @@ export default function ChangeProfilePicDialog({
             disabled={uploading}
             startIcon={<UploadFileOutlinedIcon sx={{ fontSize: "18px !important" }} />}
             sx={{
-              borderColor: "rgba(15, 23, 42, 0.15)",
-              color: "#0F172A",
+              borderColor: `${theme.palette.primary.main}26`,
+              color: theme.palette.primary.main,
               fontWeight: 700,
               fontSize: "0.825rem",
               textTransform: "none",
-              borderRadius: "8px",
+              borderRadius: `${theme.shape.borderRadius}px`,
               px: 2.5,
               py: 0.8,
-              bgcolor: "#FFFFFF",
-              boxShadow: "0 2px 6px rgba(15, 23, 42, 0.03)",
-              "& .MuiButton-startIcon": { color: "#D4AF37" },
+              bgcolor: theme.palette.background.paper,
+              boxShadow: `0 2px 6px ${theme.palette.primary.main}08`,
+              "& .MuiButton-startIcon": { color: theme.palette.secondary.main },
               "&:hover": {
-                borderColor: "#D4AF37",
-                bgcolor: "rgba(212, 175, 55, 0.05)",
-                color: "#0F172A",
-                boxShadow: "0 4px 12px rgba(212, 175, 55, 0.15)",
+                borderColor: theme.palette.secondary.main,
+                bgcolor: `${theme.palette.secondary.main}0D`,
+                color: theme.palette.primary.main,
+                boxShadow: `0 4px 12px ${theme.palette.secondary.main}26`,
               },
               transition: "all 0.2s ease",
             }}
@@ -174,13 +177,13 @@ export default function ChangeProfilePicDialog({
             <Typography
               variant="caption"
               sx={{
-                color: "#0F172A",
+                color: theme.palette.primary.main,
                 fontWeight: 600,
                 fontSize: "0.75rem",
-                bgcolor: "#F1F5F9",
+                bgcolor: theme.palette.action.hover,
                 px: 1.5,
                 py: 0.5,
-                borderRadius: "6px",
+                borderRadius: `${theme.shape.borderRadius * 0.75}px`,
                 maxWidth: "100%",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -190,14 +193,14 @@ export default function ChangeProfilePicDialog({
               Selected: {selectedFile.name}
             </Typography>
           ) : (
-            <Typography variant="caption" sx={{ color: "#94A3B8", fontWeight: 500, fontSize: "0.725rem" }}>
+            <Typography variant="caption" sx={{ color: theme.palette.text.disabled, fontWeight: 500, fontSize: "0.725rem" }}>
               Supports JPG, PNG or WEBP (Max 2MB)
             </Typography>
           )}
         </Stack>
       </DialogContent>
 
-      <Divider sx={{ borderColor: "#F1F5F9" }} />
+      <Divider sx={{ borderColor: theme.palette.divider }} />
 
       {/* ===== Actions ===== */}
       <DialogActions
@@ -213,20 +216,20 @@ export default function ChangeProfilePicDialog({
           disabled={uploading}
           startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           sx={{
-            bgcolor: "rgba(239, 68, 68, 0.08)",
-            color: "#EF4444",
-            borderRadius: "8px",
+            bgcolor: `${theme.palette.error?.main || "#EF4444"}14`,
+            color: theme.palette.error?.main || "#EF4444",
+            borderRadius: `${theme.shape.borderRadius}px`,
             px: 2.5,
             py: 0.6,
             fontWeight: 700,
             fontSize: "0.825rem",
             textTransform: "none",
-            "& .MuiButton-startIcon": { color: "#EF4444" },
+            "& .MuiButton-startIcon": { color: theme.palette.error?.main || "#EF4444" },
             "&:hover": {
-              bgcolor: "#EF4444",
-              color: "#FFFFFF",
-              "& .MuiButton-startIcon": { color: "#FFFFFF" },
-              boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)",
+              bgcolor: theme.palette.error?.main || "#EF4444",
+              color: theme.palette.common.white,
+              "& .MuiButton-startIcon": { color: theme.palette.common.white },
+              boxShadow: `0 4px 12px ${theme.palette.error?.main || "#EF4444"}40`,
             },
             transition: "all 0.2s ease",
           }}
@@ -247,27 +250,27 @@ export default function ChangeProfilePicDialog({
             )
           }
           sx={{
-            bgcolor: "#0F172A",
-            color: "#FFFFFF",
-            borderRadius: "8px",
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: `${theme.shape.borderRadius}px`,
             px: 3,
             py: 0.6,
             fontWeight: 700,
             fontSize: "0.825rem",
             textTransform: "none",
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
             transition: "all 0.2s ease",
-            "& .MuiButton-startIcon": { color: "#D4AF37" },
+            "& .MuiButton-startIcon": { color: theme.palette.secondary.main },
             "&:hover": {
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
-              boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
-              "& .MuiButton-startIcon": { color: "#0F172A" },
+              bgcolor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              boxShadow: `0 6px 18px ${theme.palette.secondary.main}59`,
+              "& .MuiButton-startIcon": { color: theme.palette.primary.main },
             },
             "&.Mui-disabled": {
-              bgcolor: "#F1F5F9",
-              color: "#94A3B8",
-              "& .MuiButton-startIcon": { color: "#CBD5E1" },
+              bgcolor: theme.palette.action.hover,
+              color: theme.palette.text.disabled,
+              "& .MuiButton-startIcon": { color: theme.palette.divider },
             },
           }}
         >

@@ -11,7 +11,7 @@ import TenantSummaryCard from "./TenantSummaryCard";
 import RecentPaymentsCard from "./RecentPaymentsCard";
 import MaintenanceRequestsCard from "./MaintenanceRequestsCard";
 
-// Motion wrapper styling helper
+// Motion wrapper styling helper utilizing theme spacing/tokens if needed
 const motionContainerStyle = {
   width: "100%",
   height: "100%",
@@ -21,7 +21,13 @@ const motionContainerStyle = {
 
 const LandlordDashboard = () => {
   return (
-    <Box sx={{ flexGrow: 1, py: 1, width: "100%" }}>
+    <Box
+      sx={(theme) => ({
+        flexGrow: 1,
+        py: theme.spacing(1),
+        width: "100%",
+      })}
+    >
       {/* ===== 1. TOP HERO STATS ROW ===== */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -34,13 +40,13 @@ const LandlordDashboard = () => {
 
       {/* ===== 2. MIDDLE ROW: PERFORMANCE & FINANCIAL OVERVIEW ===== */}
       <Box
-        sx={{
+        sx={(theme) => ({
           display: "flex",
           flexDirection: { xs: "column", lg: "row" },
-          gap: 3,
-          mt: 2,
+          gap: theme.spacing(3),
+          mt: theme.spacing(2),
           width: "100%",
-        }}
+        })}
       >
         <Box
           sx={{
@@ -79,27 +85,27 @@ const LandlordDashboard = () => {
 
       {/* ===== 3. BOTTOM ROW: PAYMENTS, MAINTENANCE & TENANTS ===== */}
       <Box
-        sx={{
+        sx={(theme) => ({
           display: "flex",
           flexDirection: "column",
-          gap: 3,
-          mt: 3,
+          gap: theme.spacing(3),
+          mt: theme.spacing(3),
           width: "100%",
-        }}
+        })}
       >
         {/* TOP PAIR: Recent Payments & Maintenance Requests (Side-by-Side) */}
         <Box
-          sx={{
+          sx={(theme) => ({
             display: "flex",
-            flexDirection: { xs: "column", lg: "row" }, // Stacks on small & medium screens, side-by-side on large screens
-            gap: 3,
+            flexDirection: { xs: "column", lg: "row" },
+            gap: theme.spacing(3),
             width: "100%",
-          }}
+          })}
         >
           {/* Recent Payments Card */}
           <Box
             sx={{
-              width: { xs: "100%", lg: "calc(50% - 12px)" }, // Full width on small and medium screens
+              width: { xs: "100%", lg: "calc(50% - 12px)" },
               display: "flex",
               flexDirection: "column",
             }}
@@ -121,7 +127,7 @@ const LandlordDashboard = () => {
           {/* Maintenance Requests Card */}
           <Box
             sx={{
-              width: { xs: "100%", lg: "calc(50% - 12px)" }, // Full width on small and medium screens
+              width: { xs: "100%", lg: "calc(50% - 12px)" },
               display: "flex",
               flexDirection: "column",
             }}

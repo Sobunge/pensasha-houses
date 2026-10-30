@@ -52,18 +52,18 @@ function Hero() {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: { xs: "85vh", md: "100vh" },
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        backgroundImage: `linear-gradient(to bottom, rgba(11, 15, 23, 0.45) 0%, rgba(11, 15, 23, 0.85) 100%), radial-gradient(circle, rgba(11,15,23,0.2) 0%, rgba(11,15,23,0.8) 100%), url(${backgroundImage})`,
+        backgroundImage: `linear-gradient(to bottom, ${theme.palette.primary.dark}73 0%, ${theme.palette.primary.dark}D9 100%), radial-gradient(circle, ${theme.palette.primary.dark}33 0%, ${theme.palette.primary.dark}CC 100%), url(${backgroundImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        color: "#fff",
+        color: theme.palette.common.white,
         py: { xs: 8, md: 10 },
-      }}
+      })}
     >
       <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
         <Stack spacing={4} alignItems="center" textAlign="center">
@@ -71,24 +71,23 @@ function Hero() {
           {/* Subtle Tagline Badge */}
           <Chip
             label="REFINED LIVING & PROPERTY MANAGEMENT"
-            sx={{
-              backgroundColor: "rgba(212, 175, 55, 0.12)",
-              color: "#D4AF37",
-              border: "1px solid rgba(212, 175, 55, 0.3)",
+            sx={(theme) => ({
+              backgroundColor: `${theme.palette.secondary.main}1F`, // ~12% opacity gold
+              color: theme.palette.secondary.main,
+              border: `1px solid ${theme.palette.secondary.main}4D`, // ~30% opacity gold border
               fontWeight: 600,
               fontSize: "0.75rem",
               letterSpacing: "0.1em",
               px: 1,
               py: 0.5,
               backdropFilter: "blur(8px)",
-            }}
+            })}
           />
 
           {/* Main Headline */}
           <Typography
             variant="h1"
             sx={{
-              fontFamily: '"Playfair Display", Georgia, serif',
               fontWeight: 600,
               fontSize: { xs: "2.4rem", sm: "3.5rem", md: "4.2rem" },
               lineHeight: 1.15,
@@ -103,13 +102,13 @@ function Hero() {
           {/* Subtitle */}
           <Typography
             variant="body1"
-            sx={{
+            sx={(theme) => ({
               maxWidth: 680,
               fontSize: { xs: "1rem", md: "1.15rem" },
-              color: "#94A3B8",
+              color: theme.palette.text.secondary,
               lineHeight: 1.6,
               fontWeight: 400,
-            }}
+            })}
           >
             Pensasha connects clients with exceptional properties, simplifies management 
             for landlords, and delivers an uncompromised experience.
@@ -117,17 +116,17 @@ function Hero() {
 
           {/* Floating Glassmorphic Search Bar Widget */}
           <Box
-            sx={{
+            sx={(theme) => ({
               width: "100%",
               maxWidth: 1000,
               mt: { xs: 2, md: 3 },
               p: { xs: 2, md: 2.5 },
-              backgroundColor: "rgba(15, 23, 42, 0.65)",
+              backgroundColor: `${theme.palette.primary.main}A6`, // ~65% opacity obsidian
               backdropFilter: "blur(20px)",
-              borderRadius: "16px",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
+              borderRadius: `${theme.shape.borderRadius * 1.33}px`,
+              border: `1px solid ${theme.palette.common.white}1F`, // ~12% white border
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)",
-            }}
+            })}
           >
             <Stack
               direction={{ xs: "column", md: "row" }}
@@ -143,7 +142,7 @@ function Hero() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LocationOnOutlinedIcon sx={{ color: "#D4AF37" }} />
+                      <LocationOnOutlinedIcon sx={(theme) => ({ color: theme.palette.secondary.main })} />
                     </InputAdornment>
                   ),
                 }}
@@ -159,7 +158,7 @@ function Hero() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <HomeOutlinedIcon sx={{ color: "#D4AF37" }} />
+                      <HomeOutlinedIcon sx={(theme) => ({ color: theme.palette.secondary.main })} />
                     </InputAdornment>
                   ),
                 }}
@@ -181,7 +180,7 @@ function Hero() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <AttachMoneyOutlinedIcon sx={{ color: "#D4AF37" }} />
+                      <AttachMoneyOutlinedIcon sx={(theme) => ({ color: theme.palette.secondary.main })} />
                     </InputAdornment>
                   ),
                 }}
@@ -199,24 +198,24 @@ function Hero() {
                 variant="contained"
                 onClick={handleSearch}
                 startIcon={<SearchIcon />}
-                sx={{
+                sx={(theme) => ({
                   width: { xs: "100%", md: "auto" },
                   minWidth: 160,
                   height: 54,
                   px: 4,
-                  backgroundColor: "#D4AF37",
-                  color: "#0B0F17",
+                  backgroundColor: theme.palette.secondary.main,
+                  color: theme.palette.primary.dark,
                   fontWeight: 600,
                   fontSize: "1rem",
                   borderRadius: "10px",
                   textTransform: "none",
                   whiteSpace: "nowrap",
-                  boxShadow: "0 4px 14px rgba(212, 175, 55, 0.3)",
+                  boxShadow: `0 4px 14px ${theme.palette.secondary.main}4D`,
                   "&:hover": {
-                    backgroundColor: "#B5922B",
-                    boxShadow: "0 6px 20px rgba(212, 175, 55, 0.4)",
+                    backgroundColor: theme.palette.secondary.dark,
+                    boxShadow: `0 6px 20px ${theme.palette.secondary.main}66`,
                   },
-                }}
+                })}
               >
                 Search
               </Button>

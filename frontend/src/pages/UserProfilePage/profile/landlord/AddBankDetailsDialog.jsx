@@ -1,4 +1,4 @@
-// src/components/Profile/AddBankDetailsDialog.jsx
+// src/components/Profile/landlord/AddBankDetailsDialog.jsx
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
@@ -14,6 +14,7 @@ import {
   Alert,
   CircularProgress,
   InputAdornment,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
@@ -24,21 +25,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import useUpdateBankDetails from "../../../../components/hooks/landlord/useUpdateBankDetails";
 
-const DESIGN_SYSTEM = {
-  colors: {
-    primary: "#0F172A",
-    gold: "#D4AF37",
-    goldLight: "rgba(212, 175, 55, 0.15)",
-    border: "#E2E8F0",
-    textMuted: "#64748B",
-    textDark: "#334155",
-    bgAction: "#FAFAFA",
-  },
-};
-
 export default function AddBankDetailsDialog({ open, handleClose, profile, bankToEdit }) {
+  const theme = useTheme();
   const landlordId = profile?.userId || profile?.id;
-  const { colors } = DESIGN_SYSTEM;
 
   const [form, setForm] = useState({
     id: null,
@@ -135,29 +124,29 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
 
   const inputStyle = {
     "& .MuiOutlinedInput-root": {
-      borderRadius: "10px",
-      backgroundColor: "#FAFAFA",
+      borderRadius: `${theme.shape.borderRadius}px`,
+      backgroundColor: theme.palette.action.hover,
       transition: "all 0.2s ease",
       "& fieldset": {
-        borderColor: colors.border,
+        borderColor: theme.palette.divider,
       },
       "&:hover fieldset": {
-        borderColor: "#94A3B8",
+        borderColor: theme.palette.text.disabled,
       },
       "&.Mui-focused": {
-        backgroundColor: "#FFFFFF",
+        backgroundColor: theme.palette.background.paper,
         "& fieldset": {
-          borderColor: colors.gold,
+          borderColor: theme.palette.secondary.main,
           borderWidth: "1.5px",
         },
       },
     },
     "& .MuiInputLabel-root": {
-      color: colors.textMuted,
+      color: theme.palette.text.secondary,
       fontWeight: 600,
       fontSize: "0.875rem",
       "&.Mui-focused": {
-        color: colors.primary,
+        color: theme.palette.primary.main,
         fontWeight: 700,
       },
     },
@@ -171,10 +160,10 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: "18px",
-          border: `1.5px solid ${colors.gold}`,
-          boxShadow: "0 20px 40px rgba(15, 23, 42, 0.2)",
-          bgcolor: "#FFFFFF",
+          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          border: `1.5px solid ${theme.palette.secondary.main}`,
+          boxShadow: `0 20px 40px ${theme.palette.primary.main}33`,
+          bgcolor: theme.palette.background.paper,
           overflow: "hidden",
         },
       }}
@@ -182,8 +171,8 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
       {/* HEADER */}
       <DialogTitle
         sx={{
-          bgcolor: colors.primary,
-          color: "#FFFFFF",
+          bgcolor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
           p: 2.5,
           display: "flex",
           alignItems: "center",
@@ -195,9 +184,9 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
             sx={{
               width: 36,
               height: 36,
-              borderRadius: "8px",
-              bgcolor: colors.goldLight,
-              color: colors.gold,
+              borderRadius: `${theme.shape.borderRadius}px`,
+              bgcolor: `${theme.palette.secondary.main}26`,
+              color: theme.palette.secondary.main,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -209,7 +198,7 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
             <Typography variant="h6" fontWeight={800} fontSize="1.05rem" lineHeight={1.2}>
               {isEditing ? "Edit Bank Account" : "Add Settlement Bank"}
             </Typography>
-            <Typography variant="caption" sx={{ color: "#94A3B8", fontSize: "0.75rem" }}>
+            <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontSize: "0.75rem" }}>
               Payout destination for rent settlements
             </Typography>
           </Box>
@@ -218,9 +207,9 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
         <IconButton
           onClick={handleClose}
           sx={{
-            color: "#94A3B8",
+            color: theme.palette.text.secondary,
             padding: "4px",
-            "&:hover": { color: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)" },
+            "&:hover": { color: theme.palette.common.white, bgcolor: "rgba(255,255,255,0.1)" },
           }}
         >
           <CloseIcon fontSize="small" />
@@ -228,9 +217,9 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
       </DialogTitle>
 
       <Box component="form" onSubmit={handleSubmit}>
-        <DialogContent sx={{ p: 3, bgcolor: "#FFFFFF" }}>
+        <DialogContent sx={{ p: 3, bgcolor: theme.palette.background.paper }}>
           {errorMessage && (
-            <Alert severity="error" sx={{ mb: 2.5, borderRadius: "10px", fontSize: "0.825rem" }}>
+            <Alert severity="error" sx={{ mb: 2.5, borderRadius: `${theme.shape.borderRadius}px`, fontSize: "0.825rem" }}>
               {errorMessage}
             </Alert>
           )}
@@ -250,7 +239,7 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <AccountBalanceOutlinedIcon sx={{ fontSize: 18, color: colors.textMuted }} />
+                    <AccountBalanceOutlinedIcon sx={{ fontSize: 18, color: theme.palette.text.secondary }} />
                   </InputAdornment>
                 ),
               }}
@@ -270,7 +259,7 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <PersonOutlinedIcon sx={{ fontSize: 18, color: colors.textMuted }} />
+                    <PersonOutlinedIcon sx={{ fontSize: 18, color: theme.palette.text.secondary }} />
                   </InputAdornment>
                 ),
               }}
@@ -290,7 +279,7 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <NumbersOutlinedIcon sx={{ fontSize: 18, color: colors.textMuted }} />
+                    <NumbersOutlinedIcon sx={{ fontSize: 18, color: theme.palette.text.secondary }} />
                   </InputAdornment>
                 ),
               }}
@@ -309,7 +298,7 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LocationOnOutlinedIcon sx={{ fontSize: 18, color: colors.textMuted }} />
+                    <LocationOnOutlinedIcon sx={{ fontSize: 18, color: theme.palette.text.secondary }} />
                   </InputAdornment>
                 ),
               }}
@@ -323,8 +312,8 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
             px: 3,
             pb: 2.5,
             pt: 1.5,
-            bgcolor: colors.bgAction,
-            borderTop: `1px solid ${colors.border}`,
+            bgcolor: theme.palette.action.hover,
+            borderTop: `1px solid ${theme.palette.divider}`,
             justifyContent: "flex-end",
             gap: 1.5,
           }}
@@ -334,20 +323,20 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
             disabled={updateBankMutation.isPending}
             startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px !important" }} />}
             sx={{
-              color: colors.textMuted,
+              color: theme.palette.text.secondary,
               fontWeight: 700,
               textTransform: "none",
-              borderRadius: "8px",
+              borderRadius: `${theme.shape.borderRadius}px`,
               px: 2,
               transition: "all 0.2s ease",
               "& .MuiButton-startIcon": {
                 transition: "color 0.2s ease",
               },
               "&:hover": {
-                color: "#DC2626",
-                bgcolor: "rgba(220, 38, 38, 0.08)",
+                color: theme.palette.error?.main || "#EF4444",
+                bgcolor: `${theme.palette.error?.main || "#EF4444"}14`,
                 "& .MuiButton-startIcon": {
-                  color: "#DC2626",
+                  color: theme.palette.error?.main || "#EF4444",
                 },
               },
             }}
@@ -361,24 +350,24 @@ export default function AddBankDetailsDialog({ open, handleClose, profile, bankT
             disabled={updateBankMutation.isPending}
             startIcon={
               updateBankMutation.isPending ? (
-                <CircularProgress size={16} sx={{ color: "#FFFFFF" }} />
+                <CircularProgress size={16} sx={{ color: theme.palette.common.white }} />
               ) : (
                 <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
               )
             }
             sx={{
-              bgcolor: colors.primary,
-              color: "#FFFFFF",
+              bgcolor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
               fontWeight: 700,
               textTransform: "none",
-              borderRadius: "10px",
+              borderRadius: `${theme.shape.borderRadius}px`,
               px: 2.5,
               py: 0.8,
-              "& .MuiButton-startIcon": { color: colors.gold },
+              "& .MuiButton-startIcon": { color: theme.palette.secondary.main },
               "&:hover": {
-                bgcolor: colors.gold,
-                color: colors.primary,
-                "& .MuiButton-startIcon": { color: colors.primary },
+                bgcolor: theme.palette.secondary.main,
+                color: theme.palette.primary.main,
+                "& .MuiButton-startIcon": { color: theme.palette.primary.main },
               },
               transition: "all 0.2s ease",
             }}

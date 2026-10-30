@@ -24,46 +24,46 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 import { useRegistrationForm } from "../../../components/hooks/auth/useRegistrationForm";
 
-/* ---------------- Premium High-Contrast Input Styles ---------------- */
-const premiumInputStyles = {
+/* ---------------- Theme-Integrated Input Styles ---------------- */
+const getPremiumInputStyles = (theme) => ({
   "& .MuiOutlinedInput-root": {
-    borderRadius: "12px",
-    backgroundColor: "#FAFAFA",
-    color: "#0F172A",
+    borderRadius: `${theme.shape.borderRadius}px`,
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.text.primary,
     fontSize: "0.95rem",
     fontWeight: 500,
     "& fieldset": {
-      borderColor: "#CBD5E1",
+      borderColor: theme.palette.divider,
       borderWidth: "1.5px",
     },
     "&:hover fieldset": {
-      borderColor: "#94A3B8",
+      borderColor: theme.palette.text.secondary,
     },
     "&.Mui-focused": {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.palette.background.paper,
       "& fieldset": {
-        borderColor: "#D4AF37",
+        borderColor: theme.palette.secondary.main,
         borderWidth: "2px",
       },
     },
   },
   "& .MuiInputLabel-root": {
-    color: "#475569",
+    color: theme.palette.text.secondary,
     fontWeight: 600,
     fontSize: "0.9rem",
     "&.Mui-focused": {
-      color: "#D4AF37",
+      color: theme.palette.secondary.main,
     },
   },
   "& input::placeholder": {
-    color: "#94A3B8",
+    color: theme.palette.text.secondary,
     opacity: 1,
   },
   "& .MuiFormHelperText-root": {
-    color: "#DC2626",
+    color: theme.palette.error?.main || "#DC2626",
     fontWeight: 500,
   },
-};
+});
 
 export default function RegistrationForm({ onSuccess, switchToLogin }) {
   const {
@@ -88,20 +88,20 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
       {/* Header */}
       <Typography
         variant="h5"
-        sx={{
+        sx={(theme) => ({
           fontWeight: 800,
-          color: "#0F172A",
+          color: theme.palette.text.primary,
           letterSpacing: "-0.02em",
           mb: 0.5,
           textAlign: "center",
-        }}
+        })}
       >
         Create Your Account
       </Typography>
 
       <Typography
         variant="body2"
-        sx={{ color: "#64748B", mb: 2.5, textAlign: "center" }}
+        sx={(theme) => ({ color: theme.palette.text.secondary, mb: 2.5, textAlign: "center" })}
       >
         Sign up to start searching or listing properties
       </Typography>
@@ -121,11 +121,11 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             required
             error={touched.firstName && !!errors.firstName}
             helperText={touched.firstName && errors.firstName}
-            sx={premiumInputStyles}
+            sx={getPremiumInputStyles}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <PersonIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
+                  <PersonIcon sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "1.1rem" })} />
                 </InputAdornment>
               ),
             }}
@@ -142,11 +142,11 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
             required
             error={touched.lastName && !!errors.lastName}
             helperText={touched.lastName && errors.lastName}
-            sx={premiumInputStyles}
+            sx={getPremiumInputStyles}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <PersonIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
+                  <PersonIcon sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "1.1rem" })} />
                 </InputAdornment>
               ),
             }}
@@ -166,15 +166,15 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           placeholder="7XXXXXXXX"
           error={touched.phoneNumber && !!errors.phoneNumber}
           helperText={touched.phoneNumber && errors.phoneNumber}
-          sx={premiumInputStyles}
+          sx={getPremiumInputStyles}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
                 <PhoneIcon
-                  sx={{ color: "#475569", mr: 0.5, fontSize: "1.1rem" }}
+                  sx={(theme) => ({ color: theme.palette.text.secondary, mr: 0.5, fontSize: "1.1rem" })}
                 />
                 <Typography
-                  sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.9rem" }}
+                  sx={(theme) => ({ color: theme.palette.text.primary, fontWeight: 700, fontSize: "0.9rem" })}
                 >
                   +254
                 </Typography>
@@ -197,11 +197,11 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           error={touched.email && !!errors.email}
           helperText={touched.email && errors.email}
-          sx={premiumInputStyles}
+          sx={getPremiumInputStyles}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <EmailIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
+                <EmailIcon sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "1.1rem" })} />
               </InputAdornment>
             ),
           }}
@@ -221,14 +221,14 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           error={touched.password && !!errors.password}
           helperText={touched.password && errors.password}
-          sx={{
-            ...premiumInputStyles,
+          sx={(theme) => ({
+            ...getPremiumInputStyles(theme),
             "& input::-ms-reveal, & input::-ms-clear": { display: "none" },
-          }}
+          })}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon sx={{ color: "#475569", fontSize: "1.1rem" }} />
+                <LockIcon sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "1.1rem" })} />
               </InputAdornment>
             ),
             endAdornment: (
@@ -238,7 +238,7 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
                   onClick={togglePasswordVisibility}
                   edge="end"
                   size="small"
-                  sx={{ color: "#64748B" }}
+                  sx={(theme) => ({ color: theme.palette.text.secondary })}
                 >
                   {showPassword ? (
                     <VisibilityOffIcon fontSize="small" />
@@ -264,14 +264,14 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
           required
           error={touched.role && !!errors.role}
           helperText={touched.role && errors.role}
-          sx={premiumInputStyles}
+          sx={getPremiumInputStyles}
           InputLabelProps={{ shrink: true }}
           SelectProps={{
             displayEmpty: true,
             renderValue: (selected) => {
               if (!selected)
                 return (
-                  <Typography sx={{ color: "#94A3B8", fontSize: "0.9rem" }}>
+                  <Typography sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "0.9rem" })}>
                     Select Role
                   </Typography>
                 );
@@ -300,42 +300,42 @@ export default function RegistrationForm({ onSuccess, switchToLogin }) {
               <PersonAddIcon sx={{ fontSize: "1.1rem !important" }} />
             )
           }
-          sx={{
+          sx={(theme) => ({
             mt: 1,
             py: 1.4,
             borderRadius: "50px",
             fontWeight: 700,
             fontSize: "0.95rem",
             textTransform: "none",
-            bgcolor: "#D4AF37",
-            color: "#000000",
-            boxShadow: "0 4px 14px rgba(212, 175, 55, 0.35)",
+            bgcolor: theme.palette.secondary.main,
+            color: theme.palette.primary.main,
+            boxShadow: `0 4px 14px ${theme.palette.secondary.main}59`,
             transition: "all 0.2s ease-in-out",
             "&:hover": {
-              bgcolor: "#B5922B",
-              boxShadow: "0 6px 18px rgba(181, 146, 43, 0.45)",
+              bgcolor: theme.palette.secondary.dark,
+              boxShadow: `0 6px 18px ${theme.palette.secondary.main}73`,
             },
-          }}
+          })}
         >
           {loading ? "Processing..." : "Register"}
         </Button>
 
-        <Divider sx={{ borderColor: "#F1F5F9", my: 0.5 }} />
+        <Divider sx={(theme) => ({ borderColor: theme.palette.divider, my: 0.5 })} />
 
         {/* Switch Link */}
-        <Typography variant="body2" textAlign="center" sx={{ color: "#64748B" }}>
+        <Typography variant="body2" textAlign="center" sx={(theme) => ({ color: theme.palette.text.secondary })}>
           Already have an account?{" "}
           <MuiLink
             component="button"
             type="button"
             onClick={switchToLogin}
-            sx={{
+            sx={(theme) => ({
               fontWeight: 700,
-              color: "#D4AF37",
+              color: theme.palette.secondary.main,
               textDecoration: "none",
               ml: 0.5,
               "&:hover": { textDecoration: "underline" },
-            }}
+            })}
           >
             Sign In
           </MuiLink>

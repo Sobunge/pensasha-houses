@@ -32,21 +32,21 @@ function ProfileMenu() {
   const profileLink = `/${role}/profile`;
   const settingsLink = `/${role}/settings`;
 
-  // Standardized luxury hover state
-  const menuItemStyle = {
+  // Standardized luxury hover state using theme tokens
+  const menuItemStyle = (theme) => ({
     px: 2,
     py: 1.25,
     borderRadius: "8px",
     mx: 1,
     my: 0.25,
-    color: "#334155",
+    color: theme.palette.primary.light,
     transition: "all 0.2s ease-in-out",
     "&:hover": {
-      backgroundColor: "rgba(212, 175, 55, 0.10)",
-      color: "#0F172A",
-      "& .MuiListItemIcon-root": { color: "#D4AF37" },
+      backgroundColor: `${theme.palette.secondary.main}1A`, // ~10% opacity gold
+      color: theme.palette.primary.main,
+      "& .MuiListItemIcon-root": { color: theme.palette.secondary.main },
     },
-  };
+  });
 
   // Logout Flow
   const handleLogout = async () => {
@@ -88,27 +88,27 @@ function ProfileMenu() {
       <IconButton
         onClick={handleOpen}
         aria-label="open profile menu"
-        sx={{
+        sx={(theme) => ({
           p: 0.5,
           border: "1.5px solid",
-          borderColor: Boolean(anchorEl) ? "#D4AF37" : "transparent",
+          borderColor: Boolean(anchorEl) ? theme.palette.secondary.main : "transparent",
           transition: "all 0.2s ease-in-out",
           "&:hover": {
-            borderColor: "#D4AF37",
-            backgroundColor: "rgba(212, 175, 55, 0.08)",
+            borderColor: theme.palette.secondary.main,
+            backgroundColor: `${theme.palette.secondary.main}14`, // ~8% opacity gold
           },
-        }}
+        })}
       >
         <Avatar
-          sx={{
+          sx={(theme) => ({
             width: 36,
             height: 36,
-            bgcolor: "#0F172A",
-            color: "#D4AF37",
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.secondary.main,
             fontSize: "0.875rem",
             fontWeight: 700,
-            boxShadow: "0 2px 8px rgba(15, 23, 42, 0.15)",
-          }}
+            boxShadow: `0 2px 8px ${theme.palette.primary.main}26`,
+          })}
         >
           {getInitials(user?.name || user?.email)}
         </Avatar>
@@ -122,21 +122,21 @@ function ProfileMenu() {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         PaperProps={{
-          sx: {
+          sx: (theme) => ({
             mt: 1.5,
             borderRadius: "16px",
             minWidth: 240,
-            boxShadow: "0px 14px 35px -5px rgba(15, 23, 42, 0.15)",
-            border: "1px solid #E2E8F0",
-            bgcolor: "#FFFFFF",
+            boxShadow: `0px 14px 35px -5px ${theme.palette.primary.main}26`,
+            border: `1px solid ${theme.palette.divider}`,
+            bgcolor: theme.palette.background.paper,
             py: 1,
-          },
+          }),
         }}
       >
-        {/* User Details Header Header */}
+        {/* User Details Header */}
         <Box sx={{ px: 2, py: 1.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#0F172A" }} noWrap>
+            <Typography variant="subtitle2" sx={(theme) => ({ fontWeight: 700, color: theme.palette.text.primary })} noWrap>
               {user?.name || "User Account"}
             </Typography>
 
@@ -144,28 +144,28 @@ function ProfileMenu() {
             <Chip
               label={role}
               size="small"
-              sx={{
+              sx={(theme) => ({
                 height: 20,
                 fontSize: "0.65rem",
                 fontWeight: 700,
                 textTransform: "uppercase",
-                bgcolor: "rgba(212, 175, 55, 0.15)",
-                color: "#D4AF37",
-                border: "1px solid rgba(212, 175, 55, 0.3)",
-              }}
+                bgcolor: `${theme.palette.secondary.main}26`, // ~15% opacity gold
+                color: theme.palette.secondary.main,
+                border: `1px solid ${theme.palette.secondary.main}4D`, // ~30% opacity gold border
+              })}
             />
           </Box>
 
-          <Typography variant="caption" sx={{ color: "#64748B" }} noWrap>
+          <Typography variant="caption" sx={(theme) => ({ color: theme.palette.text.secondary })} noWrap>
             {user?.email || "user@example.com"}
           </Typography>
         </Box>
 
-        <Divider sx={{ my: 1, borderColor: "#E2E8F0" }} />
+        <Divider sx={(theme) => ({ my: 1, borderColor: theme.palette.divider })} />
 
         {/* My Profile */}
         <MenuItem component={RouterLink} to={profileLink} onClick={handleClose} sx={menuItemStyle}>
-          <ListItemIcon sx={{ minWidth: 32, color: "#64748B" }}>
+          <ListItemIcon sx={(theme) => ({ minWidth: 32, color: theme.palette.text.secondary })}>
             <PersonIcon fontSize="small" />
           </ListItemIcon>
           <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.85rem" }}>
@@ -175,7 +175,7 @@ function ProfileMenu() {
 
         {/* Settings */}
         <MenuItem component={RouterLink} to={settingsLink} onClick={handleClose} sx={menuItemStyle}>
-          <ListItemIcon sx={{ minWidth: 32, color: "#64748B" }}>
+          <ListItemIcon sx={(theme) => ({ minWidth: 32, color: theme.palette.text.secondary })}>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
           <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.85rem" }}>
@@ -183,22 +183,27 @@ function ProfileMenu() {
           </Typography>
         </MenuItem>
 
-        <Divider sx={{ my: 1, borderColor: "#E2E8F0" }} />
+        <Divider sx={(theme) => ({ my: 1, borderColor: theme.palette.divider })} />
 
         {/* Logout */}
         <MenuItem
           onClick={handleLogout}
-          sx={{
-            ...menuItemStyle,
-            color: "#EF4444",
+          sx={(theme) => ({
+            px: 2,
+            py: 1.25,
+            borderRadius: "8px",
+            mx: 1,
+            my: 0.25,
+            color: theme.palette.error?.main || "#EF4444",
+            transition: "all 0.2s ease-in-out",
             "&:hover": {
-              backgroundColor: "rgba(239, 68, 68, 0.08)",
-              color: "#DC2626",
-              "& .MuiListItemIcon-root": { color: "#DC2626" },
+              backgroundColor: `${theme.palette.error?.main || "#EF4444"}14`,
+              color: theme.palette.error?.dark || "#DC2626",
+              "& .MuiListItemIcon-root": { color: theme.palette.error?.dark || "#DC2626" },
             },
-          }}
+          })}
         >
-          <ListItemIcon sx={{ minWidth: 32, color: "#EF4444" }}>
+          <ListItemIcon sx={(theme) => ({ minWidth: 32, color: theme.palette.error?.main || "#EF4444" })}>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
           <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.85rem" }}>

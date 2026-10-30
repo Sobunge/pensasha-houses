@@ -69,12 +69,12 @@ const FeaturedListings = () => {
 
   return (
     <Box 
-      sx={{ 
-        backgroundColor: "#F8FAFC", 
-        backgroundImage: "linear-gradient(180deg, #0B0F17 0%, #F8FAFC 20px)",
+      sx={(theme) => ({ 
+        backgroundColor: theme.palette.background.default, 
+        backgroundImage: `linear-gradient(180deg, ${theme.palette.primary.dark} 0%, ${theme.palette.background.default} 20px)`,
         py: { xs: 8, md: 12 }, 
         position: "relative",
-      }}
+      })}
     >
       <Container maxWidth="lg">
         {/* Header with Navigation Controls */}
@@ -88,24 +88,23 @@ const FeaturedListings = () => {
           <Box>
             <Typography
               variant="overline"
-              sx={{
-                color: "#B5922B",
+              sx={(theme) => ({
+                color: theme.palette.secondary.dark,
                 fontWeight: 700,
                 letterSpacing: "0.15em",
                 fontSize: "0.8rem",
-              }}
+              })}
             >
               CURATED SELECTION
             </Typography>
             <Typography
               variant="h3"
-              sx={{
-                fontFamily: '"Playfair Display", Georgia, serif',
+              sx={(theme) => ({
                 fontWeight: 600,
-                color: "#0F172A",
+                color: theme.palette.text.primary,
                 fontSize: { xs: "1.8rem", md: "2.5rem" },
                 mt: 0.5,
-              }}
+              })}
             >
               Featured Residences
             </Typography>
@@ -116,33 +115,33 @@ const FeaturedListings = () => {
             <Stack direction="row" spacing={1.5}>
               <IconButton
                 onClick={() => instanceRef.current?.prev()}
-                sx={{
-                  color: "#0F172A",
-                  border: "1px solid #D4AF37",
-                  backgroundColor: "#FFFFFF",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                sx={(theme) => ({
+                  color: theme.palette.text.primary,
+                  border: `1px solid ${theme.palette.secondary.main}`,
+                  backgroundColor: theme.palette.background.paper,
+                  boxShadow: `0 2px 8px ${theme.palette.primary.main}0A`,
                   "&:hover": {
-                    backgroundColor: "#F1F5F9",
-                    borderColor: "#B5922B",
-                    color: "#B5922B",
+                    backgroundColor: `${theme.palette.primary.main}08`,
+                    borderColor: theme.palette.secondary.dark,
+                    color: theme.palette.secondary.dark,
                   },
-                }}
+                })}
               >
                 <ChevronLeftIcon />
               </IconButton>
               <IconButton
                 onClick={() => instanceRef.current?.next()}
-                sx={{
-                  color: "#0F172A",
-                  border: "1px solid #D4AF37",
-                  backgroundColor: "#FFFFFF",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                sx={(theme) => ({
+                  color: theme.palette.text.primary,
+                  border: `1px solid ${theme.palette.secondary.main}`,
+                  backgroundColor: theme.palette.background.paper,
+                  boxShadow: `0 2px 8px ${theme.palette.primary.main}0A`,
                   "&:hover": {
-                    backgroundColor: "#F1F5F9",
-                    borderColor: "#B5922B",
-                    color: "#B5922B",
+                    backgroundColor: `${theme.palette.primary.main}08`,
+                    borderColor: theme.palette.secondary.dark,
+                    color: theme.palette.secondary.dark,
                   },
-                }}
+                })}
               >
                 <ChevronRightIcon />
               </IconButton>
@@ -155,25 +154,25 @@ const FeaturedListings = () => {
           {listings.map((listing) => (
             <Box className="keen-slider__slide" key={listing.id} sx={{ py: 1 }}>
               <Card
-                sx={{
+                sx={(theme) => ({
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: "16px",
-                  border: "1px solid #D4AF37", // Crisp Gold Border
-                  boxShadow: "0 10px 30px -5px rgba(212, 175, 55, 0.1)",
+                  backgroundColor: theme.palette.background.paper,
+                  borderRadius: `${theme.shape.borderRadius * 1.33}px`,
+                  border: `1px solid ${theme.palette.secondary.main}`,
+                  boxShadow: `0 10px 30px -5px ${theme.palette.secondary.main}1F`,
                   transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
                   overflow: "hidden",
                   "&:hover": {
                     transform: "translateY(-6px)",
-                    border: "1.5px solid #B5922B", // Darker Gold on Hover
-                    boxShadow: "0 12px 30px rgba(212, 175, 55, 0.25)",
+                    border: `1.5px solid ${theme.palette.secondary.dark}`,
+                    boxShadow: `0 12px 30px ${theme.palette.secondary.main}40`,
                     "& .card-image": {
                       transform: "scale(1.06)",
                     },
                   },
-                }}
+                })}
               >
                 {/* Image Box with Price Chip */}
                 <Box sx={{ position: "relative", overflow: "hidden", pt: "62%" }}>
@@ -192,26 +191,26 @@ const FeaturedListings = () => {
                       transition: "transform 0.5s ease",
                     }}
                   />
-                  {/* Floating Price Chip with Subtle Gold Border Accent */}
+                  {/* Floating Price Chip */}
                   <Chip
                     label={
-                      <Typography variant="body2" sx={{ fontWeight: 700, color: "#0F172A" }}>
+                      <Typography variant="body2" sx={(theme) => ({ fontWeight: 700, color: theme.palette.text.primary })}>
                         {listing.price}
                         <Box component="span" sx={{ fontSize: "0.75rem", fontWeight: 500, opacity: 0.7 }}>
                           {listing.period}
                         </Box>
                       </Typography>
                     }
-                    sx={{
+                    sx={(theme) => ({
                       position: "absolute",
                       bottom: 12,
                       right: 12,
-                      backgroundColor: "#FFFFFF",
+                      backgroundColor: theme.palette.background.paper,
                       borderRadius: "8px",
                       px: 0.5,
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-                      border: "1px solid rgba(212, 175, 55, 0.5)",
-                    }}
+                      boxShadow: `0 4px 12px ${theme.palette.primary.main}1F`,
+                      border: `1px solid ${theme.palette.secondary.main}80`,
+                    })}
                   />
                 </Box>
 
@@ -220,19 +219,19 @@ const FeaturedListings = () => {
                   <Box>
                     <Typography
                       variant="h6"
-                      sx={{
+                      sx={(theme) => ({
                         fontWeight: 600,
-                        color: "#0F172A",
+                        color: theme.palette.text.primary,
                         fontSize: "1.15rem",
                         mb: 1,
                         lineHeight: 1.3,
-                      }}
+                      })}
                     >
                       {listing.name}
                     </Typography>
 
-                    <Stack direction="row" alignItems="center" spacing={0.5} sx={{ color: "#64748B", mb: 2.5 }}>
-                      <LocationOnOutlinedIcon sx={{ fontSize: "1.05rem", color: "#B5922B" }} />
+                    <Stack direction="row" alignItems="center" spacing={0.5} sx={(theme) => ({ color: theme.palette.text.secondary, mb: 2.5 })}>
+                      <LocationOnOutlinedIcon sx={(theme) => ({ fontSize: "1.05rem", color: theme.palette.secondary.dark })} />
                       <Typography variant="body2" sx={{ fontSize: "0.875rem" }}>
                         {listing.location}
                       </Typography>
@@ -244,13 +243,13 @@ const FeaturedListings = () => {
                     <Stack
                       direction="row"
                       spacing={2}
-                      sx={{
+                      sx={(theme) => ({
                         pt: 2,
                         mb: 2.5,
-                        borderTop: "1px solid #F1F5F9",
-                        color: "#64748B",
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                        color: theme.palette.text.secondary,
                         fontSize: "0.85rem",
-                      }}
+                      })}
                     >
                       <Stack direction="row" alignItems="center" spacing={0.8}>
                         <BedOutlinedIcon sx={{ fontSize: "1.1rem" }} />
@@ -264,13 +263,13 @@ const FeaturedListings = () => {
 
                     <Button
                       component={Link}
-                      to={`/listing/${listing.id}`}
+                      to={`/properties/${listing.id}`}
                       variant="outlined"
                       fullWidth
                       endIcon={<ArrowForwardIcon />}
-                      sx={{
-                        color: "#0F172A",
-                        borderColor: "#D4AF37",
+                      sx={(theme) => ({
+                        color: theme.palette.text.primary,
+                        borderColor: theme.palette.secondary.main,
                         borderRadius: "10px",
                         py: 1,
                         textTransform: "none",
@@ -278,11 +277,11 @@ const FeaturedListings = () => {
                         fontSize: "0.9rem",
                         transition: "all 0.2s ease",
                         "&:hover": {
-                          borderColor: "#B5922B",
-                          backgroundColor: "#0F172A",
-                          color: "#FFFFFF",
+                          borderColor: theme.palette.secondary.dark,
+                          backgroundColor: theme.palette.primary.main,
+                          color: theme.palette.primary.contrastText,
                         },
-                      }}
+                      })}
                     >
                       View Details
                     </Button>
@@ -300,14 +299,14 @@ const FeaturedListings = () => {
               <Box
                 key={idx}
                 onClick={() => instanceRef.current?.moveToIdx(idx)}
-                sx={{
+                sx={(theme) => ({
                   width: currentSlide === idx ? 28 : 8,
                   height: 8,
                   borderRadius: "4px",
-                  backgroundColor: currentSlide === idx ? "#B5922B" : "#CBD5E1",
+                  backgroundColor: currentSlide === idx ? theme.palette.secondary.dark : theme.palette.divider,
                   cursor: "pointer",
                   transition: "all 0.3s ease",
-                }}
+                })}
               />
             ))}
           </Stack>

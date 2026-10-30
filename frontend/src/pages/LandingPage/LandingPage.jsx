@@ -1,4 +1,6 @@
-import { useState, useRef } from "react";
+// src/pages/LandingPage/LandingPage.jsx
+import React, { useState, useRef } from "react";
+import { Box } from "@mui/material";
 import Hero from "./Hero";
 import FeaturedListings from "./FeaturedListings";
 import HotDeals from "./HotDeals";
@@ -13,7 +15,19 @@ function LandingPage() {
   const howItWorksRef = useRef(null);
 
   return (
-    <main className="w-full min-h-screen scroll-smooth overflow-x-hidden">
+    <Box
+      component="main"
+      sx={{
+        width: "100%",
+        minHeight: "100vh",
+        scrollBehavior: "smooth",
+        overflowX: "hidden",
+        bgcolor: "background.default",
+        color: "text.primary",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* Hero handles its own initial load animations */}
       <Hero />
 
@@ -31,11 +45,11 @@ function LandingPage() {
       </ScrollReveal>
 
       {/* How It Works with Ref for smooth scrolling navigation */}
-      <div ref={howItWorksRef} className="scroll-mt-12">
+      <Box ref={howItWorksRef} sx={{ scrollMarginTop: "48px" }}>
         <ScrollReveal>
           <HowItWorks />
         </ScrollReveal>
-      </div>
+      </Box>
 
       <ScrollReveal>
         <FinalCTA handleAuthOpen={() => setAuthOpen(true)} />
@@ -43,7 +57,7 @@ function LandingPage() {
 
       {/* Authentication Modal */}
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-    </main>
+    </Box>
   );
 }
 

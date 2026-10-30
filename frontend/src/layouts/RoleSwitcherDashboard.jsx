@@ -31,7 +31,7 @@ const RoleSwitcherDashboard = () => {
         return <AdminDashboard />;
       default:
         return (
-          <Typography variant="body1" align="left">
+          <Typography variant="body1" align="left" sx={{ color: "text.secondary" }}>
             No dashboard available for this role
           </Typography>
         );
@@ -51,7 +51,7 @@ const RoleSwitcherDashboard = () => {
       {roleTabs.length > 1 && (
         <Box 
           sx={{ 
-            mb: 1,
+            mb: 3,
             display: "flex", 
             justifyContent: "center",
           }}
@@ -60,12 +60,18 @@ const RoleSwitcherDashboard = () => {
             value={activeTab}
             onChange={(_, value) => setActiveTab(value)}
             centered
-            sx={{
-              bgcolor: "rgba(255, 255, 255, 0.03)",
+            sx={(theme) => ({
+              bgcolor: theme.palette.background.paper,
               borderRadius: "12px",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: `0px 4px 20px ${theme.palette.primary.main}0D`,
               p: 0.5,
-            }}
+              "& .MuiTabs-indicator": {
+                backgroundColor: theme.palette.secondary.main, // Champagne gold active bar
+                height: "3px",
+                borderRadius: "3px",
+              },
+            })}
           >
             {roleTabs.map((role) => {
               const label =
@@ -73,7 +79,27 @@ const RoleSwitcherDashboard = () => {
                   ? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()
                   : "Unknown";
 
-              return <Tab key={role} label={label} />;
+              return (
+                <Tab
+                  key={role}
+                  label={label}
+                  sx={(theme) => ({
+                    textTransform: "none",
+                    fontWeight: 600,
+                    fontSize: "0.875rem",
+                    color: theme.palette.text.secondary,
+                    borderRadius: "8px",
+                    transition: "all 0.2s ease-in-out",
+                    "&.Mui-selected": {
+                      color: theme.palette.primary.main, // Active tab text color
+                    },
+                    "&:hover": {
+                      color: theme.palette.primary.main,
+                      backgroundColor: `${theme.palette.secondary.main}14`, // Soft gold hover
+                    },
+                  })}
+                />
+              );
             })}
           </Tabs>
         </Box>

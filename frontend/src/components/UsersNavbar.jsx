@@ -39,23 +39,21 @@ function UsersNavbar({ onMenuClick }) {
     <AppBar
       position="fixed"
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         height: NAVBAR_HEIGHT,
         ml: { md: `${DRAWER_WIDTH}px` },
         width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
-        backgroundColor: "#FAF6E9",
+        backgroundColor: theme.palette.background.paper,
         backdropFilter: "blur(12px)",
-        color: "text.primary",
+        color: theme.palette.text.primary,
         
-        // 🌟 Gold border line separating navbar from page body
-        borderBottom: "1px solid",
-        borderColor: "secondary.main", // #D4AF37 champagne gold from theme
-        boxShadow: "0px 4px 20px rgba(212, 175, 55, 0.12)", // Subtle ambient gold glow
+        // Gold border line separating navbar from page body
+        borderBottom: `1px solid ${theme.palette.secondary.main}`,
+        boxShadow: `0px 4px 20px ${theme.palette.secondary.main}1F`, // Ambient gold glow
 
         justifyContent: "center",
-        // Keep navbar below sidebar drawer z-index on desktop to prevent clipping/overlapping
         zIndex: { xs: theme.zIndex.drawer + 1, md: theme.zIndex.drawer - 1 },
-      }}
+      })}
     >
       <Toolbar
         disableGutters
@@ -73,19 +71,18 @@ function UsersNavbar({ onMenuClick }) {
             edge="start"
             onClick={onMenuClick}
             aria-label="open drawer"
-            sx={{
+            sx={(theme) => ({
               display: { md: "none" },
-              color: "text.primary",
-              bgcolor: "background.default",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: "10px",
+              color: theme.palette.text.primary,
+              bgcolor: theme.palette.background.default,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.borderRadius}px`,
               p: 0.8,
               "&:hover": {
-                backgroundColor: "rgba(212, 175, 55, 0.1)",
-                borderColor: "secondary.main",
+                backgroundColor: `${theme.palette.secondary.main}1A`,
+                borderColor: theme.palette.secondary.main,
               },
-            }}
+            })}
           >
             <MenuIcon fontSize="small" />
           </IconButton>
@@ -109,36 +106,35 @@ function UsersNavbar({ onMenuClick }) {
           <IconButton
             onClick={(e) => setAnchorElMessages(e.currentTarget)}
             size="small"
-            sx={{
-              color: "text.secondary",
-              bgcolor: "background.default",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: "10px",
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              bgcolor: theme.palette.background.default,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.borderRadius}px`,
               p: 1,
               transition: "all 0.2s ease-in-out",
               "&:hover": {
-                color: "secondary.main",
-                borderColor: "secondary.main",
-                backgroundColor: "rgba(212, 175, 55, 0.08)",
+                color: theme.palette.secondary.main,
+                borderColor: theme.palette.secondary.main,
+                backgroundColor: `${theme.palette.secondary.main}14`,
               },
-            }}
+            })}
           >
             <Badge
               badgeContent={unreadMessagesCount}
               overlap="circular"
-              sx={{
+              sx={(theme) => ({
                 "& .MuiBadge-badge": {
-                  backgroundColor: "secondary.main",
-                  color: "primary.main",
+                  backgroundColor: theme.palette.secondary.main,
+                  color: theme.palette.primary.main,
                   fontWeight: 700,
                   fontSize: "0.65rem",
                   height: 18,
                   minWidth: 18,
                   px: 0.5,
-                  boxShadow: "0 0 0 2px #FFFFFF",
+                  boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
                 },
-              }}
+              })}
             >
               <MailIcon fontSize="small" />
             </Badge>
@@ -151,15 +147,14 @@ function UsersNavbar({ onMenuClick }) {
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
             PaperProps={{
-              sx: {
+              sx: (theme) => ({
                 mt: 1.5,
                 width: isMobile ? "calc(100vw - 32px)" : 360,
-                borderRadius: "16px",
-                boxShadow: "0px 12px 32px rgba(15, 23, 42, 0.08)",
-                border: "1px solid",
-                borderColor: "divider",
+                borderRadius: `${theme.shape.borderRadius * 2}px`,
+                boxShadow: `0px 12px 32px ${theme.palette.primary.main}14`,
+                border: `1px solid ${theme.palette.divider}`,
                 overflow: "hidden",
-              },
+              }),
             }}
           >
             <MessagesCard messages={sampleMessages} compact />
@@ -169,36 +164,35 @@ function UsersNavbar({ onMenuClick }) {
           <IconButton
             onClick={(e) => setAnchorElNotifications(e.currentTarget)}
             size="small"
-            sx={{
-              color: "text.secondary",
-              bgcolor: "background.default",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: "10px",
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              bgcolor: theme.palette.background.default,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.borderRadius}px`,
               p: 1,
               transition: "all 0.2s ease-in-out",
               "&:hover": {
-                color: "secondary.main",
-                borderColor: "secondary.main",
-                backgroundColor: "rgba(212, 175, 55, 0.08)",
+                color: theme.palette.secondary.main,
+                borderColor: theme.palette.secondary.main,
+                backgroundColor: `${theme.palette.secondary.main}14`,
               },
-            }}
+            })}
           >
             <Badge
               badgeContent={unreadNotificationsCount}
               overlap="circular"
-              sx={{
+              sx={(theme) => ({
                 "& .MuiBadge-badge": {
-                  backgroundColor: "secondary.main",
-                  color: "primary.main",
+                  backgroundColor: theme.palette.secondary.main,
+                  color: theme.palette.primary.main,
                   fontWeight: 700,
                   fontSize: "0.65rem",
                   height: 18,
                   minWidth: 18,
                   px: 0.5,
-                  boxShadow: "0 0 0 2px #FFFFFF",
+                  boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
                 },
-              }}
+              })}
             >
               <NotificationsIcon fontSize="small" />
             </Badge>
@@ -211,15 +205,14 @@ function UsersNavbar({ onMenuClick }) {
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
             PaperProps={{
-              sx: {
+              sx: (theme) => ({
                 mt: 1.5,
                 width: isMobile ? "calc(100vw - 32px)" : 360,
-                borderRadius: "16px",
-                boxShadow: "0px 12px 32px rgba(15, 23, 42, 0.08)",
-                border: "1px solid",
-                borderColor: "divider",
+                borderRadius: `${theme.shape.borderRadius * 2}px`,
+                boxShadow: `0px 12px 32px ${theme.palette.primary.main}14`,
+                border: `1px solid ${theme.palette.divider}`,
                 overflow: "hidden",
-              },
+              }),
             }}
           >
             <ActivityFeedCard compact />

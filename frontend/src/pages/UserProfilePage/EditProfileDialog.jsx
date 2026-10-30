@@ -13,6 +13,7 @@ import {
   InputAdornment,
   CircularProgress,
   IconButton,
+  useTheme,
 } from "@mui/material";
 
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -24,48 +25,9 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import useProfileForm from "../../components/hooks/profile/useProfileForm";
 import useUpdateProfile from "../../components/hooks/profile/useUpdateProfile";
 
-/* ---------------- Premium & Compact Input Styles ---------------- */
-const premiumInputStyles = {
-  mt: 0.5,
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    backgroundColor: "#FFFFFF",
-    color: "#0F172A",
-    fontSize: "0.875rem",
-    fontWeight: 600,
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    "& fieldset": {
-      borderColor: "#E2E8F0",
-      borderWidth: "1.5px",
-    },
-    "&:hover fieldset": {
-      borderColor: "rgba(212, 175, 55, 0.5)",
-    },
-    "&.Mui-focused": {
-      backgroundColor: "#FFFFFF",
-      boxShadow: "0 4px 12px rgba(212, 175, 55, 0.12)",
-      "& fieldset": {
-        borderColor: "#D4AF37",
-        borderWidth: "1.5px",
-      },
-    },
-  },
-  "& .MuiInputLabel-root": {
-    color: "#475569",
-    fontWeight: 700,
-    fontSize: "0.825rem",
-    "&.Mui-focused": {
-      color: "#B48A1D",
-    },
-  },
-  "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
-    transform: "translate(14px, -8px) scale(0.75)",
-    bgcolor: "#FFFFFF",
-    px: 0.5,
-  },
-};
-
 export default function EditProfileDialog({ open, handleClose, profile, refreshProfile }) {
+  const theme = useTheme();
+
   const { 
     formData, 
     errors, 
@@ -84,6 +46,47 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
     refreshProfile,
     handleClose,
   });
+
+  /* ---------------- Premium & Compact Input Styles (Theme-Driven) ---------------- */
+  const premiumInputStyles = {
+    mt: 0.5,
+    "& .MuiOutlinedInput-root": {
+      borderRadius: `${theme.shape.borderRadius}px`,
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.primary.main,
+      fontSize: "0.875rem",
+      fontWeight: 600,
+      transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+        borderWidth: "1.5px",
+      },
+      "&.Mui-hover fieldset, &:hover fieldset": {
+        borderColor: `${theme.palette.secondary.main}80`,
+      },
+      "&.Mui-focused": {
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: `0 4px 12px ${theme.palette.secondary.main}20`,
+        "& fieldset": {
+          borderColor: theme.palette.secondary.main,
+          borderWidth: "1.5px",
+        },
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: theme.palette.text.secondary,
+      fontWeight: 700,
+      fontSize: "0.825rem",
+      "&.Mui-focused": {
+        color: theme.palette.secondary.main,
+      },
+    },
+    "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
+      transform: "translate(14px, -8px) scale(0.75)",
+      bgcolor: theme.palette.background.paper,
+      px: 0.5,
+    },
+  };
 
   // Helper function to render an individual input field
   const renderSingleField = (field, parentKey = null) => {
@@ -113,7 +116,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <PersonOutlinedIcon sx={{ color: "#D4AF37", fontSize: "1.1rem" }} />
+              <PersonOutlinedIcon sx={{ color: theme.palette.secondary.main, fontSize: "1.1rem" }} />
             </InputAdornment>
           ),
         }}
@@ -156,7 +159,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
           <Box key={field.key} sx={{ pl: parentKey ? 1.5 : 0 }}>
             <Typography
               variant="subtitle2"
-              sx={{ mb: 1, fontWeight: 800, color: "#0F172A", fontSize: "0.85rem", letterSpacing: "-0.01em" }}
+              sx={{ mb: 1, fontWeight: 800, color: theme.palette.primary.main, fontSize: "0.85rem", letterSpacing: "-0.01em" }}
             >
               {field.label}
             </Typography>
@@ -184,11 +187,12 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
       maxWidth="md"
       PaperProps={{ 
         sx: { 
-          borderRadius: "16px", 
+          borderRadius: `${theme.shape.borderRadius * 2}px`, 
           p: 0.5,
-          border: "1px solid rgba(212, 175, 55, 0.4)",
-          boxShadow: "0 20px 40px rgba(15, 23, 42, 0.18)",
-          background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
+          border: `1px solid ${theme.palette.secondary.main}66`,
+          boxShadow: `0 20px 40px ${theme.palette.primary.main}2E`,
+          background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.action.hover} 100%)`,
+          bgcolor: theme.palette.background.paper,
         } 
       }}
     >
@@ -201,7 +205,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
           pb: 1.5,
           pt: 2,
           px: { xs: 2, sm: 2.5 },
-          borderBottom: "1px solid #F1F5F9",
+          borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
         <Stack direction="row" spacing={1.5} alignItems="center">
@@ -209,9 +213,9 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
             sx={{
               width: 38,
               height: 38,
-              borderRadius: "10px",
-              bgcolor: "rgba(212, 175, 55, 0.12)",
-              color: "#D4AF37",
+              borderRadius: `${theme.shape.borderRadius}px`,
+              bgcolor: `${theme.palette.secondary.main}1F`,
+              color: theme.palette.secondary.main,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -223,11 +227,11 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
           <Box>
             <Typography
               variant="h6"
-              sx={{ fontWeight: 800, color: "#0F172A", fontSize: "1.05rem", lineHeight: 1.2 }}
+              sx={{ fontWeight: 800, color: theme.palette.primary.main, fontSize: "1.05rem", lineHeight: 1.2 }}
             >
               Edit Profile
             </Typography>
-            <Typography variant="caption" sx={{ color: "#64748B", fontWeight: 600, fontSize: "0.75rem" }}>
+            <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontWeight: 600, fontSize: "0.75rem" }}>
               Update your account details below
             </Typography>
           </Box>
@@ -237,7 +241,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
           onClick={handleClose} 
           disabled={loading}
           size="small" 
-          sx={{ color: "#64748B", "&:hover": { bgcolor: "#F1F5F9", color: "#EF4444" } }}
+          sx={{ color: theme.palette.text.secondary, "&:hover": { bgcolor: theme.palette.action.hover, color: theme.palette.error?.main || "#EF4444" } }}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
@@ -255,7 +259,7 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
         sx={{ 
           px: { xs: 2, sm: 2.5 }, 
           py: 1.5, 
-          borderTop: "1px solid #F1F5F9",
+          borderTop: `1px solid ${theme.palette.divider}`,
           justifyContent: { xs: "center", md: "flex-end" }, 
           gap: 1.2 
         }}
@@ -265,20 +269,20 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
           disabled={loading}
           startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           sx={{
-            bgcolor: "rgba(239, 68, 68, 0.08)",
-            color: "#EF4444",
-            borderRadius: "8px",
+            bgcolor: `${theme.palette.error?.main || "#EF4444"}14`,
+            color: theme.palette.error?.main || "#EF4444",
+            borderRadius: `${theme.shape.borderRadius}px`,
             px: 2.5,
             py: 0.6,
             fontWeight: 700,
             fontSize: "0.825rem",
             textTransform: "none",
-            "& .MuiButton-startIcon": { color: "#EF4444" },
+            "& .MuiButton-startIcon": { color: theme.palette.error?.main || "#EF4444" },
             "&:hover": { 
-              bgcolor: "#EF4444", 
-              color: "#FFFFFF",
-              "& .MuiButton-startIcon": { color: "#FFFFFF" },
-              boxShadow: "0 4px 12px rgba(239, 68, 68, 0.25)",
+              bgcolor: theme.palette.error?.main || "#EF4444", 
+              color: theme.palette.common.white,
+              "& .MuiButton-startIcon": { color: theme.palette.common.white },
+              boxShadow: `0 4px 12px ${theme.palette.error?.main || "#EF4444"}40`,
             },
             transition: "all 0.2s ease",
           }}
@@ -292,22 +296,22 @@ export default function EditProfileDialog({ open, handleClose, profile, refreshP
           onClick={() => handleSave(handleFormSubmit)}
           disabled={loading}
           sx={{
-            bgcolor: "#0F172A",
-            color: "#FFFFFF",
-            borderRadius: "8px",
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: `${theme.shape.borderRadius}px`,
             px: 3,
             py: 0.6,
             fontWeight: 700,
             fontSize: "0.825rem",
             textTransform: "none",
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
             transition: "all 0.2s ease",
-            "& .MuiButton-startIcon": { color: "#D4AF37" },
+            "& .MuiButton-startIcon": { color: theme.palette.secondary.main },
             "&:hover": {
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
-              boxShadow: "0 6px 18px rgba(212, 175, 55, 0.35)",
-              "& .MuiButton-startIcon": { color: "#0F172A" },
+              bgcolor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              boxShadow: `0 6px 18px ${theme.palette.secondary.main}59`,
+              "& .MuiButton-startIcon": { color: theme.palette.primary.main },
             },
           }}
         >

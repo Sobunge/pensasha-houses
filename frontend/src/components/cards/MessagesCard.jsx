@@ -33,61 +33,63 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
   return (
     <Card
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         flex: compact
           ? undefined
           : { xs: "1 1 100%", md: "1 1 45%", lg: "0 1 400px" },
         minWidth: compact
           ? { xs: 300, sm: 360 }
           : { xs: "100%", sm: "320px" },
-        borderRadius: "16px",
-        border: "1px solid #E2E8F0",
-        bgcolor: "#FFFFFF",
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
+        border: `1.5px solid ${theme.palette.secondary.main}66`,
+        bgcolor: theme.palette.background.paper,
         display: "flex",
         flexDirection: "column",
+        boxShadow: `0 15px 35px -5px ${theme.palette.primary.main}14`,
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
-          boxShadow: "0px 12px 32px rgba(15, 23, 42, 0.08)",
+          boxShadow: `0px 20px 40px -10px ${theme.palette.primary.main}24`,
           transform: "translateY(-4px)",
-          borderColor: "rgba(212, 175, 55, 0.4)",
+          borderColor: theme.palette.secondary.main,
         },
-      }}
+      })}
     >
       {/* --- Header --- */}
       <Box
-        sx={{
+        sx={(theme) => ({
           display: "flex",
           alignItems: "center",
           gap: 1.5,
           p: 2,
-          bgcolor: "rgba(212, 175, 55, 0.04)",
-          borderBottom: "1px solid #E2E8F0",
-        }}
+          bgcolor: `${theme.palette.secondary.main}0A`,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        })}
       >
         <Box
-          sx={{
+          sx={(theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             width: 32,
             height: 32,
-            borderRadius: "8px",
-            bgcolor: "rgba(212, 175, 55, 0.12)",
-            color: "#D4AF37",
-          }}
+            borderRadius: `${theme.shape.borderRadius}px`,
+            bgcolor: `${theme.palette.secondary.main}1F`,
+            color: theme.palette.secondary.main,
+            border: `1px solid ${theme.palette.secondary.main}40`,
+          })}
         >
           <MailOutlineIcon sx={{ fontSize: 18 }} />
         </Box>
 
         <Typography
           variant="subtitle1"
-          sx={{
-            fontWeight: 700,
-            color: "#0F172A",
+          sx={(theme) => ({
+            fontWeight: 800,
+            color: theme.palette.primary.main,
             flexGrow: 1,
             fontSize: "1rem",
             letterSpacing: "-0.2px",
-          }}
+          })}
         >
           Messages
         </Typography>
@@ -96,10 +98,14 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
           <IconButton
             size="small"
             onClick={onClose}
-            sx={{
-              color: "#64748B",
-              "&:hover": { bgcolor: "rgba(15, 23, 42, 0.05)", color: "#0F172A" },
-            }}
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              borderRadius: `${theme.shape.borderRadius}px`,
+              "&:hover": {
+                bgcolor: `${theme.palette.primary.main}0D`,
+                color: theme.palette.text.primary,
+              },
+            })}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -121,7 +127,7 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
           {displayMessages.length === 0 ? (
             <Typography
               variant="body2"
-              sx={{ color: "#64748B", textAlign: "center", py: 2 }}
+              sx={(theme) => ({ color: theme.palette.text.secondary, textAlign: "center", py: 2 })}
             >
               No recent messages available.
             </Typography>
@@ -130,41 +136,41 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
               <Box
                 key={msg.id}
                 onClick={() => handleNavigate(`/${role}/messages/${msg.id}`)}
-                sx={{
+                sx={(theme) => ({
                   display: "flex",
                   alignItems: "center",
                   gap: 1.5,
                   p: 1.25,
-                  borderRadius: "12px",
+                  borderRadius: `${theme.shape.borderRadius * 1.5}px`,
                   cursor: "pointer",
                   transition: "all 0.2s ease-in-out",
                   bgcolor: msg.unread
-                    ? "rgba(212, 175, 55, 0.06)"
+                    ? `${theme.palette.secondary.main}0F`
                     : "transparent",
                   border: "1px solid",
                   borderColor: msg.unread
-                    ? "rgba(212, 175, 55, 0.25)"
+                    ? `${theme.palette.secondary.main}40`
                     : "transparent",
                   "&:hover": {
-                    bgcolor: "rgba(212, 175, 55, 0.12)",
-                    borderColor: "rgba(212, 175, 55, 0.4)",
+                    bgcolor: `${theme.palette.secondary.main}1A`,
+                    borderColor: `${theme.palette.secondary.main}66`,
                     transform: "translateX(3px)",
                   },
-                }}
+                })}
               >
                 {/* Avatar with initial */}
                 <Avatar
-                  sx={{
-                    bgcolor: msg.unread ? "#0F172A" : "#F1F5F9",
-                    color: msg.unread ? "#D4AF37" : "#64748B",
+                  sx={(theme) => ({
+                    bgcolor: msg.unread ? theme.palette.primary.main : theme.palette.action.hover,
+                    color: msg.unread ? theme.palette.secondary.main : theme.palette.text.secondary,
                     width: 38,
                     height: 38,
                     fontSize: "0.875rem",
                     fontWeight: 700,
                     border: msg.unread
-                      ? "1.5px solid #D4AF37"
-                      : "1px solid #E2E8F0",
-                  }}
+                      ? `1.5px solid ${theme.palette.secondary.main}`
+                      : `1px solid ${theme.palette.divider}`,
+                  })}
                 >
                   {msg.sender ? msg.sender[0].toUpperCase() : "U"}
                 </Avatar>
@@ -180,11 +186,11 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
                   >
                     <Typography
                       variant="subtitle2"
-                      sx={{
-                        fontWeight: msg.unread ? 700 : 500,
-                        color: "#0F172A",
+                      sx={(theme) => ({
+                        fontWeight: msg.unread ? 800 : 500,
+                        color: theme.palette.primary.main,
                         fontSize: "0.875rem",
-                      }}
+                      })}
                       noWrap
                     >
                       {msg.sender}
@@ -193,24 +199,24 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
                     {/* Unread Glow Dot */}
                     {msg.unread && (
                       <Box
-                        sx={{
+                        sx={(theme) => ({
                           width: 7,
                           height: 7,
                           borderRadius: "50%",
-                          bgcolor: "#D4AF37",
-                          boxShadow: "0 0 6px rgba(212, 175, 55, 0.8)",
-                        }}
+                          bgcolor: theme.palette.secondary.main,
+                          boxShadow: `0 0 6px ${theme.palette.secondary.main}CC`,
+                        })}
                       />
                     )}
                   </Box>
 
                   <Typography
                     variant="body2"
-                    sx={{
-                      color: msg.unread ? "#334155" : "#64748B",
+                    sx={(theme) => ({
+                      color: msg.unread ? theme.palette.text.primary : theme.palette.text.secondary,
                       fontSize: "0.78rem",
                       fontWeight: msg.unread ? 500 : 400,
-                    }}
+                    })}
                     noWrap
                   >
                     {msg.lastMessage}
@@ -221,7 +227,7 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
                 {!compact && (
                   <Typography
                     variant="caption"
-                    sx={{ color: "#94A3B8", fontSize: "0.7rem", flexShrink: 0 }}
+                    sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "0.7rem", flexShrink: 0 })}
                   >
                     {msg.time || "10:00 AM"}
                   </Typography>
@@ -232,7 +238,7 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
         </Stack>
       </CardContent>
 
-      <Divider sx={{ borderStyle: "dashed", borderColor: "#E2E8F0" }} />
+      <Divider sx={(theme) => ({ borderStyle: "dashed", borderColor: theme.palette.divider })} />
 
       {/* --- Action Footer --- */}
       <Box
@@ -246,30 +252,30 @@ function MessagesCard({ messages = [], compact = false, onClose }) {
           variant="contained"
           endIcon={<ArrowForwardIcon />}
           onClick={() => handleNavigate(`/${role}/messages`)}
-          sx={{
-            bgcolor: "#0F172A",
-            color: "#FFFFFF",
+          sx={(theme) => ({
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
             textTransform: "none",
             fontWeight: 700,
             fontSize: { xs: "0.8125rem", sm: "0.875rem" },
             px: { xs: 2, sm: 3 },
             py: 1.2,
-            borderRadius: "10px",
+            borderRadius: `${theme.shape.borderRadius}px`,
             width: { xs: "100%", sm: "auto" },
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}26`,
             "& .MuiButton-endIcon": {
-              color: "#D4AF37",
+              color: theme.palette.secondary.main,
             },
             "&:hover": {
-              bgcolor: "#D4AF37",
-              color: "#0F172A",
-              boxShadow: "0 6px 16px rgba(212, 175, 55, 0.3)",
+              bgcolor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              boxShadow: `0 6px 16px ${theme.palette.secondary.main}4D`,
               "& .MuiButton-endIcon": {
-                color: "#0F172A",
+                color: theme.palette.primary.main,
               },
             },
             transition: "all 0.2s ease-in-out",
-          }}
+          })}
         >
           View All Messages
         </Button>

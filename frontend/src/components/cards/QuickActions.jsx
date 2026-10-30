@@ -17,13 +17,13 @@ const QuickActions = ({
     {/* --- Rent Summary Slate --- */}
     <Card
       elevation={0}
-      sx={{
-        bgcolor: "#0F172A",
-        color: "#FFFFFF",
-        borderRadius: "16px",
+      sx={(theme) => ({
+        bgcolor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        borderRadius: `${theme.shape.borderRadius * 2}px`,
         p: 3,
-        border: "1px solid rgba(212, 175, 55, 0.3)",
-        boxShadow: "0px 12px 32px rgba(15, 23, 42, 0.15)",
+        border: `1px solid ${theme.palette.secondary.main}4D`,
+        boxShadow: `0px 12px 32px ${theme.palette.primary.main}26`,
         position: "relative",
         overflow: "hidden",
         "&::before": {
@@ -33,24 +33,23 @@ const QuickActions = ({
           right: 0,
           width: "120px",
           height: "120px",
-          background:
-            "radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(15, 23, 42, 0) 70%)",
+          background: `radial-gradient(circle, ${theme.palette.secondary.main}1F 0%, ${theme.palette.primary.main}00 70%)`,
           pointerEvents: "none",
         },
-      }}
+      })}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
         <AccountBalanceWalletOutlinedIcon
-          sx={{ color: "#D4AF37", fontSize: 18 }}
+          sx={(theme) => ({ color: theme.palette.secondary.main, fontSize: 18 })}
         />
         <Typography
           variant="caption"
-          sx={{
+          sx={(theme) => ({
             fontWeight: 800,
             letterSpacing: "0.8px",
-            color: "#94A3B8",
+            color: theme.palette.text.secondary,
             textTransform: "uppercase",
-          }}
+          })}
         >
           Monthly Rent
         </Typography>
@@ -58,24 +57,24 @@ const QuickActions = ({
 
       <Typography
         variant="h4"
-        sx={{
+        sx={(theme) => ({
           fontWeight: 800,
-          color: "#FFFFFF",
+          color: theme.palette.primary.contrastText,
           mb: 1.5,
           letterSpacing: "-0.5px",
-        }}
+        })}
       >
         KES {Number(rentAmount).toLocaleString()}
       </Typography>
 
-      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.1)", my: 1.5 }} />
+      <Divider sx={(theme) => ({ borderColor: `${theme.palette.common.white}1A`, my: 1.5 })} />
 
       <Typography
         variant="body2"
-        sx={{ color: "#CBD5E1", fontSize: "0.8125rem" }}
+        sx={(theme) => ({ color: theme.palette.text.secondary, fontSize: "0.8125rem" })}
       >
         Last payment:{" "}
-        <Box component="span" sx={{ color: "#D4AF37", fontWeight: 700 }}>
+        <Box component="span" sx={(theme) => ({ color: theme.palette.secondary.main, fontWeight: 700 })}>
           {lastPayment}
         </Box>
       </Typography>
@@ -84,13 +83,13 @@ const QuickActions = ({
     {/* --- Quick Actions Section --- */}
     <Typography
       variant="caption"
-      sx={{
+      sx={(theme) => ({
         px: 0.5,
         fontWeight: 800,
-        color: "#64748B",
+        color: theme.palette.text.secondary,
         letterSpacing: "0.8px",
         textTransform: "uppercase",
-      }}
+      })}
     >
       Quick Actions
     </Typography>
@@ -102,28 +101,28 @@ const QuickActions = ({
         variant="contained"
         startIcon={<ReceiptLongOutlinedIcon />}
         onClick={onGenerateInvoice}
-        sx={{
-          bgcolor: "#0F172A",
-          color: "#FFFFFF",
+        sx={(theme) => ({
+          bgcolor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
           fontWeight: 700,
           py: 1.25,
-          borderRadius: "10px",
+          borderRadius: `${theme.shape.borderRadius}px`,
           textTransform: "none",
           fontSize: "0.875rem",
-          boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
+          boxShadow: `0 4px 12px ${theme.palette.primary.main}1F`,
           "& .MuiButton-startIcon": {
-            color: "#D4AF37",
+            color: theme.palette.secondary.main,
           },
           "&:hover": {
-            bgcolor: "#D4AF37",
-            color: "#0F172A",
-            boxShadow: "0 6px 16px rgba(212, 175, 55, 0.3)",
+            bgcolor: theme.palette.secondary.main,
+            color: theme.palette.primary.main,
+            boxShadow: `0 6px 16px ${theme.palette.secondary.main}4D`,
             "& .MuiButton-startIcon": {
-              color: "#0F172A",
+              color: theme.palette.primary.main,
             },
           },
           transition: "all 0.2s ease-in-out",
-        }}
+        })}
       >
         Generate Invoice
       </Button>
@@ -134,27 +133,27 @@ const QuickActions = ({
         variant="outlined"
         startIcon={<BuildOutlinedIcon />}
         onClick={onLogMaintenance}
-        sx={{
-          borderColor: "#E2E8F0",
-          bgcolor: "#FFFFFF",
-          color: "#0F172A",
+        sx={(theme) => ({
+          borderColor: theme.palette.divider,
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.primary.main,
           fontWeight: 700,
           py: 1.25,
-          borderRadius: "10px",
+          borderRadius: `${theme.shape.borderRadius}px`,
           textTransform: "none",
           fontSize: "0.875rem",
           "& .MuiButton-startIcon": {
-            color: "#64748B",
+            color: theme.palette.text.secondary,
           },
           "&:hover": {
-            borderColor: "#0F172A",
-            bgcolor: "rgba(15, 23, 42, 0.04)",
+            borderColor: theme.palette.primary.main,
+            bgcolor: `${theme.palette.primary.main}0A`,
             "& .MuiButton-startIcon": {
-              color: "#0F172A",
+              color: theme.palette.primary.main,
             },
           },
           transition: "all 0.2s ease-in-out",
-        }}
+        })}
       >
         Log Maintenance
       </Button>
@@ -165,18 +164,18 @@ const QuickActions = ({
         variant="text"
         startIcon={<GavelOutlinedIcon />}
         onClick={onTerminateLease}
-        sx={{
-          color: "#EF4444",
+        sx={(theme) => ({
+          color: theme.palette.error?.main || "#EF4444",
           fontWeight: 700,
           py: 1,
-          borderRadius: "10px",
+          borderRadius: `${theme.shape.borderRadius}px`,
           textTransform: "none",
           fontSize: "0.8125rem",
           "&:hover": {
-            bgcolor: "rgba(239, 68, 68, 0.08)",
+            bgcolor: `${theme.palette.error?.main || "#EF4444"}14`,
           },
           transition: "all 0.2s ease-in-out",
-        }}
+        })}
       >
         Terminate Lease
       </Button>
