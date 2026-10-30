@@ -7,9 +7,11 @@ import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlin
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import AddCardOutlinedIcon from "@mui/icons-material/AddCardOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
-import AddBankDetailsDialog from "../../profile/landlord/AddBankDetailsDialog";
+import AddBankDetailsDialog from "./AddBankDetailsDialog";
 import EditPaymentPreferencesDialog from "./EditPaymentPreferencesDialog";
+import { useDeleteBankDetail } from "../../../../components/hooks/landlord/useDeleteBankDetail";
 
 // Clean Design System Constants
 const DESIGN_SYSTEM = {
@@ -24,6 +26,8 @@ const DESIGN_SYSTEM = {
     textMuted: "#64748B",
     textHeader: "#0F172A",
     bgSubtle: "#F8FAFC",
+    error: "#EF4444",
+    errorLight: "rgba(239, 68, 68, 0.08)",
   },
 };
 
@@ -52,8 +56,8 @@ function ProfileInfoCard({ icon: Icon, title, action, children }) {
         display: "flex",
         alignItems: "flex-start",
         gap: 2,
-        height: "100%",
-        width: "100%",
+        width: "100%", // Forced 100% Full Width
+        boxSizing: "border-box",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         boxShadow: "0 4px 12px rgba(15, 23, 42, 0.02)",
         "&:hover": {
@@ -137,10 +141,14 @@ export default function LandlordProfileInfo({ profile }) {
   const [selectedBankToEdit, setSelectedBankToEdit] = useState(null);
   const [openPaymentPrefsDialog, setOpenPaymentPrefsDialog] = useState(false);
 
+  // Initialize TanStack Query mutation hook
+  const deleteBankMutation = useDeleteBankDetail();
+
   const { colors } = DESIGN_SYSTEM;
 
+  const userId = profile?.id || profile?.userId;
   const properties = useMemo(() => profile?.properties || [], [profile]);
-  
+
   const bankDetailsList = useMemo(() => {
     if (!profile?.bankDetails) return [];
     return Array.isArray(profile.bankDetails)
@@ -163,6 +171,18 @@ export default function LandlordProfileInfo({ profile }) {
     setOpenBankDialog(true);
   };
 
+  const handleDeleteBank = (bank) => {
+    const bankId = bank.id;
+    if (!bankId || !userId) {
+      console.error("Missing userId or bankId");
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete ${bank.bankName || "this bank account"}?`)) {
+      deleteBankMutation.mutate({ userId, bankId });
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -176,179 +196,180 @@ export default function LandlordProfileInfo({ profile }) {
         display: "flex",
         flexDirection: "column",
         gap: 2,
+        boxSizing: "border-box",
       }}
     >
-      {/* TOP ROW: PROPERTIES & BANK SETTLEMENTS */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          width: "100%",
-        }}
-      >
-        {/* PROPERTIES OWNED CARD (50%) */}
-        <Box sx={{ flex: { xs: "1 1 100%", md: "1 1 50%" }, minWidth: 0 }}>
-          <ProfileInfoCard
-            icon={HomeWorkOutlinedIcon}
-            title={`Properties Owned (${properties.length})`}
-          >
-            {properties.length > 0 ? (
-              <Stack direction="row" flexWrap="wrap" useFlexGap sx={{ gap: 1 }}>
-                {properties.map((property) => (
-                  <Chip
-                    key={property.id || property.name}
-                    icon={
-                      <HomeWorkOutlinedIcon
-                        sx={{
-                          fontSize: "0.85rem !important",
-                          color: `${colors.gold} !important`,
-                        }}
-                      />
-                    }
-                    label={property.name || "Property"}
-                    size="small"
-                    sx={{
-                      bgcolor: colors.primary,
-                      color: "#FFFFFF",
-                      fontWeight: 700,
-                      fontSize: "0.75rem",
-                      borderRadius: "8px",
-                      border: `1px solid ${colors.goldBorder}`,
-                      px: 0.5,
-                    }}
-                  />
-                ))}
-              </Stack>
-            ) : (
-              <Chip
-                label="No Properties Registered"
-                size="small"
-                sx={{
-                  bgcolor: "rgba(100, 116, 139, 0.08)",
-                  color: colors.textMuted,
-                  fontWeight: 700,
-                  fontSize: "0.725rem",
-                  borderRadius: "8px",
-                }}
-              />
-            )}
-          </ProfileInfoCard>
-        </Box>
+      {/* SECTION 1: PROPERTIES OWNED (100% Full Width Stacked Row) */}
+      <Box sx={{ width: "100%" }}>
+        <ProfileInfoCard
+          icon={HomeWorkOutlinedIcon}
+          title={`Properties Owned (${properties.length})`}
+        >
+          {properties.length > 0 ? (
+            <Stack direction="row" flexWrap="wrap" useFlexGap sx={{ gap: 1, width: "100%" }}>
+              {properties.map((property) => (
+                <Chip
+                  key={property.id || property.name}
+                  icon={
+                    <HomeWorkOutlinedIcon
+                      sx={{
+                        fontSize: "0.85rem !important",
+                        color: `${colors.gold} !important`,
+                      }}
+                    />
+                  }
+                  label={property.name || "Property"}
+                  size="small"
+                  sx={{
+                    bgcolor: colors.primary,
+                    color: "#FFFFFF",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    borderRadius: "8px",
+                    border: `1px solid ${colors.goldBorder}`,
+                    px: 0.5,
+                  }}
+                />
+              ))}
+            </Stack>
+          ) : (
+            <Chip
+              label="No Properties Registered"
+              size="small"
+              sx={{
+                bgcolor: "rgba(100, 116, 139, 0.08)",
+                color: colors.textMuted,
+                fontWeight: 700,
+                fontSize: "0.725rem",
+                borderRadius: "8px",
+              }}
+            />
+          )}
+        </ProfileInfoCard>
+      </Box>
 
-        {/* BANK SETTLEMENT DETAILS CARD (50%) - MULTI-ACCOUNT GRID */}
-        <Box sx={{ flex: { xs: "1 1 100%", md: "1 1 50%" }, minWidth: 0 }}>
-          <ProfileInfoCard
-            icon={AccountBalanceOutlinedIcon}
-            title={`Bank Accounts (${bankDetailsList.length})`}
-            action={
-              <Button
-                size="small"
-                variant="contained"
-                onClick={handleOpenAddBank}
-                startIcon={<AddCardOutlinedIcon sx={{ fontSize: "14px !important" }} />}
-                sx={{
-                  bgcolor: colors.goldLight,
-                  color: colors.goldDark,
-                  fontSize: "0.725rem",
-                  fontWeight: 800,
-                  textTransform: "none",
-                  py: 0.4,
-                  px: 1.2,
-                  borderRadius: "8px",
-                  border: `1px solid ${colors.goldBorder}`,
-                  boxShadow: "none",
-                  "&:hover": {
-                    bgcolor: colors.gold,
-                    color: colors.primary,
-                  },
-                }}
-              >
-                Add Bank
-              </Button>
-            }
-          >
-            {bankDetailsList.length > 0 ? (
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" },
-                  gap: 1.25,
-                  mt: 1,
-                  maxHeight: "260px",
-                  overflowY: "auto",
-                  pr: 0.5,
-                }}
-              >
-                {bankDetailsList.map((bank, index) => (
-                  <Box
-                    key={bank.id || index}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: "10px",
-                      bgcolor: colors.bgSubtle,
-                      border: `1px solid ${colors.border}`,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      gap: 1,
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        borderColor: colors.goldBorder,
-                        boxShadow: "0 4px 12px rgba(15, 23, 42, 0.03)",
-                      },
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          fontWeight: 800,
-                          color: colors.primary,
-                          fontSize: "0.825rem",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {bank.bankName || "Bank N/A"}
-                        {bank.branchName && (
-                          <Box
-                            component="span"
-                            sx={{
-                              fontWeight: 500,
-                              color: colors.textMuted,
-                              fontSize: "0.7rem",
-                              ml: 0.5,
-                            }}
-                          >
-                            ({bank.branchName})
-                          </Box>
-                        )}
-                      </Typography>
-
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: colors.textMuted,
-                          display: "block",
-                          mt: 0.5,
-                          fontSize: "0.725rem",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {bank.accountName ? `${bank.accountName} • ` : ""}
-                        <Box component="span" sx={{ color: colors.primary, fontWeight: 700 }}>
-                          {bank.accountNumber}
+      {/* SECTION 2: BANK SETTLEMENT DETAILS (100% Full Width Stacked Row with 3-column grid inside) */}
+      <Box sx={{ width: "100%" }}>
+        <ProfileInfoCard
+          icon={AccountBalanceOutlinedIcon}
+          title={`Bank Accounts (${bankDetailsList.length})`}
+          action={
+            <Button
+              size="small"
+              variant="contained"
+              onClick={handleOpenAddBank}
+              startIcon={<AddCardOutlinedIcon sx={{ fontSize: "14px !important" }} />}
+              sx={{
+                bgcolor: colors.goldLight,
+                color: colors.goldDark,
+                fontSize: "0.725rem",
+                fontWeight: 800,
+                textTransform: "none",
+                py: 0.4,
+                px: 1.2,
+                borderRadius: "8px",
+                border: `1px solid ${colors.goldBorder}`,
+                boxShadow: "none",
+                "&:hover": {
+                  bgcolor: colors.gold,
+                  color: colors.primary,
+                },
+              }}
+            >
+              Add Bank
+            </Button>
+          }
+        >
+          {bankDetailsList.length > 0 ? (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(3, 1fr)",
+                },
+                gap: 1.25,
+                mt: 1,
+                maxHeight: "280px",
+                overflowY: "auto",
+                pr: 0.5,
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
+              {bankDetailsList.map((bank, index) => (
+                <Box
+                  key={bank.id || index}
+                  sx={{
+                    p: 1.5,
+                    borderRadius: "10px",
+                    bgcolor: colors.bgSubtle,
+                    border: `1px solid ${colors.border}`,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    gap: 1.25,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      borderColor: colors.goldBorder,
+                      boxShadow: "0 4px 12px rgba(15, 23, 42, 0.03)",
+                    },
+                  }}
+                >
+                  <Box>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: 800,
+                        color: colors.primary,
+                        fontSize: "0.825rem",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {bank.bankName || "Bank N/A"}
+                      {bank.branchName && (
+                        <Box
+                          component="span"
+                          sx={{
+                            fontWeight: 500,
+                            color: colors.textMuted,
+                            fontSize: "0.7rem",
+                            ml: 0.5,
+                          }}
+                        >
+                          ({bank.branchName})
                         </Box>
-                      </Typography>
-                    </Box>
+                      )}
+                    </Typography>
 
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: colors.textMuted,
+                        display: "block",
+                        mt: 0.5,
+                        fontSize: "0.725rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {bank.accountName ? `${bank.accountName} - ` : ""}
+                      <Box component="span" sx={{ color: colors.primary, fontWeight: 700 }}>
+                        {bank.accountNumber}
+                      </Box>
+                    </Typography>
+                  </Box>
+
+                  {/* Action Buttons: Edit & Delete */}
+                  <Stack direction="row" spacing={1}>
                     <Button
                       size="small"
                       variant="outlined"
                       onClick={() => handleOpenEditBank(bank)}
                       startIcon={<EditOutlinedIcon sx={{ fontSize: "11px !important" }} />}
                       sx={{
-                        alignSelf: "flex-start",
                         borderColor: colors.border,
                         color: colors.goldDark,
                         fontSize: "0.685rem",
@@ -367,58 +388,63 @@ export default function LandlordProfileInfo({ profile }) {
                     >
                       Edit
                     </Button>
-                  </Box>
-                ))}
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: "10px",
-                  bgcolor: colors.bgSubtle,
-                  border: `1px dashed ${colors.border}`,
-                  textAlign: "center",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 1,
-                  mt: 0.5,
-                }}
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      disabled={deleteBankMutation.isPending}
+                      onClick={() => handleDeleteBank(bank)}
+                      startIcon={<DeleteOutlineOutlinedIcon sx={{ fontSize: "11px !important" }} />}
+                      sx={{
+                        borderColor: colors.border,
+                        color: colors.error,
+                        fontSize: "0.685rem",
+                        fontWeight: 700,
+                        textTransform: "none",
+                        py: 0.15,
+                        px: 1,
+                        minWidth: 0,
+                        borderRadius: "6px",
+                        "&:hover": {
+                          borderColor: colors.error,
+                          bgcolor: colors.errorLight,
+                        },
+                      }}
+                    >
+                      {deleteBankMutation.isPending ? "Deleting..." : "Delete"}
+                    </Button>
+                  </Stack>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: "10px",
+                bgcolor: colors.bgSubtle,
+                border: `1px dashed ${colors.border}`,
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+                mt: 0.5,
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ color: colors.textMuted, fontSize: "0.8rem", fontWeight: 600 }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{ color: colors.textMuted, fontSize: "0.8rem", fontWeight: 600 }}
-                >
-                  No bank accounts configured for settlement.
-                </Typography>
-                <Button
-                  variant="contained"
-                  onClick={handleOpenAddBank}
-                  startIcon={<AddCardOutlinedIcon sx={{ fontSize: "15px !important" }} />}
-                  sx={{
-                    bgcolor: colors.primary,
-                    color: colors.gold,
-                    fontWeight: 800,
-                    fontSize: "0.725rem",
-                    textTransform: "none",
-                    py: 0.5,
-                    px: 1.5,
-                    borderRadius: "8px",
-                    border: `1px solid ${colors.goldBorder}`,
-                    "&:hover": {
-                      bgcolor: colors.primaryLight,
-                    },
-                  }}
-                >
-                  Add First Bank Account
-                </Button>
-              </Box>
-            )}
-          </ProfileInfoCard>
-        </Box>
+                No bank accounts configured for settlement.
+              </Typography>
+            </Box>
+          )}
+        </ProfileInfoCard>
       </Box>
 
-      {/* BOTTOM ROW: ACCEPTED PAYMENT METHODS */}
+      {/* SECTION 3: ACCEPTED PAYMENT METHODS (100% Full Width Stacked Row) */}
       <Box sx={{ width: "100%" }}>
         <ProfileInfoCard
           icon={PaymentsOutlinedIcon}
@@ -428,9 +454,7 @@ export default function LandlordProfileInfo({ profile }) {
               size="small"
               variant="text"
               onClick={() => setOpenPaymentPrefsDialog(true)}
-              startIcon={
-                <EditOutlinedIcon sx={{ fontSize: "14px !important" }} />
-              }
+              startIcon={<EditOutlinedIcon sx={{ fontSize: "14px !important" }} />}
               sx={{
                 color: colors.goldDark,
                 fontSize: "0.75rem",
@@ -446,7 +470,7 @@ export default function LandlordProfileInfo({ profile }) {
           }
         >
           {acceptedMethods.length > 0 ? (
-            <Stack spacing={1.5} sx={{ mt: 0.5 }}>
+            <Stack spacing={1.5} sx={{ mt: 0.5, width: "100%" }}>
               <Stack direction="row" flexWrap="wrap" useFlexGap sx={{ gap: 1 }}>
                 {acceptedMethods.map((method) => (
                   <Chip
@@ -475,6 +499,8 @@ export default function LandlordProfileInfo({ profile }) {
                   display: "flex",
                   flexDirection: "column",
                   gap: 1,
+                  width: "100%",
+                  boxSizing: "border-box",
                 }}
               >
                 <Stack
@@ -563,6 +589,8 @@ export default function LandlordProfileInfo({ profile }) {
                 bgcolor: "rgba(241, 245, 249, 0.6)",
                 border: "1px dashed #CBD5E1",
                 textAlign: "center",
+                width: "100%",
+                boxSizing: "border-box",
               }}
             >
               <Typography

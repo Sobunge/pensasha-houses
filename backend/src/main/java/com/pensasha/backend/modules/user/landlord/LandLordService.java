@@ -25,6 +25,7 @@ import com.pensasha.backend.modules.property.Property;
 import com.pensasha.backend.modules.unit.Unit;
 import com.pensasha.backend.modules.user.User;
 import com.pensasha.backend.modules.user.UserRepository;
+import com.pensasha.backend.modules.user.landlord.LandlordProfile;
 import com.pensasha.backend.modules.user.landlord.dto.FinancialOverviewDTO;
 import com.pensasha.backend.modules.user.landlord.dto.GetLandLordDTO;
 import com.pensasha.backend.modules.user.landlord.dto.LandlordStatsDTO;
@@ -43,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LandLordService {
 
         private final LandlordProfileRepository landlordProfileRepository;
+        private final BankDetailsRepository bankDetailsRepository;
         private final UserRepository userRepository;
         private final InvoiceRepository invoiceRepository;
         private final LandlordMapper landlordMapper;
@@ -128,13 +130,15 @@ public class LandLordService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Landlord profile not found for userId: " + userId));
 
-                // If bankDetails has an ID, check if it exists in the collection to update it; otherwise add as new.
+                // If bankDetails has an ID, check if it exists in the collection to update it;
+                // otherwise add as new.
                 if (bankDetails.getId() != null) {
                         BankDetails existing = profile.getBankDetails().stream()
                                         .filter(b -> b.getId().equals(bankDetails.getId()))
                                         .findFirst()
                                         .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Bank details record with ID " + bankDetails.getId() + " not found for landlord"));
+                                                        "Bank details record with ID " + bankDetails.getId()
+                                                                        + " not found for landlord"));
 
                         existing.setBankName(bankDetails.getBankName());
                         existing.setAccountName(bankDetails.getAccountName());
@@ -368,5 +372,35 @@ public class LandLordService {
                 LandlordProfile savedProfile = landlordProfileRepository.save(profile);
 
                 return landlordMapper.toGetDTO(savedProfile);
+        }
+
+        @Transactional
+        public GetLandLordDTO deleteLandlordBankDetail(Long userId, Long bankId) {
+                log.info("Deleting bank detail ID: {} for landlord user ID: {}", bankId, userId);
+
+                // 1. Find the landlord profile
+                LandlordProfile landlordProfile = landlordProfileRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Landlord profile not found with ID: " + userId));
+
+                // 2. Find the bank detail
+                BankDetails bankDetails = bankDetailsRepository.findById(bankId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Bank detail not found with ID: " + bankId));
+
+                // 3. Verify ownership
+                if (!bankDetails.getLandlordProfile().getId().equals(landlordProfile.getId())) {
+                        throw new IllegalArgumentException("Bank detail does not belong to this landlord");
+                }
+
+                // 4. Use the helper method on LandlordProfile to trigger orphanRemoval = true
+                landlordProfile.removeBankDetails(bankDetails);
+
+                // 5. Save and flush the profile to execute the SQL DELETE immediately
+                landlordProfileRepository.save(landlordProfile);
+                landlordProfileRepository.flush();
+
+                // 6. Return the updated DTO representation
+                return getLandlordByUserId(userId);
         }
 }

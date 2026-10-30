@@ -44,7 +44,6 @@ public class LandLordController {
 
                 log.info("API call: Get paginated landlords - page: {}, size: {}", page, size);
                 
-                // Fix: Use property path String for sorting instead of lambda expression
                 Pageable pageable = PageRequest.of(page, size, Sort.by("user.idNumber").ascending());
 
                 Page<GetLandLordDTO> landlordPage = landlordService.getAllLandlords(pageable);
@@ -192,7 +191,6 @@ public class LandLordController {
         }
 
         // ---------------------- Update Landlord Bank Details ----------------------
-  // ---------------------- Update Landlord Bank Details ----------------------
         @PutMapping("/{userId}/bank-details")
         @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or #userId == principal.id or hasRole('ADMIN')")
         public ResponseEntity<EntityModel<GetLandLordDTO>> updateBankDetails(
@@ -202,7 +200,7 @@ public class LandLordController {
                 log.info("API call: Update bank details for landlord ID: {}", userId);
 
                 BankDetails bankDetails = new BankDetails();
-                bankDetails.setId(dto.getId()); // Pass ID if updating an existing record
+                bankDetails.setId(dto.getId());
                 bankDetails.setBankName(dto.getBankName());
                 bankDetails.setAccountName(dto.getAccountName());
                 bankDetails.setAccountNumber(dto.getAccountNumber());
@@ -215,6 +213,24 @@ public class LandLordController {
 
                 return ResponseEntity.ok(resource);
         }
+
+        // ---------------------- Delete Landlord Bank Detail ----------------------
+        @DeleteMapping("/{userId}/bank-details/{bankId}")
+        @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or #userId == principal.id or hasRole('ADMIN')")
+        public ResponseEntity<EntityModel<GetLandLordDTO>> deleteBankDetail(
+                        @PathVariable Long userId,
+                        @PathVariable Long bankId) {
+
+                log.info("API call: Delete bank detail ID: {} for landlord ID: {}", bankId, userId);
+
+                GetLandLordDTO updatedLandlord = landlordService.deleteLandlordBankDetail(userId, bankId);
+
+                EntityModel<GetLandLordDTO> resource = EntityModel.of(updatedLandlord,
+                                linkTo(methodOn(LandLordController.class).getLandlordById(userId)).withSelfRel());
+
+                return ResponseEntity.ok(resource);
+        }
+
         // ---------------------- Update Payment Collection Preferences ----------------------
         @PutMapping("/{userId}/payment-preferences")
         @PreAuthorize("hasAuthority('PROPERTY_UPDATE') or #userId == principal.id or hasRole('ADMIN')")
